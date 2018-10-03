@@ -168,7 +168,7 @@ Izumi Toolkit
 <ul style="display: none">
 <li class="md-nav__item md-version" id="project.version">
 <label class="md-nav__link" for="__version">
-<i class="md-icon" title="Version">label_outline</i> 0.6.0*
+<i class="md-icon" title="Version">label_outline</i> 0.5.75
 </label>
 </li>
 </ul>
@@ -315,7 +315,7 @@ classes.run {
 </code></pre>
 <h3><a href="#multibindings-set-bindings" name="multibindings-set-bindings" class="anchor"><span class="anchor-link"></span></a>Multibindings / Set Bindings</h3>
 <p>Multibindings are useful for implementing event listeners, plugins, hooks, http routes, etc.</p>
-<p>To define a multibinding use <code>.many</code> and <code>.add</code> methods in <a href="/latest/snapshot/api/com/github/pshirshov/izumi/distage/model/definition/ModuleDef.html">ModuleDef</a> DSL:</p>
+<p>To define a multibinding use <code>.many</code> and <code>.add</code> methods in <a href="/latest/release/api/com/github/pshirshov/izumi/distage/model/definition/ModuleDef.html">ModuleDef</a> DSL:</p>
 <pre class="prettyprint"><code class="language-scala">import cats.effect._, org.http4s._, org.http4s.dsl.io._
 import scala.concurrent.ExecutionContext.Implicits.global
 import distage._
@@ -361,7 +361,7 @@ testRouter.run(Request[IO](uri = uri(&quot;/blog/1&quot;))).flatMap(_.as[String]
 </code></pre>
 <p>For further detail see <a href="https://github.com/google/guice/wiki/Multibindings">Guice wiki on Multibindings</a>.</p>
 <h3><a href="#provider-bindings" name="provider-bindings" class="anchor"><span class="anchor-link"></span></a>Provider Bindings</h3>
-<p>To bind a function instead of constructor use <code>.from</code> method in <a href="/latest/snapshot/api/com/github/pshirshov/izumi/distage/model/definition/ModuleDef.html">ModuleDef</a> DSL:</p>
+<p>To bind a function instead of constructor use <code>.from</code> method in <a href="/latest/release/api/com/github/pshirshov/izumi/distage/model/definition/ModuleDef.html">ModuleDef</a> DSL:</p>
 <pre class="prettyprint"><code class="language-scala">case class HostPort(host: String, port: Int)
 
 class HttpServer(hostPort: HostPort)
@@ -382,7 +382,7 @@ trait HttpServerModule extends ModuleDef {
   }
 }
 </code></pre>
-<p>For further details, see scaladoc for <a href="/latest/snapshot/api/com/github/pshirshov/izumi/distage/model/providers/ProviderMagnet.html">ProviderMagnet</a></p>
+<p>For further details, see scaladoc for <a href="/latest/release/api/com/github/pshirshov/izumi/distage/model/providers/ProviderMagnet.html">ProviderMagnet</a></p>
 <h3><a href="#tagless-final-style-with-distage" name="tagless-final-style-with-distage" class="anchor"><span class="anchor-link"></span></a>Tagless Final Style with distage</h3>
 <p>distage works well with tagless final style. As an example, let&rsquo;s take <a href="http://frees.io/docs/core/handlers/#tagless-interpretation">freestyle&rsquo;s tagless example</a> and make it safer and more flexible by replacing fragile wiring <code>import ._</code>&rsquo;s with explicit modules.</p>
 <p>First, the program we want to write:</p>
@@ -405,7 +405,7 @@ class TaglessProgram[F[_]: Monad](validation: Validation[F], interaction: Intera
   } yield ()
 }
 </code></pre>
-<p><a href="/latest/snapshot/api/com/github/pshirshov/izumi/fundamentals/reflection/WithTags.html#TagK">TagK</a> is distage&rsquo;s analogue of <code>TypeTag</code> for higher-kinded types such as <code>F[_]</code>, it allows preserving type-information at runtime for types that aren&rsquo;t yet known at definition. You&rsquo;ll need to add a <a href="/latest/snapshot/api/com/github/pshirshov/izumi/fundamentals/reflection/WithTags.html#TagK">TagK</a> context bound to create a module parameterized by an abstract <code>F[_]</code>. Use <a href="/latest/snapshot/api/com/github/pshirshov/izumi/fundamentals/reflection/WithTags.html#Tag">Tag</a> to create modules parameterized by non-higher-kineded types.</p>
+<p><a href="/latest/release/api/com/github/pshirshov/izumi/fundamentals/reflection/WithTags.html#TagK">TagK</a> is distage&rsquo;s analogue of <code>TypeTag</code> for higher-kinded types such as <code>F[_]</code>, it allows preserving type-information at runtime for types that aren&rsquo;t yet known at definition. You&rsquo;ll need to add a <a href="/latest/release/api/com/github/pshirshov/izumi/fundamentals/reflection/WithTags.html#TagK">TagK</a> context bound to create a module parameterized by an abstract <code>F[_]</code>. Use <a href="/latest/release/api/com/github/pshirshov/izumi/fundamentals/reflection/WithTags.html#Tag">Tag</a> to create modules parameterized by non-higher-kineded types.</p>
 <p>Interpreters:</p>
 <pre class="prettyprint"><code class="language-scala">object TryInterpreters extends ModuleDef {
   make[Validation.Handler[Try]].from(tryValidationHandler)
@@ -452,14 +452,14 @@ def SyncProgram[F[_]: Sync] = new Program[F] ++ SyncInterpreters[F]
 <p><code>TagTK</code> over monad transformers:</p>
 <pre class="prettyprint"><code class="language-scala">class TransModule[F[_[_], _]: TagTK] extends ModuleDef
 </code></pre>
-<p>Adding a <code>Tag</code> for more exotic type shapes is as easy as defining a type synonym, consult <a href="/latest/snapshot/api/com/github/pshirshov/izumi/fundamentals/reflection/WithTags/HKTag.html">HKTag</a> docs for description</p>
+<p>Adding a <code>Tag</code> for more exotic type shapes is as easy as defining a type synonym, consult <a href="/latest/release/api/com/github/pshirshov/izumi/fundamentals/reflection/WithTags/HKTag.html">HKTag</a> docs for description</p>
 <h3><a href="#config-files" name="config-files" class="anchor"><span class="anchor-link"></span></a>Config files</h3>
 <p><code>distage-config</code> library parses <code>typesafe-config</code> into arbitrary case classes or sealed traits and makes them available for summoning as a class dependency.</p>
 <p>To use it, add <code>distage-config</code> library:</p>
 <pre class="prettyprint"><code class="language-scala">libraryDependencies += Izumi.R.distage_config
 </code></pre>
 <p>or</p>
-<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;com.github.pshirshov.izumi.r2&quot; %% &quot;distage-config&quot; % &quot;0.6.0-SNAPSHOT&quot;
+<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;com.github.pshirshov.izumi.r2&quot; %% &quot;distage-config&quot; % &quot;0.5.75&quot;
 </code></pre>
 <p>If you&rsquo;re not using <a href="../sbt/index.html#bills-of-materials">sbt-izumi-deps</a> plugin.</p>
 <p>Write a config in HOCON format:</p>
@@ -640,7 +640,7 @@ assert(locator.get[A].c eq locator.get[C])
 <pre class="prettyprint"><code class="language-scala">libraryDependencies += Izumi.R.distage_plugins
 </code></pre>
 <p>or</p>
-<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;com.github.pshirshov.izumi.r2&quot; %% &quot;distage-plugins&quot; % &quot;0.6.0-SNAPSHOT&quot;
+<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;com.github.pshirshov.izumi.r2&quot; %% &quot;distage-plugins&quot; % &quot;0.5.75&quot;
 </code></pre>
 <p>If you&rsquo;re not using <a href="../sbt/index.html#bills-of-materials">sbt-izumi-deps</a> plugin.</p>
 <p>Create a module extending the <code>PluginDef</code> trait instead of <code>ModuleDef</code>:</p>
@@ -681,7 +681,7 @@ val app: ModuleBase = appModules.merge
 <pre class="prettyprint"><code class="language-scala">libraryDependencies += Izumi.R.distage_testkit
 </code></pre>
 <p>or</p>
-<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;com.github.pshirshov.izumi.r2&quot; %% &quot;distage-plugins&quot; % &quot;0.6.0-SNAPSHOT&quot;
+<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;com.github.pshirshov.izumi.r2&quot; %% &quot;distage-plugins&quot; % &quot;0.5.75&quot;
 </code></pre>
 <p>If you&rsquo;re not using <a href="../sbt/index.html#bills-of-materials">sbt-izumi-deps</a> plugin.</p>
 <p>Example usage:</p>
@@ -816,7 +816,7 @@ assert(locator.get[C].c eq locator.get[C])
 </code></pre>
 <p>The proxy generation via <code>cglib</code> is still enabled by default, because in scenarios with <a href="#roles">extreme late-binding</a>, cycles can emerge unexpectedly, outside of control of the origin module. </p>
 <h3><a href="#auto-sets-collecting-bindings-by-predicate" name="auto-sets-collecting-bindings-by-predicate" class="anchor"><span class="anchor-link"></span></a>Auto-Sets: Collecting Bindings By Predicate</h3>
-<p>AutoSet <a href="/latest/snapshot/api/com/github/pshirshov/izumi/distage/model/Planner.html">Planner</a> Hooks traverse the class graph and collect all classes matching a predicate.</p>
+<p>AutoSet <a href="/latest/release/api/com/github/pshirshov/izumi/distage/model/Planner.html">Planner</a> Hooks traverse the class graph and collect all classes matching a predicate.</p>
 <p>Using Auto-Sets, one can, for example, collect all <code>AutoCloseable</code> classes and <code>.close()</code> them after the application has finished work.</p>
 <p>Note: it&rsquo;s not generally recommended to construct stateful, effectful or resource-allocating classes with <code>distage</code>, a general rule of thumb is: if a class and its dependencies are stateless and can be replaced by a global <code>object</code>, it&rsquo;s ok to inject them with <code>distage</code>. However, an example is given anyway, as a lot of real applications depend on global resources, such as JDBC connections, <code>ExecutionContext</code> thread pools, Akka Systems, etc. that should be closed properly at exit.</p>
 <pre class="prettyprint"><code class="language-scala">import java.util.concurrent.{ExecutorService, Executors}
@@ -930,7 +930,7 @@ System.err.println(plan.topology.dependees.tree(DIKey.get[Circular1]))
 <pre class="prettyprint"><code class="language-scala">libraryDependencies += Izumi.R.distage_cats
 </code></pre>
 <p>or</p>
-<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;com.github.pshirshov.izumi.r2&quot; %% &quot;distage-cats&quot; % &quot;0.6.0-SNAPSHOT&quot;
+<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;com.github.pshirshov.izumi.r2&quot; %% &quot;distage-cats&quot; % &quot;0.5.75&quot;
 </code></pre>
 <p>If you&rsquo;re not using <a href="../sbt/index.html#bills-of-materials">sbt-izumi-deps</a> plugin.</p>
 <p>Usage:</p>
@@ -969,7 +969,7 @@ Edit this page
 </div>
 <div class="print-only">
 <span class="md-source-file md-version">
-0.6.0*
+0.5.75
 </span>
 </div>
 </article>
