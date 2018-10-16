@@ -183,8 +183,8 @@
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="index.html" class="extype" name="com.github.pshirshov.izumi.distage.planning">planning</a></dd></dl></div>
     </li><li class="current-entities indented6">
                         <span class="separator"></span>
-                        <a class="class" href="" title=""></a>
-                        <a href="" title="">AssignableFromAutoSetHook</a>
+                        <a class="class" href="" title="A hook that will collect all bindings to types"></a>
+                        <a href="" title="A hook that will collect all bindings to types">AssignableFromAutoSetHook</a>
                       </li><li class="current-entities indented6">
                         <span class="separator"></span>
                         <a class="class" href="AssignableFromEarlyAutoSetHook.html" title=""></a>
@@ -257,7 +257,38 @@
       </h4>
 
       
-          <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>A hook that will collect all bindings to types </p><pre><span class="kw">&lt;:</span> T</pre><p> into a <code>Set[T]</code> available for injection as a dependency.</p><p>Usage:</p><pre><span class="kw">val</span> collectCloseables = <span class="kw">new</span> AssignableFromAutoSetHook[AutoCloseable]
+
+<span class="kw">val</span> injector = Injector(<span class="kw">new</span> BootstrapModuleDef {
+  many[PlanningHook]
+    .add(collectCloseables)
+})</pre><p>Then, in any class created from <code>injector</code>:</p><pre><span class="kw">class</span> <span class="std">App</span>(allCloseables: <span class="std">Set</span>[AutoCloseable]) {
+  ...
+}</pre><p>These Auto-Sets can be used to implement custom lifetimes:</p><pre><span class="kw">val</span> locator = injector.produce(modules)
+
+<span class="kw">val</span> closeables = locator.get[<span class="std">Set</span>[AutoCloseable]]
+<span class="kw">try</span> { locator.get[<span class="std">App</span>].runMain() } <span class="kw">finally</span> {
+  <span class="cmt">// reverse closeables list, Auto-Sets preserve order, in the order of *initialization*</span>
+  <span class="cmt">// Therefore resources should closed in the *opposite order*</span>
+  <span class="cmt">// i.e. if C depends on B depends on A, create: A -> B -> C, close: C -> B -> A</span>
+  closeables.reverse.foreach(_.close())
+}</pre><p>&lt;: T
+}}}</p><p>Usage:</p><pre><span class="kw">val</span> collectCloseables = <span class="kw">new</span> AssignableFromAutoSetHook[AutoCloseable]
+
+<span class="kw">val</span> injector = Injector(<span class="kw">new</span> BootstrapModuleDef {
+  many[PlanningHook]
+    .add(collectCloseables)
+})</pre><p>Then, in any class created from <code>injector</code>:</p><pre><span class="kw">class</span> <span class="std">App</span>(allCloseables: <span class="std">Set</span>[AutoCloseable]) {
+  ...
+}</pre><p>These Auto-Sets can be used to implement custom lifetimes:</p><pre><span class="kw">val</span> locator = injector.produce(modules)
+
+<span class="kw">val</span> closeables = locator.get[<span class="std">Set</span>[AutoCloseable]]
+<span class="kw">try</span> { locator.get[<span class="std">App</span>].runMain() } <span class="kw">finally</span> {
+  <span class="cmt">// reverse closeables list, Auto-Sets preserve order, in the order of *initialization*</span>
+  <span class="cmt">// Therefore resources should closed in the *opposite order*</span>
+  <span class="cmt">// i.e. if C depends on B depends on A, create: A -> B -> C, close: C -> B -> A</span>
+  closeables.reverse.foreach(_.close())
+}</pre></div><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
           </span>
@@ -683,7 +714,7 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.github.pshirshov.izumi.distage.planning.AssignableFromAutoSetHook">AssignableFromAutoSetHook</a> → <a href="../model/planning/PlanningHook.html" class="extype" name="com.github.pshirshov.izumi.distage.model.planning.PlanningHook">PlanningHook</a></dd></dl></div>
-    </li><li name="com.github.pshirshov.izumi.distage.model.planning.PlanningHook#phase90AfterForwarding" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+    </li><li name="com.github.pshirshov.izumi.distage.planning.AssignableFromAutoSetHook#phase90AfterForwarding" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="phase90AfterForwarding(plan:com.github.pshirshov.izumi.distage.model.plan.OrderedPlan):com.github.pshirshov.izumi.distage.model.plan.OrderedPlan"></a><a id="phase90AfterForwarding(OrderedPlan):OrderedPlan"></a>
       <span class="permalink">
       <a href="../../../../../../com/github/pshirshov/izumi/distage/planning/AssignableFromAutoSetHook.html#phase90AfterForwarding(plan:com.github.pshirshov.izumi.distage.model.plan.OrderedPlan):com.github.pshirshov.izumi.distage.model.plan.OrderedPlan" title="Permalink">
@@ -698,7 +729,7 @@
         <span class="name">phase90AfterForwarding</span><span class="params">(<span name="plan">plan: <a href="../model/plan/OrderedPlan.html" class="extype" name="com.github.pshirshov.izumi.distage.model.plan.OrderedPlan">OrderedPlan</a></span>)</span><span class="result">: <a href="../model/plan/OrderedPlan.html" class="extype" name="com.github.pshirshov.izumi.distage.model.plan.OrderedPlan">OrderedPlan</a></span>
       </span>
       
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../model/planning/PlanningHook.html" class="extype" name="com.github.pshirshov.izumi.distage.model.planning.PlanningHook">PlanningHook</a></dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.github.pshirshov.izumi.distage.planning.AssignableFromAutoSetHook">AssignableFromAutoSetHook</a> → <a href="../model/planning/PlanningHook.html" class="extype" name="com.github.pshirshov.izumi.distage.model.planning.PlanningHook">PlanningHook</a></dd></dl></div>
     </li><li name="com.github.pshirshov.izumi.distage.planning.AssignableFromAutoSetHook#setElemetType" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="setElemetType:com.github.pshirshov.izumi.distage.model.reflection.universe.RuntimeDIUniverse.SafeType"></a><a id="setElemetType:model.reflection.universe.RuntimeDIUniverse.SafeType"></a>
       <span class="permalink">
