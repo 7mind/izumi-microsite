@@ -518,72 +518,10 @@ val app: ModuleBase = appModules.merge
 <p>Launch as normal with the loaded modules:</p>
 <pre class="prettyprint"><code class="language-scala">Injector().produce(app).get[PetStoreController].run
 </code></pre>
-<p>Plugins also allow a program to extend itself at runtime by adding new <code>Plugin</code> classes to the classpath via <code>java -cp</code></p>
+<p>Plugins also allow a program to extend itself at runtime by adding new <code>Plugin</code> classes on the classpath via <code>java -cp</code></p>
 <h3><a href="#compile-time-checks" name="compile-time-checks" class="anchor"><span class="anchor-link"></span></a>Compile-Time Checks</h3><div class="callout warning "><div class="callout-title">TODO</div>
 <p>Sorry, this page is not ready yet</p>
 <p>Relevant ticket: <a href="https://github.com/pshirshov/izumi-r2/issues/51">https://github.com/pshirshov/izumi-r2/issues/51</a></p></div>
-<p>As of now, an experimental plugin-checking API is available in <code>distage-app</code> module.</p>
-<p>To use it add <code>distage-app</code> library:</p>
-<pre class="prettyprint"><code class="language-scala">libraryDependencies += Izumi.R.distage_app
-</code></pre>
-<p>or</p>
-<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;com.github.pshirshov.izumi.r2&quot; %% &quot;distage-app&quot; % &quot;0.7.0-SNAPSHOT&quot;
-</code></pre>
-<p>You can participate in this ticket at <a href="https://github.com/pshirshov/izumi-r2/issues/51">https://github.com/pshirshov/izumi-r2/issues/51</a></p>
-<p>If you&rsquo;re not using <a href="../sbt/index.html#bills-of-materials">sbt-izumi-deps</a> plugin.</p>
-<p>Only plugins defined in a different module can be checked at compile-time, <code>test</code> scope counts as a different module.</p>
-<h5><a href="#example-" name="example-" class="anchor"><span class="anchor-link"></span></a>Example:</h5>
-<p>In main scope:</p>
-<pre class="prettyprint"><code class="language-scala">// src/main/scala/com/example/AppPlugin.scala
-package com.example
-import distage._
-import distage.plugins._
-import distage.config._
-import com.github.pshirshov.izumi.distage.app.ModuleRequirements
-
-final case class HostPort(host: String, port: Int)
-
-final case class Config(hostPort: HostPort)
-
-final class Service(conf: Config @ConfPath(&quot;config&quot;), otherService: OtherService)
-
-// OtherService class is not defined here, even though Service depends on it
-final class AppPlugin extends PluginDef {
-  make[Service]
-}
-
-// Declare OtherService as an external dependency
-final class AppRequirements extends ModuleRequirements(
-  // If we remove this line, compilation will rightfully break
-  Set(DIKey.get[OtherService])
-)
-</code></pre>
-<p>In config:</p>
-<pre class="prettyprint"><code class="language-scala">// src/main/resources/application.conf
-// We are going to check if our starting configuration is correct as well.
-config {
-  // If we remove these, the compilation will rightfully break, as the `HostPort` case class won&#39;t deserialize from the config
-  host = localhost
-  port = 8080
-}
-</code></pre>
-<p>In test scope:</p>
-<pre class="prettyprint"><code class="language-scala">// src/test/scala/com/example/test/AppPluginTest.scala
-package com.example.test
-
-import com.example._
-import org.scalatest.WordSpec
-import com.github.pshirshov.izumi.distage.app.StaticPluginChecker
-
-final class AppPluginTest extends WordSpec {
-  
-  &quot;App plugin will work (if OtherService will be provided later)&quot; in {
-    StaticPluginChecker.checkWithConfig[AppPlugin, AppRequirements](disableTags = &quot;&quot;, configFileRegex = &quot;*.application.conf&quot;)   
-  }
-
-}
-</code></pre>
-<p><code>checkWithConfig</code> will run at compile-time, every time that AppPluginTest is recompiled.</p>
 <p>You can participate in this ticket at <a href="https://github.com/pshirshov/izumi-r2/issues/51">https://github.com/pshirshov/izumi-r2/issues/51</a></p>
 <h3><a href="#compile-time-instantiation" name="compile-time-instantiation" class="anchor"><span class="anchor-link"></span></a>Compile-Time Instantiation</h3><div class="callout warning "><div class="callout-title">TODO</div>
 <p>Sorry, this page is not ready yet</p></div>
@@ -976,42 +914,9 @@ try {
 } finally {
   // when done, close thread pools
   val allExecutors = locator.get[Set[ExecutorService]]
-  // Auto-set return ordered Set, in order of dependency
-  // To start resources, execute actions in order
-  // To close resources, execute actions in *reverse* order
-  allExecutors.reverse.foreach(_.shutdownNow())
+  allExecutors.foreach(_.shutdownNow())
 }
 </code></pre>
-<p>Auto-Sets preserve ordering, they use <code>ListSet</code> under the hood, unlike user-defined <a href="#multibindings--set-bindings">Sets</a>. Calling <code>.foreach</code> on an auto-set is safe; the actions will be executed in order of dependencies: i.e. if C depends on B depends on A, autoset order is: <code>A, B, C</code>, to start: <code>A -&gt; B -&gt; C</code>, to close: <code>C -&gt; B -&gt; A</code> When you use auto-sets for finalization, you <strong>must</strong> <code>.reverse</code> the autoset</p>
-<pre class="prettyprint"><code class="language-scala">trait PrintResource(name: String) {
-  def start(): Unit = println(s&quot;$name started&quot;)
-  def stop(): Unit = println(s&quot;$name stopped&quot;)
-}
-class A extends Resource(&quot;A&quot;)
-class B(val a: A) extends Resource(&quot;B&quot;)
-class C(val b: B) extends Resource(&quot;C&quot;)
-
-val resources = Injector(new BootstraModuleDef {
-  many[PlanningHook]
-    .add(new AssignableFromAutoSetHook[Resource])
-}).produce(new ModuleDef {
-  make[C]
-  make[B]
-  make[A]
-}).get[Set[Resource]]
-
-resources.foreach(_.start())
-resources.reverse.foreach(_.stop())
-
-// Will print:
-// A started
-// B started
-// C started
-// C stopped
-// B stopped
-// A stopped
-</code></pre>
-<p>NB: Auto-Sets are NOT subject to <a href="#using-garbage-collector">Garbage Collection</a>, they are assembled <em>after</em> garbage collection is done, as such they can&rsquo;t contain garbage by construction.</p>
 <h4><a href="#weak-sets" name="weak-sets" class="anchor"><span class="anchor-link"></span></a>Weak Sets</h4>
 <p>Sets (aka <a href="#multibindings--set-bindings">Multibindings</a>) can contain <em>weak</em> references. Elements designated as weak will not be retained by the <a href="#using-garbage-collector">Garbage Collector</a> if they are not referenced outside of the set.</p>
 <p>Example:</p>
