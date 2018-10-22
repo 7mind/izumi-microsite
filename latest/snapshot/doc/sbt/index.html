@@ -451,6 +451,20 @@ lazy val myProjectBom = inRoot.as.module
   .settings(withBuildInfo(&quot;com.mycompany.myproject&quot;, &quot;MyProjectBOM&quot;))
 
 </code></pre>
+<p>If you want to include BOMs of you project, you can use the following syntax:</p>
+<pre class="prettyprint"><code class="language-scala"><br/>import com.mycompany.myproject.MyProjectBOM
+
+lazy val myLib = In(&quot;lib&quot;).as.module
+  .settings(
+    libraryDependencies ++= Seq(
+      MyProjectBOM.R.my_project_bom,     // Runtime artifact
+      MyProjectBOM.T.my_project_bom,     // Runtime artifacts for test scope*
+      MyProjectBOM.TSR.my_project_bom,   // Test artifacts
+      MyProjectBOM.TST.my_project_bom,   // Test artifacts for test scope
+    )
+  )
+
+</code></pre>
 <h3><a href="#build-manifest-entries" name="build-manifest-entries" class="anchor"><span class="anchor-link"></span></a>Build Manifest entries</h3>
 <h3><a href="#git-manifest-entries" name="git-manifest-entries" class="anchor"><span class="anchor-link"></span></a>Git Manifest entries</h3>
 <p><code>GitStampPlugin</code> adds the following values into <code>MANIFEST.MF</code> of each <code>jar</code> artifact produced:</p>
