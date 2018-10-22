@@ -414,8 +414,9 @@ testRouter.run(Request[IO](uri = uri(&quot;/blog/1&quot;))).flatMap(_.as[String]
 <h3><a href="#tagless-final-style-with-distage" name="tagless-final-style-with-distage" class="anchor"><span class="anchor-link"></span></a>Tagless Final Style with distage</h3>
 <p>distage works well with tagless final style. As an example, let&rsquo;s take <a href="http://frees.io/docs/core/handlers/#tagless-interpretation">freestyle&rsquo;s tagless example</a> and make it safer and more flexible by replacing fragile wiring <code>import ._</code>&rsquo;s with explicit modules.</p>
 <p>First, the program we want to write:</p>
-<pre class="prettyprint"><code class="language-scala">import cats.Monad
-import scala.util.Try
+<pre class="prettyprint"><code class="language-scala">import cats._
+import cats.implicits._
+import cats.tagless._
 
 import distage._
 
@@ -425,17 +426,34 @@ class Program[F[_]: TagK: Monad] extends ModuleDef {
   addImplicit[Monad[F]]
 }
 
-class TaglessProgram[F[_]: Monad](validation: Validation[F], interaction: Interaction[F]) {
-  def program = for {
-      userInput &lt;- interaction.ask(&quot;Give me something with at least 3 chars and a number on it&quot;)
-      valid     &lt;- (validation.minSize(userInput, 3), validation.hasNumber(userInput)).mapN(_ &amp;&amp; _)
-      _         &lt;- if (valid) interaction.tell(&quot;awesomesauce!&quot;) else interaction.tell(s&quot;$userInput is not valid&quot;)
+@finalAlg
+trait Validation[F[_]] {
+  def minSize(s: String, n: Int): F[Boolean]
+  def hasNumber(s: String): F[Boolean]
+}
+
+@finalAlg
+trait Interaction[F[_]] {
+  def tell(msg: String): F[Unit]
+  def ask(prompt: String): F[String]
+}
+
+class TaglessProgram[F[_]: Monad: Validation: Interaction] {
+  def program: F[Unit] = for {
+    userInput &lt;- Interaction[F].ask(&quot;Give me something with at least 3 chars and a number on it&quot;)
+    valid     &lt;- (Validation[F].minSize(userInput, 3), Validation[F].hasNumber(userInput)).mapN(_ &amp;&amp; _)
+    _         &lt;- if (valid) 
+                    Interaction[F].tell(&quot;awesomesauce!&quot;)
+                 else 
+                    Interaction[F].tell(s&quot;$userInput is not valid&quot;)
   } yield ()
 }
 </code></pre>
 <p><a href="/latest/snapshot/api/com/github/pshirshov/izumi/fundamentals/reflection/WithTags.html#TagK">TagK</a> is distage&rsquo;s analogue of <code>TypeTag</code> for higher-kinded types such as <code>F[_]</code>, it allows preserving type-information at runtime for types that aren&rsquo;t yet known at definition. You&rsquo;ll need to add a <a href="/latest/snapshot/api/com/github/pshirshov/izumi/fundamentals/reflection/WithTags.html#TagK">TagK</a> context bound to create a module parameterized by an abstract <code>F[_]</code>. Use <a href="/latest/snapshot/api/com/github/pshirshov/izumi/fundamentals/reflection/WithTags.html#Tag">Tag</a> to create modules parameterized by non-higher-kineded types.</p>
 <p>Interpreters:</p>
-<pre class="prettyprint"><code class="language-scala">object TryInterpreters extends ModuleDef {
+<pre class="prettyprint"><code class="language-scala">import scala.util.Try
+
+object TryInterpreters extends ModuleDef {
   make[Validation.Handler[Try]].from(tryValidationHandler)
   make[Interaction.Handler[Try]].from(tryInteractionHandler)
   
@@ -477,10 +495,14 @@ def SyncProgram[F[_]: Sync] = new Program[F] ++ SyncInterpreters[F]
 <p>Modules can abstract over arbitrary kinds - use <code>TagKK</code> to abstract over bifunctors:</p>
 <pre class="prettyprint"><code class="language-scala">class BIOModule[F[_, _]: TagKK] extends ModuleDef 
 </code></pre>
-<p><code>TagTK</code> over monad transformers:</p>
-<pre class="prettyprint"><code class="language-scala">class TransModule[F[_[_], _]: TagTK] extends ModuleDef
+<p>Use <code>Tag.auto.T</code> to abstract polymorphically over any kind:</p>
+<pre class="prettyprint"><code class="language-scala">class MonadTransModule[F[_[_], _]: Tag.auto.T] extends ModuleDef
 </code></pre>
-<p>Adding a <code>Tag</code> for more exotic type shapes is as easy as defining a type synonym, consult <a href="/latest/snapshot/api/com/github/pshirshov/izumi/fundamentals/reflection/WithTags/HKTag.html">HKTag</a> docs for description</p>
+<pre class="prettyprint"><code class="language-scala">class TrifunctorModule[F[_, _, _]: Tag.auto.T] extends ModuleDef
+</code></pre>
+<pre class="prettyprint"><code class="language-scala">class EldritchModule[F[_, _[_, _], _[_[_, _], _], _, _[_[_[_]]], _, _]: Tag.auto.T] extends ModuleDef
+</code></pre>
+<p>consult <a href="/latest/snapshot/api/com/github/pshirshov/izumi/fundamentals/reflection/WithTags/HKTag.html">HKTag</a> docs for more details</p>
 <h3><a href="#plugins" name="plugins" class="anchor"><span class="anchor-link"></span></a>Plugins</h3>
 <p>Plugins are a distage extension that allows you to automatically pick up all <code>Plugin</code> modules that are defined in specified package on the classpath.</p>
 <p>Plugins are especially useful in scenarios with <a href="#roles">extreme late-binding</a>, when the list of loaded application modules is not known ahead of time. Plugins are compatible with <a href="#compile-time-checks">compile-time checks</a> as long as they&rsquo;re defined in a separate module.</p>
