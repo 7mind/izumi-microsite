@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="x-ua-compatible" content="ie=edge">
 <meta name="description" content="microsite">
-<meta name="generator" content="Paradox, paradox-material-theme=0.6.5, mkdocs-material=3.0.3">
+<meta name="generator" content="Paradox, paradox-material-theme=0.6.6, mkdocs-material=3.0.3">
 
 <meta name="lang:clipboard.copy" content="Copy to clipboard">
 <meta name="lang:clipboard.copied" content="Copied to clipboard">
@@ -197,7 +197,7 @@ pshirshov/izumi-r2
 <ul style="display: none">
 <li class="md-nav__item md-version" id="project.version">
 <label class="md-nav__link" for="__version">
-<i class="md-icon" title="Version">label_outline</i> 0.6.5
+<i class="md-icon" title="Version">label_outline</i> 0.6.6
 </label>
 </li>
 </ul>
@@ -510,7 +510,7 @@ def SyncProgram[F[_]: Sync] = new Program[F] ++ SyncInterpreters[F]
 <pre class="prettyprint"><code class="language-scala">libraryDependencies += Izumi.R.distage_plugins
 </code></pre>
 <p>or</p>
-<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;com.github.pshirshov.izumi.r2&quot; %% &quot;distage-plugins&quot; % &quot;0.6.5&quot;
+<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;com.github.pshirshov.izumi.r2&quot; %% &quot;distage-plugins&quot; % &quot;0.6.6&quot;
 </code></pre>
 <p>If you&rsquo;re not using <a href="../sbt/index.html#bills-of-materials">sbt-izumi-deps</a> plugin.</p>
 <p>Create a module extending the <code>PluginDef</code> trait instead of <code>ModuleDef</code>:</p>
@@ -549,7 +549,7 @@ val app: ModuleBase = appModules.merge
 <pre class="prettyprint"><code class="language-scala">libraryDependencies += Izumi.R.distage_app
 </code></pre>
 <p>or</p>
-<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;com.github.pshirshov.izumi.r2&quot; %% &quot;distage-app&quot; % &quot;0.6.5&quot;
+<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;com.github.pshirshov.izumi.r2&quot; %% &quot;distage-app&quot; % &quot;0.6.6&quot;
 </code></pre>
 <p>If you&rsquo;re not using <a href="../sbt/index.html#bills-of-materials">sbt-izumi-deps</a> plugin.</p>
 <p>Only plugins defined in a different module can be checked at compile-time, <code>test</code> scope counts as a different module.</p>
@@ -615,7 +615,7 @@ final class AppPluginTest extends WordSpec {
 <pre class="prettyprint"><code class="language-scala">libraryDependencies += Izumi.R.distage_config
 </code></pre>
 <p>or</p>
-<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;com.github.pshirshov.izumi.r2&quot; %% &quot;distage-config&quot; % &quot;0.6.5&quot;
+<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;com.github.pshirshov.izumi.r2&quot; %% &quot;distage-config&quot; % &quot;0.6.6&quot;
 </code></pre>
 <p>If you&rsquo;re not using <a href="../sbt/index.html#bills-of-materials">sbt-izumi-deps</a> plugin.</p>
 <p>Write a config in HOCON format:</p>
@@ -833,7 +833,7 @@ assert(locator.get[A].c eq locator.get[C])
 <pre class="prettyprint"><code class="language-scala">libraryDependencies += Izumi.R.distage_testkit
 </code></pre>
 <p>or</p>
-<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;com.github.pshirshov.izumi.r2&quot; %% &quot;distage-plugins&quot; % &quot;0.6.5&quot;
+<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;com.github.pshirshov.izumi.r2&quot; %% &quot;distage-plugins&quot; % &quot;0.6.6&quot;
 </code></pre>
 <p>If you&rsquo;re not using <a href="../sbt/index.html#bills-of-materials">sbt-izumi-deps</a> plugin.</p>
 <p>Example usage:</p>
@@ -860,7 +860,7 @@ class Test extends DistageSpec {
 }
 </code></pre>
 <h3><a href="#using-garbage-collector" name="using-garbage-collector" class="anchor"><span class="anchor-link"></span></a>Using Garbage Collector</h3>
-<p>A garbage collector is included in <code>distage</code>, but has to be enabled explicitly:</p>
+<p>A garbage collector is included in <code>distage</code> by default, to use it parameterize the injector with garbage collection roots:</p>
 <pre class="prettyprint"><code class="language-scala">import distage._
 
 class Main
@@ -869,8 +869,7 @@ class Main
 val roots = Seq(DIKey.get[Main])
 
 // Enable GC
-val gcModule = new TracingGCModule(roots)
-val injector = Injector(gcModule)
+val injector = Injector(roots)
 </code></pre>
 <p>GC will remove all bindings that aren&rsquo;t transitive dependencies of the chosen <code>GC root</code> keys from the plan - they will never be instantiated.</p>
 <p>In the following example:</p>
@@ -890,7 +889,7 @@ val module = new ModuleDef {
 
 val roots = Seq(DIKey.get[A])
 
-val locator = Injector(new TracingGCModule(roots)).produce(module)
+val locator = Injector(roots).produce(module)
 
 locator.find[A]
 // res0: Option[A] = Some(A(B()))
@@ -899,8 +898,12 @@ locator.find[B]
 locator.find[C]
 // res2: Option[C] = None
 </code></pre>
-<p>Class <code>C</code> is removed because it wasn&rsquo;t dependent on by classes <code>B</code> or <code>A</code>. It&rsquo;s not present in the <code>Locator</code> and the <code>&quot;C!&quot;</code> message was never printed. If class <code>B</code> were to depend on <code>C</code> as in <code>case class B(c: C)</code>, it would&rsquo;ve been retained, because <code>A</code> which is the GC root, would&rsquo;ve depended on <code>B</code> which in turns depends on <code>C</code>.</p>
-<p>GC serves two important purposes: * it enables faster <a href="#test-kit">tests</a> by omitting unneeded instantiations, * and it enables multiple separate applications, &ldquo;<a href="#roles">Roles</a>&rdquo; to be hosted within a single <code>.jar</code>.</p>
+<p>Class <code>C</code> was removed because it neither <code>B</code> nor <code>A</code> depended on it. It&rsquo;s not present in the <code>Locator</code> and the <code>&quot;C!&quot;</code> message was never printed. But, if class <code>B</code> were to depend on <code>C</code> as in <code>case class B(c: C)</code>, it would&rsquo;ve been retained, because <code>A</code> - the GC root, would depend on <code>B</code> which in turns depends on <code>C</code>.</p>
+<p>GC serves two important purposes:</p>
+<ul>
+  <li>It enables faster <a href="#test-kit">tests</a> by omitting unrequired instantiations and initialization of potentially heavy resources,</li>
+  <li>It enables multiple separate applications, aka &ldquo;<a href="#roles">Roles</a>&rdquo; to be hosted within a single <code>.jar</code>.</li>
+</ul>
 <h3><a href="#circular-dependencies-support" name="circular-dependencies-support" class="anchor"><span class="anchor-link"></span></a>Circular Dependencies support</h3>
 <p><code>distage</code> automatically resolves circular dependencies, including self-reference:</p>
 <pre class="prettyprint"><code class="language-scala">import distage._
@@ -960,7 +963,8 @@ assert(locator.get[A].b eq locator.get[B])
 assert(locator.get[B].a eq locator.get[A])
 assert(locator.get[C].c eq locator.get[C])
 </code></pre>
-<p>The proxy generation via <code>cglib</code> is still enabled by default, because in scenarios with <a href="#roles">extreme late-binding</a>, cycles can emerge unexpectedly, outside of control of the origin module. </p>
+<p>The proxy generation via <code>cglib</code> is still enabled by default, because in scenarios with <a href="#roles">extreme late-binding</a>, cycles can emerge unexpectedly, outside of control of the origin module.</p>
+<p>NB: Currently a limitation applies to by-names - ALL dependencies on a class engaged in a by-name circular dependency have to be by-name, otherwise distage will transparently revert to generating proxies.</p>
 <h3><a href="#auto-sets-collecting-bindings-by-predicate" name="auto-sets-collecting-bindings-by-predicate" class="anchor"><span class="anchor-link"></span></a>Auto-Sets: Collecting Bindings By Predicate</h3>
 <p>AutoSet <a href="/latest/release/api/com/github/pshirshov/izumi/distage/model/Planner.html">Planner</a> Hooks traverse the class graph and collect all classes matching a predicate.</p>
 <p>Using Auto-Sets, one can, for example, collect all <code>AutoCloseable</code> classes and <code>.close()</code> them after the application has finished work.</p>
@@ -1109,7 +1113,7 @@ System.err.println(plan.topology.dependees.tree(DIKey.get[Circular1]))
 <pre class="prettyprint"><code class="language-scala">libraryDependencies += Izumi.R.distage_cats
 </code></pre>
 <p>or</p>
-<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;com.github.pshirshov.izumi.r2&quot; %% &quot;distage-cats&quot; % &quot;0.6.5&quot;
+<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;com.github.pshirshov.izumi.r2&quot; %% &quot;distage-cats&quot; % &quot;0.6.6&quot;
 </code></pre>
 <p>If you&rsquo;re not using <a href="../sbt/index.html#bills-of-materials">sbt-izumi-deps</a> plugin.</p>
 <p>Usage:</p>
@@ -1148,7 +1152,7 @@ Edit this page
 </div>
 <div class="print-only">
 <span class="md-source-file md-version">
-0.6.5
+0.6.6
 </span>
 </div>
 </article>
