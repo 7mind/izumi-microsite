@@ -231,8 +231,8 @@
                         <a href="DIStageAnnotation.html" title="">DIStageAnnotation</a>
                       </li><li class="current-entities indented7">
                         <span class="separator"></span>
-                        <a class="class" href="Id.html" title=""></a>
-                        <a href="Id.html" title="">Id</a>
+                        <a class="class" href="Id.html" title="Annotation for summoning named instances."></a>
+                        <a href="Id.html" title="Annotation for summoning named instances.">Id</a>
                       </li><li class="current-entities indented7">
                         <a class="object" href="ImplDef$.html" title=""></a>
                         <a class="trait" href="ImplDef.html" title=""></a>
@@ -258,9 +258,9 @@
                         <a class="trait" href="ModuleMake.html" title=""></a>
                         <a href="ModuleMake.html" title="">ModuleMake</a>
                       </li><li class="current-entities indented7">
-                        <span class="separator"></span>
                         <a class="object" href="StaticDSL$.html" title=""></a>
-                        <a href="StaticDSL$.html" title="">StaticDSL</a>
+                        <a class="trait" href="StaticDSL.html" title=""></a>
+                        <a href="StaticDSL.html" title="">StaticDSL</a>
                       </li><li class="current-entities indented7">
                         <span class="separator"></span>
                         <a class="trait" href="StaticModuleDef.html" title=""></a>
@@ -564,7 +564,7 @@
       </span>
       
       
-    </li><li name="com.github.pshirshov.izumi.distage.model.definition.Id" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="com.github.pshirshov.izumi.distage.model.definition.Id" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="IdextendsAnnotationwithDIStageAnnotation"></a><a id="Id:Id"></a>
       <span class="permalink">
       <a href="../../../../../../../com/github/pshirshov/izumi/distage/model/definition/index.html#IdextendsAnnotationwithDIStageAnnotation" title="Permalink">
@@ -576,10 +576,19 @@
         <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <a title="" href="Id.html"><span class="name">Id</span></a><span class="result"> extends <span class="extype" name="scala.annotation.Annotation">Annotation</span> with <a href="DIStageAnnotation.html" class="extype" name="com.github.pshirshov.izumi.distage.model.definition.DIStageAnnotation">DIStageAnnotation</a></span>
+        <a title="Annotation for summoning named instances." href="Id.html"><span class="name">Id</span></a><span class="result"> extends <span class="extype" name="scala.annotation.Annotation">Annotation</span> with <a href="DIStageAnnotation.html" class="extype" name="com.github.pshirshov.izumi.distage.model.definition.DIStageAnnotation">DIStageAnnotation</a></span>
       </span>
       
-      
+      <p class="shortcomment cmt">Annotation for summoning named instances.</p><div class="fullcomment"><div class="comment cmt"><p>Annotation for summoning named instances.</p><p>Example:</p><pre><span class="kw">val</span> module = <span class="kw">new</span> ModuleDef {
+  make[<span class="std">Int</span>].named(<span class="lit">"three"</span>).from(<span class="num">3</span>)
+  make[<span class="std">Int</span>].named(<span class="lit">"five"</span>).from(<span class="num">5</span>)
+}
+
+Injector().produce(module).run {
+  (five: <span class="std">Int</span> @Id(<span class="lit">"five"</span>), three: <span class="std">Int</span> @Id(<span class="lit">"three"</span>) <span class="kw">=&gt;</span>
+    assert(<span class="num">5</span> == five)
+    assert(<span class="num">3</span> == three)
+}</pre></div></div>
     </li><li name="com.github.pshirshov.izumi.distage.model.definition.ImplDef" visbl="pub" class="indented0 " data-isabs="true" fullComment="no" group="Ungrouped">
       <a id="ImplDefextendsAnyRef"></a><a id="ImplDef:ImplDef"></a>
       <span class="permalink">
@@ -671,7 +680,7 @@
 <span class="cmt">// Combine modules into a full program</span>
 <span class="kw">val</span> TryProgram = <span class="kw">new</span> Program[Try] ++ TryInterpreters</pre><p>Singleton bindings:</p><ul><li><code>make[X]</code> = create X using its constructor</li><li><code>make[X].from[XImpl]</code> = bind X to its subtype XImpl using XImpl's constructor</li><li><code>make[X].from(myX)</code> = bind X to instance <code>myX</code></li><li><code>make[X].from { y: Y =&gt; new X(y) }</code> = bind X to an instance of X constructed by a given <a href="../providers/ProviderMagnet.html" class="extype" name="com.github.pshirshov.izumi.distage.model.providers.ProviderMagnet">Provider</a> function</li><li><code>make[X].named(&quot;special&quot;)</code> = bind a named instance of X. It can then be summoned using <a href="Id.html" class="extype" name="com.github.pshirshov.izumi.distage.model.definition.Id">Id</a> annotation.</li></ul><p>Multibindings:</p><ul><li><code>many[X].add[X1].add[X2]</code> = bind a <span class="extype" name="Set">Set</span> of X, and add subtypes X1 and X2 created via their constructors to it.
                                 Sets can be bound in multiple different modules. All the elements of the same set in different modules will be joined together.
-    <code>many[X].add(x1).add(x2)</code> = add *instances* x1 and x2 to a <code>Set[X]</code></li><li><code>many[X].add { y: Y =&gt; new X1(y).add { y: Y =&gt; X2(y) }</code> = add instances of X1 and X2 constructed by a given <a href="../providers/ProviderMagnet.html" class="extype" name="com.github.pshirshov.izumi.distage.model.providers.ProviderMagnet">Provider</a> function</li><li><code>many[X].named(&quot;special&quot;).add[X1]</code> = create a named set of X, all the elements of it are added to this named set.</li><li><code>many[X].ref[XImpl]</code> = add a reference to an already **existing** binding of XImpl to a set of X's</li><li><code>many[X].ref[X](&quot;special&quot;)</code> = add a reference to an **existing** named binding of X to a set of X's</li></ul><p>Tags:</p><ul><li><code>make[X].tagged(&quot;t1&quot;, &quot;t2)</code> = attach tags to X's binding. Tags can be processed in a special way. See <a href="../../roles/roles/RoleId.html" class="extype" name="com.github.pshirshov.izumi.distage.roles.roles.RoleId">com.github.pshirshov.izumi.distage.roles.roles.RoleId</a></li><li><code>many[X].add[X1].tagged(&quot;x1tag&quot;)</code> = Tag a specific element of X. The tags of sets and their elements are separate.</li><li><code>many[X].tagged(&quot;xsettag&quot;)</code> = Tag the binding of empty Set of X with a tag. The tags of sets and their elements are separate.
+    <code>many[X].add(x1).add(x2)</code> = add *instances* x1 and x2 to a <code>Set[X]</code></li><li><code>many[X].add { y: Y =&gt; new X1(y).add { y: Y =&gt; X2(y) }</code> = add instances of X1 and X2 constructed by a given <a href="../providers/ProviderMagnet.html" class="extype" name="com.github.pshirshov.izumi.distage.model.providers.ProviderMagnet">Provider</a> function</li><li><code>many[X].named(&quot;special&quot;).add[X1]</code> = create a named set of X, all the elements of it are added to this named set.</li><li><code>many[X].ref[XImpl]</code> = add a reference to an already **existing** binding of XImpl to a set of X's</li><li><code>many[X].ref[X](&quot;special&quot;)</code> = add a reference to an **existing** named binding of X to a set of X's</li></ul><p>Tags:</p><ul><li><code>make[X].tagged(&quot;t1&quot;, &quot;t2)</code> = attach tags to X's binding. Tags can be processed in a special way. See <a href="../../roles/RoleId.html" class="extype" name="com.github.pshirshov.izumi.distage.roles.RoleId">com.github.pshirshov.izumi.distage.roles.RoleId</a></li><li><code>many[X].add[X1].tagged(&quot;x1tag&quot;)</code> = Tag a specific element of X. The tags of sets and their elements are separate.</li><li><code>many[X].tagged(&quot;xsettag&quot;)</code> = Tag the binding of empty Set of X with a tag. The tags of sets and their elements are separate.
 </li></ul></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p><a href="../../../fundamentals/reflection/WithTags.html#TagK[K[_]]=WithTags.this.HKTag[AnyRef{typeArg[A]=K[A]}]" class="extmbr" name="com.github.pshirshov.izumi.fundamentals.reflection.WithTags.TagK">TagK</a></p></span><span class="cmt"><p><a href="Id.html" class="extype" name="com.github.pshirshov.izumi.distage.model.definition.Id">Id</a></p></span><span class="cmt"><p><span class="extype" name="ModuleDefDSL">ModuleDefDSL</span></p></span></dd></dl></div>
     </li><li name="com.github.pshirshov.izumi.distage.model.definition.ModuleMake" visbl="pub" class="indented0 " data-isabs="true" fullComment="no" group="Ungrouped">
       <a id="ModuleMake[T&lt;:com.github.pshirshov.izumi.distage.model.definition.ModuleBase]extendsAnyRef"></a><a id="ModuleMake[T&lt;:ModuleBase]:ModuleMake[T]"></a>
@@ -689,10 +698,10 @@
       </span>
       
       
-    </li><li name="com.github.pshirshov.izumi.distage.model.definition.StaticModuleDef" visbl="pub" class="indented0 " data-isabs="true" fullComment="no" group="Ungrouped">
-      <a id="StaticModuleDefextendsModuleDef"></a><a id="StaticModuleDef:StaticModuleDef"></a>
+    </li><li name="com.github.pshirshov.izumi.distage.model.definition.StaticDSL" visbl="pub" class="indented0 " data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="StaticDSLextendsAnyRef"></a><a id="StaticDSL:StaticDSL"></a>
       <span class="permalink">
-      <a href="../../../../../../../com/github/pshirshov/izumi/distage/model/definition/index.html#StaticModuleDefextendsModuleDef" title="Permalink">
+      <a href="../../../../../../../com/github/pshirshov/izumi/distage/model/definition/index.html#StaticDSLextendsAnyRef" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -701,7 +710,23 @@
         <span class="kind">trait</span>
       </span>
       <span class="symbol">
-        <a title="" href="StaticModuleDef.html"><span class="name">StaticModuleDef</span></a><span class="result"> extends <a href="ModuleDef.html" class="extype" name="com.github.pshirshov.izumi.distage.model.definition.ModuleDef">ModuleDef</a></span>
+        <a title="" href="StaticDSL.html"><span class="name">StaticDSL</span></a><span class="result"> extends <a href="../../../../../../../scala/index.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></span>
+      </span>
+      
+      
+    </li><li name="com.github.pshirshov.izumi.distage.model.definition.StaticModuleDef" visbl="pub" class="indented0 " data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="StaticModuleDefextendsModuleDefwithStaticDSL"></a><a id="StaticModuleDef:StaticModuleDef"></a>
+      <span class="permalink">
+      <a href="../../../../../../../com/github/pshirshov/izumi/distage/model/definition/index.html#StaticModuleDefextendsModuleDefwithStaticDSL" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="StaticModuleDef.html"><span class="name">StaticModuleDef</span></a><span class="result"> extends <a href="ModuleDef.html" class="extype" name="com.github.pshirshov.izumi.distage.model.definition.ModuleDef">ModuleDef</a> with <a href="StaticDSL.html" class="extype" name="com.github.pshirshov.izumi.distage.model.definition.StaticDSL">StaticDSL</a></span>
       </span>
       
       
@@ -917,7 +942,7 @@
         <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <a title="" href="StaticDSL$.html"><span class="name">StaticDSL</span></a>
+        <a title="" href="StaticDSL$.html"><span class="name">StaticDSL</span></a><span class="result"> extends <a href="StaticDSL.html" class="extype" name="com.github.pshirshov.izumi.distage.model.definition.StaticDSL">StaticDSL</a></span>
       </span>
       
       

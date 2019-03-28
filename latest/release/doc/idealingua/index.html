@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="x-ua-compatible" content="ie=edge">
 <meta name="description" content="microsite">
-<meta name="generator" content="Paradox, paradox-material-theme=0.6.10, mkdocs-material=3.0.3">
+<meta name="generator" content="Paradox, paradox-material-theme=0.6.34, mkdocs-material=3.0.3">
 
 <meta name="lang:clipboard.copy" content="Copy to clipboard">
 <meta name="lang:clipboard.copied" content="Copied to clipboard">
@@ -20,7 +20,7 @@
 
 <meta name="description" content="microsite">
 <link rel="shortcut icon" href="../assets/images/favicon.png">
-<title>IdeaLingua RPC & Domain Modeling Language ? Izumi Toolkit</title>
+<title>IdeaLingua RPC & Domain Modeling Language · Izumi Toolkit</title>
 <link rel="stylesheet" href="../assets/stylesheets/application.451f80e5.css">
 <link rel="stylesheet" href="../lib/material__tabs/dist/mdc.tabs.min.css">
 <link rel="stylesheet" href="../lib/prettify/prettify.css">
@@ -159,6 +159,7 @@ pshirshov/izumi-r2
   <li><a href="../idealingua/index.html#idealingua-rpc-domain-modeling-language" class="header">IdeaLingua RPC &amp; Domain Modeling Language</a>
   <ul>
     <li><a href="../idealingua/index.html#user-service-example" class="header">User Service Example</a></li>
+    <li><a href="../idealingua/index.html#quick-start" class="header">Quick start</a></li>
     <li><a href="../idealingua/index.html#pet-store-example" class="header">Pet Store Example</a></li>
     <li><a href="../idealingua/index.html#installation" class="header">Installation</a></li>
   </ul></li>
@@ -169,7 +170,7 @@ pshirshov/izumi-r2
 <ul style="display: none">
 <li class="md-nav__item md-version" id="project.version">
 <label class="md-nav__link" for="__version">
-<i class="md-icon" title="Version">label_outline</i> 0.6.10
+<i class="md-icon" title="Version">label_outline</i> 0.6.34
 </label>
 </li>
 </ul>
@@ -185,6 +186,7 @@ pshirshov/izumi-r2
   <li><a href="../idealingua/index.html#idealingua-rpc-domain-modeling-language" class="header">IdeaLingua RPC &amp; Domain Modeling Language</a>
   <ul>
     <li><a href="../idealingua/index.html#user-service-example" class="header">User Service Example</a></li>
+    <li><a href="../idealingua/index.html#quick-start" class="header">Quick start</a></li>
     <li><a href="../idealingua/index.html#pet-store-example" class="header">Pet Store Example</a></li>
     <li><a href="../idealingua/index.html#installation" class="header">Installation</a></li>
   </ul></li>
@@ -200,13 +202,13 @@ pshirshov/izumi-r2
 <h1><a href="#idealingua-rpc-domain-modeling-language" name="idealingua-rpc-domain-modeling-language" class="anchor"><span class="anchor-link"></span></a>IdeaLingua RPC &amp; Domain Modeling Language</h1>
 <p>IdeaLingua is an RPC framework &amp; Domain Modeling Language, it&rsquo;s purpose is to:</p>
 <ul>
-  <li>Publish APIs &amp; data definitions in a common format and create idiomatic API clients and servers in any language.</li>
-  <li>Enable remote calls to service via their public API definitions.</li>
-  <li>Abstract irrelevant details such as network protocol and serialization format.</li>
-  <li>Deliver our souls from REST and its brittle boilerplate.</li>
+  <li>Share &amp; publish APIs and data models in a common concise format</li>
+  <li>Create idiomatic API clients and servers for any programming language.</li>
+  <li>Allow remote calls to services given their public API definitions.</li>
+  <li>Abstract away details such as the network protocol or the serialization format.</li>
+  <li>Save users from the brittleness of REST.</li>
 </ul>
 <h2><a href="#user-service-example" name="user-service-example" class="anchor"><span class="anchor-link"></span></a>User Service Example</h2>
-<p>Example definition of a user database service:</p>
 <pre><code>package user.api
 
 enum Gender = Male | Female
@@ -251,16 +253,48 @@ service UserService {
   def findUserByName(name: str): list[PublicUser] | Failure
 }
 </code></pre>
+<h2><a href="#quick-start" name="quick-start" class="anchor"><span class="anchor-link"></span></a>Quick start</h2>
+<p>You may use our preconfigured <a href="https://github.com/pshirshov/izumi-docker/blob/master/izumi-env/Dockerfile">Docker environment</a> to experiment with Izumi IDL compiler:</p>
+<pre class="prettyprint"><code class="language-bash">docker run -ti --rm septimalmind/izumi-env
+</code></pre>
+<p>Then try this snippet:</p>
+<pre class="prettyprint"><code class="language-bash">export COMPILER=&quot;com.github.pshirshov.izumi.r2:idealingua-compiler_2.12:$izumi.version$&quot;
+export S_REPOSITORY=https://oss.sonatype.org/content/repositories/snapshots
+export R_REPOSITORY=https://oss.sonatype.org/content/repositories/releases
+
+# create sample project in `testproject` directory
+coursier launch -E &#39;*:*&#39; -r $S_REPOSITORY -r $R_REPOSITORY $COMPILER -- -i testproject
+
+cd testproject
+
+# compile Scala and Typescript projects using all the defaults
+coursier launch -E &#39;*:*&#39; -r S_REPOSITORY -r $R_REPOSITORY $COMPILER -- typescript scala go csharp
+
+# Run SBT on generated Scala project
+pushd .
+cd target/scala
+sbt package
+popd
+
+# Run SBT on generated Typescript project
+pushd .
+cd target/typescript
+yarn install
+tsc
+popd
+</code></pre>
 <h2><a href="#pet-store-example" name="pet-store-example" class="anchor"><span class="anchor-link"></span></a>Pet Store Example</h2>
-<p>See <a href="https://github.com/kaishh/izumi-petstore">izumi-petstore</a> for examples in Scala, TypeScript, Go, C# and other languages.</p>
+<p>See <a href="https://github.com/kaishh/izumi-petstore">izumi-petstore</a> for samples in Scala, TypeScript, Go, C# and other languages.</p>
 <h1><a href="#installation" name="installation" class="anchor"><span class="anchor-link"></span></a>Installation</h1>
 <h2><a href="#using-sbt-plugin" name="using-sbt-plugin" class="anchor"><span class="anchor-link"></span></a>Using SBT Plugin</h2>
 <p>Add the following to your <code>project/plugins.sbt</code> file:</p>
-<pre class="prettyprint"><code class="language-scala">val izumi_version = &quot;0.6.10&quot;
+<pre class="prettyprint"><code class="language-scala">val izumi_version = &quot;0.6.34&quot;
 addSbtPlugin(&quot;com.github.pshirshov.izumi.r2&quot; % &quot;sbt-idealingua&quot; % izumi_version)
 </code></pre>
 <p>Place your domain definitions into <code>/src/main/izumi</code> directory, then enable the plugin for that project. For the generated code to compile, you will also need to add dependencies on the Idealingua RTS modules: </p>
-<pre class="prettyprint"><code class="language-scala">izumiProject
+<pre class="prettyprint"><code class="language-scala">val izumi = prop
+
+izumiProject
   .enablePlugins(IdealinguaPlugin)
   .settings(
     libraryDependencies ++= Seq(
@@ -275,34 +309,39 @@ addSbtPlugin(&quot;com.github.pshirshov.izumi.r2&quot; % &quot;sbt-idealingua&qu
 <pre class="prettyprint"><code class="language-scala">project.dependsOn(izumiProject)
 </code></pre>
 <h2><a href="#using-the-standalone-compiler" name="using-the-standalone-compiler" class="anchor"><span class="anchor-link"></span></a>Using the standalone compiler</h2>
-<p>The compiler executable is built as an uberjar and published on <a href="https://search.maven.org/">Maven Central</a>.</p>
-<p>The preferred way to install the compiler is with <a href="https://github.com/coursier/coursier#command-line">coursier</a></p>
+<p>The compiler is built as an uberjar and published to <a href="https://search.maven.org/">Maven Central</a>.</p>
+<p>The preferred way to install the compiler is via <a href="https://github.com/coursier/coursier#command-line">coursier</a></p>
+<p>To install current release version:</p>
 <pre class="prettyprint"><code class="language-bash"># install release executable
-coursier bootstrap com.github.pshirshov.izumi.r2:idealingua-compiler_2.12:0.6.10 -o idlc
+coursier bootstrap com.github.pshirshov.izumi.r2:idealingua-compiler_2.12:0.6.34 -o idlc
 
 ./idlc --help
 </code></pre>
-<p>To install snapshot:</p>
+<p>To install development snapshot:</p>
 <pre class="prettyprint"><code class="language-bash"># install snapshot
-coursier bootstrap -r https://oss.sonatype.org/content/repositories/snapshots/ com.github.pshirshov.izumi.r2:idealingua-compiler_2.12:0.6.0-SNAPSHOT -o idlc
+coursier bootstrap -r https://oss.sonatype.org/content/repositories/snapshots/ com.github.pshirshov.izumi.r2:idealingua-compiler_2.12:0.7.0-SNAPSHOT -o idlc
 
 ./idlc --help
 </code></pre>
 <p>Commandline examples:</p>
-<pre><code>./idlc -s src -t target -L scala=* -L typescript=*
+<pre><code># compile sources in ./src and output generated code to ./target/scala and ./target/typescript 
+# all compiler plugins for Scala and TypeScript are enabled by * pattern
+
+./idlc -s src -t target -L scala=* -L typescript=*
 </code></pre>
-<pre><code>./idlc -s src -t target -L scala=-AnyvalExtension -L typescript=*
+<pre><code># compile with `AnyValExtension` compiler plugin for Scala disabled
+
+./idlc -s src -t target -L scala=-AnyvalExtension -L typescript=*
 </code></pre>
 <h2><a href="#scala-http4s-transport" name="scala-http4s-transport" class="anchor"><span class="anchor-link"></span></a>Scala http4s Transport</h2>
-<p>Most likely you will need to use <a href="https://github.com/non/kind-projector">Kind Projector</a> compiler plugin and enable partial unification:</p>
+<p>Most likely you&rsquo;ll need to use <a href="https://github.com/non/kind-projector">Kind Projector</a> and enable partial unification:</p>
 <pre class="prettyprint"><code class="language-scala">scalacOptions += &quot;-Ypartial-unification&quot;
 
 resolvers += Resolver.sonatypeRepo(&quot;releases&quot;)
 
-addCompilerPlugin(&quot;org.spire-math&quot; % &quot;kind-projector&quot; % &quot;0.9.6&quot; cross CrossVersion.binary)
+addCompilerPlugin(&quot;org.spire-math&quot; % &quot;kind-projector&quot; % &quot;0.9.8&quot; cross CrossVersion.binary)
 </code></pre>
-<p>You may find a test suite for the whole http4s pipeline <a href="blob/develop/idealingua/idealingua-runtime-rpc-http4s/src/test/scala/com/github/pshirshov/izumi/idealingua/runtime/rpc/http4s/Http4sServer.scala">here</a>.</p>
-<p>Please note that service definitons for the test suite are <em>not</em> generated from Idealingua definitions, you can find the Scala sources <a href="https://github.com/pshirshov/izumi-r2/tree/develop/idealingua/idealingua-test-defs/src/main/scala/com/github/pshirshov/izumi/r2/idealingua/test">here</a>.</p>
+<p>You may find the test suite for the http4s backend <a href="blob/develop/idealingua/idealingua-runtime-rpc-http4s/src/test/scala/com/github/pshirshov/izumi/idealingua/runtime/rpc/http4s/Http4sServer.scala">here</a>.</p>
 </div>
 <div>
 <a href="https://github.com/pshirshov/izumi-r2/tree/master/doc/microsite/target/scala-2.12/tut/idealingua/00_idealingua.md" title="Edit this page" class="md-source-file md-edit">
@@ -311,7 +350,7 @@ Edit this page
 </div>
 <div class="print-only">
 <span class="md-source-file md-version">
-0.6.10
+0.6.34
 </span>
 </div>
 </article>
