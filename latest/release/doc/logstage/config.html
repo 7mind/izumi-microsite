@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="x-ua-compatible" content="ie=edge">
 <meta name="description" content="microsite">
-<meta name="generator" content="Paradox, paradox-material-theme=0.6.34, mkdocs-material=3.0.3">
+<meta name="generator" content="Paradox, paradox-material-theme=0.7.0, mkdocs-material=3.0.3">
 
 <meta name="lang:clipboard.copy" content="Copy to clipboard">
 <meta name="lang:clipboard.copied" content="Copied to clipboard">
@@ -20,7 +20,7 @@
 
 <meta name="description" content="microsite">
 <link rel="shortcut icon" href="../assets/images/favicon.png">
-<title>Logstage Config · Izumi Toolkit</title>
+<title>Logstage Config · Izumi Project</title>
 <link rel="stylesheet" href="../assets/stylesheets/application.451f80e5.css">
 <link rel="stylesheet" href="../lib/material__tabs/dist/mdc.tabs.min.css">
 <link rel="stylesheet" href="../lib/prettify/prettify.css">
@@ -43,7 +43,7 @@ code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}
 <nav class="md-header-nav md-grid">
 <div class="md-flex">
 <div class="md-flex__cell md-flex__cell--shrink">
-<a href="../index.html" title="Izumi Toolkit" class="md-header-nav__button md-logo">
+<a href="../index.html" title="Izumi Project" class="md-header-nav__button md-logo">
 <i class="md-icon">local_library</i>
 </a>
 </div>
@@ -53,7 +53,7 @@ code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}
 <div class="md-flex__cell md-flex__cell--stretch">
 <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
 <span class="md-header-nav__topic">
-Izumi Toolkit
+Izumi Project
 </span>
 <span class="md-header-nav__topic">
 Logstage Config
@@ -112,12 +112,12 @@ pshirshov/izumi-r2
 <div class="md-sidebar__inner">
 <nav class="md-nav md-nav--primary" data-md-level="0" style="visibility: hidden">
 <label class="md-nav__title md-nav__title--site" for="drawer">
-<a href="../index.html" title="Izumi Toolkit" class="md-nav__button md-logo">
+<a href="../index.html" title="Izumi Project" class="md-nav__button md-logo">
 <span class="md-nav__button md-logo">
 <i class="md-icon">local_library</i>
 </a>
-<a href="../index.html" title="Izumi Toolkit">
-Izumi Toolkit
+<a href="../index.html" title="Izumi Project">
+Izumi Project
 </a>
 </label>
 <div class="md-nav__source">
@@ -142,7 +142,15 @@ pshirshov/izumi-r2
     <li><a href="../idealingua/cogen.html" class="page">Code generator reference</a></li>
     <li><a href="../idealingua/cogen-circe.html" class="page">Circe serialization reference</a></li>
   </ul></li>
-  <li><a href="../distage/index.html" class="page">distage Staged Dependency Injection</a></li>
+  <li><a href="../distage/index.html" class="page">distage: Staged Dependency Injection</a>
+  <ul>
+    <li><a href="../distage/basics.html" class="page">Basics</a></li>
+    <li><a href="../distage/config_injection.html" class="page">Config Injection</a></li>
+    <li><a href="../distage/other-features.html" class="page">Other Features</a></li>
+    <li><a href="../distage/debugging.html" class="page">Debugging</a></li>
+    <li><a href="../distage/cookbook.html" class="page">Cookbook</a></li>
+    <li><a href="../distage/reference.html" class="page">Syntax Summary</a></li>
+  </ul></li>
   <li><a href="../logstage/index.html" class="page">LogStage</a>
   <ul>
     <li><a href="../logstage/policy.html" class="page">Rendering policy</a></li>
@@ -170,7 +178,7 @@ pshirshov/izumi-r2
 <ul style="display: none">
 <li class="md-nav__item md-version" id="project.version">
 <label class="md-nav__link" for="__version">
-<i class="md-icon" title="Version">label_outline</i> 0.6.34
+<i class="md-icon" title="Version">label_outline</i> 0.7.0
 </label>
 </li>
 </ul>
@@ -301,48 +309,51 @@ pshirshov/izumi-r2
 <p>So, what you need to do to use logstage declarative config:</p>
 <p>1) include <code>&quot;logstage-reference.conf&quot;</code> in your application config</p>
 <p>2) defined next bootstrap modules :</p>
-<pre><code>- `LogstageCodecsModule()` - it will bind rendering policy and logsinks mappers and all necessary logstage runtime codecs
+<ul>
+  <li><code>LogstageCodecsModule()</code> - it will bind rendering policy and logsinks mappers and all necessary logstage runtime codecs
+    <p>Each <code>RenderingPolicy</code> and <code>LogSink</code> you may bind by calling follow commands inside LogstageCodecsModule:</p>
+    <pre><code>   bindLogSinkMapper[T &lt;: LogSink : ru.TypeTag, C: ru.TypeTag](f: C =&gt; T)
 
-Each `RenderingPolicy` and `LogSink` you may bind by calling follow commands inside LogstageCodecsModule:
-
-    bindLogSinkMapper[T &lt;: LogSink : ru.TypeTag, C: ru.TypeTag](f: C =&gt; T)
-
-    bindRenderingPolicyMapper[T &lt;: RenderingPolicy : ru.TypeTag, C: ru.TypeTag](f: C =&gt; T)
+   bindRenderingPolicyMapper[T &lt;: RenderingPolicy : ru.TypeTag, C: ru.TypeTag](f: C =&gt; T)
 </code></pre>
-<p>3) defined application modules: </p>
-<pre><code>- `LoggerConfigModule()` - it makes binding of LoggerConfig and you may inject it from locator using next command:
+  </li>
+</ul>
+<p>3) defined application modules:</p>
+<ul>
+  <li><code>LoggerConfigModule()</code> - it makes binding of LoggerConfig and you may inject it from locator using next command:</li>
+</ul>
+<p><code>scala
+   val logstageConfig = locator.get[LoggerConfig]
+</code></p>
+<pre><code>   LoggerConfig model is next:
 
-```scala
-val logstageConfig = locator.get[LoggerConfig]
-```
+   ```scala
+   final case class LoggerPathConfig(threshold: Log.Level, sinks: Seq[LogSink])
 
-LoggerConfig model is next:
-
-```scala
-final case class LoggerPathConfig(threshold: Log.Level, sinks: Seq[LogSink])
-
-final case class LoggerConfig(root : LoggerPathConfig, entries : Map[String, LoggerPathConfig])
-```
+   final case class LoggerConfig(root : LoggerPathConfig, entries : Map[String, LoggerPathConfig])
+   ```
 </code></pre>
 <h2><a href="#example" name="example" class="anchor"><span class="anchor-link"></span></a>Example</h2>
 <ol>
   <li>
     <p>Let&rsquo;s define our sinks and policies</p>
     <p>1.1 DummyLogSink</p>
-    <pre class="prettyprint"><code class="language-scala">class DummyLogSink(policy: RenderingPolicy) extends LogSink {
-   override def flush(e: Log.Entry): Unit = {
-     // do smth
+    <p><code>scala
+   class DummyLogSink(policy: RenderingPolicy) extends LogSink {
+      override def flush(e: Log.Entry): Unit = {
+        // do smth
+      }
    }
-}
-</code></pre>
+</code></p>
     <p>1.2 DummyRenderingPolicy</p>
-    <pre class="prettyprint"><code class="language-scala">class DummyRenderingPolicy(foo: Int, bar: Option[String]) extends RenderingPolicy {
-  override def render(entry: Log.Entry): String = entry.toString
-}
-</code></pre>
+    <p><code>scala
+   class DummyRenderingPolicy(foo: Int, bar: Option[String]) extends RenderingPolicy {
+     override def render(entry: Log.Entry): String = entry.toString
+   }
+</code></p>
   </li>
   <li>
-  <p>Let&rsquo;s define out logstage reference config </p></li>
+  <p>Let&rsquo;s define out logstage reference config</p></li>
 </ol>
 <pre class="prettyprint"><code class="language-hocon">logstage {
 
@@ -383,58 +394,53 @@ final case class LoggerConfig(root : LoggerPathConfig, entries : Map[String, Log
   <li>
     <p>So, for now we need to specify case classes constructors for out DummyLogSink and DummyRenderingPolicy for automatic parsing</p>
     <p>3.1 DummyRenderingPolicyConstructor</p>
-    <pre class="prettyprint"><code class="language-scala">case class DummyRenderingPolicyConstructor(foo : Int, bar: Option[String])
-</code></pre>
+    <p><code>scala
+   case class DummyRenderingPolicyConstructor(foo : Int, bar: Option[String])
+</code></p>
     <p>3.2 DummyLogSinkConstructor</p>
-    <pre class="prettyprint"><code class="language-scala">case class DummyLogSinkConstructor(policy : RenderingPolicy)
-</code></pre>
+    <p><code>scala
+   case class DummyLogSinkConstructor(policy : RenderingPolicy)
+</code></p>
   </li>
   <li>
     <p>now we need to configure out DI for loggerConfigUsage</p>
     <p>4.1 Define bootsrap module. Here you can bind all mappers for custom Policies and Logsinks:</p>
-    <pre class="prettyprint"><code class="language-scala">val logstageBootstrapModule = new LogstageCodecsModule {
+    <p>```scala  val logstageBootstrapModule = new LogstageCodecsModule {</p>
+    <pre><code>   // bind our rendering policy
 
-    // bind our rendering policy
+   bindRenderingPolicyMapper[DummyRenderingPolicy, DummyRenderingPolicyConstructor]{
+     c =&gt; 
+       new DummyRenderingPolicy(c.foo, c.bar)
+   }
 
-    bindRenderingPolicyMapper[DummyRenderingPolicy, DummyRenderingPolicyConstructor]{
-      c =&gt; 
-        new DummyRenderingPolicy(c.foo, c.bar)
-    }
+   // bind our logsink
 
-    // bind our logsink
-
-    bindLogSinkMapper[DummyLogSink, DummyLogSinkConstructor] {
-      c =&gt;  new DummyLogSink(c.policy)
-    }
-}
-
-val bootstrapModules = Seq(..., logstageBootstrapModule)
-
+   bindLogSinkMapper[DummyLogSink, DummyLogSinkConstructor] {
+     c =&gt;  new DummyLogSink(c.policy)
+   }
 </code></pre>
+    <p>}</p>
+    <p>val bootstrapModules = Seq(&hellip;, logstageBootstrapModule)</p>
+    <p>```</p>
     <p>4.2 Add <code>LoggerConfigModule</code> to app modules</p>
-    <pre class="prettyprint"><code class="language-scala">val modules = Seq(..., new LoggerConfigModule ())
-</code></pre>
+    <p><code>scala
+   val modules = Seq(..., new LoggerConfigModule ())
+</code></p>
     <p>4.2 Enjoy!</p>
-    <pre class="prettyprint"><code class="language-scala">// Basic locator setup
-
-val injector = Injector(bootstapModules: _*)
-val plan = injector.plan(modules.toList.overrideLeft)
-val locator = injector.produce(plan)
-
-// retrieve binded config
-val cfg = locator.get[LoggerConfig]
-</code></pre>
+    <p>```scala  // Basic locator setup</p>
+    <p>val injector = Injector(bootstapModules: _*)  val plan = injector.plan(modules.toList.overrideLeft)  val locator = injector.produce(plan)</p>
+    <p>// retrieve binded config  val cfg = locator.get[LoggerConfig]  ```</p>
   </li>
 </ol>
 </div>
 <div>
-<a href="https://github.com/pshirshov/izumi-r2/tree/master/doc/microsite/target/scala-2.12/tut/logstage/config.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/pshirshov/izumi-r2/tree/master/doc/microsite/target/mdoc/logstage/config.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>
 <div class="print-only">
 <span class="md-source-file md-version">
-0.6.34
+0.7.0
 </span>
 </div>
 </article>
