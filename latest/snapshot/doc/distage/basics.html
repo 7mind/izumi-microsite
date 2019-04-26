@@ -86,7 +86,7 @@ Type to start searching
 </div>
 <div class="md-flex__cell md-flex__cell--shrink">
 <div class="md-header-nav__source">
-<a href="https://github.com/pshirshov/izumi-r2"
+<a href="https://github.com/7mind/izumi"
 title="Go to repository"
 class="md-source"
 data-md-source="github">
@@ -94,7 +94,7 @@ data-md-source="github">
 <i class="fa fa-github"></i>
 </div>
 <div class="md-source__repository">
-pshirshov/izumi-r2
+7mind/izumi
 </div>
 </a>
 
@@ -121,7 +121,7 @@ Izumi Project
 </a>
 </label>
 <div class="md-nav__source">
-<a href="https://github.com/pshirshov/izumi-r2"
+<a href="https://github.com/7mind/izumi"
 title="Go to repository"
 class="md-source"
 data-md-source="github">
@@ -129,7 +129,7 @@ data-md-source="github">
 <i class="fa fa-github"></i>
 </div>
 <div class="md-source__repository">
-pshirshov/izumi-r2
+7mind/izumi
 </div>
 </a>
 
@@ -156,6 +156,7 @@ pshirshov/izumi-r2
     <li><a href="../logstage/policy.html" class="page">Rendering policy</a></li>
     <li><a href="../logstage/config.html" class="page">Logstage Config</a></li>
     <li><a href="../logstage/custom_ctx.html" class="page">Custom Context</a></li>
+    <li><a href="../logstage/syntax.html" class="page">Syntax Reference</a></li>
   </ul></li>
   <li><a href="../sbt/index.html" class="page">SBT Toolkit</a></li>
   <li><a href="../manifesto/index.html" class="page">Productivity and challenges</a></li>
@@ -293,7 +294,7 @@ val app = objects.get[HelloByeApp]
 // )
 </code></pre>
 <p>Since <code>plan</code> is just a piece of data, we need to interpret it to create the actual object graph ? <code>Injector</code>&rsquo;s <code>produce</code> method is the default interpreter. <code>Injector</code> contains no logic of its own beyond interpreting instructions, its output is fully determined by the plan. This makes <a href="debugging.html#debugging">debugging</a> quite easy.</p>
-<p>Given that plans are data, it&rsquo;s possible to <a href="other-features.html#compile-time-checks">verify them at compile-time</a> or <a href="other-features.md#compile-time-instantiation">splice equivalent Scala code</a> to do the instantiation before ever running the application. When used in that way, <code>distage</code> is a great alternative to compile-time frameworks such as <code>MacWire</code> all the while keeping the flexibility to interpret at runtime when needed. This flexibility in interpretation allows adding features, such as <a href="other-features.html#plugins">Plugins</a> and <a href="config_injection.html#config-injection">Typesafe Config integration</a> by transforming plans and bindings.</p>
+<p>Given that plans are data, it&rsquo;s possible to <a href="other-features.html#compile-time-checks">verify them at compile-time</a> or <a href="other-features.html#compile-time-instantiation">splice equivalent Scala code</a> to do the instantiation before ever running the application. When used in that way, <code>distage</code> is a great alternative to compile-time frameworks such as <code>MacWire</code> all the while keeping the flexibility to interpret at runtime when needed. This flexibility in interpretation allows adding features, such as <a href="other-features.html#plugins">Plugins</a> and <a href="config_injection.html#config-injection">Typesafe Config integration</a> by transforming plans and bindings.</p>
 <p>Note: classes in <code>distage</code> are always created exactly once, even if many different classes depend on them - they&rsquo;re <code>Singletons</code>. Non-singleton semantics are not available, however you can create multiple <code>named</code> instances and disambiguate between them with <code>@Id</code> annotation:</p>
 <pre class="prettyprint"><code class="language-scala">import distage.Id
 
@@ -357,7 +358,7 @@ object HostPortModule extends ModuleDef {
 <pre class="prettyprint"><code class="language-scala">import scala.util.Random
 
 val objects = Injector().produceUnsafe(HelloByeModule)
-// objects: Locator = com.github.pshirshov.izumi.distage.LocatorDefaultImpl@39432ce1
+// objects: Locator = com.github.pshirshov.izumi.distage.LocatorDefaultImpl@dcf7388
 
 objects.run {
   (hello: Hello, bye: Bye) =&gt;
@@ -450,17 +451,17 @@ val server = objects.get[HttpServer]
 <p>Let&rsquo;s check if it works:</p>
 <pre class="prettyprint"><code class="language-scala">server.router.run(Request(uri = uri(&quot;/home&quot;)))
   .flatMap(_.as[String]).unsafeRunSync
-// res9: String = &quot;Home page!&quot;
+// res10: String = &quot;Home page!&quot;
 </code></pre>
 <pre class="prettyprint"><code class="language-scala">server.router.run(Request(uri = uri(&quot;/blog/1&quot;)))
   .flatMap(_.as[String]).unsafeRunSync
-// res10: String = &quot;Blog post ``1&#39;&#39;!&quot;
+// res11: String = &quot;Blog post ``1&#39;&#39;!&quot;
 </code></pre>
 <p>Fantastic!</p>
 <p>consult <a href="https://github.com/google/guice/wiki/Multibindings">Guice wiki on Multibindings</a> for more details about the concept.</p>
 <h3><a href="#injecting-implicits" name="injecting-implicits" class="anchor"><span class="anchor-link"></span></a>Injecting Implicits</h3><div class="callout warning "><div class="callout-title">TODO</div>
 <p>Sorry, this page is not ready yet</p>
-<p>Relevant ticket: <a href="https://github.com/pshirshov/izumi-r2/issues/230">https://github.com/pshirshov/izumi-r2/issues/230</a></p></div>
+<p>Relevant ticket: <a href="https://github.com/7mind/izumi/issues/230">https://github.com/7mind/izumi/issues/230</a></p></div>
 <p>Implicits are managed like any other class. To make them available for summoning, declare them in a module:</p>
 <pre class="prettyprint"><code class="language-scala">import cats.Monad
 import distage._
@@ -505,32 +506,41 @@ val kvstoreModuleGood = new ModuleDef {
 }
 </code></pre>
 <p>Implicits obey the usual lexical scope in user code.</p>
-<p>You can participate in this ticket at <a href="https://github.com/pshirshov/izumi-r2/issues/230">https://github.com/pshirshov/izumi-r2/issues/230</a></p>
+<p>You can participate in this ticket at <a href="https://github.com/7mind/izumi/issues/230">https://github.com/7mind/izumi/issues/230</a></p>
 <h3><a href="#resource-bindings-lifecycle" name="resource-bindings-lifecycle" class="anchor"><span class="anchor-link"></span></a>Resource Bindings &amp; Lifecycle</h3>
 <p>Lifecycle is supported via Resource bindings. You can inject any <a href="https://typelevel.org/cats-effect/datatypes/resource.html">cats.effect.Resource</a> into the object graph. You can also inject <a href="/latest/snapshot/api/com/github/pshirshov/izumi/distage/model/definition/DIResource.html">DIResource</a> classes. Global resources will be deallocated when the app or the test ends.</p>
 <p>Note that lifecycle control via <code>DIResource</code> is available in non-FP applications as well via inheritance from <code>DIResource.Simple</code> and <code>DIResource.Mutable</code>.</p>
-<p>Basic example with <code>cats</code> Resource:</p>
+<p>Example with <code>cats</code> Resource:</p>
 <pre class="prettyprint"><code class="language-scala">import distage._
-import cats.effect.IO
+import cats.effect._
 
 class DBConnection
 class MessageQueueConnection
 
-val dbResource = DIResource.make(IO { println(&quot;Connecting to DB!&quot;); new DBConnection })(_ =&gt; IO(println(&quot;Disconnecting DB&quot;)))
-// dbResource: DIResource[IO, DBConnection] = com.github.pshirshov.izumi.distage.model.definition.DIResource$$anon$1@2e324a0b
-val mqResource = DIResource.make(IO { println(&quot;Connecting to Message Queue!&quot;); new MessageQueueConnection })(_ =&gt; IO(println(&quot;Disconnecting Message Queue&quot;)))
-// mqResource: DIResource[IO, MessageQueueConnection] = com.github.pshirshov.izumi.distage.model.definition.DIResource$$anon$1@6e60dc81
+val dbResource = Resource.make(
+  acquire = IO { println(&quot;Connecting to DB!&quot;); new DBConnection }
+)(release = _ =&gt; IO(println(&quot;Disconnecting DB&quot;)))
+// dbResource: Resource[IO, DBConnection] = Allocate(
+//   Map(Delay(&lt;function0&gt;), scala.Function1$$Lambda$14255/1129775263@50447d38, 1)
+// )
+
+val mqResource = Resource.make(
+  acquire = IO { println(&quot;Connecting to Message Queue!&quot;); new MessageQueueConnection }
+)(release = _ =&gt; IO(println(&quot;Disconnecting Message Queue&quot;)))
+// mqResource: Resource[IO, MessageQueueConnection] = Allocate(
+//   Map(Delay(&lt;function0&gt;), scala.Function1$$Lambda$14255/1129775263@37904907, 1)
+// )
 
 class MyApp(db: DBConnection, mq: MessageQueueConnection) {
   val run = IO(println(&quot;Hello World!&quot;))
 }
 
-val module = new ModuleDef {
+def module = new ModuleDef {
   make[DBConnection].fromResource(dbResource)
   make[MessageQueueConnection].fromResource(mqResource)
+  addImplicit[Bracket[IO, Throwable]]
   make[MyApp]
 }
-// module: AnyRef with ModuleDef = Set(SingletonBinding({type.repl.Session.App11.DBConnection},ResourceImpl(repl.Session.App11.DBConnection,[A]cats.effect.IO[A],InstanceImpl(com.github.pshirshov.izumi.distage.model.definition.DIResource[cats.effect.IO,repl.Session.App11.DBConnection],com.github.pshirshov.izumi.distage.model.definition.DIResource$$anon$1@2e324a0b)),Set(&lt;*&gt;, &lt;singleton&gt;),(basics.md:392)), SingletonBinding({type.repl.Session.App11.MyApp},TypeImpl(repl.Session.App11.MyApp),Set(&lt;*&gt;, &lt;singleton&gt;),(basics.md:394)), SingletonBinding({type.repl.Session.App11.MessageQueueConnection},ResourceImpl(repl.Session.App11.MessageQueueConnection,[A]cats.effect.IO[A],InstanceImpl(com.github.pshirshov.izumi.distage.model.definition.DIResource[cats.effect.IO,repl.Session.App11.MessageQueueConnection],com.github.pshirshov.izumi.distage.model.definition.DIResource$$anon$1@6e60dc81)),Set(&lt;*&gt;, &lt;singleton&gt;),(basics.md:393)))
 </code></pre>
 <p>Will produce the following output:</p>
 <pre class="prettyprint"><code class="language-scala">Injector().produceF[IO](module).use {
@@ -564,7 +574,7 @@ class InitResource extends DIResource.Simple[Init] {
 val module = new ModuleDef {
   make[Init].fromResource[InitResource]
 }
-// module: AnyRef with ModuleDef = Set(SingletonBinding({type.repl.Session.App13.Init},ResourceImpl(repl.Session.App13.Init,[A]com.github.pshirshov.izumi.fundamentals.platform.functional.Identity[A],TypeImpl(repl.Session.App13.InitResource)),Set(&lt;*&gt;, &lt;singleton&gt;),(basics.md:444)))
+// module: AnyRef with ModuleDef = Set(SingletonBinding({type.repl.Session.App14.Init},ResourceImpl(repl.Session.App14.Init,[A]com.github.pshirshov.izumi.fundamentals.platform.functional.Identity[A],TypeImpl(repl.Session.App14.InitResource)),Set(&lt;*&gt;, &lt;singleton&gt;),(basics.md:466)))
 </code></pre>
 <pre class="prettyprint"><code class="language-scala">val closedInit = Injector().produce(module).use {
   objects =&gt;
@@ -573,14 +583,14 @@ val module = new ModuleDef {
     init
 }
 // true
-// closedInit: com.github.pshirshov.izumi.fundamentals.platform.functional.package.Identity[Init] = repl.Session$App13$Init@72a1e584
+// closedInit: com.github.pshirshov.izumi.fundamentals.platform.functional.package.Identity[Init] = repl.Session$App14$Init@1f139971
 println(closedInit.initialized)
 // false
 </code></pre>
 <p><code>DIResource</code> forms a monad and has the expected <code>.map</code>, <code>.flatMap</code>, <code>.evalMap</code> methods available. You can convert a <code>DIResource</code> into a <code>cats.effect.Resource</code> via <code>.toCats</code> method.</p>
 <p>You need to use resource-aware <code>Injector.produce</code>/<code>Injector.produceF</code> methods to control lifecycle of the object graph.</p>
 <h3><a href="#effect-bindings" name="effect-bindings" class="anchor"><span class="anchor-link"></span></a>Effect Bindings</h3>
-<p>Sometimes we need to effectfully create a component or fetch some data and inject it into the object graph during startup (e.g. read a configuration file), but the resulting component or data does not need to be closed. An example might be a global <code>Semaphore</code> that limit the parallelism of the entire application based on configuration value or a <code>Dummy</code> / <code>test double</code> implementation of some external service made for testing.</p>
+<p>Sometimes we need to effectfully create a component or fetch some data and inject it into the object graph during startup (e.g. read a configuration file), but the resulting component or data does not need to be closed. An example might be a global <code>Semaphore</code> that limits the parallelism of an entire application based on configuration value or a <code>dummy</code>/<code>test double</code> implementation of some external service made for testing using simple <code>Ref</code>s.</p>
 <p>In these cases we can use <code>.fromEffect</code> to simply bind a value created effectfully.</p>
 <p>Example with <code>ZIO</code> <code>Semaphore</code>:</p>
 <pre class="prettyprint"><code class="language-scala">import distage._
@@ -636,7 +646,7 @@ object KVStore {
 val kvStoreModule = new ModuleDef {
   make[KVStore[IO]].fromEffect(KVStore.dummy)
 }
-// kvStoreModule: AnyRef with ModuleDef = Set(SingletonBinding({type.App15.this.KVStore[scalaz.zio.IO]},EffectImpl(App15.this.KVStore[scalaz.zio.IO],[A]scalaz.zio.IO[Nothing,A],InstanceImpl(scalaz.zio.IO[Nothing,App15.this.KVStore[scalaz.zio.IO]],scalaz.zio.IO$FlatMap@420a5d36)),Set(&lt;*&gt;, &lt;singleton&gt;),(basics.md:540)))
+// kvStoreModule: AnyRef with ModuleDef = Set(SingletonBinding({type.App16.this.KVStore[scalaz.zio.IO]},EffectImpl(App16.this.KVStore[scalaz.zio.IO],[A]scalaz.zio.IO[Nothing,A],InstanceImpl(scalaz.zio.IO[Nothing,App16.this.KVStore[scalaz.zio.IO]],scalaz.zio.IO$FlatMap@74d39eef)),Set(&lt;*&gt;, &lt;singleton&gt;),(basics.md:562)))
 
 new RTS{}.unsafeRun {
   Injector().produceF[IO[Throwable, ?]](kvStoreModule)
@@ -650,7 +660,7 @@ new RTS{}.unsafeRun {
         } yield res
     }
 }
-// res16: String = &quot;pie&quot;
+// res17: String = &quot;pie&quot;
 </code></pre>
 <p>You need to use effect-aware <code>Injector.produceF</code>/<code>Injector.produceUnsafeF</code> methods to use effect bindings.</p>
 <h3><a href="#tagless-final-style" name="tagless-final-style" class="anchor"><span class="anchor-link"></span></a>Tagless Final Style</h3>
@@ -724,16 +734,16 @@ object TryInterpreters extends ModuleDef {
 
 // combine all modules
 val TryProgram = new Program[Try] ++ TryInterpreters
-// TryProgram: Module = Set(SingletonBinding({type.repl.Session.App17.TaglessProgram[[A]scala.util.Try[A]]},ProviderImpl(repl.Session.App17.TaglessProgram[[A]scala.util.Try[A]],&lt;function1&gt;(cats.Monad[[A]scala.util.Try[A]], repl.Session.App17.Validation[[A]scala.util.Try[A]], repl.Session.App17.Interaction[[A]scala.util.Try[A]]): repl.Session.App17.TaglessProgram[[A]scala.util.Try[A]]),Set(&lt;*&gt;, &lt;singleton&gt;),(basics.md:614)), SingletonBinding({type.repl.Session.App17.Validation[scala.util.Try]},InstanceImpl(repl.Session.App17.Validation[scala.util.Try],repl.Session$App17$$anon$12@1e584ed8),Set(&lt;*&gt;, &lt;singleton&gt;),(basics.md:648)), SingletonBinding({type.cats.Monad[[A]scala.util.Try[A]]},InstanceImpl(cats.Monad[[A]scala.util.Try[A]],cats.instances.TryInstances$$anon$1@cd32c57),Set(&lt;*&gt;, &lt;singleton&gt;),(basics.md:616)), SingletonBinding({type.repl.Session.App17.Interaction[scala.util.Try]},InstanceImpl(repl.Session.App17.Interaction[scala.util.Try],repl.Session$App17$$anon$13@76e073e5),Set(&lt;*&gt;, &lt;singleton&gt;),(basics.md:649)))
+// TryProgram: Module = Set(SingletonBinding({type.repl.Session.App18.Interaction[scala.util.Try]},InstanceImpl(repl.Session.App18.Interaction[scala.util.Try],repl.Session$App18$$anon$13@56941a4b),Set(&lt;*&gt;, &lt;singleton&gt;),(basics.md:671)), SingletonBinding({type.repl.Session.App18.TaglessProgram[[A]scala.util.Try[A]]},ProviderImpl(repl.Session.App18.TaglessProgram[[A]scala.util.Try[A]],&lt;function1&gt;(cats.Monad[[A]scala.util.Try[A]], repl.Session.App18.Validation[[A]scala.util.Try[A]], repl.Session.App18.Interaction[[A]scala.util.Try[A]]): repl.Session.App18.TaglessProgram[[A]scala.util.Try[A]]),Set(&lt;*&gt;, &lt;singleton&gt;),(basics.md:636)), SingletonBinding({type.cats.Monad[[A]scala.util.Try[A]]},InstanceImpl(cats.Monad[[A]scala.util.Try[A]],cats.instances.TryInstances$$anon$1@68052254),Set(&lt;*&gt;, &lt;singleton&gt;),(basics.md:638)), SingletonBinding({type.repl.Session.App18.Validation[scala.util.Try]},InstanceImpl(repl.Session.App18.Validation[scala.util.Try],repl.Session$App18$$anon$12@1c18f911),Set(&lt;*&gt;, &lt;singleton&gt;),(basics.md:670)))
 
 // create object graph
 val objects = Injector().produceUnsafe(TryProgram)
-// objects: Locator = com.github.pshirshov.izumi.distage.LocatorDefaultImpl@5567a96
+// objects: Locator = com.github.pshirshov.izumi.distage.LocatorDefaultImpl@1e5742ad
 
 // run
 objects.get[TaglessProgram[Try]].program
 // awesomesauce!
-// res18: Try[Unit] = Success(())
+// res19: Try[Unit] = Success(())
 </code></pre>
 <p>The program module is polymorphic over its eventual monad, we can easily parameterize it with a different monad:</p>
 <pre class="prettyprint"><code class="language-scala">import cats.effect._
@@ -777,35 +787,15 @@ def chooseInterpreters(default: Boolean) = {
 <pre class="prettyprint"><code class="language-scala">libraryDependencies += Izumi.R.distage_testkit
 </code></pre>
 <p>or</p>
-<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;com.github.pshirshov.izumi.r2&quot; %% &quot;distage-plugins&quot; % &quot;0.8.0-SNAPSHOT&quot;
+<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;io.7mind&quot; %% &quot;distage-plugins&quot; % &quot;0.8.0-SNAPSHOT&quot;
 </code></pre>
 <p>If you&rsquo;re not using <a href="../sbt/index.html#bills-of-materials">sbt-izumi-deps</a> plugin.</p>
 <p>Example usage:</p>
-<pre class="prettyprint"><code class="language-scala">import distage._
-import com.github.pshirshov.izumi.distage.testkit.DistageSpec
-
-class TestClass {
-  def hello: String = &quot;Hello World!&quot;
-}
-
-class Test extends DistageSpec {
-  override protected def makeBindings: ModuleBase = new ModuleDef {
-    make[TestClass]
-  }
-
-  &quot;TestClass&quot; should {
-
-    &quot;Say hello&quot; in di {
-      testClass: TestClass =&gt;
-        assert(testClass.hello == &quot;Hello World!&quot;)
-    }
-
-  }
-}
-</code></pre>
+<p>```scala</p>
+<p>```</p>
 </div>
 <div>
-<a href="https://github.com/pshirshov/izumi-r2/tree/master/doc/microsite/target/mdoc/distage/basics.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/7mind/izumi/tree/master/doc/microsite/target/mdoc/distage/basics.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>

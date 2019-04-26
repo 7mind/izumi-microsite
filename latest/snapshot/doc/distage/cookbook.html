@@ -86,7 +86,7 @@ Type to start searching
 </div>
 <div class="md-flex__cell md-flex__cell--shrink">
 <div class="md-header-nav__source">
-<a href="https://github.com/pshirshov/izumi-r2"
+<a href="https://github.com/7mind/izumi"
 title="Go to repository"
 class="md-source"
 data-md-source="github">
@@ -94,7 +94,7 @@ data-md-source="github">
 <i class="fa fa-github"></i>
 </div>
 <div class="md-source__repository">
-pshirshov/izumi-r2
+7mind/izumi
 </div>
 </a>
 
@@ -121,7 +121,7 @@ Izumi Project
 </a>
 </label>
 <div class="md-nav__source">
-<a href="https://github.com/pshirshov/izumi-r2"
+<a href="https://github.com/7mind/izumi"
 title="Go to repository"
 class="md-source"
 data-md-source="github">
@@ -129,7 +129,7 @@ data-md-source="github">
 <i class="fa fa-github"></i>
 </div>
 <div class="md-source__repository">
-pshirshov/izumi-r2
+7mind/izumi
 </div>
 </a>
 
@@ -156,6 +156,7 @@ pshirshov/izumi-r2
     <li><a href="../logstage/policy.html" class="page">Rendering policy</a></li>
     <li><a href="../logstage/config.html" class="page">Logstage Config</a></li>
     <li><a href="../logstage/custom_ctx.html" class="page">Custom Context</a></li>
+    <li><a href="../logstage/syntax.html" class="page">Syntax Reference</a></li>
   </ul></li>
   <li><a href="../sbt/index.html" class="page">SBT Toolkit</a></li>
   <li><a href="../manifesto/index.html" class="page">Productivity and challenges</a></li>
@@ -205,7 +206,7 @@ pshirshov/izumi-r2
 <div class="md-content__searchable">
 <h1><a href="#cookbook" name="cookbook" class="anchor"><span class="anchor-link"></span></a>Cookbook</h1>
 <h3><a href="#inner-classes-and-path-dependent-types" name="inner-classes-and-path-dependent-types" class="anchor"><span class="anchor-link"></span></a>Inner Classes and Path-Dependent Types</h3>
-<p>To instantiate path-dependent types via constructor, their prefix type has to be present in DI object graph:</p>
+<p>To instantiate path-dependent types via constructor, their prefix type must be present in the object graph:</p>
 <pre class="prettyprint"><code class="language-scala">import distage._
 
 trait Path {
@@ -214,32 +215,32 @@ trait Path {
 }
 
 val path = new Path {}
-// path: AnyRef with Path = repl.Session$App0$$anon$1@e15636
+// path: AnyRef with Path = repl.Session$App0$$anon$1@7233652c
 
 val module = new ModuleDef {
   make[path.A]
   make[path.type].from[path.type](path: path.type)
 }
-// module: AnyRef with ModuleDef = Set(SingletonBinding({type.repl.Session.App0.&lt;refinement&gt;.type},InstanceImpl(repl.Session.App0.&lt;refinement&gt;.type,repl.Session$App0$$anon$1@e15636),Set(&lt;*&gt;, &lt;singleton&gt;),(cookbook.md:25)), SingletonBinding({type.repl.Session.App0.path.A},TypeImpl(repl.Session.App0.path.A),Set(&lt;*&gt;, &lt;singleton&gt;),(cookbook.md:24)))
+// module: AnyRef with ModuleDef = Set(SingletonBinding({type.repl.Session.App0.&lt;refinement&gt;.type},InstanceImpl(repl.Session.App0.&lt;refinement&gt;.type,repl.Session$App0$$anon$1@7233652c),Set(&lt;*&gt;, &lt;singleton&gt;),(cookbook.md:25)), SingletonBinding({type.repl.Session.App0.path.A},TypeImpl(repl.Session.App0.path.A),Set(&lt;*&gt;, &lt;singleton&gt;),(cookbook.md:24)))
 </code></pre>
 <p>The same applies to type projections:</p>
 <pre class="prettyprint"><code class="language-scala">val module1 = new ModuleDef {
   make[Path#B]
   make[Path].from(new Path {})
 }
-// module1: AnyRef with ModuleDef = Set(SingletonBinding({type.repl.Session.App0.Path},InstanceImpl(repl.Session.App0.Path,repl.Session$App0$$anon$3$$anon$4@461c04a6),Set(&lt;*&gt;, &lt;singleton&gt;),(cookbook.md:34)), SingletonBinding({type.repl.Session.App0.Path#B},TypeImpl(repl.Session.App0.Path#B),Set(&lt;*&gt;, &lt;singleton&gt;),(cookbook.md:33)))
+// module1: AnyRef with ModuleDef = Set(SingletonBinding({type.repl.Session.App0.Path},InstanceImpl(repl.Session.App0.Path,repl.Session$App0$$anon$3$$anon$4@1ced5a5a),Set(&lt;*&gt;, &lt;singleton&gt;),(cookbook.md:34)), SingletonBinding({type.repl.Session.App0.Path#B},TypeImpl(repl.Session.App0.Path#B),Set(&lt;*&gt;, &lt;singleton&gt;),(cookbook.md:33)))
 </code></pre>
-<p>Provider and instance bindings and also compile-time mode in <code>distage-static</code> module do not require the singleton type prefix to be present in DI object graph:</p>
+<p>Function and instance bindings and also compile-time mode in <code>distage-static</code> module do not require the type prefix:</p>
 <pre class="prettyprint"><code class="language-scala">val module2 = new ModuleDef {
   make[Path#B].from {
     val path = new Path {}
     new path.B
   }
 }
-// module2: AnyRef with ModuleDef = Set(SingletonBinding({type.repl.Session.App0.Path#B},InstanceImpl(path.B,repl.Session$App0$Path$B@76ed4d2c),Set(&lt;*&gt;, &lt;singleton&gt;),(cookbook.md:42)))
+// module2: AnyRef with ModuleDef = Set(SingletonBinding({type.repl.Session.App0.Path#B},InstanceImpl(path.B,repl.Session$App0$Path$B@41c704f4),Set(&lt;*&gt;, &lt;singleton&gt;),(cookbook.md:42)))
 </code></pre>
 <h3><a href="#depending-on-locator" name="depending-on-locator" class="anchor"><span class="anchor-link"></span></a>Depending on Locator</h3>
-<p>Classes can depend on the Locator:</p>
+<p>Classes can depend on the Locator (container of the final object graph):</p>
 <pre class="prettyprint"><code class="language-scala">import distage._
 
 class A(all: LocatorRef) {
@@ -258,10 +259,16 @@ val locator = Injector().produce(module)
 
 assert(locator.get[A].c eq locator.get[C]) 
 </code></pre>
-<p>It is recommended to avoid this if possible, doing so is often a sign of broken application design.</p>
+<p>Locator contains metadata about the plan and the bindings from which it was ultimately created:</p>
+<pre class="prettyprint"><code class="language-scala">// Plan that created this locator
+val plan: OrderedPlan = locator.plan
+
+// Bindings from which the Plan was built
+val moduleDef: ModuleBase = plan.definition
+</code></pre>
 </div>
 <div>
-<a href="https://github.com/pshirshov/izumi-r2/tree/master/doc/microsite/target/mdoc/distage/cookbook.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/7mind/izumi/tree/master/doc/microsite/target/mdoc/distage/cookbook.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>
