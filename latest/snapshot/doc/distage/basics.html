@@ -307,7 +307,7 @@ new ModuleDef {
       }
   }
 }
-// res3: AnyRef with ModuleDef = Set(SingletonBinding({type.repl.Session.App0.Byer@byer-1},TypeImpl(repl.Session.App0.PrintByer),Set(),(basics.md:117)), SingletonBinding({type.repl.Session.App0.Byer@byer-2},ProviderImpl(repl.Session.App0.Byer,&lt;function1&gt;(repl.Session.App0.Byer): repl.Session.App0.Byer),Set(),(basics.md:118)))
+// res3: AnyRef with ModuleDef = Set(SingletonBinding({type.repl.Session.App0.Byer@byer-2},ProviderImpl(repl.Session.App0.Byer,&lt;function1&gt;(repl.Session.App0.Byer): repl.Session.App0.Byer),Set(),(basics.md:118)), SingletonBinding({type.repl.Session.App0.Byer@byer-1},TypeImpl(repl.Session.App0.PrintByer),Set(),(basics.md:117)))
 </code></pre>
 <p>You can also create factory classes to help you mint new non-singleton instances. <a href="#auto-factories">Auto-Factories</a> can reduce boilerplate involved in doing this.</p>
 <p>Modules can be combined into larger modules with <code>++</code> and <code>overridenBy</code> operators. Let&rsquo;s use <code>overridenBy</code> to greet in ALL CAPS:</p>
@@ -358,7 +358,7 @@ object HostPortModule extends ModuleDef {
 <pre class="prettyprint"><code class="language-scala">import scala.util.Random
 
 val objects = Injector().produceUnsafe(HelloByeModule)
-// objects: Locator = com.github.pshirshov.izumi.distage.LocatorDefaultImpl@574cb69c
+// objects: Locator = com.github.pshirshov.izumi.distage.LocatorDefaultImpl@14817993
 
 objects.run {
   (hello: Hello, bye: Bye) =&gt;
@@ -368,9 +368,9 @@ objects.run {
     hello(names(rnd))
     bye(names(rnd))
 }
-// Random index: 2
-// Hello Shelby
-// Bye Shelby
+// Random index: 1
+// Hello Marisa
+// Bye Marisa
 </code></pre>
 <pre class="prettyprint"><code class="language-scala">objects.runOption { i: Int =&gt; i + 10 } match {
   case None =&gt; println(&quot;There is no Int in the object graph!&quot;)
@@ -521,14 +521,14 @@ val dbResource = Resource.make(
   acquire = IO { println(&quot;Connecting to DB!&quot;); new DBConnection }
 )(release = _ =&gt; IO(println(&quot;Disconnecting DB&quot;)))
 // dbResource: Resource[IO, DBConnection] = Allocate(
-//   Map(Delay(&lt;function0&gt;), scala.Function1$$Lambda$14425/78062774@a6a41f0, 1)
+//   Map(Delay(&lt;function0&gt;), scala.Function1$$Lambda$14618/924561904@3765d7fe, 1)
 // )
 
 val mqResource = Resource.make(
   acquire = IO { println(&quot;Connecting to Message Queue!&quot;); new MessageQueueConnection }
 )(release = _ =&gt; IO(println(&quot;Disconnecting Message Queue&quot;)))
 // mqResource: Resource[IO, MessageQueueConnection] = Allocate(
-//   Map(Delay(&lt;function0&gt;), scala.Function1$$Lambda$14425/78062774@10e1afa9, 1)
+//   Map(Delay(&lt;function0&gt;), scala.Function1$$Lambda$14618/924561904@2f1ac322, 1)
 // )
 
 class MyApp(db: DBConnection, mq: MessageQueueConnection) {
@@ -583,7 +583,7 @@ val module = new ModuleDef {
     init
 }
 // true
-// closedInit: com.github.pshirshov.izumi.fundamentals.platform.functional.package.Identity[Init] = repl.Session$App14$Init@3f79cfaa
+// closedInit: com.github.pshirshov.izumi.fundamentals.platform.functional.package.Identity[Init] = repl.Session$App14$Init@6ac2038f
 println(closedInit.initialized)
 // false
 </code></pre>
@@ -646,7 +646,7 @@ object KVStore {
 val kvStoreModule = new ModuleDef {
   make[KVStore[IO]].fromEffect(KVStore.dummy)
 }
-// kvStoreModule: AnyRef with ModuleDef = Set(SingletonBinding({type.App16.this.KVStore[scalaz.zio.IO]},EffectImpl(App16.this.KVStore[scalaz.zio.IO],[A]scalaz.zio.IO[Nothing,A],InstanceImpl(scalaz.zio.ZIO[Any,Nothing,App16.this.KVStore[scalaz.zio.IO]],scalaz.zio.ZIO$FlatMap@56740ff5)),Set(),(basics.md:562)))
+// kvStoreModule: AnyRef with ModuleDef = Set(SingletonBinding({type.App16.this.KVStore[scalaz.zio.IO]},EffectImpl(App16.this.KVStore[scalaz.zio.IO],[A]scalaz.zio.IO[Nothing,A],InstanceImpl(scalaz.zio.ZIO[Any,Nothing,App16.this.KVStore[scalaz.zio.IO]],scalaz.zio.ZIO$FlatMap@2652f5a9)),Set(),(basics.md:562)))
 
 new DefaultRuntime{}.unsafeRun {
   Injector().produceF[IO[Throwable, ?]](kvStoreModule)
@@ -734,11 +734,11 @@ object TryInterpreters extends ModuleDef {
 
 // combine all modules
 val TryProgram = new Program[Try] ++ TryInterpreters
-// TryProgram: Module = Set(SingletonBinding({type.repl.Session.App18.Validation[scala.util.Try]},InstanceImpl(repl.Session.App18.Validation[scala.util.Try],repl.Session$App18$$anon$12@35b3d332),Set(),(basics.md:670)), SingletonBinding({type.repl.Session.App18.TaglessProgram[[A]scala.util.Try[A]]},ProviderImpl(repl.Session.App18.TaglessProgram[[A]scala.util.Try[A]],&lt;function1&gt;(cats.Monad[[A]scala.util.Try[A]], repl.Session.App18.Validation[[A]scala.util.Try[A]], repl.Session.App18.Interaction[[A]scala.util.Try[A]]): repl.Session.App18.TaglessProgram[[A]scala.util.Try[A]]),Set(),(basics.md:636)), SingletonBinding({type.repl.Session.App18.Interaction[scala.util.Try]},InstanceImpl(repl.Session.App18.Interaction[scala.util.Try],repl.Session$App18$$anon$13@f2b7e8c),Set(),(basics.md:671)), SingletonBinding({type.cats.Monad[[A]scala.util.Try[A]]},InstanceImpl(cats.Monad[[A]scala.util.Try[A]],cats.instances.TryInstances$$anon$1@5d8e5485),Set(),(basics.md:638)))
+// TryProgram: Module = Set(SingletonBinding({type.cats.Monad[[A]scala.util.Try[A]]},InstanceImpl(cats.Monad[[A]scala.util.Try[A]],cats.instances.TryInstances$$anon$1@432d3f52),Set(),(basics.md:638)), SingletonBinding({type.repl.Session.App18.Interaction[scala.util.Try]},InstanceImpl(repl.Session.App18.Interaction[scala.util.Try],repl.Session$App18$$anon$13@1b6f4f0c),Set(),(basics.md:671)), SingletonBinding({type.repl.Session.App18.TaglessProgram[[A]scala.util.Try[A]]},ProviderImpl(repl.Session.App18.TaglessProgram[[A]scala.util.Try[A]],&lt;function1&gt;(cats.Monad[[A]scala.util.Try[A]], repl.Session.App18.Validation[[A]scala.util.Try[A]], repl.Session.App18.Interaction[[A]scala.util.Try[A]]): repl.Session.App18.TaglessProgram[[A]scala.util.Try[A]]),Set(),(basics.md:636)), SingletonBinding({type.repl.Session.App18.Validation[scala.util.Try]},InstanceImpl(repl.Session.App18.Validation[scala.util.Try],repl.Session$App18$$anon$12@3db12964),Set(),(basics.md:670)))
 
 // create object graph
 val objects = Injector().produceUnsafe(TryProgram)
-// objects: Locator = com.github.pshirshov.izumi.distage.LocatorDefaultImpl@44de6aa5
+// objects: Locator = com.github.pshirshov.izumi.distage.LocatorDefaultImpl@5c9474c0
 
 // run
 objects.get[TaglessProgram[Try]].program
