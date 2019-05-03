@@ -276,7 +276,7 @@ val module = new ModuleDef {
 // )
 
 val locator = Injector().produceUnsafe(module, mode = gc)
-// locator: Locator = com.github.pshirshov.izumi.distage.LocatorDefaultImpl@6fea66b2
+// locator: Locator = com.github.pshirshov.izumi.distage.LocatorDefaultImpl@1921839f
 
 // A and B are here
 locator.find[A]
@@ -580,21 +580,12 @@ locator.get[Set[SetElem]].size == 2
 // res1: Boolean = true
 </code></pre>
 <h3><a href="#cats-integration" name="cats-integration" class="anchor"><span class="anchor-link"></span></a>Cats Integration</h3>
-<p>You can use <code>produceF</code> with <code>cats.effect.IO</code> with just <code>distage-core</code>.</p>
-<p><a href="basics.html#resource-bindings--lifecycle">Cats Resource Bindings</a> will also work out of the box without any additional modules.</p><div class="callout warning "><div class="callout-title">deprecated</div>
-<p>All cats instances &amp; syntax will be rolled into <code>distage-core</code>. (via sbt&rsquo;s <code>Optional</code> dependencies, they will only be available if your project depends on <code>cats</code>.)</p></div>
-<p>To import cats integration add <code>distage-cats</code> library:</p>
-<pre class="prettyprint"><code class="language-scala">libraryDependencies += Izumi.R.distage_cats
-</code></pre>
-<p>or</p>
-<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;io.7mind.izumi&quot; %% &quot;distage-cats&quot; % &quot;0.8.0-SNAPSHOT&quot;
-</code></pre>
-<p>If you&rsquo;re not using <a href="../sbt/index.html#bills-of-materials">sbt-izumi-deps</a> plugin.</p>
+<p>Additional cats instances and syntax are available automatically without imports if you already depend on cats via <a href="https://blog.7mind.io/no-more-orphans.html">No More Orphans</a> technique.</p>
+<p><a href="basics.html#resource-bindings--lifecycle">Cats Resource Bindings</a> will also work out of the box without imports.</p>
 <p>Usage:</p>
 <pre class="prettyprint"><code class="language-scala">import cats.implicits._
 import cats.effect._
 import distage._
-import distage.interop.cats._
 import com.example.{DBConnection, AppEntrypoint}
 
 object Main extends IOApp {
@@ -606,7 +597,7 @@ object Main extends IOApp {
         case i if i.target == DIKey.get[DBConnection] =&gt;
            DBConnection.create[IO]
       } 
-      classes &lt;- Injector().produceF[IO](plan) // produceF allows using `IO` with effect and resource bindings
+      classes &lt;- Injector().produceF[IO](plan) // produceF allows using cats `IO` with effect and resource bindings
       _ &lt;- classes.get[AppEntrypoint].run
     } yield ()
   }
