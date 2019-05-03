@@ -149,6 +149,8 @@ data-md-source="github">
     <li><a href="../distage/other-features.html" class="active page">Other Features</a></li>
     <li><a href="../distage/debugging.html" class="page">Debugging</a></li>
     <li><a href="../distage/cookbook.html" class="page">Cookbook</a></li>
+    <li><a href="../distage/roles.html" class="page">Role-Based Applications</a></li>
+    <li><a href="../distage/testkit.html" class="page">Testkit</a></li>
     <li><a href="../distage/reference.html" class="page">Syntax Summary</a></li>
   </ul></li>
   <li><a href="../logstage/index.html" class="page">LogStage</a>
@@ -268,13 +270,13 @@ val module = new ModuleDef {
 }
 // module: AnyRef with ModuleDef = Set(SingletonBinding({type.App0.this.A},TypeImpl(App0.this.A),Set(),(other-features.md:26)), SingletonBinding({type.App0.this.B},TypeImpl(App0.this.B),Set(),(other-features.md:27)), SingletonBinding({type.App0.this.C},TypeImpl(App0.this.C),Set(),(other-features.md:28)))
 </code></pre>
-<pre class="prettyprint"><code class="language-scala">val roots = Set[DIKey](DIKey.get[A])
-// roots: Set[DIKey] = Set(
-//   TypeKey(SafeType(TypeRef(ThisType(class App0), class A, List())))
+<pre class="prettyprint"><code class="language-scala">val gc = GCMode.GCRoots(Set[DIKey](DIKey.get[A]))
+// gc: package.GCMode.GCRoots = GCRoots(
+//   Set(TypeKey(SafeType(TypeRef(ThisType(class App0), class A, List()))))
 // )
 
-val locator = Injector().produceUnsafe(module, roots = roots)
-// locator: Locator = com.github.pshirshov.izumi.distage.LocatorDefaultImpl@7c9982de
+val locator = Injector().produceUnsafe(module, mode = gc)
+// locator: Locator = com.github.pshirshov.izumi.distage.LocatorDefaultImpl@6fea66b2
 
 // A and B are here
 locator.find[A]

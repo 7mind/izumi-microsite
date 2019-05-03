@@ -149,6 +149,8 @@ data-md-source="github">
     <li><a href="../distage/other-features.html" class="page">Other Features</a></li>
     <li><a href="../distage/debugging.html" class="page">Debugging</a></li>
     <li><a href="../distage/cookbook.html" class="page">Cookbook</a></li>
+    <li><a href="../distage/roles.html" class="page">Role-Based Applications</a></li>
+    <li><a href="../distage/testkit.html" class="page">Testkit</a></li>
     <li><a href="../distage/reference.html" class="page">Syntax Summary</a></li>
   </ul></li>
   <li><a href="../logstage/index.html" class="page">LogStage</a>
@@ -261,7 +263,7 @@ final class HelloByeApp(greeter: Greeter, byer: Byer) {
 </code></pre>
 <p>The app above uses <code>Greeter</code> and <code>Byer</code> to hold a simple conversation with the user.</p>
 <p>To actually run the app, we&rsquo;ll have to bind the real implementations of <code>Greeter</code> and <code>Byer</code>.</p>
-<pre class="prettyprint"><code class="language-scala">import distage.{ModuleDef, Injector}
+<pre class="prettyprint"><code class="language-scala">import distage.{ModuleDef, Injector, GCMode}
 
 object HelloByeModule extends ModuleDef {
   make[Greeter].from[PrintGreeter]
@@ -273,7 +275,7 @@ object HelloByeModule extends ModuleDef {
 <p>Let&rsquo;s launch the app and see what happens:</p>
 <pre class="prettyprint"><code class="language-scala">val injector = Injector()
 
-val plan = injector.plan(HelloByeModule)
+val plan = injector.plan(HelloByeModule, GCMode.NoGC)
 val objects = injector.produceUnsafe(plan)
 
 val app = objects.get[HelloByeApp]
@@ -317,7 +319,7 @@ new ModuleDef {
   })
 })
 
-val capsUniverse = injector.produceUnsafe(caps)
+val capsUniverse = injector.produceUnsafe(caps, GCMode.NoGC)
 </code></pre>
 <pre class="prettyprint"><code class="language-scala">capsUniverse.get[HelloByeApp].run()
 // What&#39;s your name?
@@ -357,8 +359,8 @@ object HostPortModule extends ModuleDef {
 <p>Given a <code>Locator</code> we can retrieve instances by type, call methods on them or summon them with a function:</p>
 <pre class="prettyprint"><code class="language-scala">import scala.util.Random
 
-val objects = Injector().produceUnsafe(HelloByeModule)
-// objects: Locator = com.github.pshirshov.izumi.distage.LocatorDefaultImpl@14817993
+val objects = Injector().produceUnsafe(HelloByeModule, GCMode.NoGC)
+// objects: Locator = com.github.pshirshov.izumi.distage.LocatorDefaultImpl@1495801d
 
 objects.run {
   (hello: Hello, bye: Bye) =&gt;
@@ -368,9 +370,9 @@ objects.run {
     hello(names(rnd))
     bye(names(rnd))
 }
-// Random index: 1
-// Hello Marisa
-// Bye Marisa
+// Random index: 0
+// Hello Snow
+// Bye Snow
 </code></pre>
 <pre class="prettyprint"><code class="language-scala">objects.runOption { i: Int =&gt; i + 10 } match {
   case None =&gt; println(&quot;There is no Int in the object graph!&quot;)
@@ -444,7 +446,7 @@ object HttpServerModule extends ModuleDef {
     HttpServerModule,
   ).merge
 
-val objects = Injector().produceUnsafe(finalModule)
+val objects = Injector().produceUnsafe(finalModule, GCMode.NoGC)
 
 val server = objects.get[HttpServer]
 </code></pre>
@@ -521,14 +523,14 @@ val dbResource = Resource.make(
   acquire = IO { println(&quot;Connecting to DB!&quot;); new DBConnection }
 )(release = _ =&gt; IO(println(&quot;Disconnecting DB&quot;)))
 // dbResource: Resource[IO, DBConnection] = Allocate(
-//   Map(Delay(&lt;function0&gt;), scala.Function1$$Lambda$14618/924561904@3765d7fe, 1)
+//   Map(Delay(&lt;function0&gt;), scala.Function1$$Lambda$14282/1349391915@11fc478a, 1)
 // )
 
 val mqResource = Resource.make(
   acquire = IO { println(&quot;Connecting to Message Queue!&quot;); new MessageQueueConnection }
 )(release = _ =&gt; IO(println(&quot;Disconnecting Message Queue&quot;)))
 // mqResource: Resource[IO, MessageQueueConnection] = Allocate(
-//   Map(Delay(&lt;function0&gt;), scala.Function1$$Lambda$14618/924561904@2f1ac322, 1)
+//   Map(Delay(&lt;function0&gt;), scala.Function1$$Lambda$14282/1349391915@12ca15f8, 1)
 // )
 
 class MyApp(db: DBConnection, mq: MessageQueueConnection) {
@@ -543,7 +545,7 @@ def module = new ModuleDef {
 }
 </code></pre>
 <p>Will produce the following output:</p>
-<pre class="prettyprint"><code class="language-scala">Injector().produceF[IO](module).use {
+<pre class="prettyprint"><code class="language-scala">Injector().produceF[IO](module, GCMode.NoGC).use {
   objects =&gt;
     objects.get[MyApp].run
 }.unsafeRunSync()
@@ -576,14 +578,14 @@ val module = new ModuleDef {
 }
 // module: AnyRef with ModuleDef = Set(SingletonBinding({type.repl.Session.App14.Init},ResourceImpl(repl.Session.App14.Init,[A]com.github.pshirshov.izumi.fundamentals.platform.functional.Identity[A],TypeImpl(repl.Session.App14.InitResource)),Set(),(basics.md:466)))
 </code></pre>
-<pre class="prettyprint"><code class="language-scala">val closedInit = Injector().produce(module).use {
+<pre class="prettyprint"><code class="language-scala">val closedInit = Injector().produce(module, GCMode.NoGC).use {
   objects =&gt;
     val init = objects.get[Init] 
     println(init.initialized)
     init
 }
 // true
-// closedInit: com.github.pshirshov.izumi.fundamentals.platform.functional.package.Identity[Init] = repl.Session$App14$Init@6ac2038f
+// closedInit: com.github.pshirshov.izumi.fundamentals.platform.functional.package.Identity[Init] = repl.Session$App14$Init@651b3b09
 println(closedInit.initialized)
 // false
 </code></pre>
@@ -626,7 +628,7 @@ object KVStore {
     ref &lt;- Ref.make(Map.empty[String, String])
     kvStore = new KVStore[IO] {
       def put(key: String, value: String): IO[Nothing, Unit] =
-        ref.update(_ + (key -&gt; value)).void
+        ref.update(_ + (key -&gt; value)).unit
       
       def get(key: String): IO[NoSuchElementException, String] = 
         for {
@@ -646,10 +648,10 @@ object KVStore {
 val kvStoreModule = new ModuleDef {
   make[KVStore[IO]].fromEffect(KVStore.dummy)
 }
-// kvStoreModule: AnyRef with ModuleDef = Set(SingletonBinding({type.App16.this.KVStore[scalaz.zio.IO]},EffectImpl(App16.this.KVStore[scalaz.zio.IO],[A]scalaz.zio.IO[Nothing,A],InstanceImpl(scalaz.zio.ZIO[Any,Nothing,App16.this.KVStore[scalaz.zio.IO]],scalaz.zio.ZIO$FlatMap@2652f5a9)),Set(),(basics.md:562)))
+// kvStoreModule: AnyRef with ModuleDef = Set(SingletonBinding({type.App16.this.KVStore[scalaz.zio.IO]},EffectImpl(App16.this.KVStore[scalaz.zio.IO],[A]scalaz.zio.IO[Nothing,A],InstanceImpl(scalaz.zio.ZIO[Any,Nothing,App16.this.KVStore[scalaz.zio.IO]],scalaz.zio.ZIO$FlatMap@619383a3)),Set(),(basics.md:562)))
 
 new DefaultRuntime{}.unsafeRun {
-  Injector().produceF[IO[Throwable, ?]](kvStoreModule)
+  Injector().produceF[IO[Throwable, ?]](kvStoreModule, GCMode.NoGC)
     .use {
       objects =&gt;
         val kv = objects.get[KVStore[IO]]
@@ -734,11 +736,11 @@ object TryInterpreters extends ModuleDef {
 
 // combine all modules
 val TryProgram = new Program[Try] ++ TryInterpreters
-// TryProgram: Module = Set(SingletonBinding({type.cats.Monad[[A]scala.util.Try[A]]},InstanceImpl(cats.Monad[[A]scala.util.Try[A]],cats.instances.TryInstances$$anon$1@432d3f52),Set(),(basics.md:638)), SingletonBinding({type.repl.Session.App18.Interaction[scala.util.Try]},InstanceImpl(repl.Session.App18.Interaction[scala.util.Try],repl.Session$App18$$anon$13@1b6f4f0c),Set(),(basics.md:671)), SingletonBinding({type.repl.Session.App18.TaglessProgram[[A]scala.util.Try[A]]},ProviderImpl(repl.Session.App18.TaglessProgram[[A]scala.util.Try[A]],&lt;function1&gt;(cats.Monad[[A]scala.util.Try[A]], repl.Session.App18.Validation[[A]scala.util.Try[A]], repl.Session.App18.Interaction[[A]scala.util.Try[A]]): repl.Session.App18.TaglessProgram[[A]scala.util.Try[A]]),Set(),(basics.md:636)), SingletonBinding({type.repl.Session.App18.Validation[scala.util.Try]},InstanceImpl(repl.Session.App18.Validation[scala.util.Try],repl.Session$App18$$anon$12@3db12964),Set(),(basics.md:670)))
+// TryProgram: Module = Set(SingletonBinding({type.repl.Session.App18.TaglessProgram[[A]scala.util.Try[A]]},ProviderImpl(repl.Session.App18.TaglessProgram[[A]scala.util.Try[A]],&lt;function1&gt;(cats.Monad[[A]scala.util.Try[A]], repl.Session.App18.Validation[[A]scala.util.Try[A]], repl.Session.App18.Interaction[[A]scala.util.Try[A]]): repl.Session.App18.TaglessProgram[[A]scala.util.Try[A]]),Set(),(basics.md:636)), SingletonBinding({type.repl.Session.App18.Interaction[scala.util.Try]},InstanceImpl(repl.Session.App18.Interaction[scala.util.Try],repl.Session$App18$$anon$13@5600b96a),Set(),(basics.md:671)), SingletonBinding({type.cats.Monad[[A]scala.util.Try[A]]},InstanceImpl(cats.Monad[[A]scala.util.Try[A]],cats.instances.TryInstances$$anon$1@37a34c65),Set(),(basics.md:638)), SingletonBinding({type.repl.Session.App18.Validation[scala.util.Try]},InstanceImpl(repl.Session.App18.Validation[scala.util.Try],repl.Session$App18$$anon$12@abd5323),Set(),(basics.md:670)))
 
 // create object graph
-val objects = Injector().produceUnsafe(TryProgram)
-// objects: Locator = com.github.pshirshov.izumi.distage.LocatorDefaultImpl@5c9474c0
+val objects = Injector().produceUnsafe(TryProgram, GCMode.NoGC)
+// objects: Locator = com.github.pshirshov.izumi.distage.LocatorDefaultImpl@6029b64e
 
 // run
 objects.get[TaglessProgram[Try]].program
