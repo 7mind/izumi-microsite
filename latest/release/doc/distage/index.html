@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="x-ua-compatible" content="ie=edge">
 <meta name="description" content="microsite">
-<meta name="generator" content="Paradox, paradox-material-theme=0.7.0, mkdocs-material=3.0.3">
+<meta name="generator" content="Paradox, paradox-material-theme=0.8.0, mkdocs-material=3.0.3">
 
 <meta name="lang:clipboard.copy" content="Copy to clipboard">
 <meta name="lang:clipboard.copied" content="Copied to clipboard">
@@ -86,7 +86,7 @@ Type to start searching
 </div>
 <div class="md-flex__cell md-flex__cell--shrink">
 <div class="md-header-nav__source">
-<a href="https://github.com/pshirshov/izumi-r2"
+<a href="https://github.com/7mind/izumi"
 title="Go to repository"
 class="md-source"
 data-md-source="github">
@@ -94,7 +94,7 @@ data-md-source="github">
 <i class="fa fa-github"></i>
 </div>
 <div class="md-source__repository">
-pshirshov/izumi-r2
+7mind/izumi
 </div>
 </a>
 
@@ -121,7 +121,7 @@ Izumi Project
 </a>
 </label>
 <div class="md-nav__source">
-<a href="https://github.com/pshirshov/izumi-r2"
+<a href="https://github.com/7mind/izumi"
 title="Go to repository"
 class="md-source"
 data-md-source="github">
@@ -129,7 +129,7 @@ data-md-source="github">
 <i class="fa fa-github"></i>
 </div>
 <div class="md-source__repository">
-pshirshov/izumi-r2
+7mind/izumi
 </div>
 </a>
 
@@ -149,6 +149,8 @@ pshirshov/izumi-r2
     <li><a href="../distage/other-features.html" class="page">Other Features</a></li>
     <li><a href="../distage/debugging.html" class="page">Debugging</a></li>
     <li><a href="../distage/cookbook.html" class="page">Cookbook</a></li>
+    <li><a href="../distage/roles.html" class="page">Role-Based Applications</a></li>
+    <li><a href="../distage/testkit.html" class="page">Testkit</a></li>
     <li><a href="../distage/reference.html" class="page">Syntax Summary</a></li>
   </ul></li>
   <li><a href="../logstage/index.html" class="page">LogStage</a>
@@ -156,6 +158,7 @@ pshirshov/izumi-r2
     <li><a href="../logstage/policy.html" class="page">Rendering policy</a></li>
     <li><a href="../logstage/config.html" class="page">Logstage Config</a></li>
     <li><a href="../logstage/custom_ctx.html" class="page">Custom Context</a></li>
+    <li><a href="../logstage/syntax.html" class="page">Syntax Reference</a></li>
   </ul></li>
   <li><a href="../sbt/index.html" class="page">SBT Toolkit</a></li>
   <li><a href="../manifesto/index.html" class="page">Productivity and challenges</a></li>
@@ -166,6 +169,9 @@ pshirshov/izumi-r2
 <ul>
   <li><a href="../distage/index.html#distage-staged-dependency-injection" class="header">distage: Staged Dependency Injection</a>
   <ul>
+    <li><a href="../distage/index.html#why-to-use-distage-" class="header">Why to use distage?</a></li>
+    <li><a href="../distage/index.html#faq" class="header">FAQ</a></li>
+    <li><a href="../distage/index.html#further-reading" class="header">Further reading</a></li>
     <li><a href="../distage/index.html#pper" class="header">PPER</a></li>
   </ul></li>
 </ul>
@@ -175,7 +181,7 @@ pshirshov/izumi-r2
 <ul style="display: none">
 <li class="md-nav__item md-version" id="project.version">
 <label class="md-nav__link" for="__version">
-<i class="md-icon" title="Version">label_outline</i> 0.7.0
+<i class="md-icon" title="Version">label_outline</i> 0.8.0
 </label>
 </li>
 </ul>
@@ -190,6 +196,9 @@ pshirshov/izumi-r2
 <ul>
   <li><a href="../distage/index.html#distage-staged-dependency-injection" class="header">distage: Staged Dependency Injection</a>
   <ul>
+    <li><a href="../distage/index.html#why-to-use-distage-" class="header">Why to use distage?</a></li>
+    <li><a href="../distage/index.html#faq" class="header">FAQ</a></li>
+    <li><a href="../distage/index.html#further-reading" class="header">Further reading</a></li>
     <li><a href="../distage/index.html#pper" class="header">PPER</a></li>
   </ul></li>
 </ul>
@@ -204,27 +213,49 @@ pshirshov/izumi-r2
 <h1><a href="#distage-staged-dependency-injection" name="distage-staged-dependency-injection" class="anchor"><span class="anchor-link"></span></a>distage: Staged Dependency Injection</h1>
 <p><code>distage</code> is a pragmatic module system for Scala that combines simplicity and reliability of pure FP with extreme late-binding and flexibility of runtime dependency injection frameworks such as Guice.</p>
 <p><code>distage</code> is unopinionated, it&rsquo;s good for structuring applications written in either imperative Scala as in Akka/Play, or in pure FP <a href="basics.html#tagless-final-style">Tagless Final Style</a></p>
-<p>Further reading:</p>
+<h2><a href="#why-to-use-distage-" name="why-to-use-distage-" class="anchor"><span class="anchor-link"></span></a>Why to use distage?</h2>
+<ol>
+  <li><strong>Faster applications and tests</strong>:  <code>distage</code> guarantees that no unneccessary instantiations will happen during your tests or application startup.</li>
+  <li><strong>Quicker failure detection</strong>:  <code>distage</code> peforms all the integration checks for your application and tests even before any instantiations happened.</li>
+  <li><strong>Simpler tests</strong>:  <code>distage</code> eliminates all the hard work of setting up your test environments, especially polymorphic ones.</li>
+  <li><strong>Simpler development workflows</strong>:  <code>distage</code> allows you to develop Role-Based Applications &ndash; a fusion of Microservices and Monoliths.  You may run all your services in one process for development purposes (and even switch to mock implementations with a single commandline argument).</li>
+  <li><strong>Simpler deployments</strong>:  <code>distage</code> allows you to simplify deployments and reduce your running costs by leveraging Role-Based Applications Architecture.</li>
+  <li><strong>Simpler debugging</strong>:  <code>distage</code> provides you important insights about your application and allows you to introspect and modify it on the fly,  before any instantiations happen.</li>
+  <li><strong>Higher Correctness</strong>:  <code>distage</code> supports resources natively and guarantees proper cleanups even when something went wrong.</li>
+  <li><strong>Cheaper integration tests</strong>:  <code>distage</code> provides you great memoization support for your tests so you may reuse heavy resources (like database connections) in your  integration tests not sacrificing correctness.</li>
+  <li><strong>No pressure</strong>:  <code>distage</code> is non-invasive and designed not to interfere with your of writing Scala code.  It just removes all the initialization boilerplate. You don&rsquo;t need to learn magic tricks to write components for distage application.</li>
+</ol>
+<p>Also <code>distage</code> is approved by industry leaders:</p>
+<blockquote>
+  <p>Given its native support for type classes and higher-kinded types &ndash; both features indispensable to functional programming &ndash; distage is one of the leading dependency injection libraries out there. Bonus points for being built by a wicked-smart team that contributes to ZIO!</p>
+  <p>-– <em>John A. De Goes</em></p>
+</blockquote>
+<h2><a href="#faq" name="faq" class="anchor"><span class="anchor-link"></span></a>FAQ</h2>
+<p><strong>Q:</strong> isn&rsquo;t it unsafe to use runtime dependency injection framework?</p>
+<p><strong>A</strong>: <code>distage</code> has static verification mechanisms allowing to achieve same level of guarantees as hand-written static code. Full compile-time DI support is under development.</p>
+<h2><a href="#further-reading" name="further-reading" class="anchor"><span class="anchor-link"></span></a>Further reading</h2>
 <ul>
-  <li>Slides: <a href="https://www.slideshare.net/7mind/distage-purely-functional-staged-dependency-injection-bonus-faking-kind-polymorphism-in-scala-2">distage: Purely Functional Staged Dependency Injection</a></li>
+  <li>Slides - <a href="https://www.slideshare.net/7mind/scalaua-distage-staged-dependency-injection">distage: Staged Dependency Injection</a></li>
   <li><a href="basics.html#tutorial">Tutorial</a></li>
   <li><a href="config_injection.html">Config Injection</a></li>
   <li><a href="other-features.html">Other features</a></li>
   <li><a href="debugging.html">Debugging</a></li>
   <li><a href="cookbook.html">Cookbook</a></li>
+  <li><a href="roles.html">Role-Based Apps</a></li>
+  <li><a href="testkit.html">Testkit</a></li>
   <li><a href="reference.html">Syntax reference</a></li>
 </ul>
 <h2><a href="#pper" name="pper" class="anchor"><span class="anchor-link"></span></a>PPER</h2>
 <p>See <a href="../pper/index.html">PPER Overview</a></p>
 </div>
 <div>
-<a href="https://github.com/pshirshov/izumi-r2/tree/master/doc/microsite/target/mdoc/distage/00_distage.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/7mind/izumi/tree/master/doc/microsite/target/mdoc/distage/00_distage.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>
 <div class="print-only">
 <span class="md-source-file md-version">
-0.7.0
+0.8.0
 </span>
 </div>
 </article>

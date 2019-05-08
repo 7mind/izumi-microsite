@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="x-ua-compatible" content="ie=edge">
 <meta name="description" content="microsite">
-<meta name="generator" content="Paradox, paradox-material-theme=0.7.0, mkdocs-material=3.0.3">
+<meta name="generator" content="Paradox, paradox-material-theme=0.8.0, mkdocs-material=3.0.3">
 
 <meta name="lang:clipboard.copy" content="Copy to clipboard">
 <meta name="lang:clipboard.copied" content="Copied to clipboard">
@@ -86,7 +86,7 @@ Type to start searching
 </div>
 <div class="md-flex__cell md-flex__cell--shrink">
 <div class="md-header-nav__source">
-<a href="https://github.com/pshirshov/izumi-r2"
+<a href="https://github.com/7mind/izumi"
 title="Go to repository"
 class="md-source"
 data-md-source="github">
@@ -94,7 +94,7 @@ data-md-source="github">
 <i class="fa fa-github"></i>
 </div>
 <div class="md-source__repository">
-pshirshov/izumi-r2
+7mind/izumi
 </div>
 </a>
 
@@ -121,7 +121,7 @@ Izumi Project
 </a>
 </label>
 <div class="md-nav__source">
-<a href="https://github.com/pshirshov/izumi-r2"
+<a href="https://github.com/7mind/izumi"
 title="Go to repository"
 class="md-source"
 data-md-source="github">
@@ -129,7 +129,7 @@ data-md-source="github">
 <i class="fa fa-github"></i>
 </div>
 <div class="md-source__repository">
-pshirshov/izumi-r2
+7mind/izumi
 </div>
 </a>
 
@@ -149,6 +149,8 @@ pshirshov/izumi-r2
     <li><a href="../distage/other-features.html" class="page">Other Features</a></li>
     <li><a href="../distage/debugging.html" class="page">Debugging</a></li>
     <li><a href="../distage/cookbook.html" class="page">Cookbook</a></li>
+    <li><a href="../distage/roles.html" class="page">Role-Based Applications</a></li>
+    <li><a href="../distage/testkit.html" class="page">Testkit</a></li>
     <li><a href="../distage/reference.html" class="page">Syntax Summary</a></li>
   </ul></li>
   <li><a href="../logstage/index.html" class="active page">LogStage</a>
@@ -156,6 +158,7 @@ pshirshov/izumi-r2
     <li><a href="../logstage/policy.html" class="page">Rendering policy</a></li>
     <li><a href="../logstage/config.html" class="page">Logstage Config</a></li>
     <li><a href="../logstage/custom_ctx.html" class="page">Custom Context</a></li>
+    <li><a href="../logstage/syntax.html" class="page">Syntax Reference</a></li>
   </ul></li>
   <li><a href="../sbt/index.html" class="page">SBT Toolkit</a></li>
   <li><a href="../manifesto/index.html" class="page">Productivity and challenges</a></li>
@@ -179,7 +182,7 @@ pshirshov/izumi-r2
 <ul style="display: none">
 <li class="md-nav__item md-version" id="project.version">
 <label class="md-nav__link" for="__version">
-<i class="md-icon" title="Version">label_outline</i> 0.7.0
+<i class="md-icon" title="Version">label_outline</i> 0.8.0
 </label>
 </li>
 </ul>
@@ -226,15 +229,20 @@ pshirshov/izumi-r2
 <pre class="prettyprint"><code class="language-scala">import logstage._
 import scala.util.Random
 
-val logger = IzLogger.DebugLogger
+val logger = IzLogger()
 
 val justAnArg = &quot;example&quot;
 val justAList = List[Any](10, &quot;green&quot;, &quot;bottles&quot;)
 
 logger.trace(s&quot;Argument: $justAnArg, another arg: $justAList&quot;)
+
+// custom name, not based on `val` name
 logger.info(s&quot;Named expression: ${Random.nextInt() -&gt; &quot;random number&quot;}&quot;)
+
+// print result without a name
 logger.warn(s&quot;Invisible argument: ${Random.nextInt() -&gt; &quot;random number&quot; -&gt; null}&quot;)
 
+// add following fields to all messages printed by a new logger value
 val ctxLogger = logger(&quot;userId&quot; -&gt; &quot;user@google.com&quot;, &quot;company&quot; -&gt; &quot;acme&quot;)
 val delta = Random.nextInt(1000)
 
@@ -262,16 +270,16 @@ libraryDependencies ++= Seq(
 )
 </code></pre>
 <p>or</p>
-<pre class="prettyprint"><code class="language-scala">val izumi_version = &quot;0.7.0&quot;
+<pre class="prettyprint"><code class="language-scala">val izumi_version = &quot;0.8.0&quot;
 // LogStage API, you need it to use the logger
-libraryDependencies += &quot;com.github.pshirshov.izumi.r2&quot; %% &quot;logstage-core&quot; % izumi_version
+libraryDependencies += &quot;io.7mind.izumi&quot; %% &quot;logstage-core&quot; % izumi_version
 
 // LogStage machinery
 libraryDependencies ++= Seq(
   // json output
-    &quot;com.github.pshirshov.izumi.r2&quot; %% &quot;logstage-rendering-circe&quot; % izumi_version
+    &quot;io.7mind.izumi&quot; %% &quot;logstage-rendering-circe&quot; % izumi_version
   // router from Slf4j to LogStage
-  , &quot;com.github.pshirshov.izumi.r2&quot; %% &quot;logstage-adapter-slf4j&quot; % izumi_version    
+  , &quot;io.7mind.izumi&quot; %% &quot;logstage-adapter-slf4j&quot; % izumi_version    
 )
 </code></pre>
 <p>If you&rsquo;re not using <a href="../sbt/index.html#bills-of-materials">sbt-izumi-deps</a> plugin.</p>
@@ -297,7 +305,7 @@ contextLogger.info(s&quot;Hey&quot;)
 import com.github.pshirshov.izumi.logstage.api.routing.StaticLogRouter
 
 val myLogger = IzLogger()
-// myLogger: IzLogger = com.github.pshirshov.izumi.logstage.api.IzLogger@748670ef
+// myLogger: IzLogger = com.github.pshirshov.izumi.logstage.api.IzLogger@1c0812ce
 
 // configure SLF4j to use the same router as `myLogger`
 StaticLogRouter.instance.setup(myLogger.router)
@@ -308,47 +316,56 @@ StaticLogRouter.instance.setup(myLogger.router)
 import cats.effect.IO
 
 val logger = IzLogger()
-// logger: IzLogger = com.github.pshirshov.izumi.logstage.api.IzLogger@24671bea
+// logger: IzLogger = com.github.pshirshov.izumi.logstage.api.IzLogger@44f8953
 
 val log = LogIO.fromLogger[IO](logger)
-// log: LogIO[IO] = logstage.LogIO$$anon$1@23659f5b
+// log: LogIO[IO] = logstage.LogIO$$anon$1@1a7bb51e
 
 log.info(s&quot;Hey! I&#39;m logging with ${log}stage!&quot;).unsafeRunSync()
 </code></pre>
 <pre><code>I 2019-03-29T23:21:48.693Z[Europe/Dublin] r.S.App7.res8 ...main-12:5384  (00_logstage.md:92) Hey! I&#39;m logging with log=logstage.LogIO$$anon$1@72736f25stage!
 </code></pre>
-<p><code>logstage-zio</code> module adds an alternative <code>LogBIO</code> that logs the current fiber ID in addition to usual logging of thread ID:</p>
+<p><code>LogstageZIO.withFiberId</code> provides an <code>LogBIO</code> instance that always logs the current fiber ID in addition to usual logging of thread ID:</p>
 <p>Example:</p>
 <pre class="prettyprint"><code class="language-scala">import logstage.LogstageZIO
-import scalaz.zio.{IO, RTS}
+import scalaz.zio.{IO, DefaultRuntime}
 
 val log = LogstageZIO.withFiberId(logger)
-// log: LogBIO[IO] = logstage.LogstageZIO$$anon$1@7921d539
+// log: LogBIO[IO] = logstage.LogstageZIO$$anon$1@44119c2
 
-val rts = new RTS {}
-// rts: AnyRef with RTS = repl.Session$App11$$anon$1@2328fcd
+val rts = new DefaultRuntime {}
+// rts: AnyRef with DefaultRuntime = repl.Session$App11$$anon$1@bf31fef
 rts.unsafeRun {
   log.info(s&quot;Hey! I&#39;m logging with ${log}stage!&quot;)
 }
 </code></pre>
 <pre><code>I 2019-03-29T23:21:48.760Z[Europe/Dublin] r.S.App9.res10 ...main-12:5384  (00_logstage.md:123) {fiberId=0} Hey! I&#39;m logging with log=logstage.LogstageZIO$$anon$1@c39104astage!
 </code></pre>
-<p>To add use:</p>
-<pre class="prettyprint"><code class="language-scala">libraryDependencies += Izumi.R.logstage_zio
+<p><code>LogIO</code>/<code>LogBIO</code> algebras can be extended with custom context, same as <code>IzLogger</code>:</p>
+<pre class="prettyprint"><code class="language-scala">import cats.effect.IO
+import cats.implicits._
+import logstage._
+import io.circe.syntax._
+
+def importEntity(entity: Entity)(implicit log: LogIO[IO]): IO[Unit] = {
+  val ctxLog = log(&quot;ID&quot; -&gt; someEntity.id, &quot;entityAsJSON&quot; -&gt; entity.asJson.pretty(Printer.spaces2))
+
+  IO(???).handleErrorWith {
+    case error =&gt;
+      ctxLog.error(s&quot;Failed to import entity: $error.&quot;).void
+      // message includes `ID` and `entityAsJSON` fields
+  }
+}
 </code></pre>
-<p>or</p>
-<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;com.github.pshirshov.izumi.r2&quot; %% &quot;logstage-zio&quot; % izumi_version
-</code></pre>
-<p>If you&rsquo;re not using <a href="../sbt/index.html#bills-of-materials">sbt-izumi-deps</a> plugin.</p>
 </div>
 <div>
-<a href="https://github.com/pshirshov/izumi-r2/tree/master/doc/microsite/target/mdoc/logstage/00_logstage.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/7mind/izumi/tree/master/doc/microsite/target/mdoc/logstage/00_logstage.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>
 <div class="print-only">
 <span class="md-source-file md-version">
-0.7.0
+0.8.0
 </span>
 </div>
 </article>

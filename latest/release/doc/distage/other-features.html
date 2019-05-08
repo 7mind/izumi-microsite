@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="x-ua-compatible" content="ie=edge">
 <meta name="description" content="microsite">
-<meta name="generator" content="Paradox, paradox-material-theme=0.7.0, mkdocs-material=3.0.3">
+<meta name="generator" content="Paradox, paradox-material-theme=0.8.0, mkdocs-material=3.0.3">
 
 <meta name="lang:clipboard.copy" content="Copy to clipboard">
 <meta name="lang:clipboard.copied" content="Copied to clipboard">
@@ -86,7 +86,7 @@ Type to start searching
 </div>
 <div class="md-flex__cell md-flex__cell--shrink">
 <div class="md-header-nav__source">
-<a href="https://github.com/pshirshov/izumi-r2"
+<a href="https://github.com/7mind/izumi"
 title="Go to repository"
 class="md-source"
 data-md-source="github">
@@ -94,7 +94,7 @@ data-md-source="github">
 <i class="fa fa-github"></i>
 </div>
 <div class="md-source__repository">
-pshirshov/izumi-r2
+7mind/izumi
 </div>
 </a>
 
@@ -121,7 +121,7 @@ Izumi Project
 </a>
 </label>
 <div class="md-nav__source">
-<a href="https://github.com/pshirshov/izumi-r2"
+<a href="https://github.com/7mind/izumi"
 title="Go to repository"
 class="md-source"
 data-md-source="github">
@@ -129,7 +129,7 @@ data-md-source="github">
 <i class="fa fa-github"></i>
 </div>
 <div class="md-source__repository">
-pshirshov/izumi-r2
+7mind/izumi
 </div>
 </a>
 
@@ -149,6 +149,8 @@ pshirshov/izumi-r2
     <li><a href="../distage/other-features.html" class="active page">Other Features</a></li>
     <li><a href="../distage/debugging.html" class="page">Debugging</a></li>
     <li><a href="../distage/cookbook.html" class="page">Cookbook</a></li>
+    <li><a href="../distage/roles.html" class="page">Role-Based Applications</a></li>
+    <li><a href="../distage/testkit.html" class="page">Testkit</a></li>
     <li><a href="../distage/reference.html" class="page">Syntax Summary</a></li>
   </ul></li>
   <li><a href="../logstage/index.html" class="page">LogStage</a>
@@ -156,6 +158,7 @@ pshirshov/izumi-r2
     <li><a href="../logstage/policy.html" class="page">Rendering policy</a></li>
     <li><a href="../logstage/config.html" class="page">Logstage Config</a></li>
     <li><a href="../logstage/custom_ctx.html" class="page">Custom Context</a></li>
+    <li><a href="../logstage/syntax.html" class="page">Syntax Reference</a></li>
   </ul></li>
   <li><a href="../sbt/index.html" class="page">SBT Toolkit</a></li>
   <li><a href="../manifesto/index.html" class="page">Productivity and challenges</a></li>
@@ -175,6 +178,7 @@ pshirshov/izumi-r2
     <li><a href="../distage/other-features.html#roles" class="header">Roles</a></li>
     <li><a href="../distage/other-features.html#circular-dependencies-support" class="header">Circular Dependencies support</a></li>
     <li><a href="../distage/other-features.html#auto-sets-collecting-bindings-by-predicate" class="header">Auto-Sets: Collecting Bindings By Predicate</a></li>
+    <li><a href="../distage/other-features.html#weak-sets" class="header">Weak Sets</a></li>
     <li><a href="../distage/other-features.html#cats-integration" class="header">Cats Integration</a></li>
   </ul></li>
 </ul>
@@ -184,7 +188,7 @@ pshirshov/izumi-r2
 <ul style="display: none">
 <li class="md-nav__item md-version" id="project.version">
 <label class="md-nav__link" for="__version">
-<i class="md-icon" title="Version">label_outline</i> 0.7.0
+<i class="md-icon" title="Version">label_outline</i> 0.8.0
 </label>
 </li>
 </ul>
@@ -208,6 +212,7 @@ pshirshov/izumi-r2
     <li><a href="../distage/other-features.html#roles" class="header">Roles</a></li>
     <li><a href="../distage/other-features.html#circular-dependencies-support" class="header">Circular Dependencies support</a></li>
     <li><a href="../distage/other-features.html#auto-sets-collecting-bindings-by-predicate" class="header">Auto-Sets: Collecting Bindings By Predicate</a></li>
+    <li><a href="../distage/other-features.html#weak-sets" class="header">Weak Sets</a></li>
     <li><a href="../distage/other-features.html#cats-integration" class="header">Cats Integration</a></li>
   </ul></li>
 </ul>
@@ -237,10 +242,8 @@ pshirshov/izumi-r2
     <li><a href="../distage/other-features.html#automatic-resolution-with-generated-proxies" class="header">Automatic Resolution with generated proxies</a></li>
     <li><a href="../distage/other-features.html#manual-resolution-with-by-name-parameters" class="header">Manual Resolution with by-name parameters</a></li>
   </ul></li>
-  <li><a href="../distage/other-features.html#auto-sets-collecting-bindings-by-predicate" class="header">Auto-Sets: Collecting Bindings By Predicate</a>
-  <ul>
-    <li><a href="../distage/other-features.html#weak-sets" class="header">Weak Sets</a></li>
-  </ul></li>
+  <li><a href="../distage/other-features.html#auto-sets-collecting-bindings-by-predicate" class="header">Auto-Sets: Collecting Bindings By Predicate</a></li>
+  <li><a href="../distage/other-features.html#weak-sets" class="header">Weak Sets</a></li>
   <li><a href="../distage/other-features.html#cats-integration" class="header">Cats Integration</a></li>
 </ul>
 </div>
@@ -265,27 +268,27 @@ val module = new ModuleDef {
   make[B]
   make[C]
 }
-// module: AnyRef with ModuleDef = Set(SingletonBinding({type.App0.this.A},TypeImpl(App0.this.A),Set(&lt;*&gt;, &lt;singleton&gt;),(other-features.md:26)), SingletonBinding({type.App0.this.B},TypeImpl(App0.this.B),Set(&lt;*&gt;, &lt;singleton&gt;),(other-features.md:27)), SingletonBinding({type.App0.this.C},TypeImpl(App0.this.C),Set(&lt;*&gt;, &lt;singleton&gt;),(other-features.md:28)))
+// module: AnyRef with ModuleDef = Set(SingletonBinding({type.App0.this.A},TypeImpl(App0.this.A),Set(),(other-features.md:26)), SingletonBinding({type.App0.this.B},TypeImpl(App0.this.B),Set(),(other-features.md:27)), SingletonBinding({type.App0.this.C},TypeImpl(App0.this.C),Set(),(other-features.md:28)))
 </code></pre>
-<pre class="prettyprint"><code class="language-scala">val roots = Set[DIKey](DIKey.get[A])
-// roots: Set[DIKey] = Set(
-//   TypeKey(SafeType(TypeRef(ThisType(class App0), class A, List())))
+<pre class="prettyprint"><code class="language-scala">val gc = GCMode.GCRoots(Set[DIKey](DIKey.get[A]))
+// gc: package.GCMode.GCRoots = GCRoots(
+//   Set(TypeKey(SafeType(TypeRef(ThisType(class App0), class A, List()))))
 // )
 
-val locator = Injector().produceUnsafe(module, roots = roots)
-// locator: Locator = com.github.pshirshov.izumi.distage.LocatorDefaultImpl@53db0057
+val locator = Injector().produceUnsafe(module, mode = gc)
+// locator: Locator = com.github.pshirshov.izumi.distage.LocatorDefaultImpl@60728e7e
 
-// A is here
+// A and B are here
 locator.find[A]
 // res1: Option[A] = Some(A(B()))
-
-// B and C were not created
 locator.find[B]
 // res2: Option[B] = Some(B())
+
+// C was not created
 locator.find[C]
 // res3: Option[C] = None
 </code></pre>
-<p>Class <code>C</code> was removed because it neither <code>B</code> nor <code>A</code> depended on it. It&rsquo;s not present in the <code>Locator</code> and the <code>&quot;C!&quot;</code> message was never printed. But, if class <code>B</code> were to depend on <code>C</code> as in <code>case class B(c: C)</code>, it would&rsquo;ve been retained, because <code>A</code> - the GC root, would depend on <code>B</code> which in turns depends on <code>C</code>.</p>
+<p>Class <code>C</code> was removed because neither <code>B</code> nor <code>A</code> depended on it. It&rsquo;s not present in the <code>Locator</code> and the <code>&quot;C!&quot;</code> message was never printed. But, if class <code>B</code> were to depend on <code>C</code> as in <code>case class B(c: C)</code>, it would&rsquo;ve been retained, because <code>A</code> - the GC root, would depend on <code>B</code> which in turns depends on <code>C</code>.</p>
 <h3><a href="#auto-traits" name="auto-traits" class="anchor"><span class="anchor-link"></span></a>Auto-Traits</h3><div class="callout warning "><div class="callout-title">TODO</div>
 <p>Sorry, this page is not ready yet</p></div>
 <p>&hellip;</p>
@@ -324,7 +327,7 @@ trait ActorFactory {
 <pre class="prettyprint"><code class="language-scala">libraryDependencies += Izumi.R.distage_plugins
 </code></pre>
 <p>or</p>
-<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;com.github.pshirshov.izumi.r2&quot; %% &quot;distage-plugins&quot; % &quot;0.7.0&quot;
+<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;io.7mind.izumi&quot; %% &quot;distage-plugins&quot; % &quot;0.8.0&quot;
 </code></pre>
 <p>If you&rsquo;re not using <a href="../sbt/index.html#bills-of-materials">sbt-izumi-deps</a> plugin.</p>
 <p>Create a module extending the <code>PluginDef</code> trait instead of <code>ModuleDef</code>:</p>
@@ -359,18 +362,18 @@ val app: ModuleBase = appModules.merge
 <p>Plugins also allow a program to extend itself at runtime by adding new <code>Plugin</code> classes to the classpath via <code>java -cp</code></p>
 <h3><a href="#compile-time-instantiation" name="compile-time-instantiation" class="anchor"><span class="anchor-link"></span></a>Compile-Time Instantiation</h3><div class="callout warning "><div class="callout-title">TODO</div>
 <p>Sorry, this page is not ready yet</p>
-<p>Relevant ticket: <a href="https://github.com/pshirshov/izumi-r2/issues/453">https://github.com/pshirshov/izumi-r2/issues/453</a></p></div>
+<p>Relevant ticket: <a href="https://github.com/7mind/izumi/issues/453">https://github.com/7mind/izumi/issues/453</a></p></div>
 <p>WIP</p>
-<p>You can participate in this ticket at <a href="https://github.com/pshirshov/izumi-r2/issues/453">https://github.com/pshirshov/izumi-r2/issues/453</a></p>
+<p>You can participate in this ticket at <a href="https://github.com/7mind/izumi/issues/453">https://github.com/7mind/izumi/issues/453</a></p>
 <h3><a href="#compile-time-checks" name="compile-time-checks" class="anchor"><span class="anchor-link"></span></a>Compile-Time Checks</h3><div class="callout warning "><div class="callout-title">TODO</div>
 <p>Sorry, this page is not ready yet</p>
-<p>Relevant ticket: <a href="https://github.com/pshirshov/izumi-r2/issues/51">https://github.com/pshirshov/izumi-r2/issues/51</a></p></div>
+<p>Relevant ticket: <a href="https://github.com/7mind/izumi/issues/51">https://github.com/7mind/izumi/issues/51</a></p></div>
 <p>As of now, an experimental plugin-checking API is available in <code>distage-app</code> module.</p>
 <p>To use it add <code>distage-app</code> library:</p>
 <pre class="prettyprint"><code class="language-scala">libraryDependencies += Izumi.R.distage_app
 </code></pre>
 <p>or</p>
-<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;com.github.pshirshov.izumi.r2&quot; %% &quot;distage-app&quot; % &quot;0.7.0&quot;
+<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;io.7mind.izumi&quot; %% &quot;distage-app&quot; % &quot;0.8.0&quot;
 </code></pre>
 <p>If you&rsquo;re not using <a href="../sbt/index.html#bills-of-materials">sbt-izumi-deps</a> plugin.</p>
 <p>Only plugins defined in a different module can be checked at compile-time, <code>test</code> scope counts as a different module.</p>
@@ -426,7 +429,7 @@ final class AppPluginTest extends WordSpec {
 }
 </code></pre>
 <p><code>checkWithConfig</code> will run at compile-time, every time that AppPluginTest is recompiled.</p>
-<p>You can participate in this ticket at <a href="https://github.com/pshirshov/izumi-r2/issues/51">https://github.com/pshirshov/izumi-r2/issues/51</a></p>
+<p>You can participate in this ticket at <a href="https://github.com/7mind/izumi/issues/51">https://github.com/7mind/izumi/issues/51</a></p>
 <h3><a href="#roles" name="roles" class="anchor"><span class="anchor-link"></span></a>Roles</h3><div class="callout warning "><div class="callout-title">TODO</div>
 <p>Sorry, this page is not ready yet</p></div>
 <p>&ldquo;Roles&rdquo; are a pattern of multi-tenant applications, in which multiple separate microservices all reside within a single <code>.jar</code>. This strategy helps cut down development, maintenance and operations costs associated with maintaining fully separate code bases and binaries. Apps are chosen via command-line parameters: <code>./launcher app1 app2 app3</code>. If you&rsquo;re not launching all apps hosted by the launcher at the same time, the redundant components from unlaunched apps will be <a href="#garbage-collection">garbage collected</a> and won&rsquo;t be started.</p>
@@ -435,7 +438,7 @@ final class AppPluginTest extends WordSpec {
 <pre class="prettyprint"><code class="language-scala">libraryDependencies += Izumi.R.distage_roles
 </code></pre>
 <p>or</p>
-<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;com.github.pshirshov.izumi.r2&quot; %% &quot;distage-roles&quot; % &quot;0.7.0&quot;
+<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;io.7mind.izumi&quot; %% &quot;distage-roles&quot; % &quot;0.8.0&quot;
 </code></pre>
 <p>If you&rsquo;re not using <a href="../sbt/index.html#bills-of-materials">sbt-izumi-deps</a> plugin.</p>
 <h3><a href="#circular-dependencies-support" name="circular-dependencies-support" class="anchor"><span class="anchor-link"></span></a>Circular Dependencies support</h3>
@@ -533,7 +536,7 @@ resources.reverse.foreach(_.stop())
 </code></pre>
 <p>Calling <code>.foreach</code> on an auto-set is safe; the actions will be executed in order of dependencies. Auto-Sets preserve ordering, they use <code>ListSet</code> under the hood, unlike user-defined <a href="#multibindings--set-bindings">Sets</a>. e.g. If <code>C</code> depends on <code>B</code> depends on <code>A</code>, autoset order is: <code>A, B, C</code>, to start call: <code>A, B, C</code>, to close call: <code>C, B, A</code>. When you use auto-sets for finalization, you <strong>must</strong> <code>.reverse</code> the autoset.</p>
 <p>Note: Auto-Sets are NOT subject to <a href="#using-garbage-collector">Garbage Collection</a>, they are assembled <em>after</em> garbage collection is done, as such they can&rsquo;t contain garbage by construction.</p>
-<h4><a href="#weak-sets" name="weak-sets" class="anchor"><span class="anchor-link"></span></a>Weak Sets</h4>
+<h3><a href="#weak-sets" name="weak-sets" class="anchor"><span class="anchor-link"></span></a>Weak Sets</h3>
 <p><a href="#set-bindings--multibindings">Set bindings</a> can contain <em>weak</em> references. References designated as weak will be retained by <a href="#using-garbage-collector">Garbage Collector</a> <em>only</em> if there are other references to them except the set binding itself.</p>
 <p>Example:</p>
 <pre class="prettyprint"><code class="language-scala">import distage._
@@ -577,21 +580,12 @@ locator.get[Set[SetElem]].size == 2
 // res1: Boolean = true
 </code></pre>
 <h3><a href="#cats-integration" name="cats-integration" class="anchor"><span class="anchor-link"></span></a>Cats Integration</h3>
-<p>You can use <code>produceF</code> with <code>cats.effect.IO</code> with just <code>distage-core</code>.</p>
-<p><a href="basics.md#resource-bindings--lifecycle">Cats Resource Bindings</a> will also work out of the box without any additional modules.</p><div class="callout warning "><div class="callout-title">deprecated</div>
-<p>All cats instances &amp; syntax will be rolled into <code>distage-core</code>. (via sbt&rsquo;s <code>Optional</code> dependencies, they will only be available if your project depends on <code>cats</code>.)</p></div>
-<p>To import cats integration add <code>distage-cats</code> library:</p>
-<pre class="prettyprint"><code class="language-scala">libraryDependencies += Izumi.R.distage_cats
-</code></pre>
-<p>or</p>
-<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;com.github.pshirshov.izumi.r2&quot; %% &quot;distage-cats&quot; % &quot;0.7.0&quot;
-</code></pre>
-<p>If you&rsquo;re not using <a href="../sbt/index.html#bills-of-materials">sbt-izumi-deps</a> plugin.</p>
+<p>Additional cats instances and syntax are available automatically without imports if you already depend on cats via <a href="https://blog.7mind.io/no-more-orphans.html">No More Orphans</a> technique.</p>
+<p><a href="basics.html#resource-bindings--lifecycle">Cats Resource Bindings</a> will also work out of the box without imports.</p>
 <p>Usage:</p>
 <pre class="prettyprint"><code class="language-scala">import cats.implicits._
 import cats.effect._
 import distage._
-import distage.interop.cats._
 import com.example.{DBConnection, AppEntrypoint}
 
 object Main extends IOApp {
@@ -603,7 +597,7 @@ object Main extends IOApp {
         case i if i.target == DIKey.get[DBConnection] =&gt;
            DBConnection.create[IO]
       } 
-      classes &lt;- Injector().produceF[IO](plan) // produceF allows using `IO` with effect and resource bindings
+      classes &lt;- Injector().produceF[IO](plan) // produceF allows using cats `IO` with effect and resource bindings
       _ &lt;- classes.get[AppEntrypoint].run
     } yield ()
   }
@@ -611,13 +605,13 @@ object Main extends IOApp {
 </code></pre>
 </div>
 <div>
-<a href="https://github.com/pshirshov/izumi-r2/tree/master/doc/microsite/target/mdoc/distage/other-features.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/7mind/izumi/tree/master/doc/microsite/target/mdoc/distage/other-features.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>
 <div class="print-only">
 <span class="md-source-file md-version">
-0.7.0
+0.8.0
 </span>
 </div>
 </article>

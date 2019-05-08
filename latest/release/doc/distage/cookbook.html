@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="x-ua-compatible" content="ie=edge">
 <meta name="description" content="microsite">
-<meta name="generator" content="Paradox, paradox-material-theme=0.7.0, mkdocs-material=3.0.3">
+<meta name="generator" content="Paradox, paradox-material-theme=0.8.0, mkdocs-material=3.0.3">
 
 <meta name="lang:clipboard.copy" content="Copy to clipboard">
 <meta name="lang:clipboard.copied" content="Copied to clipboard">
@@ -86,7 +86,7 @@ Type to start searching
 </div>
 <div class="md-flex__cell md-flex__cell--shrink">
 <div class="md-header-nav__source">
-<a href="https://github.com/pshirshov/izumi-r2"
+<a href="https://github.com/7mind/izumi"
 title="Go to repository"
 class="md-source"
 data-md-source="github">
@@ -94,7 +94,7 @@ data-md-source="github">
 <i class="fa fa-github"></i>
 </div>
 <div class="md-source__repository">
-pshirshov/izumi-r2
+7mind/izumi
 </div>
 </a>
 
@@ -121,7 +121,7 @@ Izumi Project
 </a>
 </label>
 <div class="md-nav__source">
-<a href="https://github.com/pshirshov/izumi-r2"
+<a href="https://github.com/7mind/izumi"
 title="Go to repository"
 class="md-source"
 data-md-source="github">
@@ -129,7 +129,7 @@ data-md-source="github">
 <i class="fa fa-github"></i>
 </div>
 <div class="md-source__repository">
-pshirshov/izumi-r2
+7mind/izumi
 </div>
 </a>
 
@@ -149,6 +149,8 @@ pshirshov/izumi-r2
     <li><a href="../distage/other-features.html" class="page">Other Features</a></li>
     <li><a href="../distage/debugging.html" class="page">Debugging</a></li>
     <li><a href="../distage/cookbook.html" class="active page">Cookbook</a></li>
+    <li><a href="../distage/roles.html" class="page">Role-Based Applications</a></li>
+    <li><a href="../distage/testkit.html" class="page">Testkit</a></li>
     <li><a href="../distage/reference.html" class="page">Syntax Summary</a></li>
   </ul></li>
   <li><a href="../logstage/index.html" class="page">LogStage</a>
@@ -156,6 +158,7 @@ pshirshov/izumi-r2
     <li><a href="../logstage/policy.html" class="page">Rendering policy</a></li>
     <li><a href="../logstage/config.html" class="page">Logstage Config</a></li>
     <li><a href="../logstage/custom_ctx.html" class="page">Custom Context</a></li>
+    <li><a href="../logstage/syntax.html" class="page">Syntax Reference</a></li>
   </ul></li>
   <li><a href="../sbt/index.html" class="page">SBT Toolkit</a></li>
   <li><a href="../manifesto/index.html" class="page">Productivity and challenges</a></li>
@@ -176,7 +179,7 @@ pshirshov/izumi-r2
 <ul style="display: none">
 <li class="md-nav__item md-version" id="project.version">
 <label class="md-nav__link" for="__version">
-<i class="md-icon" title="Version">label_outline</i> 0.7.0
+<i class="md-icon" title="Version">label_outline</i> 0.8.0
 </label>
 </li>
 </ul>
@@ -205,7 +208,7 @@ pshirshov/izumi-r2
 <div class="md-content__searchable">
 <h1><a href="#cookbook" name="cookbook" class="anchor"><span class="anchor-link"></span></a>Cookbook</h1>
 <h3><a href="#inner-classes-and-path-dependent-types" name="inner-classes-and-path-dependent-types" class="anchor"><span class="anchor-link"></span></a>Inner Classes and Path-Dependent Types</h3>
-<p>To instantiate path-dependent types via constructor, their prefix type has to be present in DI object graph:</p>
+<p>To instantiate path-dependent types via constructor, their prefix type must be present in the object graph:</p>
 <pre class="prettyprint"><code class="language-scala">import distage._
 
 trait Path {
@@ -214,32 +217,32 @@ trait Path {
 }
 
 val path = new Path {}
-// path: AnyRef with Path = repl.Session$App0$$anon$1@421fb4d5
+// path: AnyRef with Path = repl.Session$App0$$anon$1@6129659a
 
 val module = new ModuleDef {
   make[path.A]
   make[path.type].from[path.type](path: path.type)
 }
-// module: AnyRef with ModuleDef = Set(SingletonBinding({type.repl.Session.App0.&lt;refinement&gt;.type},InstanceImpl(repl.Session.App0.&lt;refinement&gt;.type,repl.Session$App0$$anon$1@421fb4d5),Set(&lt;*&gt;, &lt;singleton&gt;),(cookbook.md:25)), SingletonBinding({type.repl.Session.App0.path.A},TypeImpl(repl.Session.App0.path.A),Set(&lt;*&gt;, &lt;singleton&gt;),(cookbook.md:24)))
+// module: AnyRef with ModuleDef = Set(SingletonBinding({type.repl.Session.App0.path.A},TypeImpl(repl.Session.App0.path.A),Set(),(cookbook.md:24)), SingletonBinding({type.repl.Session.App0.&lt;refinement&gt;.type},InstanceImpl(repl.Session.App0.&lt;refinement&gt;.type,repl.Session$App0$$anon$1@6129659a),Set(),(cookbook.md:25)))
 </code></pre>
 <p>The same applies to type projections:</p>
 <pre class="prettyprint"><code class="language-scala">val module1 = new ModuleDef {
   make[Path#B]
   make[Path].from(new Path {})
 }
-// module1: AnyRef with ModuleDef = Set(SingletonBinding({type.repl.Session.App0.Path},InstanceImpl(repl.Session.App0.Path,repl.Session$App0$$anon$3$$anon$4@ec693c),Set(&lt;*&gt;, &lt;singleton&gt;),(cookbook.md:34)), SingletonBinding({type.repl.Session.App0.Path#B},TypeImpl(repl.Session.App0.Path#B),Set(&lt;*&gt;, &lt;singleton&gt;),(cookbook.md:33)))
+// module1: AnyRef with ModuleDef = Set(SingletonBinding({type.repl.Session.App0.Path#B},TypeImpl(repl.Session.App0.Path#B),Set(),(cookbook.md:33)), SingletonBinding({type.repl.Session.App0.Path},InstanceImpl(repl.Session.App0.Path,repl.Session$App0$$anon$3$$anon$4@2ace8677),Set(),(cookbook.md:34)))
 </code></pre>
-<p>Provider and instance bindings and also compile-time mode in <code>distage-static</code> module do not require the singleton type prefix to be present in DI object graph:</p>
+<p>Function and instance bindings and also compile-time mode in <code>distage-static</code> module do not require the type prefix:</p>
 <pre class="prettyprint"><code class="language-scala">val module2 = new ModuleDef {
   make[Path#B].from {
     val path = new Path {}
     new path.B
   }
 }
-// module2: AnyRef with ModuleDef = Set(SingletonBinding({type.repl.Session.App0.Path#B},InstanceImpl(path.B,repl.Session$App0$Path$B@83f7b16),Set(&lt;*&gt;, &lt;singleton&gt;),(cookbook.md:42)))
+// module2: AnyRef with ModuleDef = Set(SingletonBinding({type.repl.Session.App0.Path#B},InstanceImpl(path.B,repl.Session$App0$Path$B@47ec150e),Set(),(cookbook.md:42)))
 </code></pre>
 <h3><a href="#depending-on-locator" name="depending-on-locator" class="anchor"><span class="anchor-link"></span></a>Depending on Locator</h3>
-<p>Classes can depend on the Locator:</p>
+<p>Classes can depend on the Locator (container of the final object graph):</p>
 <pre class="prettyprint"><code class="language-scala">import distage._
 
 class A(all: LocatorRef) {
@@ -258,16 +261,22 @@ val locator = Injector().produce(module)
 
 assert(locator.get[A].c eq locator.get[C]) 
 </code></pre>
-<p>It is recommended to avoid this if possible, doing so is often a sign of broken application design.</p>
+<p>Locator contains metadata about the plan and the bindings from which it was ultimately created:</p>
+<pre class="prettyprint"><code class="language-scala">// Plan that created this locator
+val plan: OrderedPlan = locator.plan
+
+// Bindings from which the Plan was built
+val moduleDef: ModuleBase = plan.definition
+</code></pre>
 </div>
 <div>
-<a href="https://github.com/pshirshov/izumi-r2/tree/master/doc/microsite/target/mdoc/distage/cookbook.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/7mind/izumi/tree/master/doc/microsite/target/mdoc/distage/cookbook.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>
 <div class="print-only">
 <span class="md-source-file md-version">
-0.7.0
+0.8.0
 </span>
 </div>
 </article>
@@ -290,13 +299,13 @@ Debugging
 </span>
 </div>
 </a>
-<a href="../distage/reference.html" title="Syntax Summary" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+<a href="../distage/roles.html" title="Role-Based Applications" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
 <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
 <span class="md-flex__ellipsis">
 <span class="md-footer-nav__direction">
 Next
 </span>
-Syntax Summary
+Role-Based Applications
 </span>
 </div>
 <div class="md-flex__cell md-flex__cell--shrink">
