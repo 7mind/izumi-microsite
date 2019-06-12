@@ -300,15 +300,15 @@ logger.info(&quot;Hey&quot;)
 contextLogger.info(s&quot;Hey&quot;)
 </code></pre>
 <h2><a href="#slf4j-router" name="slf4j-router" class="anchor"><span class="anchor-link"></span></a>SLF4J Router</h2>
-<p>When not configured, <code>logstage-adapter-slf4j</code> will log to <code>stderr</code>.</p>
-<p>Due to the global mutable nature of <code>slf4j</code> you&rsquo;ll have to configure a global singleton to use the same <code>LogRouter</code> as your logger:</p>
+<p>When not configured, <code>logstage-adapter-slf4j</code> will log messages with level <code>&gt;= Info</code> to <code>stdout</code>.</p>
+<p>Due to the global mutable nature of <code>slf4j</code> to configure slf4j logging you&rsquo;ll have to mutate a global singleton. To change its settings, replace its <code>LogRouter</code> with the same one you use elsewhere in your application.</p>
 <pre class="prettyprint"><code class="language-scala">import logstage._
 import com.github.pshirshov.izumi.logstage.api.routing.StaticLogRouter
 
 val myLogger = IzLogger()
-// myLogger: IzLogger = com.github.pshirshov.izumi.logstage.api.IzLogger@7d63f26d
+// myLogger: IzLogger = com.github.pshirshov.izumi.logstage.api.IzLogger@6c4408b9
 
-// configure SLF4j to use the same router as `myLogger`
+// configure SLF4j to use the same router that `myLogger` uses
 StaticLogRouter.instance.setup(myLogger.router)
 </code></pre>
 <h2><a href="#log-algebras" name="log-algebras" class="anchor"><span class="anchor-link"></span></a>Log algebras</h2>
@@ -317,10 +317,10 @@ StaticLogRouter.instance.setup(myLogger.router)
 import cats.effect.IO
 
 val logger = IzLogger()
-// logger: IzLogger = com.github.pshirshov.izumi.logstage.api.IzLogger@3d2034a0
+// logger: IzLogger = com.github.pshirshov.izumi.logstage.api.IzLogger@e39abc5
 
 val log = LogIO.fromLogger[IO](logger)
-// log: LogIO[IO] = logstage.LogIO$$anon$1@51370059
+// log: LogIO[IO] = logstage.LogIO$$anon$1@4e67450f
 
 log.info(s&quot;Hey! I&#39;m logging with ${log}stage!&quot;).unsafeRunSync()
 </code></pre>
@@ -332,10 +332,10 @@ log.info(s&quot;Hey! I&#39;m logging with ${log}stage!&quot;).unsafeRunSync()
 import zio.{IO, DefaultRuntime}
 
 val log = LogstageZIO.withFiberId(logger)
-// log: LogBIO[IO] = logstage.LogstageZIO$$anon$1@62a0a55e
+// log: LogBIO[IO] = logstage.LogstageZIO$$anon$1@9264bbb
 
 val rts = new DefaultRuntime {}
-// rts: AnyRef with DefaultRuntime = repl.Session$App11$$anon$1@3ee97755
+// rts: AnyRef with DefaultRuntime = repl.Session$App11$$anon$1@5e936d3d
 rts.unsafeRun {
   log.info(s&quot;Hey! I&#39;m logging with ${log}stage!&quot;)
 }
