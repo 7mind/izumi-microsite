@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="x-ua-compatible" content="ie=edge">
 <meta name="description" content="microsite">
-<meta name="generator" content="Paradox, paradox-material-theme=0.8.5-SNAPSHOT, mkdocs-material=3.0.3">
+<meta name="generator" content="Paradox, paradox-material-theme=0.9.0-SNAPSHOT, mkdocs-material=3.0.3">
 
 <meta name="lang:clipboard.copy" content="Copy to clipboard">
 <meta name="lang:clipboard.copied" content="Copied to clipboard">
@@ -185,7 +185,7 @@ data-md-source="github">
 <ul style="display: none">
 <li class="md-nav__item md-version" id="project.version">
 <label class="md-nav__link" for="__version">
-<i class="md-icon" title="Version">label_outline</i> 0.8.5*
+<i class="md-icon" title="Version">label_outline</i> 0.9.0*
 </label>
 </li>
 </ul>
@@ -309,7 +309,7 @@ new ModuleDef {
       }
   }
 }
-// res3: AnyRef with ModuleDef = Set(SingletonBinding({type.repl.Session.App0.Byer@byer-2},ProviderImpl(repl.Session.App0.Byer,&lt;function1&gt;(repl.Session.App0.Byer): repl.Session.App0.Byer),Set(),(basics.md:118)), SingletonBinding({type.repl.Session.App0.Byer@byer-1},TypeImpl(repl.Session.App0.PrintByer),Set(),(basics.md:117)))
+// res3: AnyRef with ModuleDef = Set(SingletonBinding({type.repl.Session.App0.Byer@byer-1},TypeImpl(repl.Session.App0.PrintByer),Set(),(basics.md:117)), SingletonBinding({type.repl.Session.App0.Byer@byer-2},ProviderImpl(repl.Session.App0.Byer,&lt;function1&gt;(repl.Session.App0.Byer): repl.Session.App0.Byer),Set(),(basics.md:118)))
 </code></pre>
 <p>You can also create factory classes to help you mint new non-singleton instances. <a href="#auto-factories">Auto-Factories</a> can reduce boilerplate involved in doing this.</p>
 <p>Modules can be combined into larger modules with <code>++</code> and <code>overridenBy</code> operators. Let&rsquo;s use <code>overridenBy</code> to greet in ALL CAPS:</p>
@@ -360,7 +360,7 @@ object HostPortModule extends ModuleDef {
 <pre class="prettyprint"><code class="language-scala">import scala.util.Random
 
 val objects = Injector().produceUnsafe(HelloByeModule, GCMode.NoGC)
-// objects: Locator = com.github.pshirshov.izumi.distage.LocatorDefaultImpl@665f46a
+// objects: Locator = com.github.pshirshov.izumi.distage.LocatorDefaultImpl@5d99a04
 
 objects.run {
   (hello: Hello, bye: Bye) =&gt;
@@ -523,14 +523,14 @@ val dbResource = Resource.make(
   acquire = IO { println(&quot;Connecting to DB!&quot;); new DBConnection }
 )(release = _ =&gt; IO(println(&quot;Disconnecting DB&quot;)))
 // dbResource: Resource[IO, DBConnection] = Allocate(
-//   Map(Delay(&lt;function0&gt;), scala.Function1$$Lambda$13409/1996244344@bb2ecb8, 1)
+//   Map(Delay(&lt;function0&gt;), scala.Function1$$Lambda$13347/1802032176@52c646b5, 1)
 // )
 
 val mqResource = Resource.make(
   acquire = IO { println(&quot;Connecting to Message Queue!&quot;); new MessageQueueConnection }
 )(release = _ =&gt; IO(println(&quot;Disconnecting Message Queue&quot;)))
 // mqResource: Resource[IO, MessageQueueConnection] = Allocate(
-//   Map(Delay(&lt;function0&gt;), scala.Function1$$Lambda$13409/1996244344@3d4ba303, 1)
+//   Map(Delay(&lt;function0&gt;), scala.Function1$$Lambda$13347/1802032176@4a876c91, 1)
 // )
 
 class MyApp(db: DBConnection, mq: MessageQueueConnection) {
@@ -585,7 +585,7 @@ val module = new ModuleDef {
     init
 }
 // true
-// closedInit: com.github.pshirshov.izumi.fundamentals.platform.functional.package.Identity[Init] = repl.Session$App14$Init@53067414
+// closedInit: com.github.pshirshov.izumi.fundamentals.platform.functional.package.Identity[Init] = repl.Session$App14$Init@22f50986
 println(closedInit.initialized)
 // false
 </code></pre>
@@ -648,7 +648,7 @@ object KVStore {
 val kvStoreModule = new ModuleDef {
   make[KVStore[IO]].fromEffect(KVStore.dummy)
 }
-// kvStoreModule: AnyRef with ModuleDef = Set(SingletonBinding({type.App16.this.KVStore[zio.IO]},EffectImpl(App16.this.KVStore[zio.IO],[A]zio.IO[Nothing,A],InstanceImpl(zio.ZIO[Any,Nothing,App16.this.KVStore[zio.IO]],zio.ZIO$FlatMap@68230f70)),Set(),(basics.md:562)))
+// kvStoreModule: AnyRef with ModuleDef = Set(SingletonBinding({type.App16.this.KVStore[zio.IO]},EffectImpl(App16.this.KVStore[zio.IO],[A]zio.IO[Nothing,A],InstanceImpl(zio.ZIO[Any,Nothing,App16.this.KVStore[zio.IO]],zio.ZIO$FlatMap@71c645d0)),Set(),(basics.md:562)))
 
 new DefaultRuntime{}.unsafeRun {
   Injector().produceF[IO[Throwable, ?]](kvStoreModule, GCMode.NoGC)
@@ -736,11 +736,11 @@ object TryInterpreters extends ModuleDef {
 
 // combine all modules
 val TryProgram = new Program[Try] ++ TryInterpreters
-// TryProgram: Module = Set(SingletonBinding({type.repl.Session.App18.Validation[scala.util.Try]},ProviderImpl(repl.Session.App18.Validation[scala.util.Try],com.github.pshirshov.izumi.distage.model.providers.ProviderMagnet$$$Lambda$12453/1908378504@5b90bcc5(): repl.Session.App18.Validation[scala.util.Try]),Set(),(basics.md:670)), SingletonBinding({type.repl.Session.App18.Interaction[scala.util.Try]},ProviderImpl(repl.Session.App18.Interaction[scala.util.Try],com.github.pshirshov.izumi.distage.model.providers.ProviderMagnet$$$Lambda$12453/1908378504@45fe255b(): repl.Session.App18.Interaction[scala.util.Try]),Set(),(basics.md:671)), SingletonBinding({type.repl.Session.App18.TaglessProgram[[A]scala.util.Try[A]]},ProviderImpl(repl.Session.App18.TaglessProgram[[A]scala.util.Try[A]],&lt;function1&gt;(cats.Monad[[A]scala.util.Try[A]], repl.Session.App18.Validation[[A]scala.util.Try[A]], repl.Session.App18.Interaction[[A]scala.util.Try[A]]): repl.Session.App18.TaglessProgram[[A]scala.util.Try[A]]),Set(),(basics.md:636)), SingletonBinding({type.cats.Monad[[A]scala.util.Try[A]]},InstanceImpl(cats.Monad[[A]scala.util.Try[A]],cats.instances.TryInstances$$anon$1@5569ee1b),Set(),(basics.md:638)))
+// TryProgram: Module = Set(SingletonBinding({type.repl.Session.App18.Validation[scala.util.Try]},ProviderImpl(repl.Session.App18.Validation[scala.util.Try],com.github.pshirshov.izumi.distage.model.providers.ProviderMagnet$$$Lambda$12390/1619842422@d7ca1de(): repl.Session.App18.Validation[scala.util.Try]),Set(),(basics.md:670)), SingletonBinding({type.repl.Session.App18.Interaction[scala.util.Try]},ProviderImpl(repl.Session.App18.Interaction[scala.util.Try],com.github.pshirshov.izumi.distage.model.providers.ProviderMagnet$$$Lambda$12390/1619842422@560e2885(): repl.Session.App18.Interaction[scala.util.Try]),Set(),(basics.md:671)), SingletonBinding({type.cats.Monad[[A]scala.util.Try[A]]},InstanceImpl(cats.Monad[[A]scala.util.Try[A]],cats.instances.TryInstances$$anon$1@53086ee1),Set(),(basics.md:638)), SingletonBinding({type.repl.Session.App18.TaglessProgram[[A]scala.util.Try[A]]},ProviderImpl(repl.Session.App18.TaglessProgram[[A]scala.util.Try[A]],&lt;function1&gt;(cats.Monad[[A]scala.util.Try[A]], repl.Session.App18.Validation[[A]scala.util.Try[A]], repl.Session.App18.Interaction[[A]scala.util.Try[A]]): repl.Session.App18.TaglessProgram[[A]scala.util.Try[A]]),Set(),(basics.md:636)))
 
 // create object graph
 val objects = Injector().produceUnsafe(TryProgram, GCMode.NoGC)
-// objects: Locator = com.github.pshirshov.izumi.distage.LocatorDefaultImpl@7cc92297
+// objects: Locator = com.github.pshirshov.izumi.distage.LocatorDefaultImpl@b5e3612
 
 // run
 objects.get[TaglessProgram[Try]].program
@@ -789,7 +789,7 @@ def chooseInterpreters(default: Boolean) = {
 <pre class="prettyprint"><code class="language-scala">libraryDependencies += Izumi.R.distage_testkit
 </code></pre>
 <p>or</p>
-<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;io.7mind.izumi&quot; %% &quot;distage-plugins&quot; % &quot;0.8.5-SNAPSHOT&quot;
+<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;io.7mind.izumi&quot; %% &quot;distage-plugins&quot; % &quot;0.9.0-SNAPSHOT&quot;
 </code></pre>
 <p>If you&rsquo;re not using <a href="../sbt/index.html#bills-of-materials">sbt-izumi-deps</a> plugin.</p>
 <p>Example usage:</p>
@@ -803,7 +803,7 @@ Edit this page
 </div>
 <div class="print-only">
 <span class="md-source-file md-version">
-0.8.5*
+0.9.0*
 </span>
 </div>
 </article>
