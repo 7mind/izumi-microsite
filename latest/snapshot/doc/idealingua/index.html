@@ -270,17 +270,17 @@ service UserService {
 <pre class="prettyprint"><code class="language-bash">docker run -ti --rm septimalmind/izumi-env
 </code></pre>
 <p>Then try this snippet:</p>
-<pre class="prettyprint"><code class="language-bash">export COMPILER=&quot;com.github.pshirshov.izumi.r2:idealingua-compiler_2.12:$izumi.version$&quot;
-export S_REPOSITORY=https://oss.sonatype.org/content/repositories/snapshots
+<pre class="prettyprint"><code class="language-bash">export COMPILER=&quot;io.7mind.izumi:idealingua-v1-compiler_2.12:$izumi.version$&quot;
+export S_REPOSITORY=https://oss.sonatype.org/content/repositories/snapshots 
 export R_REPOSITORY=https://oss.sonatype.org/content/repositories/releases
 
 # create sample project in `testproject` directory
-coursier launch -E &#39;*:*&#39; -r $S_REPOSITORY -r $R_REPOSITORY $COMPILER -- -i testproject
-
-cd testproject
+coursier launch -r $S_REPOSITORY -r $R_REPOSITORY $COMPILER -- :init testproject 
 
 # compile Scala and Typescript projects using all the defaults
-coursier launch -E &#39;*:*&#39; -r S_REPOSITORY -r $R_REPOSITORY $COMPILER -- typescript scala go csharp
+coursier launch -r $S_REPOSITORY -r $R_REPOSITORY $COMPILER -- :scala :typescript
+
+cd testproject 
 
 # Run SBT on generated Scala project
 pushd .
@@ -288,12 +288,15 @@ cd target/scala
 sbt package
 popd
 
-# Run SBT on generated Typescript project
+# Run tsc on generated Typescript project
 pushd .
 cd target/typescript
 yarn install
 tsc
 popd
+
+apt install -y mc
+mc
 </code></pre>
 <h2><a href="#example-project" name="example-project" class="anchor"><span class="anchor-link"></span></a>Example Project</h2>
 <p>See <a href="https://github.com/7mind/idealingua-example">idealingua-example</a> for examples for Scala, TypeScript, Go, C# and other languages.</p>
