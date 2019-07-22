@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="x-ua-compatible" content="ie=edge">
 <meta name="description" content="microsite">
-<meta name="generator" content="Paradox, paradox-material-theme=0.8.6, mkdocs-material=3.0.3">
+<meta name="generator" content="Paradox, paradox-material-theme=0.8.7, mkdocs-material=3.0.3">
 
 <meta name="lang:clipboard.copy" content="Copy to clipboard">
 <meta name="lang:clipboard.copied" content="Copied to clipboard">
@@ -153,7 +153,6 @@ data-md-source="github">
     <li><a href="logstage/policy.html" class="page">Rendering policy</a></li>
     <li><a href="logstage/config.html" class="page">Logstage Config</a></li>
     <li><a href="logstage/custom_ctx.html" class="page">Custom Context</a></li>
-    <li><a href="logstage/syntax.html" class="page">Syntax Reference</a></li>
   </ul></li>
   <li><a href="sbt/index.html" class="page">SBT Toolkit</a></li>
   <li><a href="manifesto/index.html" class="page">Productivity and challenges</a></li>
@@ -174,7 +173,7 @@ data-md-source="github">
 <ul style="display: none">
 <li class="md-nav__item md-version" id="project.version">
 <label class="md-nav__link" for="__version">
-<i class="md-icon" title="Version">label_outline</i> 0.8.6
+<i class="md-icon" title="Version">label_outline</i> 0.8.7
 </label>
 </li>
 </ul>
@@ -201,89 +200,87 @@ data-md-source="github">
 <div class="md-content">
 <article class="md-content__inner md-typeset">
 <div class="md-content__searchable">
-<h1><a href="#izumi-project" name="izumi-project" class="anchor"><span class="anchor-link"></span></a>Izumi Project</h1><div class="callout warning "><div class="callout-title">TODO</div>
-<p>Sorry, this page is not ready yet</p></div>
-<p><a href="https://github.com/7mind/izumi">Github</a></p>
+<h1><a href="#izumi-project" name="izumi-project" class="anchor"><span class="anchor-link"></span></a>Izumi Project</h1>
+<p>Izumi <em>(jap. 泉水, spring)</em> is a set of independent libraries and frameworks allowing you to significantly increase productivity of your Scala development.</p>
+<p>including the following components:</p>
+<ol>
+  <li><a href="distage/index.html"><strong>distage</strong></a> – Staged, transparent and debuggable runtime &amp; compile-time Dependency Injection Framework,</li>
+  <li><a href="logstage/index.html"><strong>logstage</strong></a> – Automatic structural logs from Scala string interpolations,</li>
+  <li><a href="idealingua/index.html"><strong>idealingua</strong></a> – API Definition, Data Modeling and RPC Language, optimized for fast prototyping – like gRPC, but with a human face. Currently generates servers and clients for Go, TypeScript, C# and Scala,</li>
+  <li><a href="sbt/index.html"><strong>Opinionated SBT plugins</strong></a> – Reduces verbosity of SBT builds and introduces new features – inter-project shared test scopes and BOM plugins (from Maven),</li>
+  <li><a href="pper/index.html"><strong>Percept-Plan-Execute-Repeat (PPER)</strong></a> – a pattern that enables modeling very complex domains and orchestrate deadly complex processes a lot easier than you&rsquo;re used to.</li>
+</ol>
 <h2><a href="#dependencies" name="dependencies" class="anchor"><span class="anchor-link"></span></a>Dependencies</h2>
 <p>To use <a href="sbt/index.html">Izumi SBT Toolkit</a> add the following into <code>project/build.sbt</code>:</p>
-<pre class="prettyprint"><code class="language-scala">val izumi_version = &quot;0.8.6&quot;
+<pre class="prettyprint"><code class="language-scala">val izumi_version = &quot;0.8.7&quot;
+
 // sbt toolkit
 addSbtPlugin(&quot;io.7mind.izumi&quot; % &quot;sbt-izumi&quot; % izumi_version)
 
-// This is Izumi&#39;s BOM (Bill of Materials), see below
+// This is Izumi Bill of Materials, see below
 addSbtPlugin(&quot;io.7mind.izumi&quot; % &quot;sbt-izumi-deps&quot; % izumi_version)
-
-// idealingua compiler (optional)
-addSbtPlugin(&quot;io.7mind.izumi&quot; % &quot;sbt-idealingua&quot; % izumi_version)
 </code></pre>
 <p>You can use izumi&rsquo;s <code>BOM</code> definitions to import (from <a href="sbt/index.html#bills-of-materials"><code>sbt-izumi-deps</code> plugin</a>). BOM will insert the correct version automatically:</p>
+<p><a href="distage/index.html"><strong>distage</strong></a> modules:</p>
 <pre class="prettyprint"><code class="language-scala">libraryDependencies ++= Seq(
-  
-  // distage
-    Izumi.R.distage_core
-  , Izumi.R.distage_config // Typesafe Config support
-  , Izumi.R.distage_cats // Cats Integration
-  , Izumi.R.distage_static // Compile-time checks &amp; reflection-less mode
-  , Izumi.R.distage_plugins // runtime Plugins support
-  , Izumi.R.logstage_di // LogStage integration
-  , Izumi.R.distage_app  // DiApp
-  , Izumi.R.distage_roles  // Roles
-  
-  // LogStage
-  , Izumi.R.logstage_core
-  , Izumi.R.logstage_zio // ZIO Integration (log current FiberId)
-  , Izumi.R.logstage_cats // Cats Integration
-  , Izumi.R.logstage_adapter_slf4j // Route Slf4J logs to logstage
-  , Izumi.R.logstage_rendering_circe // dump structured log as JSON
-  , Izumi.R.logstage_sink_slf4j // write to slf4j
-  
-  // Idealingua Runtime Dependencies (for use with Idealingua compiler)
-  , Izumi.R.idealingua_runtime_rpc_http4s
-  , Izumi.R.idealingua_runtime_rpc_scala
-  , Izumi.R.idealingua_model
+  Izumi.R.distage_core,    // Core DIStage library
+  Izumi.T.distage_testkit, // Testkit for ScalaTest
+  Izumi.R.distage_static,  // Compile-time checks &amp; reflection-less mode
+  Izumi.R.distage_config,  // Typesafe Config support
+  Izumi.R.distage_plugins, // Classpath discovery support
+  Izumi.R.distage_roles,   // Roles &amp; Application entrypoint framework
+)
+</code></pre>
+<p><a href="logstage/index.html"><strong>logstage</strong></a> modules:</p>
+<pre class="prettyprint"><code class="language-scala">libraryDependencies ++= Seq(
+  Izumi.R.logstage_core,   // Core LogStage library
+  Izumi.R.logstage_config, // Configure LogStage with Typesafe Config
+  Izumi.R.logstage_di,     // LogStage integration with DIStage
+  Izumi.R.logstage_rendering_circe, // Write logs as JSON
+  Izumi.R.logstage_adapter_slf4j,   // Route Slf4J logs to LogStage
+  Izumi.R.logstage_sink_slf4j,      // Route LogStage logs to Slf4J
+)
+</code></pre>
+<p><a href="idealingua/index.html"><strong>IdeaLingua</strong></a> modules:</p>
+<pre class="prettyprint"><code class="language-scala">// Idealingua Runtime Dependencies (for use with the Idealingua compiler)
+libraryDependencies ++= Seq(
+  Izumi.R.idealingua_runtime_rpc_http4s
 )
 </code></pre>
 <p>Alternatively, you can use the following artifact names and versions:</p>
 <pre class="prettyprint"><code class="language-scala">libraryDependencies ++= Seq(
-    &quot;io.7mind.izumi&quot; %% &quot;distage-core&quot; % &quot;0.8.6&quot;
-  , &quot;io.7mind.izumi&quot; %% &quot;distage-config&quot; % &quot;0.8.6&quot;
-  , &quot;io.7mind.izumi&quot; %% &quot;distage-cats&quot; % &quot;0.8.6&quot;
-  , &quot;io.7mind.izumi&quot; %% &quot;distage-testkit&quot; % &quot;0.8.6&quot;
-  , &quot;io.7mind.izumi&quot; %% &quot;distage-plugins&quot; % &quot;0.8.6&quot;
-  , &quot;io.7mind.izumi&quot; %% &quot;distage-static&quot; % &quot;0.8.6&quot;
-  , &quot;io.7mind.izumi&quot; %% &quot;distage-app&quot; % &quot;0.8.6&quot;
-  , &quot;io.7mind.izumi&quot; %% &quot;distage-roles&quot; % &quot;0.8.6&quot;
+  &quot;io.7mind.izumi&quot; %% &quot;distage-core&quot; % &quot;0.8.7&quot;,
+  &quot;io.7mind.izumi&quot; %% &quot;distage-testkit&quot; % &quot;0.8.7&quot; % Test,
+  &quot;io.7mind.izumi&quot; %% &quot;distage-static&quot; % &quot;0.8.7&quot;,
+  &quot;io.7mind.izumi&quot; %% &quot;distage-config&quot; % &quot;0.8.7&quot;,
+  &quot;io.7mind.izumi&quot; %% &quot;distage-plugins&quot; % &quot;0.8.7&quot;,
+  &quot;io.7mind.izumi&quot; %% &quot;distage-roles&quot; % &quot;0.8.7&quot;,
+
+  &quot;io.7mind.izumi&quot; %% &quot;logstage-core&quot; % &quot;0.8.7&quot;,
+  &quot;io.7mind.izumi&quot; %% &quot;logstage-config&quot; % &quot;0.8.7&quot;,
+  &quot;io.7mind.izumi&quot; %% &quot;logstage-di&quot; % &quot;0.8.7&quot;,
+  &quot;io.7mind.izumi&quot; %% &quot;logstage-adapter-slf4j &quot; % &quot;0.8.7&quot;,
+  &quot;io.7mind.izumi&quot; %% &quot;logstage-sink-slf4j &quot; % &quot;0.8.7&quot;,
+  &quot;io.7mind.izumi&quot; %% &quot;logstage-rendering-circe &quot; % &quot;0.8.7&quot;,
   
-  , &quot;io.7mind.izumi&quot; %% &quot;logstage-core&quot; % &quot;0.8.6&quot;
-  , &quot;io.7mind.izumi&quot; %% &quot;logstage-adapter-slf4j &quot; % &quot;0.8.6&quot;
-  , &quot;io.7mind.izumi&quot; %% &quot;logstage-config&quot; % &quot;0.8.6&quot;
-  , &quot;io.7mind.izumi&quot; %% &quot;logstage-config-di&quot; % &quot;0.8.6&quot;
-  , &quot;io.7mind.izumi&quot; %% &quot;logstage-cats&quot; % &quot;0.8.6&quot;
-  , &quot;io.7mind.izumi&quot; %% &quot;logstage-zio&quot; % &quot;0.8.6&quot;
-  , &quot;io.7mind.izumi&quot; %% &quot;logstage-api&quot; % &quot;0.8.6&quot;
-  , &quot;io.7mind.izumi&quot; %% &quot;logstage-di&quot; % &quot;0.8.6&quot;
-  , &quot;io.7mind.izumi&quot; %% &quot;logstage-rendering-circe &quot; % &quot;0.8.6&quot;
-  , &quot;io.7mind.izumi&quot; %% &quot;logstage-sink-slf4j &quot; % &quot;0.8.6&quot;
-  
-  , &quot;io.7mind.izumi&quot; %% &quot;idealingua-v1-model&quot; % &quot;0.8.6&quot;
-  , &quot;io.7mind.izumi&quot; %% &quot;idealingua-v1-runtime-rpc-scala&quot; % &quot;0.8.6&quot;
-  , &quot;io.7mind.izumi&quot; %% &quot;idealingua-v1-runtime-rpc-http4s&quot; % &quot;0.8.6&quot;
+  &quot;io.7mind.izumi&quot; %% &quot;idealingua-v1-runtime-rpc-http4s&quot; % &quot;0.8.7&quot;,
 )
 </code></pre>
 <p>You can find ScalaDoc API docs <a href="/latest/release/api/com/github/pshirshov/izumi/index.html">here</a></p>
 <p>You can find Izumi on github <a href="https://github.com/7mind/izumi">here</a></p>
+<p>Latest SNAPSHOT documentation <a href="https://izumi.7mind.io/latest/snapshot/doc/">here</a></p>
 <h1><a href="#credits" name="credits" class="anchor"><span class="anchor-link"></span></a>Credits</h1>
 <p><img src="https://www.yourkit.com/images/yklogo.png" alt="YourKit" /></p>
 <p>YourKit supports open source projects with innovative and intelligent tools for monitoring and profiling Java and .NET applications. YourKit is the creator of <a href="https://www.yourkit.com/java/profiler/">YourKit Java Profiler</a> <a href="https://www.yourkit.com/.net/profiler/">YourKit .NET Profiler</a> and <a href="https://www.yourkit.com/youmonitor/">YourKit YouMonitor</a>.</p>
 </div>
 <div>
-<a href="https://github.com/7mind/izumi/tree/v0.8.6/doc/microsite/target/mdoc/izumi.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/7mind/izumi/tree/v0.8.7/doc/microsite/target/mdoc/izumi.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>
 <div class="print-only">
 <span class="md-source-file md-version">
-0.8.6
+0.8.7
 </span>
 </div>
 </article>
