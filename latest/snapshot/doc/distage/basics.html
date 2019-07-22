@@ -20,7 +20,7 @@
 
 <meta name="description" content="microsite">
 <link rel="shortcut icon" href="../assets/images/favicon.png">
-<title>Basics · Izumi Project</title>
+<title>Basics ? Izumi Project</title>
 <link rel="stylesheet" href="../assets/stylesheets/application.451f80e5.css">
 <link rel="stylesheet" href="../lib/material__tabs/dist/mdc.tabs.min.css">
 <link rel="stylesheet" href="../lib/prettify/prettify.css">
@@ -294,7 +294,7 @@ val app = objects.get[HelloByeApp]
 //   arg byer: Byer = lookup({type.Byer})
 // )
 </code></pre>
-<p>Since <code>plan</code> is just a piece of data, we need to interpret it to create the actual object graph – <code>Injector</code>&rsquo;s <code>produce</code> method is the default interpreter. <code>Injector</code> contains no logic of its own beyond interpreting instructions, its output is fully determined by the plan. This makes <a href="debugging.html#debugging">debugging</a> quite easy.</p>
+<p>Since <code>plan</code> is just a piece of data, we need to interpret it to create the actual object graph ? <code>Injector</code>&rsquo;s <code>produce</code> method is the default interpreter. <code>Injector</code> contains no logic of its own beyond interpreting instructions, its output is fully determined by the plan. This makes <a href="debugging.html#debugging">debugging</a> quite easy.</p>
 <p>Given that plans are data, it&rsquo;s possible to <a href="other-features.html#compile-time-checks">verify them at compile-time</a> or <a href="other-features.html#compile-time-instantiation">splice equivalent Scala code</a> to do the instantiation before ever running the application. When used in that way, <code>distage</code> is a great alternative to compile-time frameworks such as <code>MacWire</code> all the while keeping the flexibility to interpret at runtime when needed. This flexibility in interpretation allows adding features, such as <a href="other-features.html#plugins">Plugins</a> and <a href="config_injection.html#config-injection">Typesafe Config integration</a> by transforming plans and bindings.</p>
 <p>Note: classes in <code>distage</code> are always created exactly once, even if many different classes depend on them - they&rsquo;re <code>Singletons</code>. Non-singleton semantics are not available, however you can create multiple <code>named</code> instances and disambiguate between them with <code>@Id</code> annotation:</p>
 <pre class="prettyprint"><code class="language-scala">import distage.Id
@@ -308,7 +308,7 @@ new ModuleDef {
       }
   }
 }
-// res3: AnyRef with ModuleDef = Set(SingletonBinding({type.repl.Session.App0.Byer@byer-2},ProviderImpl(repl.Session.App0.Byer,&lt;function1&gt;(repl.Session.App0.Byer): repl.Session.App0.Byer),Set(),(basics.md:118)), SingletonBinding({type.repl.Session.App0.Byer@byer-1},TypeImpl(repl.Session.App0.PrintByer),Set(),(basics.md:117)))
+// res3: AnyRef with ModuleDef = Set(SingletonBinding({type.repl.Session.App0.Byer@byer-1},TypeImpl(repl.Session.App0.PrintByer),Set(),(basics.md:117)), SingletonBinding({type.repl.Session.App0.Byer@byer-2},ProviderImpl(repl.Session.App0.Byer,&lt;function1&gt;(repl.Session.App0.Byer): repl.Session.App0.Byer),Set(),(basics.md:118)))
 </code></pre>
 <p>You can also create factory classes to help you mint new non-singleton instances. <a href="#auto-factories">Auto-Factories</a> can reduce boilerplate involved in doing this.</p>
 <p>Modules can be combined into larger modules with <code>++</code> and <code>overridenBy</code> operators. Let&rsquo;s use <code>overridenBy</code> to greet in ALL CAPS:</p>
@@ -359,7 +359,7 @@ object HostPortModule extends ModuleDef {
 <pre class="prettyprint"><code class="language-scala">import scala.util.Random
 
 val objects = Injector().produceUnsafe(HelloByeModule, GCMode.NoGC)
-// objects: Locator = com.github.pshirshov.izumi.distage.LocatorDefaultImpl@79f3822
+// objects: Locator = com.github.pshirshov.izumi.distage.LocatorDefaultImpl@6d403eab
 
 objects.run {
   (hello: Hello, bye: Bye) =&gt;
@@ -369,9 +369,9 @@ objects.run {
     hello(names(rnd))
     bye(names(rnd))
 }
-// Random index: 1
-// Hello Marisa
-// Bye Marisa
+// Random index: 0
+// Hello Snow
+// Bye Snow
 </code></pre>
 <pre class="prettyprint"><code class="language-scala">objects.runOption { i: Int =&gt; i + 10 } match {
   case None =&gt; println(&quot;There is no Int in the object graph!&quot;)
@@ -517,7 +517,7 @@ object KVStore {
 val kvStoreModule = new ModuleDef {
   make[KVStore[IO]].fromEffect(KVStore.dummy)
 }
-// kvStoreModule: AnyRef with ModuleDef = Set(SingletonBinding({type.App12.this.KVStore[zio.IO]},EffectImpl(App12.this.KVStore[zio.IO],[A]zio.IO[Nothing,A],InstanceImpl(zio.ZIO[Any,Nothing,App12.this.KVStore[zio.IO]],zio.ZIO$FlatMap@a880637)),Set(),(basics.md:438)))
+// kvStoreModule: AnyRef with ModuleDef = Set(SingletonBinding({type.App12.this.KVStore[zio.IO]},EffectImpl(App12.this.KVStore[zio.IO],[A]zio.IO[Nothing,A],InstanceImpl(zio.ZIO[Any,Nothing,App12.this.KVStore[zio.IO]],zio.ZIO$FlatMap@757114d3)),Set(),(basics.md:438)))
 
 new DefaultRuntime{}.unsafeRun {
   Injector().produceF[IO[Throwable, ?]](kvStoreModule, GCMode.NoGC)
@@ -548,22 +548,14 @@ val dbResource = Resource.make(
   acquire = IO { println(&quot;Connecting to DB!&quot;); new DBConnection }
 )(release = _ =&gt; IO(println(&quot;Disconnecting DB&quot;)))
 // dbResource: Resource[IO, DBConnection] = Allocate(
-//   Map(
-//     Delay(&lt;function0&gt;),
-//     scala.Function1$$Lambda$20739/0x0000000803b7b840@4b2d9691,
-//     1
-//   )
+//   Map(Delay(&lt;function0&gt;), scala.Function1$$Lambda$13421/2145623513@69718b5f, 1)
 // )
 
 val mqResource = Resource.make(
   acquire = IO { println(&quot;Connecting to Message Queue!&quot;); new MessageQueueConnection }
 )(release = _ =&gt; IO(println(&quot;Disconnecting Message Queue&quot;)))
 // mqResource: Resource[IO, MessageQueueConnection] = Allocate(
-//   Map(
-//     Delay(&lt;function0&gt;),
-//     scala.Function1$$Lambda$20739/0x0000000803b7b840@5b0b65d9,
-//     1
-//   )
+//   Map(Delay(&lt;function0&gt;), scala.Function1$$Lambda$13421/2145623513@730e1d66, 1)
 // )
 
 class MyApp(db: DBConnection, mq: MessageQueueConnection) {
@@ -618,7 +610,7 @@ val module = new ModuleDef {
     init
 }
 // true
-// closedInit: com.github.pshirshov.izumi.fundamentals.platform.functional.package.Identity[Init] = repl.Session$App16$Init@470d5968
+// closedInit: com.github.pshirshov.izumi.fundamentals.platform.functional.package.Identity[Init] = repl.Session$App16$Init@7db82680
 println(closedInit.initialized)
 // false
 </code></pre>
@@ -743,11 +735,11 @@ object TryInterpreters extends ModuleDef {
 
 // combine all modules
 val TryProgram = new Program[Try] ++ TryInterpreters
-// TryProgram: Module = Set(SingletonBinding({type.repl.Session.App18.Validation[scala.util.Try]},ProviderImpl(repl.Session.App18.Validation[scala.util.Try],com.github.pshirshov.izumi.distage.model.providers.ProviderMagnet$$$Lambda$20453/0x0000000803835840@5478be37(): repl.Session.App18.Validation[scala.util.Try]),Set(),(basics.md:670)), SingletonBinding({type.repl.Session.App18.TaglessProgram[[A]scala.util.Try[A]]},ProviderImpl(repl.Session.App18.TaglessProgram[[A]scala.util.Try[A]],&lt;function1&gt;(cats.Monad[[A]scala.util.Try[A]], repl.Session.App18.Validation[[A]scala.util.Try[A]], repl.Session.App18.Interaction[[A]scala.util.Try[A]]): repl.Session.App18.TaglessProgram[[A]scala.util.Try[A]]),Set(),(basics.md:636)), SingletonBinding({type.cats.Monad[[A]scala.util.Try[A]]},InstanceImpl(cats.Monad[[A]scala.util.Try[A]],cats.instances.TryInstances$$anon$1@28d9d778),Set(),(basics.md:638)), SingletonBinding({type.repl.Session.App18.Interaction[scala.util.Try]},ProviderImpl(repl.Session.App18.Interaction[scala.util.Try],com.github.pshirshov.izumi.distage.model.providers.ProviderMagnet$$$Lambda$20453/0x0000000803835840@13461839(): repl.Session.App18.Interaction[scala.util.Try]),Set(),(basics.md:671)))
+// TryProgram: Module = Set(SingletonBinding({type.repl.Session.App18.Validation[scala.util.Try]},ProviderImpl(repl.Session.App18.Validation[scala.util.Try],com.github.pshirshov.izumi.distage.model.providers.ProviderMagnet$$$Lambda$12234/899724825@4954256e(): repl.Session.App18.Validation[scala.util.Try]),Set(),(basics.md:670)), SingletonBinding({type.cats.Monad[[A]scala.util.Try[A]]},InstanceImpl(cats.Monad[[A]scala.util.Try[A]],cats.instances.TryInstances$$anon$1@12e34e3e),Set(),(basics.md:638)), SingletonBinding({type.repl.Session.App18.Interaction[scala.util.Try]},ProviderImpl(repl.Session.App18.Interaction[scala.util.Try],com.github.pshirshov.izumi.distage.model.providers.ProviderMagnet$$$Lambda$12234/899724825@1ef956c8(): repl.Session.App18.Interaction[scala.util.Try]),Set(),(basics.md:671)), SingletonBinding({type.repl.Session.App18.TaglessProgram[[A]scala.util.Try[A]]},ProviderImpl(repl.Session.App18.TaglessProgram[[A]scala.util.Try[A]],&lt;function1&gt;(cats.Monad[[A]scala.util.Try[A]], repl.Session.App18.Validation[[A]scala.util.Try[A]], repl.Session.App18.Interaction[[A]scala.util.Try[A]]): repl.Session.App18.TaglessProgram[[A]scala.util.Try[A]]),Set(),(basics.md:636)))
 
 // create object graph
 val objects = Injector().produceUnsafe(TryProgram, GCMode.NoGC)
-// objects: Locator = com.github.pshirshov.izumi.distage.LocatorDefaultImpl@738ac242
+// objects: Locator = com.github.pshirshov.izumi.distage.LocatorDefaultImpl@3b4a72dd
 
 // run
 objects.get[TaglessProgram[Try]].program
