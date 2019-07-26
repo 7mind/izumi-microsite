@@ -339,25 +339,25 @@ contextLogger.info(s&quot;Hey&quot;)
 import cats.effect.IO
 
 val logger = IzLogger()
-// logger: IzLogger = com.github.pshirshov.izumi.logstage.api.IzLogger@2631ccc7
+// logger: IzLogger = com.github.pshirshov.izumi.logstage.api.IzLogger@3aac08e4
 
 val log = LogIO.fromLogger[IO](logger)
-// log: LogIO[IO] = logstage.LogIO$$anon$1@e23f884
+// log: LogIO[IO] = logstage.LogIO$$anon$1@2d00851e
 
 log.info(s&quot;Hey! I&#39;m logging with ${log}stage!&quot;).unsafeRunSync()
 </code></pre>
 <pre><code>I 2019-03-29T23:21:48.693Z[Europe/Dublin] r.S.App7.res8 ...main-12:5384  (00_logstage.md:92) Hey! I&#39;m logging with log=logstage.LogIO$$anon$1@72736f25stage!
 </code></pre>
-<p><code>LogstageZIO.withFiberId</code> provides an <code>LogBIO</code> instance that always logs the current fiber ID in addition to usual logging of thread ID:</p>
+<p><code>LogstageZIO.withFiberId</code> provides a <code>LogBIO</code> instance that logs the current ZIO <code>FiberId</code> in addition to the thread id:</p>
 <p>Example:</p>
 <pre class="prettyprint"><code class="language-scala">import logstage.LogstageZIO
 import zio.{IO, DefaultRuntime}
 
 val log = LogstageZIO.withFiberId(logger)
-// log: LogBIO[IO] = logstage.LogstageZIO$$anon$1@7d1363bd
+// log: LogBIO[IO] = logstage.LogstageZIO$$anon$1@29276c46
 
 val rts = new DefaultRuntime {}
-// rts: AnyRef with DefaultRuntime = repl.Session$App9$$anon$1@7bf1b520
+// rts: AnyRef with DefaultRuntime = repl.Session$App9$$anon$1@64bd1526
 rts.unsafeRun {
   log.info(s&quot;Hey! I&#39;m logging with ${log}stage!&quot;)
 }
@@ -387,7 +387,7 @@ def importEntity(entity: Entity)(implicit log: LogIO[IO]): IO[Unit] = {
 import com.github.pshirshov.izumi.logstage.api.routing.StaticLogRouter
 
 val myLogger = IzLogger()
-// myLogger: IzLogger = com.github.pshirshov.izumi.logstage.api.IzLogger@45621ec2
+// myLogger: IzLogger = com.github.pshirshov.izumi.logstage.api.IzLogger@6eba0d66
 
 // configure SLF4j to use the same router that `myLogger` uses
 StaticLogRouter.instance.setup(myLogger.router)
