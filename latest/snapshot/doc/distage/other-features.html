@@ -267,15 +267,19 @@ val module = new ModuleDef {
   make[B]
   make[C]
 }
-// module: AnyRef with ModuleDef = Set(SingletonBinding({type.App0.this.A},TypeImpl(App0.this.A),Set(),(other-features.md:26)), SingletonBinding({type.App0.this.B},TypeImpl(App0.this.B),Set(),(other-features.md:27)), SingletonBinding({type.App0.this.C},TypeImpl(App0.this.C),Set(),(other-features.md:28)))
+// module: AnyRef with ModuleDef = Set(SingletonBinding({type.repl.Session::repl.Session.App0::repl.Session.App0.C},TypeImpl(repl.Session::repl.Session.App0::repl.Session.App0.C),Set(),(other-features.md:28)), SingletonBinding({type.repl.Session::repl.Session.App0::repl.Session.App0.A},TypeImpl(repl.Session::repl.Session.App0::repl.Session.App0.A),Set(),(other-features.md:26)), SingletonBinding({type.repl.Session::repl.Session.App0::repl.Session.App0.B},TypeImpl(repl.Session::repl.Session.App0::repl.Session.App0.B),Set(),(other-features.md:27)))
 </code></pre>
 <pre class="prettyprint"><code class="language-scala">val gc = GCMode.GCRoots(Set[DIKey](DIKey.get[A]))
 // gc: package.GCMode.GCRoots = GCRoots(
-//   Set(TypeKey(SafeType(TypeRef(ThisType(class App0), class A, List()))))
+//   Set(
+//     TypeKey(
+//       SafeType(TypeRef(ThisType(class App0), class A, List()), Session::App0::A)
+//     )
+//   )
 // )
 
 val locator = Injector().produceUnsafe(module, mode = gc)
-// locator: Locator = com.github.pshirshov.izumi.distage.LocatorDefaultImpl@b62974e
+// locator: Locator = com.github.pshirshov.izumi.distage.LocatorDefaultImpl@1dfe3cfc
 
 // A and B are here
 locator.find[A]
