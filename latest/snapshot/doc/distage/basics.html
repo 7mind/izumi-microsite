@@ -359,7 +359,7 @@ object HostPortModule extends ModuleDef {
 <pre class="prettyprint"><code class="language-scala">import scala.util.Random
 
 val objects = Injector().produceUnsafe(HelloByeModule, GCMode.NoGC)
-// objects: Locator = izumi.distage.LocatorDefaultImpl@1591ea33
+// objects: Locator = izumi.distage.LocatorDefaultImpl@41fd16c8
 
 objects.run {
   (hello: Hello, bye: Bye) =&gt;
@@ -369,9 +369,9 @@ objects.run {
     hello(names(rnd))
     bye(names(rnd))
 }
-// Random index: 2
-// Hello Shelby
-// Bye Shelby
+// Random index: 0
+// Hello Snow
+// Bye Snow
 </code></pre>
 <pre class="prettyprint"><code class="language-scala">objects.runOption { i: Int =&gt; i + 10 } match {
   case None =&gt; println(&quot;There is no Int in the object graph!&quot;)
@@ -517,7 +517,7 @@ object KVStore {
 val kvStoreModule = new ModuleDef {
   make[KVStore[IO]].fromEffect(KVStore.dummy)
 }
-// kvStoreModule: AnyRef with ModuleDef = Set(SingletonBinding({type.repl.Session::repl.Session.App12::repl.Session.App12.KVStore[=? %0,%1 ? ZIO[-Any,+0,+1]]},EffectImpl(repl.Session::repl.Session.App12::repl.Session.App12.KVStore[=? %0,%1 ? ZIO[-Any,+0,+1]],? %0 ? zio.ZIO[-Any,+Nothing,+0],InstanceImpl(zio.ZIO[-Any,+Nothing,+Session::App12::KVStore[=? %0,%1 ? ZIO[-Any,+0,+1]]],zio.ZIO$FlatMap@3c6cbaf7)),Set(),(basics.md:438)))
+// kvStoreModule: AnyRef with ModuleDef = Set(SingletonBinding({type.repl.Session::repl.Session.App12::repl.Session.App12.KVStore[=? %0,%1 ? ZIO[-Any,+0,+1]]},EffectImpl(repl.Session::repl.Session.App12::repl.Session.App12.KVStore[=? %0,%1 ? ZIO[-Any,+0,+1]],? %0 ? zio.ZIO[-Any,+Nothing,+0],InstanceImpl(zio.ZIO[-Any,+Nothing,+Session::App12::KVStore[=? %0,%1 ? ZIO[-Any,+0,+1]]],zio.ZIO$FlatMap@453c3cb8)),Set(),(basics.md:438)))
 
 new DefaultRuntime{}.unsafeRun {
   Injector().produceF[IO[Throwable, ?]](kvStoreModule, GCMode.NoGC)
@@ -548,14 +548,14 @@ val dbResource = Resource.make(
   acquire = IO { println(&quot;Connecting to DB!&quot;); new DBConnection }
 )(release = _ =&gt; IO(println(&quot;Disconnecting DB&quot;)))
 // dbResource: Resource[IO, DBConnection] = Allocate(
-//   Map(Delay(&lt;function0&gt;), scala.Function1$$Lambda$16401/936367548@107b3907, 1)
+//   Map(Delay(&lt;function0&gt;), scala.Function1$$Lambda$19866/981030720@41bcf676, 1)
 // )
 
 val mqResource = Resource.make(
   acquire = IO { println(&quot;Connecting to Message Queue!&quot;); new MessageQueueConnection }
 )(release = _ =&gt; IO(println(&quot;Disconnecting Message Queue&quot;)))
 // mqResource: Resource[IO, MessageQueueConnection] = Allocate(
-//   Map(Delay(&lt;function0&gt;), scala.Function1$$Lambda$16401/936367548@5b512125, 1)
+//   Map(Delay(&lt;function0&gt;), scala.Function1$$Lambda$19866/981030720@2eb52c47, 1)
 // )
 
 class MyApp(db: DBConnection, mq: MessageQueueConnection) {
@@ -610,7 +610,7 @@ val module = new ModuleDef {
     init
 }
 // true
-// closedInit: izumi.fundamentals.platform.functional.package.Identity[Init] = repl.Session$App16$Init@bd28550
+// closedInit: izumi.fundamentals.platform.functional.package.Identity[Init] = repl.Session$App16$Init@140f0451
 println(closedInit.initialized)
 // false
 </code></pre>
@@ -735,11 +735,11 @@ object TryInterpreters extends ModuleDef {
 
 // combine all modules
 val TryProgram = new Program[Try] ++ TryInterpreters
-// TryProgram: Module = Set(SingletonBinding({type.cats.Monad[=? %0 ? Try[+0]]},InstanceImpl(cats.Monad[=? %0 ? Try[+0]],cats.instances.TryInstances$$anon$1@2b3e70a5),Set(),(basics.md:638)), SingletonBinding({type.repl.Session::repl.Session.App18::repl.Session.App18.Validation[=? %0 ? Try[+0]]},ProviderImpl({java.lang.Object &amp; repl.Session::repl.Session.App18::repl.Session.App18.Validation[=? %0 ? Try[+0]]},izumi.distage.model.providers.ProviderMagnet$$$Lambda$15104/869153163@3e0a0cbf(): {java.lang.Object &amp; repl.Session::repl.Session.App18::repl.Session.App18.Validation[=? %0 ? Try[+0]]}),Set(),(basics.md:670)), SingletonBinding({type.repl.Session::repl.Session.App18::repl.Session.App18.Interaction[=? %0 ? Try[+0]]},ProviderImpl({java.lang.Object &amp; repl.Session::repl.Session.App18::repl.Session.App18.Interaction[=? %0 ? Try[+0]]},izumi.distage.model.providers.ProviderMagnet$$$Lambda$15104/869153163@10ebaa29(): {java.lang.Object &amp; repl.Session::repl.Session.App18::repl.Session.App18.Interaction[=? %0 ? Try[+0]]}),Set(),(basics.md:671)), SingletonBinding({type.repl.Session::repl.Session.App18::repl.Session.App18.TaglessProgram[=? %0 ? Try[+0]]},ProviderImpl(repl.Session::repl.Session.App18::repl.Session.App18.TaglessProgram[=? %0 ? Try[+0]],&lt;function1&gt;(cats.Monad[=? %0 ? Try[+0]], repl.Session::repl.Session.App18::repl.Session.App18.Validation[=? %0 ? Try[+0]], repl.Session::repl.Session.App18::repl.Session.App18.Interaction[=? %0 ? Try[+0]]): repl.Session::repl.Session.App18::repl.Session.App18.TaglessProgram[=? %0 ? Try[+0]]),Set(),(basics.md:636)))
+// TryProgram: Module = Set(SingletonBinding({type.repl.Session::repl.Session.App18::repl.Session.App18.TaglessProgram[=? %0 ? Try[+0]]},ProviderImpl(repl.Session::repl.Session.App18::repl.Session.App18.TaglessProgram[=? %0 ? Try[+0]],&lt;function1&gt;(cats.Monad[=? %0 ? Try[+0]], repl.Session::repl.Session.App18::repl.Session.App18.Validation[=? %0 ? Try[+0]], repl.Session::repl.Session.App18::repl.Session.App18.Interaction[=? %0 ? Try[+0]]): repl.Session::repl.Session.App18::repl.Session.App18.TaglessProgram[=? %0 ? Try[+0]]),Set(),(basics.md:636)), SingletonBinding({type.cats.Monad[=? %0 ? Try[+0]]},InstanceImpl(cats.Monad[=? %0 ? Try[+0]],cats.instances.TryInstances$$anon$1@3e06c814),Set(),(basics.md:638)), SingletonBinding({type.repl.Session::repl.Session.App18::repl.Session.App18.Interaction[=? %0 ? Try[+0]]},ProviderImpl({java.lang.Object &amp; repl.Session::repl.Session.App18::repl.Session.App18.Interaction[=? %0 ? Try[+0]]},izumi.distage.model.providers.ProviderMagnet$$$Lambda$18872/1367149349@4cc66a61(): {java.lang.Object &amp; repl.Session::repl.Session.App18::repl.Session.App18.Interaction[=? %0 ? Try[+0]]}),Set(),(basics.md:671)), SingletonBinding({type.repl.Session::repl.Session.App18::repl.Session.App18.Validation[=? %0 ? Try[+0]]},ProviderImpl({java.lang.Object &amp; repl.Session::repl.Session.App18::repl.Session.App18.Validation[=? %0 ? Try[+0]]},izumi.distage.model.providers.ProviderMagnet$$$Lambda$18872/1367149349@342c465e(): {java.lang.Object &amp; repl.Session::repl.Session.App18::repl.Session.App18.Validation[=? %0 ? Try[+0]]}),Set(),(basics.md:670)))
 
 // create object graph
 val objects = Injector().produceUnsafe(TryProgram, GCMode.NoGC)
-// objects: Locator = izumi.distage.LocatorDefaultImpl@15351244
+// objects: Locator = izumi.distage.LocatorDefaultImpl@1d8e560b
 
 // run
 objects.get[TaglessProgram[Try]].program
