@@ -308,7 +308,7 @@ new ModuleDef {
       }
   }
 }
-// res3: AnyRef with ModuleDef = Set(SingletonBinding({type.repl.Session::repl.Session.App0::repl.Session.App0.Byer@byer-1},TypeImpl(repl.Session::repl.Session.App0::repl.Session.App0.PrintByer),Set(),(basics.md:117)), SingletonBinding({type.repl.Session::repl.Session.App0::repl.Session.App0.Byer@byer-2},ProviderImpl({java.lang.Object &amp; repl.Session::repl.Session.App0::repl.Session.App0.Byer},&lt;function1&gt;(repl.Session::repl.Session.App0::repl.Session.App0.Byer): {java.lang.Object &amp; repl.Session::repl.Session.App0::repl.Session.App0.Byer}),Set(),(basics.md:118)))
+// res3: AnyRef with ModuleDef = Set(SingletonBinding({type.repl.Session::repl.Session.App0::repl.Session.App0.Byer@byer-2},ProviderImpl({java.lang.Object &amp; repl.Session::repl.Session.App0::repl.Session.App0.Byer},&lt;function1&gt;(repl.Session::repl.Session.App0::repl.Session.App0.Byer): {java.lang.Object &amp; repl.Session::repl.Session.App0::repl.Session.App0.Byer}),Set(),(basics.md:118)), SingletonBinding({type.repl.Session::repl.Session.App0::repl.Session.App0.Byer@byer-1},TypeImpl(repl.Session::repl.Session.App0::repl.Session.App0.PrintByer),Set(),(basics.md:117)))
 </code></pre>
 <p>You can also create factory classes to help you mint new non-singleton instances. <a href="#auto-factories">Auto-Factories</a> can reduce boilerplate involved in doing this.</p>
 <p>Modules can be combined into larger modules with <code>++</code> and <code>overridenBy</code> operators. Let&rsquo;s use <code>overridenBy</code> to greet in ALL CAPS:</p>
@@ -359,7 +359,7 @@ object HostPortModule extends ModuleDef {
 <pre class="prettyprint"><code class="language-scala">import scala.util.Random
 
 val objects = Injector().produceUnsafe(HelloByeModule, GCMode.NoGC)
-// objects: Locator = izumi.distage.LocatorDefaultImpl@727cf14
+// objects: Locator = izumi.distage.LocatorDefaultImpl@236f3ac5
 
 objects.run {
   (hello: Hello, bye: Bye) =&gt;
@@ -369,9 +369,9 @@ objects.run {
     hello(names(rnd))
     bye(names(rnd))
 }
-// Random index: 2
-// Hello Shelby
-// Bye Shelby
+// Random index: 1
+// Hello Marisa
+// Bye Marisa
 </code></pre>
 <pre class="prettyprint"><code class="language-scala">objects.runOption { i: Int =&gt; i + 10 } match {
   case None =&gt; println(&quot;There is no Int in the object graph!&quot;)
@@ -459,7 +459,7 @@ val server = objects.get[HttpServer]
 // res11: String = &quot;Blog post ``1&#39;&#39;!&quot;
 </code></pre>
 <p>Fantastic!</p>
-<p>consult <a href="https://github.com/google/guice/wiki/Multibindings">Guice wiki on Multibindings</a> for more details about the concept.</p>
+<p>See also, same concept in <a href="https://github.com/google/guice/wiki/Multibindings">Guice</a>.</p>
 <h3><a href="#effect-bindings" name="effect-bindings" class="anchor"><span class="anchor-link"></span></a>Effect Bindings</h3>
 <p>Sometimes we need to effectfully create a component or fetch some data and inject it into the object graph during startup (e.g. read a configuration file), but the resulting component or data does not need to be closed. An example might be a global <code>Semaphore</code> that limits the parallelism of an entire application based on configuration value or a <code>dummy</code>/<code>test double</code> implementation of some external service made for testing using simple <code>Ref</code>s.</p>
 <p>In these cases we can use <code>.fromEffect</code> to simply bind a value created effectfully.</p>
@@ -517,7 +517,7 @@ object KVStore {
 val kvStoreModule = new ModuleDef {
   make[KVStore[IO]].fromEffect(KVStore.dummy)
 }
-// kvStoreModule: AnyRef with ModuleDef = Set(SingletonBinding({type.repl.Session::repl.Session.App12::repl.Session.App12.KVStore[=? %0,%1 ? ZIO[-Any,+0,+1]]},EffectImpl(repl.Session::repl.Session.App12::repl.Session.App12.KVStore[=? %0,%1 ? ZIO[-Any,+0,+1]],? %0 ? zio.ZIO[-Any,+Nothing,+0],InstanceImpl(zio.ZIO[-Any,+Nothing,+Session::App12::KVStore[=? %0,%1 ? ZIO[-Any,+0,+1]]],zio.ZIO$FlatMap@4ca2ce85)),Set(),(basics.md:438)))
+// kvStoreModule: AnyRef with ModuleDef = Set(SingletonBinding({type.repl.Session::repl.Session.App12::repl.Session.App12.KVStore[=? %0,%1 ? ZIO[-Any,+0,+1]]},EffectImpl(repl.Session::repl.Session.App12::repl.Session.App12.KVStore[=? %0,%1 ? ZIO[-Any,+0,+1]],? %0 ? zio.ZIO[-Any,+Nothing,+0],InstanceImpl(zio.ZIO[-Any,+Nothing,+Session::App12::KVStore[=? %0,%1 ? ZIO[-Any,+0,+1]]],zio.ZIO$FlatMap@328b28c2)),Set(),(basics.md:438)))
 
 new DefaultRuntime{}.unsafeRun {
   Injector().produceF[IO[Throwable, ?]](kvStoreModule, GCMode.NoGC)
@@ -550,7 +550,7 @@ val dbResource = Resource.make(
 // dbResource: Resource[IO, DBConnection] = Allocate(
 //   Map(
 //     Delay(&lt;function0&gt;),
-//     scala.Function1$$Lambda$19780/0x0000000843bba840@102279ca,
+//     scala.Function1$$Lambda$19803/0x0000000844b3f040@78f64eaf,
 //     1
 //   )
 // )
@@ -561,7 +561,7 @@ val mqResource = Resource.make(
 // mqResource: Resource[IO, MessageQueueConnection] = Allocate(
 //   Map(
 //     Delay(&lt;function0&gt;),
-//     scala.Function1$$Lambda$19780/0x0000000843bba840@6aca718,
+//     scala.Function1$$Lambda$19803/0x0000000844b3f040@62ab16e9,
 //     1
 //   )
 // )
@@ -618,7 +618,7 @@ val module = new ModuleDef {
     init
 }
 // true
-// closedInit: izumi.fundamentals.platform.functional.package.Identity[Init] = repl.Session$App16$Init@48210dbe
+// closedInit: izumi.fundamentals.platform.functional.package.Identity[Init] = repl.Session$App16$Init@2f85ca1a
 println(closedInit.initialized)
 // false
 </code></pre>
@@ -743,11 +743,11 @@ object TryInterpreters extends ModuleDef {
 
 // combine all modules
 val TryProgram = new Program[Try] ++ TryInterpreters
-// TryProgram: Module = Set(SingletonBinding({type.repl.Session::repl.Session.App18::repl.Session.App18.TaglessProgram[=? %0 ? Try[+0]]},ProviderImpl(repl.Session::repl.Session.App18::repl.Session.App18.TaglessProgram[=? %0 ? Try[+0]],&lt;function1&gt;(cats.Monad[=? %0 ? Try[+0]], repl.Session::repl.Session.App18::repl.Session.App18.Validation[=? %0 ? Try[+0]], repl.Session::repl.Session.App18::repl.Session.App18.Interaction[=? %0 ? Try[+0]]): repl.Session::repl.Session.App18::repl.Session.App18.TaglessProgram[=? %0 ? Try[+0]]),Set(),(basics.md:636)), SingletonBinding({type.repl.Session::repl.Session.App18::repl.Session.App18.Validation[=? %0 ? Try[+0]]},ProviderImpl({java.lang.Object &amp; repl.Session::repl.Session.App18::repl.Session.App18.Validation[=? %0 ? Try[+0]]},izumi.distage.model.providers.ProviderMagnet$$$Lambda$19487/0x0000000843767040@5ccd9b9a(): {java.lang.Object &amp; repl.Session::repl.Session.App18::repl.Session.App18.Validation[=? %0 ? Try[+0]]}),Set(),(basics.md:670)), SingletonBinding({type.repl.Session::repl.Session.App18::repl.Session.App18.Interaction[=? %0 ? Try[+0]]},ProviderImpl({java.lang.Object &amp; repl.Session::repl.Session.App18::repl.Session.App18.Interaction[=? %0 ? Try[+0]]},izumi.distage.model.providers.ProviderMagnet$$$Lambda$19487/0x0000000843767040@1b6f2ae5(): {java.lang.Object &amp; repl.Session::repl.Session.App18::repl.Session.App18.Interaction[=? %0 ? Try[+0]]}),Set(),(basics.md:671)), SingletonBinding({type.cats.Monad[=? %0 ? Try[+0]]},InstanceImpl(cats.Monad[=? %0 ? Try[+0]],cats.instances.TryInstances$$anon$1@749e7892),Set(),(basics.md:638)))
+// TryProgram: Module = Set(SingletonBinding({type.repl.Session::repl.Session.App18::repl.Session.App18.Validation[=? %0 ? Try[+0]]},ProviderImpl({java.lang.Object &amp; repl.Session::repl.Session.App18::repl.Session.App18.Validation[=? %0 ? Try[+0]]},izumi.distage.model.providers.ProviderMagnet$$$Lambda$19510/0x00000008449d1840@fada32a(): {java.lang.Object &amp; repl.Session::repl.Session.App18::repl.Session.App18.Validation[=? %0 ? Try[+0]]}),Set(),(basics.md:670)), SingletonBinding({type.repl.Session::repl.Session.App18::repl.Session.App18.TaglessProgram[=? %0 ? Try[+0]]},ProviderImpl(repl.Session::repl.Session.App18::repl.Session.App18.TaglessProgram[=? %0 ? Try[+0]],&lt;function1&gt;(cats.Monad[=? %0 ? Try[+0]], repl.Session::repl.Session.App18::repl.Session.App18.Validation[=? %0 ? Try[+0]], repl.Session::repl.Session.App18::repl.Session.App18.Interaction[=? %0 ? Try[+0]]): repl.Session::repl.Session.App18::repl.Session.App18.TaglessProgram[=? %0 ? Try[+0]]),Set(),(basics.md:636)), SingletonBinding({type.repl.Session::repl.Session.App18::repl.Session.App18.Interaction[=? %0 ? Try[+0]]},ProviderImpl({java.lang.Object &amp; repl.Session::repl.Session.App18::repl.Session.App18.Interaction[=? %0 ? Try[+0]]},izumi.distage.model.providers.ProviderMagnet$$$Lambda$19510/0x00000008449d1840@c911f46(): {java.lang.Object &amp; repl.Session::repl.Session.App18::repl.Session.App18.Interaction[=? %0 ? Try[+0]]}),Set(),(basics.md:671)), SingletonBinding({type.cats.Monad[=? %0 ? Try[+0]]},InstanceImpl(cats.Monad[=? %0 ? Try[+0]],cats.instances.TryInstances$$anon$1@23b543ba),Set(),(basics.md:638)))
 
 // create object graph
 val objects = Injector().produceUnsafe(TryProgram, GCMode.NoGC)
-// objects: Locator = izumi.distage.LocatorDefaultImpl@7405e36e
+// objects: Locator = izumi.distage.LocatorDefaultImpl@5c1be5ed
 
 // run
 objects.get[TaglessProgram[Try]].program
