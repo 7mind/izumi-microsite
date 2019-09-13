@@ -151,10 +151,6 @@
                         <a href="IRTWithCirce.html" title="Provides circe codecs for case classes (won't work with sealed traits):">IRTWithCirce</a>
                       </li><li class="current-entities indented4">
                         <span class="separator"></span>
-                        <a class="trait" href="IRTWithCirceGeneric.html" title="this will give codecs that cache derivation resolution _within compiler session_ (_NOT between compiler runs_) Can't define it so that it would cache between _compiler runs_ because of a shapeless bug https://github.com/milessabin/shapeless/issues/837 preventing a definition such as"></a>
-                        <a href="IRTWithCirceGeneric.html" title="this will give codecs that cache derivation resolution _within compiler session_ (_NOT between compiler runs_) Can't define it so that it would cache between _compiler runs_ because of a shapeless bug https://github.com/milessabin/shapeless/issues/837 preventing a definition such as">IRTWithCirceGeneric</a>
-                      </li><li class="current-entities indented4">
-                        <span class="separator"></span>
                         <a class="class" href="MaterializeDerivationMacros.html" title=""></a>
                         <a href="MaterializeDerivationMacros.html" title="">MaterializeDerivationMacros</a>
                       </li><li name="izumi.idealingua.runtime.model" visbl="pub" class="indented4 " data-isabs="false" fullComment="yes" group="Ungrouped">
@@ -317,40 +313,8 @@
       
       <p class="shortcomment cmt">Provides circe codecs for case classes (won't work with sealed traits):</p><div class="fullcomment"><div class="comment cmt"><p>Provides circe codecs for case classes (won't work with sealed traits):</p><pre><span class="kw">final</span> <span class="kw">case</span> <span class="kw">class</span> Abc(a: <span class="std">String</span>, b: <span class="std">String</span>, c: <span class="std">String</span>)
 
-<span class="kw">object</span> Abc <span class="kw">extends</span> WithCirce[Abc]</pre><p>For sealed traits use <a href="IRTWithCirceGeneric.html" class="extype" name="izumi.idealingua.runtime.circe.IRTWithCirceGeneric">IRTWithCirceGeneric</a>. It's not as efficient wrt compile time, but will cache during a single compilation run.
+<span class="kw">object</span> Abc <span class="kw">extends</span> WithCirce[Abc]</pre><p>For sealed traits use <span class="extype" name="IRTWithCirceGeneric">IRTWithCirceGeneric</span>. It's not as efficient wrt compile time, but will cache during a single compilation run.
 </p></div></div>
-    </li><li name="izumi.idealingua.runtime.circe.IRTWithCirceGeneric" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="IRTWithCirceGeneric[A]extendsAnyRef"></a><a id="IRTWithCirceGeneric[A]:IRTWithCirceGeneric[A]"></a>
-      <span class="permalink">
-      <a href="../../../../izumi/idealingua/runtime/circe/index.html#IRTWithCirceGeneric[A]extendsAnyRef" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">trait</span>
-      </span>
-      <span class="symbol">
-        <a title="this will give codecs that cache derivation resolution _within compiler session_ (_NOT between compiler runs_) Can't define it so that it would cache between _compiler runs_ because of a shapeless bug https://github.com/milessabin/shapeless/issues/837 preventing a definition such as" href="IRTWithCirceGeneric.html"><span class="name">IRTWithCirceGeneric</span></a><span class="tparams">[<span name="A">A</span>]</span><span class="result"> extends <a href="../../../../scala/index.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></span>
-      </span>
-      
-      <p class="shortcomment cmt">this will give codecs that cache derivation resolution _within compiler session_ (_NOT between compiler runs_)
-Can't define it so that it would cache between _compiler runs_
-because of a shapeless bug https://github.com/milessabin/shapeless/issues/837 preventing a definition such as</p><div class="fullcomment"><div class="comment cmt"><p>this will give codecs that cache derivation resolution _within compiler session_ (_NOT between compiler runs_)
-Can't define it so that it would cache between _compiler runs_
-because of a shapeless bug https://github.com/milessabin/shapeless/issues/837 preventing a definition such as</p><pre><span class="kw">abstract</span> <span class="kw">class</span> WithCirceGeneric[A: DerivedObjectEncoder: DerivedDecoder] {
-  <span class="kw">implicit</span> <span class="kw">val</span> enc: Encoder[A] = implicitly[DerivedObjectEncoder[A]]
-  <span class="kw">implicit</span> <span class="kw">val</span> dec: Decoder[A] = implicitly[DerivedDecoder[A]]
-}
-
-<span class="kw">final</span> <span class="kw">case</span> <span class="kw">class</span> X(int: <span class="std">Int</span>)
-
-<span class="kw">object</span> X <span class="kw">extends</span> WithCirceGeneric[X]</pre><p>with error</p><p>Error:(26, 19) super constructor cannot be passed a self reference unless parameter is declared by-name
-object X extends WithCirceGeneric[X]</p><p>(if you rename object to e.g. <code>XCodecs</code> it will work though)</p><p>This is still useful to derive sealed traits since WithCirce doees not support them:</p><pre><span class="kw">sealed</span> <span class="kw">trait</span> Y
-<span class="kw">final</span> <span class="kw">case</span> <span class="kw">class</span> Ya() <span class="kw">extends</span> Y
-
-<span class="kw">object</span> Ya <span class="kw">extends</span> WithCirce[Ya]
-<span class="kw">object</span> Y <span class="kw">extends</span> WithCirceGeneric[Y]</pre></div></div>
     </li><li name="izumi.idealingua.runtime.circe.MaterializeDerivationMacros" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="MaterializeDerivationMacrosextendsDerivationMacros"></a><a id="MaterializeDerivationMacros:MaterializeDerivationMacros"></a>
       <span class="permalink">
