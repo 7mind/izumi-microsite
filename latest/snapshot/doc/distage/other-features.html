@@ -267,19 +267,22 @@ val module = new ModuleDef {
   make[B]
   make[C]
 }
-// module: AnyRef with ModuleDef = Set(SingletonBinding({type.repl.Session::repl.Session.App0::repl.Session.App0.C},TypeImpl(repl.Session::repl.Session.App0::repl.Session.App0.C),Set(),(other-features.md:28)), SingletonBinding({type.repl.Session::repl.Session.App0::repl.Session.App0.A},TypeImpl(repl.Session::repl.Session.App0::repl.Session.App0.A),Set(),(other-features.md:26)), SingletonBinding({type.repl.Session::repl.Session.App0::repl.Session.App0.B},TypeImpl(repl.Session::repl.Session.App0::repl.Session.App0.B),Set(),(other-features.md:27)))
+// module: AnyRef with ModuleDef = Set(SingletonBinding({type.repl.Session::type::repl.Session.App0::repl.Session.App0.B},TypeImpl(repl.Session::type::repl.Session.App0::repl.Session.App0.B),Set(),(other-features.md:27)), SingletonBinding({type.repl.Session::type::repl.Session.App0::repl.Session.App0.C},TypeImpl(repl.Session::type::repl.Session.App0::repl.Session.App0.C),Set(),(other-features.md:28)), SingletonBinding({type.repl.Session::type::repl.Session.App0::repl.Session.App0.A},TypeImpl(repl.Session::type::repl.Session.App0::repl.Session.App0.A),Set(),(other-features.md:26)))
 </code></pre>
 <pre class="prettyprint"><code class="language-scala">val gc = GCMode.GCRoots(Set[DIKey](DIKey.get[A]))
 // gc: package.GCMode.GCRoots = GCRoots(
 //   Set(
 //     TypeKey(
-//       SafeType(TypeRef(ThisType(class App0), class A, List()), Session::App0::A)
+//       SafeType(
+//         TypeRef(ThisType(class App0), class A, List()),
+//         Session::type::App0::A
+//       )
 //     )
 //   )
 // )
 
 val locator = Injector().produceUnsafe(module, mode = gc)
-// locator: Locator = izumi.distage.LocatorDefaultImpl@7c2bd406
+// locator: Locator = izumi.distage.LocatorDefaultImpl@7a68461f
 
 // A and B are here
 locator.find[A]
@@ -506,7 +509,7 @@ assert(locator.get[C].c eq locator.get[C])
 <p>The proxy generation via <code>cglib</code> is still enabled by default, because in scenarios with <a href="#roles">extreme late-binding</a>, cycles can emerge unexpectedly, outside of control of the origin module.</p>
 <p>NB: Currently a limitation applies to by-names - ALL dependencies on a class engaged in a by-name circular dependency have to be by-name, otherwise distage will transparently revert to generating proxies.</p>
 <h3><a href="#auto-sets" name="auto-sets" class="anchor"><span class="anchor-link"></span></a>Auto-Sets</h3>
-<p>AutoSet <a href="/latest/snapshot/api/com/github/pshirshov/izumi/distage/model/Planner.html">Planner</a> Hooks traverse the plan and collect all future objects matching a predicate.</p>
+<p>AutoSet <a href="/latest/snapshot/api/izumi/izumi/distage/model/Planner.html">Planner</a> Hooks traverse the plan and collect all future objects matching a predicate.</p>
 <p>Using Auto-Sets you can e.g. collect all <code>AutoCloseable</code> classes and <code>.close()</code> them after the application has finished work.</p>
 <p>NOTE: please use <a href="basics.html#resource-bindings-lifecycle">Resource bindings</a> for real lifecycle, this is just an example.</p>
 <pre class="prettyprint"><code class="language-scala">trait PrintResource(name: String) {
