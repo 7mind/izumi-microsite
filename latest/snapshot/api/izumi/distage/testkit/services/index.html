@@ -314,6 +314,7 @@
       <p class="shortcomment cmt">Allows summoning DI objects via ZIO environment intersection types</p><div class="fullcomment"><div class="comment cmt"><p>Allows summoning DI objects via ZIO environment intersection types</p><pre><span class="kw">trait</span> PetStore[F[_, _]] {
   <span class="kw">def</span> purchasePet(name: <span class="std">String</span>, cost: <span class="std">Int</span>): F[Throwable, <span class="std">Boolean</span>]
 }
+
 <span class="kw">trait</span> Pets[F[_, _]]
   <span class="kw">def</span> myPets: F[Throwable, <span class="std">List</span>[<span class="std">String</span>]]
 }
@@ -334,11 +335,11 @@
 }
 
 <span class="lit">"test purchase pets"</span> in {
-  <span class="kw">val</span> test: ZIO[PetStoreEnv <span class="kw">with</span> PetsEnv, Throwable, <span class="std">Unit</span>] = <span class="kw">for</span> {
+  <span class="kw">for</span> {
     _    <span class="kw">&lt;-</span> store.purchasePet(<span class="lit">"Zab"</span>, <span class="num">213</span>)
     pets <span class="kw">&lt;-</span> pets.myPets
   } <span class="kw">yield</span> assert(pets.contains(<span class="lit">"Zab"</span>))
-  test
+  <span class="cmt">// : ZIO[PetStoreEnv with PetsEnv, Throwable, Unit]</span>
 }</pre></div></div>
     </li><li name="izumi.distage.testkit.services.SyncCache" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="SyncCache[K,V]extendsAnyRef"></a><a id="SyncCache[K,V]:SyncCache[K,V]"></a>
