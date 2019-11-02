@@ -311,51 +311,48 @@ data-md-source="github">
 <p>So, what you need to do to use logstage declarative config:</p>
 <p>1) include <code>&quot;logstage-reference.conf&quot;</code> in your application config</p>
 <p>2) defined next bootstrap modules :</p>
-<ul>
-  <li><code>LogstageCodecsModule()</code> - it will bind rendering policy and logsinks mappers and all necessary logstage runtime codecs
-    <p>Each <code>RenderingPolicy</code> and <code>LogSink</code> you may bind by calling follow commands inside LogstageCodecsModule:</p>
-    <pre><code>   bindLogSinkMapper[T &lt;: LogSink : ru.TypeTag, C: ru.TypeTag](f: C =&gt; T)
+<pre><code>- `LogstageCodecsModule()` - it will bind rendering policy and logsinks mappers and all necessary logstage runtime codecs
 
-   bindRenderingPolicyMapper[T &lt;: RenderingPolicy : ru.TypeTag, C: ru.TypeTag](f: C =&gt; T)
+Each `RenderingPolicy` and `LogSink` you may bind by calling follow commands inside LogstageCodecsModule:
+
+    bindLogSinkMapper[T &lt;: LogSink : ru.TypeTag, C: ru.TypeTag](f: C =&gt; T)
+
+    bindRenderingPolicyMapper[T &lt;: RenderingPolicy : ru.TypeTag, C: ru.TypeTag](f: C =&gt; T)
 </code></pre>
-  </li>
-</ul>
-<p>3) defined application modules:</p>
-<ul>
-  <li><code>LoggerConfigModule()</code> - it makes binding of LoggerConfig and you may inject it from locator using next command:</li>
-</ul>
-<p><code>scala
-   val logstageConfig = locator.get[LoggerConfig]
-</code></p>
-<pre><code>   LoggerConfig model is next:
+<p>3) defined application modules: </p>
+<pre><code>- `LoggerConfigModule()` - it makes binding of LoggerConfig and you may inject it from locator using next command:
 
-   ```scala
-   final case class LoggerPathConfig(threshold: Log.Level, sinks: Seq[LogSink])
+```scala
+val logstageConfig = locator.get[LoggerConfig]
+```
 
-   final case class LoggerConfig(root : LoggerPathConfig, entries : Map[String, LoggerPathConfig])
-   ```
+LoggerConfig model is next:
+
+```scala
+final case class LoggerPathConfig(threshold: Log.Level, sinks: Seq[LogSink])
+
+final case class LoggerConfig(root : LoggerPathConfig, entries : Map[String, LoggerPathConfig])
+```
 </code></pre>
 <h2><a href="#example" name="example" class="anchor"><span class="anchor-link"></span></a>Example</h2>
 <ol>
   <li>
     <p>Let&rsquo;s define our sinks and policies</p>
     <p>1.1 DummyLogSink</p>
-    <p><code>scala
-   class DummyLogSink(policy: RenderingPolicy) extends LogSink {
-      override def flush(e: Log.Entry): Unit = {
-        // do smth
-      }
+    <pre class="prettyprint"><code class="language-scala">class DummyLogSink(policy: RenderingPolicy) extends LogSink {
+   override def flush(e: Log.Entry): Unit = {
+     // do smth
    }
-</code></p>
+}
+</code></pre>
     <p>1.2 DummyRenderingPolicy</p>
-    <p><code>scala
-   class DummyRenderingPolicy(foo: Int, bar: Option[String]) extends RenderingPolicy {
-     override def render(entry: Log.Entry): String = entry.toString
-   }
-</code></p>
+    <pre class="prettyprint"><code class="language-scala">class DummyRenderingPolicy(foo: Int, bar: Option[String]) extends RenderingPolicy {
+  override def render(entry: Log.Entry): String = entry.toString
+}
+</code></pre>
   </li>
   <li>
-  <p>Let&rsquo;s define out logstage reference config</p></li>
+  <p>Let&rsquo;s define out logstage reference config </p></li>
 </ol>
 <pre class="prettyprint"><code class="language-hocon">logstage {
 
@@ -396,42 +393,47 @@ data-md-source="github">
   <li>
     <p>So, for now we need to specify case classes constructors for out DummyLogSink and DummyRenderingPolicy for automatic parsing</p>
     <p>3.1 DummyRenderingPolicyConstructor</p>
-    <p><code>scala
-   case class DummyRenderingPolicyConstructor(foo : Int, bar: Option[String])
-</code></p>
+    <pre class="prettyprint"><code class="language-scala">case class DummyRenderingPolicyConstructor(foo : Int, bar: Option[String])
+</code></pre>
     <p>3.2 DummyLogSinkConstructor</p>
-    <p><code>scala
-   case class DummyLogSinkConstructor(policy : RenderingPolicy)
-</code></p>
+    <pre class="prettyprint"><code class="language-scala">case class DummyLogSinkConstructor(policy : RenderingPolicy)
+</code></pre>
   </li>
   <li>
     <p>now we need to configure out DI for loggerConfigUsage</p>
     <p>4.1 Define bootsrap module. Here you can bind all mappers for custom Policies and Logsinks:</p>
-    <p>```scala  val logstageBootstrapModule = new LogstageCodecsModule {</p>
-    <pre><code>   // bind our rendering policy
+    <pre class="prettyprint"><code class="language-scala">val logstageBootstrapModule = new LogstageCodecsModule {
 
-   bindRenderingPolicyMapper[DummyRenderingPolicy, DummyRenderingPolicyConstructor]{
-     c =&gt; 
-       new DummyRenderingPolicy(c.foo, c.bar)
-   }
+    // bind our rendering policy
 
-   // bind our logsink
+    bindRenderingPolicyMapper[DummyRenderingPolicy, DummyRenderingPolicyConstructor]{
+      c =&gt; 
+        new DummyRenderingPolicy(c.foo, c.bar)
+    }
 
-   bindLogSinkMapper[DummyLogSink, DummyLogSinkConstructor] {
-     c =&gt;  new DummyLogSink(c.policy)
-   }
+    // bind our logsink
+
+    bindLogSinkMapper[DummyLogSink, DummyLogSinkConstructor] {
+      c =&gt;  new DummyLogSink(c.policy)
+    }
+}
+
+val bootstrapModules = Seq(..., logstageBootstrapModule)
+
 </code></pre>
-    <p>}</p>
-    <p>val bootstrapModules = Seq(&hellip;, logstageBootstrapModule)</p>
-    <p>```</p>
     <p>4.2 Add <code>LoggerConfigModule</code> to app modules</p>
-    <p><code>scala
-   val modules = Seq(..., new LoggerConfigModule ())
-</code></p>
+    <pre class="prettyprint"><code class="language-scala">val modules = Seq(..., new LoggerConfigModule ())
+</code></pre>
     <p>4.2 Enjoy!</p>
-    <p>```scala  // Basic locator setup</p>
-    <p>val injector = Injector(bootstapModules: _*)  val plan = injector.plan(modules.toList.overrideLeft)  val locator = injector.produce(plan)</p>
-    <p>// retrieve binded config  val cfg = locator.get[LoggerConfig]  ```</p>
+    <pre class="prettyprint"><code class="language-scala">// Basic locator setup
+
+val injector = Injector(bootstapModules: _*)
+val plan = injector.plan(modules.toList.overrideLeft)
+val locator = injector.produce(plan)
+
+// retrieve binded config
+val cfg = locator.get[LoggerConfig]
+</code></pre>
   </li>
 </ol>
 </div>

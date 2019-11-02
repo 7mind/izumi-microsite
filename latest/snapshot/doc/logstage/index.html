@@ -259,24 +259,15 @@ ctxLogger.info(s&quot;Processing time: $delta&quot;)
   <li>Each JSON message contains <code>@class</code> field with holds a unique <code>event class</code> identifier.  All events produced by the same source code line will share the same <code>event class</code>.</li>
 </ol>
 <h2><a href="#syntax-reference" name="syntax-reference" class="anchor"><span class="anchor-link"></span></a>Syntax Reference</h2>
-<p>1) Simple variable:</p>
-<p><code>scala
+<p>1) Simple variable:  <code>scala
    logger.info(s&quot;My message: $argument&quot;)
-</code></p>
-<p>2) Chain:</p>
-<p><code>scala
+</code> 2) Chain:  <code>scala
    logger.info(s&quot;My message: ${call.method} ${access.value}&quot;)
-</code></p>
-<p>3) Named expression:</p>
-<p><code>scala
+</code> 3) Named expression:  <code>scala
    logger.info(s&quot;My message: ${Some.expression -&gt; &quot;argname&quot;}&quot;)
-</code></p>
-<p>4) Invisible name expression:</p>
-<p><code>scala
+</code> 4) Invisible name expression:  <code>scala
    logger.info(s&quot;My message: ${Some.expression -&gt; &quot;argname&quot; -&gt; null}&quot;)
-</code></p>
-<p>5) De-camelcased name:</p>
-<p><code>scala
+</code> 5) De-camelcased name:  <code>scala
    logger.info(${camelCaseName-&gt; &#39; &#39;})
 </code></p>
 <h2><a href="#dependencies" name="dependencies" class="anchor"><span class="anchor-link"></span></a>Dependencies</h2>
@@ -339,25 +330,25 @@ contextLogger.info(s&quot;Hey&quot;)
 import cats.effect.IO
 
 val logger = IzLogger()
-// logger: IzLogger = izumi.logstage.api.IzLogger@51e36e7
+// logger: IzLogger = izumi.logstage.api.IzLogger@779ec535
 
 val log = LogIO.fromLogger[IO](logger)
-// log: LogIO[IO] = logstage.LogIO$$anon$1@6689d8d3
+// log: LogIO[IO] = logstage.LogIO$$anon$1@6fa5365e
 
 log.info(s&quot;Hey! I&#39;m logging with ${log}stage!&quot;).unsafeRunSync()
 </code></pre>
 <pre><code>I 2019-03-29T23:21:48.693Z[Europe/Dublin] r.S.App7.res8 ...main-12:5384  (00_logstage.md:92) Hey! I&#39;m logging with log=logstage.LogIO$$anon$1@72736f25stage!
 </code></pre>
 <p><code>LogstageZIO.withFiberId</code> provides a <code>LogBIO</code> instance that logs the current ZIO <code>FiberId</code> in addition to the thread id:</p>
-<p>Example:</p>
+<p>Example: </p>
 <pre class="prettyprint"><code class="language-scala">import logstage.LogstageZIO
 import zio.{IO, DefaultRuntime}
 
 val log: LogBIO[IO] = LogstageZIO.withFiberId(logger)
-// log: LogBIO[IO] = logstage.LogstageZIO$$anon$1@2fe83e37
+// log: LogBIO[IO] = logstage.LogstageZIO$$anon$1@59ce7da4
 
 val rts = new DefaultRuntime {}
-// rts: AnyRef with DefaultRuntime = repl.Session$App9$$anon$1@ffc8de1
+// rts: AnyRef with DefaultRuntime = repl.Session$App9$$anon$1@1187baf1
 rts.unsafeRun {
   log.info(s&quot;Hey! I&#39;m logging with ${log}stage!&quot;)
 }
@@ -383,12 +374,12 @@ def importEntity(entity: Entity)(implicit log: LogIO[IO]): IO[Unit] = {
 </code></pre>
 <h2><a href="#slf4j-router" name="slf4j-router" class="anchor"><span class="anchor-link"></span></a>SLF4J Router</h2>
 <p>When not configured, <code>logstage-adapter-slf4j</code> will log messages with level <code>&gt;= Info</code> to <code>stdout</code>.</p>
-<p>Due to the global mutable nature of <code>slf4j</code> to configure slf4j logging you&rsquo;ll have to mutate a global singleton. To change its settings, replace its <code>LogRouter</code> with the same one you use elsewhere in your application.</p>
+<p>Due to the global mutable nature of <code>slf4j</code> to configure slf4j logging you&rsquo;ll have to mutate a global singleton. To change its settings, replace its <code>LogRouter</code> with the same one you use elsewhere in your application. </p>
 <pre class="prettyprint"><code class="language-scala">import logstage._
 import izumi.logstage.api.routing.StaticLogRouter
 
 val myLogger = IzLogger()
-// myLogger: IzLogger = izumi.logstage.api.IzLogger@787e51d6
+// myLogger: IzLogger = izumi.logstage.api.IzLogger@10317299
 
 // configure SLF4j to use the same router that `myLogger` uses
 StaticLogRouter.instance.setup(myLogger.router)
