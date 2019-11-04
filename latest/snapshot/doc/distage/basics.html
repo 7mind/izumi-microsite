@@ -334,7 +334,7 @@ val capsUniverse = injector.produceUnsafe(caps, GCMode.NoGC)
 </code></pre>
 <p>We&rsquo;ve overriden the <code>Greeter</code> binding in <code>HelloByeModule</code> with an implementation of <code>Greeter</code> that prints in ALL CAPS. For simple cases like this we can write implementations right inside the module.</p>
 <h3><a href="#function-bindings" name="function-bindings" class="anchor"><span class="anchor-link"></span></a>Function Bindings</h3>
-<p>To bind to a function instead of a class constructor use <code>.from</code> method in <a href="/latest/snapshot/api/izumi/izumi/distage/model/definition/ModuleDef.html">ModuleDef</a> DSL:</p>
+<p>To bind to a function instead of a class constructor use <code>.from</code> method in <a href="/latest/snapshot/api/izumi/distage/model/definition/ModuleDef.html">ModuleDef</a> DSL:</p>
 <pre class="prettyprint"><code class="language-scala">import distage._
 
 case class HostPort(host: String, port: Int)
@@ -365,7 +365,7 @@ object HostPortModule extends ModuleDef {
 <pre class="prettyprint"><code class="language-scala">import scala.util.Random
 
 val objects = Injector().produceUnsafe(HelloByeModule, GCMode.NoGC)
-// objects: Locator = izumi.distage.LocatorDefaultImpl@714384c
+// objects: Locator = izumi.distage.LocatorDefaultImpl@1eac26c1
 
 objects.run {
   (hello: Hello, bye: Bye) =&gt;
@@ -385,10 +385,10 @@ objects.run {
 }
 // There is no Int in the object graph!
 </code></pre>
-<p>consult <a href="/latest/snapshot/api/izumi/izumi/distage/model/providers/ProviderMagnet.html">ProviderMagnet</a> docs for more details.</p>
+<p>consult <a href="/latest/snapshot/api/izumi/distage/model/providers/ProviderMagnet.html">ProviderMagnet</a> docs for more details.</p>
 <h3><a href="#set-bindings" name="set-bindings" class="anchor"><span class="anchor-link"></span></a>Set Bindings</h3>
 <p>Set bindings are useful for implementing event listeners, plugins, hooks, http routes, healthchecks, migrations, etc. Everywhere where you need to gather up a bunch of similar components is probably a good place for a Set Binding.</p>
-<p>To define a Set binding use <code>.many</code> and <code>.add</code> methods in <a href="/latest/snapshot/api/izumi/izumi/distage/model/definition/ModuleDef.html">ModuleDef</a> DSL.</p>
+<p>To define a Set binding use <code>.many</code> and <code>.add</code> methods in <a href="/latest/snapshot/api/izumi/distage/model/definition/ModuleDef.html">ModuleDef</a> DSL.</p>
 <p>For example, we can gather and serve all the different <a href="https://http4s.org">http4s</a> routes added in multiple independent modules:</p>
 <pre class="prettyprint"><code class="language-scala">// boilerplate
 import cats.implicits._
@@ -523,7 +523,7 @@ object KVStore {
 val kvStoreModule = new ModuleDef {
   make[KVStore[IO]].fromEffect(KVStore.dummy)
 }
-// kvStoreModule: AnyRef with ModuleDef = ListSet(SingletonBinding({type.repl.Session::repl.Session.App12::repl.Session.App12.KVStore[=? %1:0,%1:1 ? ZIO[-Any,+1:0,+1:1]]},EffectImpl(repl.Session::repl.Session.App12::repl.Session.App12.KVStore[=? %1:0,%1:1 ? ZIO[-Any,+1:0,+1:1]],? %0 ? zio.ZIO[-Any,+Nothing,+0],InstanceImpl(zio.ZIO[-Any,+Nothing,+Session::App12::KVStore[=? %2:0,%2:1 ? ZIO[-Any,+2:0,+2:1]]],zio.ZIO$FlatMap@d4760b4)),Set(),(basics.md:438)))
+// kvStoreModule: AnyRef with ModuleDef = ListSet(SingletonBinding({type.repl.Session::repl.Session.App12::repl.Session.App12.KVStore[=? %1:0,%1:1 ? ZIO[-Any,+1:0,+1:1]]},EffectImpl(repl.Session::repl.Session.App12::repl.Session.App12.KVStore[=? %1:0,%1:1 ? ZIO[-Any,+1:0,+1:1]],? %0 ? zio.ZIO[-Any,+Nothing,+0],InstanceImpl(zio.ZIO[-Any,+Nothing,+Session::App12::KVStore[=? %2:0,%2:1 ? ZIO[-Any,+2:0,+2:1]]],zio.ZIO$FlatMap@45c23af8)),Set(),(basics.md:438)))
 
 new DefaultRuntime{}.unsafeRun {
   Injector().produceF[IO[Throwable, ?]](kvStoreModule, GCMode.NoGC)
@@ -541,7 +541,7 @@ new DefaultRuntime{}.unsafeRun {
 </code></pre>
 <p>You need to use effect-aware <code>Injector.produceF</code>/<code>Injector.produceUnsafeF</code> methods to use effect bindings.</p>
 <h3><a href="#resource-bindings-lifecycle" name="resource-bindings-lifecycle" class="anchor"><span class="anchor-link"></span></a>Resource Bindings &amp; Lifecycle</h3>
-<p>Lifecycle is supported via Resource bindings. You can inject any <a href="https://typelevel.org/cats-effect/datatypes/resource.html">cats.effect.Resource</a> into the object graph. You can also inject <a href="/latest/snapshot/api/izumi/izumi/distage/model/definition/DIResource.html">DIResource</a> classes. Global resources will be deallocated when the app or the test ends.</p>
+<p>Lifecycle is supported via Resource bindings. You can inject any <a href="https://typelevel.org/cats-effect/datatypes/resource.html">cats.effect.Resource</a> into the object graph. You can also inject <a href="/latest/snapshot/api/izumi/distage/model/definition/DIResource.html">DIResource</a> classes. Global resources will be deallocated when the app or the test ends.</p>
 <p>Note that lifecycle control via <code>DIResource</code> is available in non-FP applications as well via inheritance from <code>DIResource.Simple</code> and <code>DIResource.Mutable</code>.</p>
 <p>Example with <code>cats</code> Resource:</p>
 <pre class="prettyprint"><code class="language-scala">import distage._
@@ -556,7 +556,7 @@ val dbResource = Resource.make(
 // dbResource: Resource[IO, DBConnection] = Allocate(
 //   Map(
 //     Delay(&lt;function0&gt;),
-//     scala.Function1$$Lambda$19563/0x0000000843433040@66fc1eaa,
+//     scala.Function1$$Lambda$19595/0x0000000842b7e840@5683457d,
 //     1
 //   )
 // )
@@ -567,7 +567,7 @@ val mqResource = Resource.make(
 // mqResource: Resource[IO, MessageQueueConnection] = Allocate(
 //   Map(
 //     Delay(&lt;function0&gt;),
-//     scala.Function1$$Lambda$19563/0x0000000843433040@7cc3190f,
+//     scala.Function1$$Lambda$19595/0x0000000842b7e840@4f188489,
 //     1
 //   )
 // )
@@ -624,7 +624,7 @@ val module = new ModuleDef {
     init
 }
 // true
-// closedInit: izumi.fundamentals.platform.functional.package.Identity[Init] = repl.Session$App16$Init@39cdbe37
+// closedInit: izumi.fundamentals.platform.functional.package.Identity[Init] = repl.Session$App16$Init@144fe55e
 println(closedInit.initialized)
 // false
 </code></pre>
@@ -727,7 +727,7 @@ class Program[F[_]: TagK: Monad] extends ModuleDef {
   addImplicit[Monad[F]]
 }
 </code></pre>
-<p><a href="/latest/snapshot/api/izumi/izumi/fundamentals/reflection/WithTags.html#TagK">TagK</a> is distage&rsquo;s analogue of <code>TypeTag</code> for higher-kinded types such as <code>F[_]</code>, it allows preserving type-information at runtime for types that aren&rsquo;t yet known at definition. You&rsquo;ll need to add a <a href="/latest/snapshot/api/izumi/izumi/fundamentals/reflection/WithTags.html#TagK">TagK</a> context bound to create a module parameterized by an abstract <code>F[_]</code>. Use <a href="/latest/snapshot/api/izumi/izumi/fundamentals/reflection/WithTags.html#Tag">Tag</a> to create modules parameterized by non-higher-kinded types.</p>
+<p><a href="/latest/snapshot/api/izumi/fundamentals/reflection/WithTags.html#TagK">TagK</a> is distage&rsquo;s analogue of <code>TypeTag</code> for higher-kinded types such as <code>F[_]</code>, it allows preserving type-information at runtime for types that aren&rsquo;t yet known at definition. You&rsquo;ll need to add a <a href="/latest/snapshot/api/izumi/fundamentals/reflection/WithTags.html#TagK">TagK</a> context bound to create a module parameterized by an abstract <code>F[_]</code>. Use <a href="/latest/snapshot/api/izumi/fundamentals/reflection/WithTags.html#Tag">Tag</a> to create modules parameterized by non-higher-kinded types.</p>
 <p>Interpreters:</p>
 <pre class="prettyprint"><code class="language-scala">import scala.util.Try
 import cats.instances.all._
@@ -749,11 +749,11 @@ object TryInterpreters extends ModuleDef {
 
 // combine all modules
 val TryProgram = new Program[Try] ++ TryInterpreters
-// TryProgram: Module = ListSet(SingletonBinding({type.repl.Session::repl.Session.App18::repl.Session.App18.TaglessProgram[=? %1:0 ? Try[+1:0]]},ProviderImpl(repl.Session::repl.Session.App18::repl.Session.App18.TaglessProgram[=? %1:0 ? Try[+1:0]],&lt;function1&gt;(cats.Monad[=? %1:0 ? Try[+1:0]], repl.Session::repl.Session.App18::repl.Session.App18.Validation[=? %1:0 ? Try[+1:0]], repl.Session::repl.Session.App18::repl.Session.App18.Interaction[=? %1:0 ? Try[+1:0]]): repl.Session::repl.Session.App18::repl.Session.App18.TaglessProgram[=? %1:0 ? Try[+1:0]]),Set(),(basics.md:636)), SingletonBinding({type.repl.Session::repl.Session.App18::repl.Session.App18.Validation[=? %1:0 ? Try[+1:0]]},ProviderImpl({java.lang.Object &amp; repl.Session::repl.Session.App18::repl.Session.App18.Validation[=? %1:0 ? Try[+1:0]]},izumi.distage.model.providers.ProviderMagnet$$$Lambda$19261/0x0000000843879840@739d6572(): {java.lang.Object &amp; repl.Session::repl.Session.App18::repl.Session.App18.Validation[=? %1:0 ? Try[+1:0]]}),Set(),(basics.md:670)), SingletonBinding({type.repl.Session::repl.Session.App18::repl.Session.App18.Interaction[=? %1:0 ? Try[+1:0]]},ProviderImpl({java.lang.Object &amp; repl.Session::repl.Session.App18::repl.Session.App18.Interaction[=? %1:0 ? Try[+1:0]]},izumi.distage.model.providers.ProviderMagnet$$$Lambda$19261/0x0000000843879840@5111c364(): {java.lang.Object &amp; repl.Session::repl.Session.App18::repl.Session.App18.Interaction[=? %1:0 ? Try[+1:0]]}),Set(),(basics.md:671)), SingletonBinding({type.cats.Monad[=? %1:0 ? Try[+1:0]]},InstanceImpl(cats.Monad[=? %1:0 ? Try[+1:0]],cats.instances.TryInstances$$anon$1@72dc4d6f),Set(),(basics.md:638)))
+// TryProgram: Module = ListSet(SingletonBinding({type.repl.Session::repl.Session.App18::repl.Session.App18.Interaction[=? %1:0 ? Try[+1:0]]},ProviderImpl({java.lang.Object &amp; repl.Session::repl.Session.App18::repl.Session.App18.Interaction[=? %1:0 ? Try[+1:0]]},izumi.distage.model.providers.ProviderMagnet$$$Lambda$19258/0x0000000843177040@17c6f1cf(): {java.lang.Object &amp; repl.Session::repl.Session.App18::repl.Session.App18.Interaction[=? %1:0 ? Try[+1:0]]}),Set(),(basics.md:671)), SingletonBinding({type.cats.Monad[=? %1:0 ? Try[+1:0]]},InstanceImpl(cats.Monad[=? %1:0 ? Try[+1:0]],cats.instances.TryInstances$$anon$1@1ad188aa),Set(),(basics.md:638)), SingletonBinding({type.repl.Session::repl.Session.App18::repl.Session.App18.TaglessProgram[=? %1:0 ? Try[+1:0]]},ProviderImpl(repl.Session::repl.Session.App18::repl.Session.App18.TaglessProgram[=? %1:0 ? Try[+1:0]],&lt;function1&gt;(cats.Monad[=? %1:0 ? Try[+1:0]], repl.Session::repl.Session.App18::repl.Session.App18.Validation[=? %1:0 ? Try[+1:0]], repl.Session::repl.Session.App18::repl.Session.App18.Interaction[=? %1:0 ? Try[+1:0]]): repl.Session::repl.Session.App18::repl.Session.App18.TaglessProgram[=? %1:0 ? Try[+1:0]]),Set(),(basics.md:636)), SingletonBinding({type.repl.Session::repl.Session.App18::repl.Session.App18.Validation[=? %1:0 ? Try[+1:0]]},ProviderImpl({java.lang.Object &amp; repl.Session::repl.Session.App18::repl.Session.App18.Validation[=? %1:0 ? Try[+1:0]]},izumi.distage.model.providers.ProviderMagnet$$$Lambda$19258/0x0000000843177040@180df4f6(): {java.lang.Object &amp; repl.Session::repl.Session.App18::repl.Session.App18.Validation[=? %1:0 ? Try[+1:0]]}),Set(),(basics.md:670)))
 
 // create object graph
 val objects = Injector().produceUnsafe(TryProgram, GCMode.NoGC)
-// objects: Locator = izumi.distage.LocatorDefaultImpl@4599d10a
+// objects: Locator = izumi.distage.LocatorDefaultImpl@780f0f34
 
 // run
 objects.get[TaglessProgram[Try]].program
@@ -796,7 +796,7 @@ def chooseInterpreters(default: Boolean) = {
 </code></pre>
 <pre class="prettyprint"><code class="language-scala">class EldritchModule[F[+_, -_[_, _], _[_[_, _], _], _]: Tag.auto.T] extends ModuleDef
 </code></pre>
-<p>consult <a href="/latest/snapshot/api/izumi/izumi/fundamentals/reflection/WithTags.html#HKTag">HKTag</a> docs for more details.</p>
+<p>consult <a href="/latest/snapshot/api/izumi/fundamentals/reflection/WithTags.html#HKTag">HKTag</a> docs for more details.</p>
 <h3><a href="#testkit" name="testkit" class="anchor"><span class="anchor-link"></span></a>Testkit</h3>
 <p><code>distage-testkit</code> module provides integration with <code>scalatest</code>:</p>
 <pre class="prettyprint"><code class="language-scala">libraryDependencies += Izumi.R.distage_testkit
