@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="x-ua-compatible" content="ie=edge">
 <meta name="description" content="microsite">
-<meta name="generator" content="Paradox, paradox-material-theme=0.9.9, mkdocs-material=3.0.3">
+<meta name="generator" content="Paradox, paradox-material-theme=0.9.10, mkdocs-material=3.0.3">
 
 <meta name="lang:clipboard.copy" content="Copy to clipboard">
 <meta name="lang:clipboard.copied" content="Copied to clipboard">
@@ -182,7 +182,7 @@ data-md-source="github">
 <ul style="display: none">
 <li class="md-nav__item md-version" id="project.version">
 <label class="md-nav__link" for="__version">
-<i class="md-icon" title="Version">label_outline</i> 0.9.9
+<i class="md-icon" title="Version">label_outline</i> 0.9.10
 </label>
 </li>
 </ul>
@@ -259,24 +259,15 @@ ctxLogger.info(s&quot;Processing time: $delta&quot;)
   <li>Each JSON message contains <code>@class</code> field with holds a unique <code>event class</code> identifier.  All events produced by the same source code line will share the same <code>event class</code>.</li>
 </ol>
 <h2><a href="#syntax-reference" name="syntax-reference" class="anchor"><span class="anchor-link"></span></a>Syntax Reference</h2>
-<p>1) Simple variable:</p>
-<p><code>scala
+<p>1) Simple variable:  <code>scala
    logger.info(s&quot;My message: $argument&quot;)
-</code></p>
-<p>2) Chain:</p>
-<p><code>scala
+</code> 2) Chain:  <code>scala
    logger.info(s&quot;My message: ${call.method} ${access.value}&quot;)
-</code></p>
-<p>3) Named expression:</p>
-<p><code>scala
+</code> 3) Named expression:  <code>scala
    logger.info(s&quot;My message: ${Some.expression -&gt; &quot;argname&quot;}&quot;)
-</code></p>
-<p>4) Invisible name expression:</p>
-<p><code>scala
+</code> 4) Invisible name expression:  <code>scala
    logger.info(s&quot;My message: ${Some.expression -&gt; &quot;argname&quot; -&gt; null}&quot;)
-</code></p>
-<p>5) De-camelcased name:</p>
-<p><code>scala
+</code> 5) De-camelcased name:  <code>scala
    logger.info(${camelCaseName-&gt; &#39; &#39;})
 </code></p>
 <h2><a href="#dependencies" name="dependencies" class="anchor"><span class="anchor-link"></span></a>Dependencies</h2>
@@ -298,7 +289,7 @@ libraryDependencies ++= Seq(
 )
 </code></pre>
 <p>or</p>
-<pre class="prettyprint"><code class="language-scala">val izumi_version = &quot;0.9.9&quot;
+<pre class="prettyprint"><code class="language-scala">val izumi_version = &quot;0.9.10&quot;
 // LogStage API, you need it to use the logger
 libraryDependencies += &quot;io.7mind.izumi&quot; %% &quot;logstage-core&quot; % izumi_version
 
@@ -339,25 +330,25 @@ contextLogger.info(s&quot;Hey&quot;)
 import cats.effect.IO
 
 val logger = IzLogger()
-// logger: IzLogger = izumi.logstage.api.IzLogger@4c146dc7
+// logger: IzLogger = izumi.logstage.api.IzLogger@3e569349
 
 val log = LogIO.fromLogger[IO](logger)
-// log: LogIO[IO] = logstage.LogIO$$anon$1@79aa554a
+// log: LogIO[IO] = logstage.LogIO$$anon$1@1b6e76bf
 
 log.info(s&quot;Hey! I&#39;m logging with ${log}stage!&quot;).unsafeRunSync()
 </code></pre>
 <pre><code>I 2019-03-29T23:21:48.693Z[Europe/Dublin] r.S.App7.res8 ...main-12:5384  (00_logstage.md:92) Hey! I&#39;m logging with log=logstage.LogIO$$anon$1@72736f25stage!
 </code></pre>
 <p><code>LogstageZIO.withFiberId</code> provides a <code>LogBIO</code> instance that logs the current ZIO <code>FiberId</code> in addition to the thread id:</p>
-<p>Example:</p>
+<p>Example: </p>
 <pre class="prettyprint"><code class="language-scala">import logstage.LogstageZIO
 import zio.{IO, DefaultRuntime}
 
 val log: LogBIO[IO] = LogstageZIO.withFiberId(logger)
-// log: LogBIO[IO] = logstage.LogstageZIO$$anon$1@6703b9dd
+// log: LogBIO[IO] = logstage.LogstageZIO$$anon$1@1edc757b
 
 val rts = new DefaultRuntime {}
-// rts: AnyRef with DefaultRuntime = repl.Session$App9$$anon$1@734bbe1b
+// rts: AnyRef with DefaultRuntime = repl.Session$App9$$anon$1@6ac7ad92
 rts.unsafeRun {
   log.info(s&quot;Hey! I&#39;m logging with ${log}stage!&quot;)
 }
@@ -383,25 +374,25 @@ def importEntity(entity: Entity)(implicit log: LogIO[IO]): IO[Unit] = {
 </code></pre>
 <h2><a href="#slf4j-router" name="slf4j-router" class="anchor"><span class="anchor-link"></span></a>SLF4J Router</h2>
 <p>When not configured, <code>logstage-adapter-slf4j</code> will log messages with level <code>&gt;= Info</code> to <code>stdout</code>.</p>
-<p>Due to the global mutable nature of <code>slf4j</code> to configure slf4j logging you&rsquo;ll have to mutate a global singleton. To change its settings, replace its <code>LogRouter</code> with the same one you use elsewhere in your application.</p>
+<p>Due to the global mutable nature of <code>slf4j</code> to configure slf4j logging you&rsquo;ll have to mutate a global singleton. To change its settings, replace its <code>LogRouter</code> with the same one you use elsewhere in your application. </p>
 <pre class="prettyprint"><code class="language-scala">import logstage._
 import izumi.logstage.api.routing.StaticLogRouter
 
 val myLogger = IzLogger()
-// myLogger: IzLogger = izumi.logstage.api.IzLogger@42da6b61
+// myLogger: IzLogger = izumi.logstage.api.IzLogger@6081b758
 
 // configure SLF4j to use the same router that `myLogger` uses
 StaticLogRouter.instance.setup(myLogger.router)
 </code></pre>
 </div>
 <div>
-<a href="https://github.com/7mind/izumi/tree/v0.9.9/doc/microsite/target/mdoc/logstage/00_logstage.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/7mind/izumi/tree/v0.9.10/doc/microsite/target/mdoc/logstage/00_logstage.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>
 <div class="print-only">
 <span class="md-source-file md-version">
-0.9.9
+0.9.10
 </span>
 </div>
 </article>

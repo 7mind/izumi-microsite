@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="x-ua-compatible" content="ie=edge">
 <meta name="description" content="microsite">
-<meta name="generator" content="Paradox, paradox-material-theme=0.9.9, mkdocs-material=3.0.3">
+<meta name="generator" content="Paradox, paradox-material-theme=0.9.10, mkdocs-material=3.0.3">
 
 <meta name="lang:clipboard.copy" content="Copy to clipboard">
 <meta name="lang:clipboard.copied" content="Copied to clipboard">
@@ -187,7 +187,7 @@ data-md-source="github">
 <ul style="display: none">
 <li class="md-nav__item md-version" id="project.version">
 <label class="md-nav__link" for="__version">
-<i class="md-icon" title="Version">label_outline</i> 0.9.9
+<i class="md-icon" title="Version">label_outline</i> 0.9.10
 </label>
 </li>
 </ul>
@@ -279,7 +279,7 @@ val module = new ModuleDef {
 // )
 
 val locator = Injector().produceUnsafe(module, mode = gc)
-// locator: Locator = izumi.distage.LocatorDefaultImpl@41801738
+// locator: Locator = izumi.distage.LocatorDefaultImpl@1403d5d3
 
 // A and B are here
 locator.find[A]
@@ -322,7 +322,7 @@ trait ActorFactory {
 }
 </code></pre>
 <p>You can use this feature to concisely provide non-singleton semantics for some of your components.</p>
-<p>By default, the factory implementation class will be created automatically at runtime. To create factories at compile-time summon an implicit <a href="/latest/release/api/izumi/izumi/distage/constructors/FactoryConstructor.html">FactoryConstructor</a> for your type.</p>
+<p>By default, the factory implementation class will be created automatically at runtime. To create factories at compile-time summon an implicit <a href="/latest/release/api/izumi/distage/constructors/FactoryConstructor.html">FactoryConstructor</a> for your type.</p>
 <h3><a href="#plugins" name="plugins" class="anchor"><span class="anchor-link"></span></a>Plugins</h3>
 <p>Plugins are a distage extension that allows you to automatically pick up all <code>Plugin</code> modules that are defined in specified package on the classpath.</p>
 <p>Plugins are especially useful in scenarios with <a href="#roles">extreme late-binding</a>, when the list of loaded application modules is not known ahead of time. Plugins are compatible with <a href="#compile-time-checks">compile-time checks</a> as long as they&rsquo;re defined in a separate module.</p>
@@ -330,7 +330,7 @@ trait ActorFactory {
 <pre class="prettyprint"><code class="language-scala">libraryDependencies += Izumi.R.distage_plugins
 </code></pre>
 <p>or</p>
-<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;io.7mind.izumi&quot; %% &quot;distage-plugins&quot; % &quot;0.9.9&quot;
+<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;io.7mind.izumi&quot; %% &quot;distage-plugins&quot; % &quot;0.9.10&quot;
 </code></pre>
 <p>If you&rsquo;re not using <a href="../sbt/index.html#bills-of-materials">sbt-izumi-deps</a> plugin.</p>
 <p>Create a module extending the <code>PluginDef</code> trait instead of <code>ModuleDef</code>:</p>
@@ -339,7 +339,7 @@ trait ActorFactory {
 import distage._
 import distage.plugins._
 
-trait PetStorePlugin extends PluginDef {
+object PetStorePlugin extends PluginDef {
   make[PetRepository]
   make[PetStoreService]
   make[PetStoreController]
@@ -376,7 +376,7 @@ val app: ModuleBase = appModules.merge
 <pre class="prettyprint"><code class="language-scala">libraryDependencies += Izumi.R.distage_app
 </code></pre>
 <p>or</p>
-<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;io.7mind.izumi&quot; %% &quot;distage-app&quot; % &quot;0.9.9&quot;
+<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;io.7mind.izumi&quot; %% &quot;distage-app&quot; % &quot;0.9.10&quot;
 </code></pre>
 <p>If you&rsquo;re not using <a href="../sbt/index.html#bills-of-materials">sbt-izumi-deps</a> plugin.</p>
 <p>Only plugins defined in a different module can be checked at compile-time, <code>test</code> scope counts as a different module.</p>
@@ -441,7 +441,7 @@ final class AppPluginTest extends WordSpec {
 <pre class="prettyprint"><code class="language-scala">libraryDependencies += Izumi.R.distage_roles
 </code></pre>
 <p>or</p>
-<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;io.7mind.izumi&quot; %% &quot;distage-roles&quot; % &quot;0.9.9&quot;
+<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;io.7mind.izumi&quot; %% &quot;distage-roles&quot; % &quot;0.9.10&quot;
 </code></pre>
 <p>If you&rsquo;re not using <a href="../sbt/index.html#bills-of-materials">sbt-izumi-deps</a> plugin.</p>
 <h3><a href="#circular-dependencies-support" name="circular-dependencies-support" class="anchor"><span class="anchor-link"></span></a>Circular Dependencies support</h3>
@@ -506,7 +506,7 @@ assert(locator.get[C].c eq locator.get[C])
 <p>The proxy generation via <code>cglib</code> is still enabled by default, because in scenarios with <a href="#roles">extreme late-binding</a>, cycles can emerge unexpectedly, outside of control of the origin module.</p>
 <p>NB: Currently a limitation applies to by-names - ALL dependencies on a class engaged in a by-name circular dependency have to be by-name, otherwise distage will transparently revert to generating proxies.</p>
 <h3><a href="#auto-sets" name="auto-sets" class="anchor"><span class="anchor-link"></span></a>Auto-Sets</h3>
-<p>AutoSet <a href="/latest/release/api/izumi/izumi/distage/model/Planner.html">Planner</a> Hooks traverse the plan and collect all future objects matching a predicate.</p>
+<p>AutoSet <a href="/latest/release/api/izumi/distage/model/Planner.html">Planner</a> Hooks traverse the plan and collect all future objects matching a predicate.</p>
 <p>Using Auto-Sets you can e.g. collect all <code>AutoCloseable</code> classes and <code>.close()</code> them after the application has finished work.</p>
 <p>NOTE: please use <a href="basics.html#resource-bindings-lifecycle">Resource bindings</a> for real lifecycle, this is just an example.</p>
 <pre class="prettyprint"><code class="language-scala">trait PrintResource(name: String) {
@@ -617,13 +617,13 @@ object Main extends IOApp {
 </code></pre>
 </div>
 <div>
-<a href="https://github.com/7mind/izumi/tree/v0.9.9/doc/microsite/target/mdoc/distage/other-features.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/7mind/izumi/tree/v0.9.10/doc/microsite/target/mdoc/distage/other-features.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>
 <div class="print-only">
 <span class="md-source-file md-version">
-0.9.9
+0.9.10
 </span>
 </div>
 </article>
