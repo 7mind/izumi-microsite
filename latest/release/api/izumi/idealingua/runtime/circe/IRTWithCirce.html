@@ -8,17 +8,17 @@
           <meta name="keywords" content="" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
+      
       <link href="../../../../lib/index.css" media="screen" type="text/css" rel="stylesheet" />
       <link href="../../../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
       <link href="../../../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
-      <script type="text/javascript" src="../../../../lib/jquery.js"></script>
+      <script type="text/javascript" src="../../../../lib/jquery.min.js"></script>
       <script type="text/javascript" src="../../../../lib/jquery.panzoom.min.js"></script>
       <script type="text/javascript" src="../../../../lib/jquery.mousewheel.min.js"></script>
       <script type="text/javascript" src="../../../../lib/index.js"></script>
       <script type="text/javascript" src="../../../../index.js"></script>
       <script type="text/javascript" src="../../../../lib/scheduler.js"></script>
       <script type="text/javascript" src="../../../../lib/template.js"></script>
-      <script type="text/javascript" src="../../../../lib/tools.tooltip.js"></script>
       
       <script type="text/javascript">
         /* this variable can be used by the JS to determine the path to the root document */
@@ -56,7 +56,7 @@
                 <li name="_root_.root" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="_root_"></a><a id="root:_root_"></a>
       <span class="permalink">
-      <a href="index.html#_root_" title="Permalink">
+      <a href="../../../../index.html" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -72,7 +72,7 @@
     </li><li name="_root_.izumi" visbl="pub" class="indented1 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="izumi"></a><a id="izumi:izumi"></a>
       <span class="permalink">
-      <a href="index.html#izumi" title="Permalink">
+      <a href="../../../../izumi/index.html" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -88,7 +88,7 @@
     </li><li name="izumi.idealingua" visbl="pub" class="indented2 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="idealingua"></a><a id="idealingua:idealingua"></a>
       <span class="permalink">
-      <a href="../izumi/index.html#idealingua" title="Permalink">
+      <a href="../../../../izumi/idealingua/index.html" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -104,7 +104,7 @@
     </li><li name="izumi.idealingua.runtime" visbl="pub" class="indented3 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="runtime"></a><a id="runtime:runtime"></a>
       <span class="permalink">
-      <a href="../../izumi/idealingua/index.html#runtime" title="Permalink">
+      <a href="../../../../izumi/idealingua/runtime/index.html" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -120,7 +120,7 @@
     </li><li name="izumi.idealingua.runtime.circe" visbl="pub" class="indented4 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="circe"></a><a id="circe:circe"></a>
       <span class="permalink">
-      <a href="../../../izumi/idealingua/runtime/index.html#circe" title="Permalink">
+      <a href="../../../../izumi/idealingua/runtime/circe/index.html" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -134,6 +134,10 @@
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="izumi.idealingua.runtime">runtime</a></dd></dl></div>
     </li><li class="current-entities indented4">
+                        <a class="object" href="DerivationDerivedCodec$.html" title=""></a>
+                        <a class="class" href="DerivationDerivedCodec.html" title=""></a>
+                        <a href="DerivationDerivedCodec.html" title="">DerivationDerivedCodec</a>
+                      </li><li class="current-entities indented4">
                         <a class="object" href="DerivationDerivedDecoder$.html" title=""></a>
                         <a class="class" href="DerivationDerivedDecoder.html" title=""></a>
                         <a href="DerivationDerivedDecoder.html" title="">DerivationDerivedDecoder</a>
@@ -183,7 +187,22 @@
       
           <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Provides circe codecs for case classes and sealed traits</p><pre><span class="kw">final</span> <span class="kw">case</span> <span class="kw">class</span> Abc(a: <span class="std">String</span>, b: <span class="std">String</span>, c: <span class="std">String</span>)
 
-<span class="kw">object</span> Abc <span class="kw">extends</span> IRTWithCirce[Abc]</pre></div><div class="toggleContainer block">
+<span class="kw">object</span> Abc <span class="kw">extends</span> IRTWithCirce[Abc]</pre><p>To derive codecs for a sealed trait with branches inside its
+own companion object, use a proxy object. This works around
+a scala limitation: https://github.com/milessabin/shapeless/issues/837</p><pre><span class="kw">sealed</span> <span class="kw">trait</span> Abc
+
+<span class="kw">private</span> abcCodecs <span class="kw">extends</span> IRTWithCirce[Abc]
+
+<span class="kw">object</span> Abc <span class="kw">extends</span> IRTWithCirce(abcCodecs) {
+  <span class="kw">final</span> <span class="kw">case</span> <span class="kw">class</span> A()
+  <span class="kw">object</span> A <span class="kw">extends</span> IRTWithCirce[A]
+
+  <span class="kw">final</span> <span class="kw">case</span> <span class="kw">class</span> B()
+  <span class="kw">object</span> B <span class="kw">extends</span> IRTWithCirce[B]
+  <span class="kw">final</span> <span class="kw">case</span> <span class="kw">class</span> C()
+
+  <span class="kw">object</span> C <span class="kw">extends</span> IRTWithCirce[C]
+}</pre></div><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
           </span>
@@ -250,9 +269,9 @@
       
       
     </li><li name="izumi.idealingua.runtime.circe.IRTWithCirce#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;()(implicitencoder:izumi.idealingua.runtime.circe.DerivationDerivedEncoder[A],implicitdecoder:izumi.idealingua.runtime.circe.DerivationDerivedDecoder[A]):izumi.idealingua.runtime.circe.IRTWithCirce[A]"></a><a id="&lt;init&gt;:IRTWithCirce[A]"></a>
+      <a id="&lt;init&gt;()(implicitderivedCodec:izumi.idealingua.runtime.circe.DerivationDerivedCodec[A]):izumi.idealingua.runtime.circe.IRTWithCirce[A]"></a><a id="&lt;init&gt;:IRTWithCirce[A]"></a>
       <span class="permalink">
-      <a href="../../../../izumi/idealingua/runtime/circe/IRTWithCirce.html#&lt;init&gt;()(implicitencoder:izumi.idealingua.runtime.circe.DerivationDerivedEncoder[A],implicitdecoder:izumi.idealingua.runtime.circe.DerivationDerivedDecoder[A]):izumi.idealingua.runtime.circe.IRTWithCirce[A]" title="Permalink">
+      <a href="../../../../izumi/idealingua/runtime/circe/IRTWithCirce.html#&lt;init&gt;()(implicitderivedCodec:izumi.idealingua.runtime.circe.DerivationDerivedCodec[A]):izumi.idealingua.runtime.circe.IRTWithCirce[A]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -261,7 +280,7 @@
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">IRTWithCirce</span><span class="params">()</span><span class="params">(<span class="implicit">implicit </span><span name="encoder">encoder: <a href="DerivationDerivedEncoder.html" class="extype" name="izumi.idealingua.runtime.circe.DerivationDerivedEncoder">DerivationDerivedEncoder</a>[<span class="extype" name="izumi.idealingua.runtime.circe.IRTWithCirce.A">A</span>]</span>, <span name="decoder">decoder: <a href="DerivationDerivedDecoder.html" class="extype" name="izumi.idealingua.runtime.circe.DerivationDerivedDecoder">DerivationDerivedDecoder</a>[<span class="extype" name="izumi.idealingua.runtime.circe.IRTWithCirce.A">A</span>]</span>)</span>
+        <span class="name">IRTWithCirce</span><span class="params">()</span><span class="params">(<span class="implicit">implicit </span><span name="derivedCodec">derivedCodec: <a href="DerivationDerivedCodec.html" class="extype" name="izumi.idealingua.runtime.circe.DerivationDerivedCodec">DerivationDerivedCodec</a>[<span class="extype" name="izumi.idealingua.runtime.circe.IRTWithCirce.A">A</span>]</span>)</span>
       </span>
       
       
@@ -354,21 +373,21 @@
         <span class="name">clone</span><span class="params">()</span><span class="result">: <a href="../../../../scala/index.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></span>
       </span>
       
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../../java/lang/index.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
-                <span class="name">@native</span><span class="args">()</span>
-              
-                <span class="name">@HotSpotIntrinsicCandidate</span><span class="args">()</span>
-              
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<span class="extype" name="java.lang">lang</span>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
                 <span class="name">@throws</span><span class="args">(<span>
       
       <span class="defval" name="classOf[java.lang.CloneNotSupportedException]">...</span>
     </span>)</span>
               
+                <span class="name">@native</span><span class="args">()</span>
+              
+                <span class="name">@HotSpotIntrinsicCandidate</span><span class="args">()</span>
+              
         </dd></dl></div>
-    </li><li name="izumi.idealingua.runtime.circe.IRTWithCirce#dec" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="dec:io.circe.Decoder[A]"></a><a id="dec:Decoder[A]"></a>
+    </li><li name="izumi.idealingua.runtime.circe.IRTWithCirce#codec" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="codec:io.circe.Codec.AsObject[A]"></a><a id="codec:AsObject[A]"></a>
       <span class="permalink">
-      <a href="../../../../izumi/idealingua/runtime/circe/IRTWithCirce.html#dec:io.circe.Decoder[A]" title="Permalink">
+      <a href="../../../../izumi/idealingua/runtime/circe/IRTWithCirce.html#codec:io.circe.Codec.AsObject[A]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -377,23 +396,7 @@
         <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">dec</span><span class="result">: <span class="extype" name="io.circe.Decoder">Decoder</span>[<span class="extype" name="izumi.idealingua.runtime.circe.IRTWithCirce.A">A</span>]</span>
-      </span>
-      
-      
-    </li><li name="izumi.idealingua.runtime.circe.IRTWithCirce#enc" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="enc:io.circe.Encoder.AsObject[A]"></a><a id="enc:AsObject[A]"></a>
-      <span class="permalink">
-      <a href="../../../../izumi/idealingua/runtime/circe/IRTWithCirce.html#enc:io.circe.Encoder.AsObject[A]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">implicit </span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">enc</span><span class="result">: <span class="extype" name="io.circe.Encoder.AsObject">AsObject</span>[<span class="extype" name="izumi.idealingua.runtime.circe.IRTWithCirce.A">A</span>]</span>
+        <span class="name">codec</span><span class="result">: <span class="extype" name="io.circe.Codec.AsObject">AsObject</span>[<span class="extype" name="izumi.idealingua.runtime.circe.IRTWithCirce.A">A</span>]</span>
       </span>
       
       
@@ -615,12 +618,12 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
-                <span class="name">@native</span><span class="args">()</span>
-              
                 <span class="name">@throws</span><span class="args">(<span>
       
       <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
     </span>)</span>
+              
+                <span class="name">@native</span><span class="args">()</span>
               
         </dd></dl></div>
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
@@ -668,15 +671,15 @@
         <span class="name deprecated" title="Deprecated: (Since version ) see corresponding Javadoc for more information.">finalize</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../../java/lang/index.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
-                <span class="name">@Deprecated</span>
-              
-                <span class="name">@deprecated</span>
-              
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<span class="extype" name="java.lang">lang</span>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
                 <span class="name">@throws</span><span class="args">(<span>
       
       <span class="symbol">classOf[java.lang.Throwable]</span>
     </span>)</span>
+              
+                <span class="name">@Deprecated</span>
+              
+                <span class="name">@deprecated</span>
               
         </dd><dt>Deprecated</dt><dd class="cmt"><p><i>(Since version )</i> see corresponding Javadoc for more information.</p></dd></dl></div>
     </li></ol>
