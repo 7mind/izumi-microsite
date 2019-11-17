@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="x-ua-compatible" content="ie=edge">
 <meta name="description" content="microsite">
-<meta name="generator" content="Paradox, paradox-material-theme=0.9.12-M2, mkdocs-material=3.0.3">
+<meta name="generator" content="Paradox, paradox-material-theme=0.9.12, mkdocs-material=3.0.3">
 
 <meta name="lang:clipboard.copy" content="Copy to clipboard">
 <meta name="lang:clipboard.copied" content="Copied to clipboard">
@@ -184,7 +184,7 @@ data-md-source="github">
 <ul style="display: none">
 <li class="md-nav__item md-version" id="project.version">
 <label class="md-nav__link" for="__version">
-<i class="md-icon" title="Version">label_outline</i> 0.9.12-M2
+<i class="md-icon" title="Version">label_outline</i> 0.9.12
 </label>
 </li>
 </ul>
@@ -365,7 +365,7 @@ object HostPortModule extends ModuleDef {
 <pre class="prettyprint"><code class="language-scala">import scala.util.Random
 
 val objects = Injector().produceUnsafe(HelloByeModule, GCMode.NoGC)
-// objects: Locator = izumi.distage.LocatorDefaultImpl@75458c5a
+// objects: Locator = izumi.distage.LocatorDefaultImpl@7ade6182
 
 objects.run {
   (hello: Hello, bye: Bye) =&gt;
@@ -375,9 +375,9 @@ objects.run {
     hello(names(rnd))
     bye(names(rnd))
 }
-// Random index: 2
-// Hello Shelby
-// Bye Shelby
+// Random index: 0
+// Hello Snow
+// Bye Snow
 </code></pre>
 <pre class="prettyprint"><code class="language-scala">objects.runOption { i: Int =&gt; i + 10 } match {
   case None =&gt; println(&quot;There is no Int in the object graph!&quot;)
@@ -523,7 +523,7 @@ object KVStore {
 val kvStoreModule = new ModuleDef {
   make[KVStore[IO]].fromEffect(KVStore.dummy)
 }
-// kvStoreModule: AnyRef with ModuleDef = ListSet(SingletonBinding({type.repl.Session::repl.Session.App12::repl.Session.App12.KVStore[=? %1:0,%1:1 ? ZIO[-Any,+1:0,+1:1]]},EffectImpl(repl.Session::repl.Session.App12::repl.Session.App12.KVStore[=? %1:0,%1:1 ? ZIO[-Any,+1:0,+1:1]],? %0 ? zio.ZIO[-Any,+Nothing,+0],InstanceImpl(zio.ZIO[-Any,+Nothing,+Session::App12::KVStore[=? %2:0,%2:1 ? ZIO[-Any,+2:0,+2:1]]],zio.ZIO$FlatMap@5315b90d)),Set(),(basics.md:438)))
+// kvStoreModule: AnyRef with ModuleDef = ListSet(SingletonBinding({type.repl.Session::repl.Session.App12::repl.Session.App12.KVStore[=? %1:0,%1:1 ? ZIO[-Any,+1:0,+1:1]]},EffectImpl(repl.Session::repl.Session.App12::repl.Session.App12.KVStore[=? %1:0,%1:1 ? ZIO[-Any,+1:0,+1:1]],? %0 ? zio.ZIO[-Any,+Nothing,+0],InstanceImpl(zio.ZIO[-Any,+Nothing,+Session::App12::KVStore[=? %2:0,%2:1 ? ZIO[-Any,+2:0,+2:1]]],zio.ZIO$FlatMap@7f3b311b)),Set(),(basics.md:438)))
 
 new DefaultRuntime{}.unsafeRun {
   Injector().produceF[IO[Throwable, ?]](kvStoreModule, GCMode.NoGC)
@@ -555,7 +555,7 @@ val dbResource = Resource.make(
 // dbResource: Resource[IO, DBConnection] = Allocate(
 //   Map(
 //     Delay(&lt;function0&gt;),
-//     scala.Function1$$Lambda$17283/0x0000000844138840@8dc3ac9,
+//     scala.Function1$$Lambda$17135/0x00000008440e6040@5dd710a5,
 //     1
 //   )
 // )
@@ -566,7 +566,7 @@ val mqResource = Resource.make(
 // mqResource: Resource[IO, MessageQueueConnection] = Allocate(
 //   Map(
 //     Delay(&lt;function0&gt;),
-//     scala.Function1$$Lambda$17283/0x0000000844138840@763de5e,
+//     scala.Function1$$Lambda$17135/0x00000008440e6040@96a5a30,
 //     1
 //   )
 // )
@@ -588,7 +588,7 @@ def module = new ModuleDef {
 // One value can be reused to recreate the same graph multiple times.
 
 val objectGraphResource = Injector().produceF[IO](module, GCMode.NoGC)
-// objectGraphResource: DIResourceBase[IO, Locator] = izumi.distage.model.definition.DIResource$$anon$7@4479be2a
+// objectGraphResource: DIResourceBase[IO, Locator] = izumi.distage.model.definition.DIResource$$anon$7@3592862b
 objectGraphResource.use {
   objects =&gt;
     objects.get[MyApp].run
@@ -629,7 +629,7 @@ val module = new ModuleDef {
     init
 }
 // true
-// closedInit: izumi.fundamentals.platform.functional.package.Identity[Init] = repl.Session$App16$Init@4df62b06
+// closedInit: izumi.fundamentals.platform.functional.package.Identity[Init] = repl.Session$App16$Init@1170bd
 println(closedInit.initialized)
 // false
 </code></pre>
@@ -754,11 +754,11 @@ object TryInterpreters extends ModuleDef {
 
 // combine all modules
 val TryProgram = new Program[Try] ++ TryInterpreters
-// TryProgram: Module = ListSet(SingletonBinding({type.repl.Session::repl.Session.App18::repl.Session.App18.Interaction[=? %1:0 ? Try[+1:0]]},ProviderImpl({java.lang.Object &amp; repl.Session::repl.Session.App18::repl.Session.App18.Interaction[=? %1:0 ? Try[+1:0]]},izumi.distage.model.providers.ProviderMagnet$$$Lambda$15909/0x0000000843bea040@750ed386(): {java.lang.Object &amp; repl.Session::repl.Session.App18::repl.Session.App18.Interaction[=? %1:0 ? Try[+1:0]]}),Set(),(basics.md:674)), SingletonBinding({type.cats.Monad[=? %1:0 ? Try[+1:0]]},InstanceImpl(cats.Monad[=? %1:0 ? Try[+1:0]],cats.instances.TryInstances$$anon$1@3a1391c9),Set(),(basics.md:641)), SingletonBinding({type.repl.Session::repl.Session.App18::repl.Session.App18.TaglessProgram[=? %1:0 ? Try[+1:0]]},ProviderImpl(repl.Session::repl.Session.App18::repl.Session.App18.TaglessProgram[=? %1:0 ? Try[+1:0]],&lt;function1&gt;(cats.Monad[=? %1:0 ? Try[+1:0]], repl.Session::repl.Session.App18::repl.Session.App18.Validation[=? %1:0 ? Try[+1:0]], repl.Session::repl.Session.App18::repl.Session.App18.Interaction[=? %1:0 ? Try[+1:0]]): repl.Session::repl.Session.App18::repl.Session.App18.TaglessProgram[=? %1:0 ? Try[+1:0]]),Set(),(basics.md:639)), SingletonBinding({type.repl.Session::repl.Session.App18::repl.Session.App18.Validation[=? %1:0 ? Try[+1:0]]},ProviderImpl({java.lang.Object &amp; repl.Session::repl.Session.App18::repl.Session.App18.Validation[=? %1:0 ? Try[+1:0]]},izumi.distage.model.providers.ProviderMagnet$$$Lambda$15909/0x0000000843bea040@6651d01e(): {java.lang.Object &amp; repl.Session::repl.Session.App18::repl.Session.App18.Validation[=? %1:0 ? Try[+1:0]]}),Set(),(basics.md:673)))
+// TryProgram: Module = ListSet(SingletonBinding({type.repl.Session::repl.Session.App18::repl.Session.App18.Validation[=? %1:0 ? Try[+1:0]]},ProviderImpl({java.lang.Object &amp; repl.Session::repl.Session.App18::repl.Session.App18.Validation[=? %1:0 ? Try[+1:0]]},izumi.distage.model.providers.ProviderMagnet$$$Lambda$15761/0x0000000843b7b840@5e5f2c52(): {java.lang.Object &amp; repl.Session::repl.Session.App18::repl.Session.App18.Validation[=? %1:0 ? Try[+1:0]]}),Set(),(basics.md:673)), SingletonBinding({type.cats.Monad[=? %1:0 ? Try[+1:0]]},InstanceImpl(cats.Monad[=? %1:0 ? Try[+1:0]],cats.instances.TryInstances$$anon$1@377ceb96),Set(),(basics.md:641)), SingletonBinding({type.repl.Session::repl.Session.App18::repl.Session.App18.Interaction[=? %1:0 ? Try[+1:0]]},ProviderImpl({java.lang.Object &amp; repl.Session::repl.Session.App18::repl.Session.App18.Interaction[=? %1:0 ? Try[+1:0]]},izumi.distage.model.providers.ProviderMagnet$$$Lambda$15761/0x0000000843b7b840@7f0dbaa0(): {java.lang.Object &amp; repl.Session::repl.Session.App18::repl.Session.App18.Interaction[=? %1:0 ? Try[+1:0]]}),Set(),(basics.md:674)), SingletonBinding({type.repl.Session::repl.Session.App18::repl.Session.App18.TaglessProgram[=? %1:0 ? Try[+1:0]]},ProviderImpl(repl.Session::repl.Session.App18::repl.Session.App18.TaglessProgram[=? %1:0 ? Try[+1:0]],&lt;function1&gt;(cats.Monad[=? %1:0 ? Try[+1:0]], repl.Session::repl.Session.App18::repl.Session.App18.Validation[=? %1:0 ? Try[+1:0]], repl.Session::repl.Session.App18::repl.Session.App18.Interaction[=? %1:0 ? Try[+1:0]]): repl.Session::repl.Session.App18::repl.Session.App18.TaglessProgram[=? %1:0 ? Try[+1:0]]),Set(),(basics.md:639)))
 
 // create object graph
 val objects = Injector().produceUnsafe(TryProgram, GCMode.NoGC)
-// objects: Locator = izumi.distage.LocatorDefaultImpl@117fc667
+// objects: Locator = izumi.distage.LocatorDefaultImpl@5823aff7
 
 // run
 objects.get[TaglessProgram[Try]].program
@@ -807,7 +807,7 @@ def chooseInterpreters(default: Boolean) = {
 <pre class="prettyprint"><code class="language-scala">libraryDependencies += Izumi.R.distage_testkit
 </code></pre>
 <p>or</p>
-<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;io.7mind.izumi&quot; %% &quot;distage-plugins&quot; % &quot;0.9.12-M2&quot;
+<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;io.7mind.izumi&quot; %% &quot;distage-plugins&quot; % &quot;0.9.12&quot;
 </code></pre>
 <p>If you&rsquo;re not using <a href="../sbt/index.html#bills-of-materials">sbt-izumi-deps</a> plugin.</p>
 <p>Example usage:</p>
@@ -815,13 +815,13 @@ def chooseInterpreters(default: Boolean) = {
 <p>```</p>
 </div>
 <div>
-<a href="https://github.com/7mind/izumi/tree/v0.9.12-M2/doc/microsite/target/mdoc/distage/basics.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/7mind/izumi/tree/v0.9.12/doc/microsite/target/mdoc/distage/basics.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>
 <div class="print-only">
 <span class="md-source-file md-version">
-0.9.12-M2
+0.9.12
 </span>
 </div>
 </article>
