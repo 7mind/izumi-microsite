@@ -151,8 +151,8 @@
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="index.html" class="extype" name="izumi.distage.planning">planning</a></dd></dl></div>
     </li><li class="current-entities indented3">
                         <span class="separator"></span>
-                        <a class="class" href="AutoSetHook.html" title="A hook that will collect all implementations with types that are"></a>
-                        <a href="AutoSetHook.html" title="A hook that will collect all implementations with types that are">AutoSetHook</a>
+                        <a class="class" href="" title="A hook that will collect all implementations with types that are"></a>
+                        <a href="" title="A hook that will collect all implementations with types that are">AutoSetHook</a>
                       </li><li class="current-entities indented3">
                         <a class="object" href="AutoSetModule$.html" title=""></a>
                         <a class="class" href="AutoSetModule.html" title="Auto-Sets collect all bindings with static types &lt;: T into a summonable Set[T]"></a>
@@ -179,8 +179,8 @@
                         <a href="PlanMergingPolicyDefaultImpl.html" title="">PlanMergingPolicyDefaultImpl</a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
-                        <a class="class" href="" title=""></a>
-                        <a href="" title="">PlannerDefaultImpl</a>
+                        <a class="class" href="PlannerDefaultImpl.html" title=""></a>
+                        <a href="PlannerDefaultImpl.html" title="">PlannerDefaultImpl</a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
                         <a class="class" href="PlanningHookAggregate.html" title=""></a>
@@ -202,8 +202,8 @@
       <div id="definition">
         <div class="big-circle class">c</div>
         <p id="owner"><a href="../../index.html" class="extype" name="izumi">izumi</a>.<a href="../index.html" class="extype" name="izumi.distage">distage</a>.<a href="index.html" class="extype" name="izumi.distage.planning">planning</a></p>
-        <h1>PlannerDefaultImpl<span class="permalink">
-      <a href="../../../izumi/distage/planning/PlannerDefaultImpl.html" title="Permalink">
+        <h1>AutoSetHook<span class="permalink">
+      <a href="../../../izumi/distage/planning/AutoSetHook.html" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span></h1>
@@ -212,20 +212,58 @@
 
       <h4 id="signature" class="signature">
       <span class="modifier_kind">
-        <span class="modifier">final </span>
+        <span class="modifier"></span>
         <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <span class="name">PlannerDefaultImpl</span><span class="result"> extends <a href="../model/Planner.html" class="extype" name="izumi.distage.model.Planner">Planner</a></span>
+        <span class="name">AutoSetHook</span><span class="tparams">[<span name="INSTANCE">INSTANCE</span>, <span name="BINDING">BINDING</span>]</span><span class="result"> extends <a href="../model/planning/PlanningHook.html" class="extype" name="izumi.distage.model.planning.PlanningHook">PlanningHook</a></span>
       </span>
       </h4>
 
       
-          <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>A hook that will collect all implementations with types that are </p><pre>_ <span class="kw">&lt;:</span> T</pre><p> into a <code>Set[T]</code> set binding
+available for summoning</p><p>Usage:</p><pre><span class="kw">val</span> collectCloseables = <span class="kw">new</span> AutoSetHook[AutoCloseable, AutoCloseable](identity)
+
+<span class="kw">val</span> injector = Injector(<span class="kw">new</span> BootstrapModuleDef {
+  many[PlanningHook]
+    .add(collectCloseables)
+})</pre><p>Then, in any class created from <code>injector</code>:</p><pre><span class="kw">class</span> <span class="std">App</span>(allCloseables: <span class="std">Set</span>[AutoCloseable]) {
+  ...
+}</pre><p>These Auto-Sets can be used to implement custom lifetimes:</p><pre><span class="kw">val</span> locator = injector.produce(modules)
+
+<span class="kw">val</span> closeables = locator.get[<span class="std">Set</span>[AutoCloseable]]
+<span class="kw">try</span> { locator.get[<span class="std">App</span>].runMain() } <span class="kw">finally</span> {
+  <span class="cmt">// reverse closeables list, Auto-Sets preserve order, in the order of *initialization*</span>
+  <span class="cmt">// Therefore resources should closed in the *opposite order*</span>
+  <span class="cmt">// e.g. if C depends on B depends on A, create: A -&gt; B -&gt; C, close: C -&gt; B -&gt; A</span>
+  closeables.reverse.foreach(_.close())
+}</pre><p>Auto-Sets are NOT subject to <a href="gc/TracingDIGC.html" class="extype" name="izumi.distage.planning.gc.TracingDIGC">Garbage Collection</a>, they are assembled
+*after* garbage collection is done, as such they can't contain garbage by construction
+and they cannot be designated as GC root keys.</p><p>_ &lt;: T
+}}}
+available for summoning</p><p>Usage:</p><pre><span class="kw">val</span> collectCloseables = <span class="kw">new</span> AutoSetHook[AutoCloseable, AutoCloseable](identity)
+
+<span class="kw">val</span> injector = Injector(<span class="kw">new</span> BootstrapModuleDef {
+  many[PlanningHook]
+    .add(collectCloseables)
+})</pre><p>Then, in any class created from <code>injector</code>:</p><pre><span class="kw">class</span> <span class="std">App</span>(allCloseables: <span class="std">Set</span>[AutoCloseable]) {
+  ...
+}</pre><p>These Auto-Sets can be used to implement custom lifetimes:</p><pre><span class="kw">val</span> locator = injector.produce(modules)
+
+<span class="kw">val</span> closeables = locator.get[<span class="std">Set</span>[AutoCloseable]]
+<span class="kw">try</span> { locator.get[<span class="std">App</span>].runMain() } <span class="kw">finally</span> {
+  <span class="cmt">// reverse closeables list, Auto-Sets preserve order, in the order of *initialization*</span>
+  <span class="cmt">// Therefore resources should closed in the *opposite order*</span>
+  <span class="cmt">// e.g. if C depends on B depends on A, create: A -&gt; B -&gt; C, close: C -&gt; B -&gt; A</span>
+  closeables.reverse.foreach(_.close())
+}</pre><p>Auto-Sets are NOT subject to <a href="gc/TracingDIGC.html" class="extype" name="izumi.distage.planning.gc.TracingDIGC">Garbage Collection</a>, they are assembled
+*after* garbage collection is done, as such they can't contain garbage by construction
+and they cannot be designated as GC root keys.
+</p></div><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
           </span>
-          <div class="superTypes hiddenContent"><a href="../model/Planner.html" class="extype" name="izumi.distage.model.Planner">Planner</a>, <a href="../../../scala/index.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a>, <span class="extype" name="scala.Any">Any</span></div>
+          <div class="superTypes hiddenContent"><a href="../model/planning/PlanningHook.html" class="extype" name="izumi.distage.model.planning.PlanningHook">PlanningHook</a>, <a href="../../../scala/index.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
         
 
@@ -251,7 +289,7 @@
                   <span class="filtertype">Inherited<br />
                   </span>
                   <ol id="linearization">
-                    <li class="in" name="izumi.distage.planning.PlannerDefaultImpl"><span>PlannerDefaultImpl</span></li><li class="in" name="izumi.distage.model.Planner"><span>Planner</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                    <li class="in" name="izumi.distage.planning.AutoSetHook"><span>AutoSetHook</span></li><li class="in" name="izumi.distage.model.planning.PlanningHook"><span>PlanningHook</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                   </ol>
                 </div><div class="ancestors">
               <span class="filtertype"></span>
@@ -271,10 +309,10 @@
         <div id="allMembers">
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
-              <ol><li name="izumi.distage.planning.PlannerDefaultImpl#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(forwardingRefResolver:izumi.distage.model.planning.ForwardingRefResolver,sanityChecker:izumi.distage.model.planning.SanityChecker,gc:izumi.distage.model.planning.DIGarbageCollector,planningObserver:izumi.distage.model.planning.PlanningObserver,planMergingPolicy:izumi.distage.model.planning.PlanMergingPolicy,hook:izumi.distage.model.planning.PlanningHook,bindingTranslator:izumi.distage.planning.BindingTranslator,analyzer:izumi.distage.model.planning.PlanAnalyzer,symbolIntrospector:izumi.distage.model.reflection.SymbolIntrospector.Runtime):izumi.distage.planning.PlannerDefaultImpl"></a><a id="&lt;init&gt;:PlannerDefaultImpl"></a>
+              <ol><li name="izumi.distage.planning.AutoSetHook#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="&lt;init&gt;(wrap:INSTANCE=&gt;BINDING)(implicitevidence$1:izumi.distage.model.reflection.universe.RuntimeDIUniverse.Tag[INSTANCE],implicitevidence$2:izumi.distage.model.reflection.universe.RuntimeDIUniverse.Tag[BINDING]):izumi.distage.planning.AutoSetHook[INSTANCE,BINDING]"></a><a id="&lt;init&gt;:AutoSetHook[INSTANCE,BINDING]"></a>
       <span class="permalink">
-      <a href="../../../izumi/distage/planning/PlannerDefaultImpl.html#&lt;init&gt;(forwardingRefResolver:izumi.distage.model.planning.ForwardingRefResolver,sanityChecker:izumi.distage.model.planning.SanityChecker,gc:izumi.distage.model.planning.DIGarbageCollector,planningObserver:izumi.distage.model.planning.PlanningObserver,planMergingPolicy:izumi.distage.model.planning.PlanMergingPolicy,hook:izumi.distage.model.planning.PlanningHook,bindingTranslator:izumi.distage.planning.BindingTranslator,analyzer:izumi.distage.model.planning.PlanAnalyzer,symbolIntrospector:izumi.distage.model.reflection.SymbolIntrospector.Runtime):izumi.distage.planning.PlannerDefaultImpl" title="Permalink">
+      <a href="../../../izumi/distage/planning/AutoSetHook.html#&lt;init&gt;(wrap:INSTANCE=&gt;BINDING)(implicitevidence$1:izumi.distage.model.reflection.universe.RuntimeDIUniverse.Tag[INSTANCE],implicitevidence$2:izumi.distage.model.reflection.universe.RuntimeDIUniverse.Tag[BINDING]):izumi.distage.planning.AutoSetHook[INSTANCE,BINDING]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -283,7 +321,7 @@
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">PlannerDefaultImpl</span><span class="params">(<span name="forwardingRefResolver">forwardingRefResolver: <a href="../model/planning/ForwardingRefResolver.html" class="extype" name="izumi.distage.model.planning.ForwardingRefResolver">ForwardingRefResolver</a></span>, <span name="sanityChecker">sanityChecker: <a href="../model/planning/SanityChecker.html" class="extype" name="izumi.distage.model.planning.SanityChecker">SanityChecker</a></span>, <span name="gc">gc: <a href="../model/planning/DIGarbageCollector.html" class="extype" name="izumi.distage.model.planning.DIGarbageCollector">DIGarbageCollector</a></span>, <span name="planningObserver">planningObserver: <a href="../model/planning/PlanningObserver.html" class="extype" name="izumi.distage.model.planning.PlanningObserver">PlanningObserver</a></span>, <span name="planMergingPolicy">planMergingPolicy: <a href="../model/planning/PlanMergingPolicy.html" class="extype" name="izumi.distage.model.planning.PlanMergingPolicy">PlanMergingPolicy</a></span>, <span name="hook">hook: <a href="../model/planning/PlanningHook.html" class="extype" name="izumi.distage.model.planning.PlanningHook">PlanningHook</a></span>, <span name="bindingTranslator">bindingTranslator: <a href="BindingTranslator.html" class="extype" name="izumi.distage.planning.BindingTranslator">BindingTranslator</a></span>, <span name="analyzer">analyzer: <a href="../model/planning/PlanAnalyzer.html" class="extype" name="izumi.distage.model.planning.PlanAnalyzer">PlanAnalyzer</a></span>, <span name="symbolIntrospector">symbolIntrospector: <a href="../model/reflection/SymbolIntrospector$$Runtime.html" class="extype" name="izumi.distage.model.reflection.SymbolIntrospector.Runtime">Runtime</a></span>)</span>
+        <span class="name">AutoSetHook</span><span class="params">(<span name="wrap">wrap: (<span class="extype" name="izumi.distage.planning.AutoSetHook.INSTANCE">INSTANCE</span>) ⇒ <span class="extype" name="izumi.distage.planning.AutoSetHook.BINDING">BINDING</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <a href="../model/reflection/universe/RuntimeDIUniverse$.html#Tag[T]=WithTags.this.tags.Tag[T]" class="extmbr" name="izumi.distage.model.reflection.universe.RuntimeDIUniverse.Tag">model.reflection.universe.RuntimeDIUniverse.Tag</a>[<span class="extype" name="izumi.distage.planning.AutoSetHook.INSTANCE">INSTANCE</span>]</span>, <span name="arg1">arg1: <a href="../model/reflection/universe/RuntimeDIUniverse$.html#Tag[T]=WithTags.this.tags.Tag[T]" class="extmbr" name="izumi.distage.model.reflection.universe.RuntimeDIUniverse.Tag">model.reflection.universe.RuntimeDIUniverse.Tag</a>[<span class="extype" name="izumi.distage.planning.AutoSetHook.BINDING">BINDING</span>]</span>)</span>
       </span>
       
       
@@ -300,7 +338,7 @@
                 <li name="scala.AnyRef#!=" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="!=(x$1:Any):Boolean"></a><a id="!=(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../izumi/distage/planning/PlannerDefaultImpl.html#!=(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../izumi/distage/planning/AutoSetHook.html#!=(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -316,7 +354,7 @@
     </li><li name="scala.AnyRef###" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="##():Int"></a>
       <span class="permalink">
-      <a href="../../../izumi/distage/planning/PlannerDefaultImpl.html###():Int" title="Permalink">
+      <a href="../../../izumi/distage/planning/AutoSetHook.html###():Int" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -332,7 +370,7 @@
     </li><li name="scala.AnyRef#==" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="==(x$1:Any):Boolean"></a><a id="==(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../izumi/distage/planning/PlannerDefaultImpl.html#==(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../izumi/distage/planning/AutoSetHook.html#==(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -348,7 +386,7 @@
     </li><li name="scala.Any#asInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <span class="permalink">
-      <a href="../../../izumi/distage/planning/PlannerDefaultImpl.html#asInstanceOf[T0]:T0" title="Permalink">
+      <a href="../../../izumi/distage/planning/AutoSetHook.html#asInstanceOf[T0]:T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -364,7 +402,7 @@
     </li><li name="scala.AnyRef#clone" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="clone():Object"></a><a id="clone():AnyRef"></a>
       <span class="permalink">
-      <a href="../../../izumi/distage/planning/PlannerDefaultImpl.html#clone():Object" title="Permalink">
+      <a href="../../../izumi/distage/planning/AutoSetHook.html#clone():Object" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -390,7 +428,7 @@
     </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../../izumi/distage/planning/PlannerDefaultImpl.html#eq(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../../izumi/distage/planning/AutoSetHook.html#eq(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -406,7 +444,7 @@
     </li><li name="scala.AnyRef#equals" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="equals(x$1:Any):Boolean"></a><a id="equals(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../izumi/distage/planning/PlannerDefaultImpl.html#equals(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../izumi/distage/planning/AutoSetHook.html#equals(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -419,42 +457,10 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="izumi.distage.planning.PlannerDefaultImpl#finish" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="finish(semiPlan:izumi.distage.model.plan.SemiPlan):izumi.distage.model.plan.OrderedPlan"></a><a id="finish(SemiPlan):OrderedPlan"></a>
-      <span class="permalink">
-      <a href="../../../izumi/distage/planning/PlannerDefaultImpl.html#finish(semiPlan:izumi.distage.model.plan.SemiPlan):izumi.distage.model.plan.OrderedPlan" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">finish</span><span class="params">(<span name="semiPlan">semiPlan: <a href="../model/plan/SemiPlan.html" class="extype" name="izumi.distage.model.plan.SemiPlan">SemiPlan</a></span>)</span><span class="result">: <a href="../model/plan/OrderedPlan.html" class="extype" name="izumi.distage.model.plan.OrderedPlan">OrderedPlan</a></span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="izumi.distage.planning.PlannerDefaultImpl">PlannerDefaultImpl</a> → <a href="../model/Planner.html" class="extype" name="izumi.distage.model.Planner">Planner</a></dd></dl></div>
-    </li><li name="izumi.distage.planning.PlannerDefaultImpl#freeze" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="freeze(plan:izumi.distage.model.plan.DodgyPlan):izumi.distage.model.plan.SemiPlan"></a><a id="freeze(DodgyPlan):SemiPlan"></a>
-      <span class="permalink">
-      <a href="../../../izumi/distage/planning/PlannerDefaultImpl.html#freeze(plan:izumi.distage.model.plan.DodgyPlan):izumi.distage.model.plan.SemiPlan" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">freeze</span><span class="params">(<span name="plan">plan: <a href="../model/plan/DodgyPlan.html" class="extype" name="izumi.distage.model.plan.DodgyPlan">DodgyPlan</a></span>)</span><span class="result">: <a href="../model/plan/SemiPlan.html" class="extype" name="izumi.distage.model.plan.SemiPlan">SemiPlan</a></span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="izumi.distage.planning.PlannerDefaultImpl">PlannerDefaultImpl</a> → <a href="../model/Planner.html" class="extype" name="izumi.distage.model.Planner">Planner</a></dd></dl></div>
     </li><li name="scala.AnyRef#getClass" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <span class="permalink">
-      <a href="../../../izumi/distage/planning/PlannerDefaultImpl.html#getClass():Class[_]" title="Permalink">
+      <a href="../../../izumi/distage/planning/AutoSetHook.html#getClass():Class[_]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -475,7 +481,7 @@
     </li><li name="scala.AnyRef#hashCode" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="hashCode():Int"></a>
       <span class="permalink">
-      <a href="../../../izumi/distage/planning/PlannerDefaultImpl.html#hashCode():Int" title="Permalink">
+      <a href="../../../izumi/distage/planning/AutoSetHook.html#hashCode():Int" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -493,10 +499,58 @@
                 <span class="name">@HotSpotIntrinsicCandidate</span><span class="args">()</span>
               
         </dd></dl></div>
+    </li><li name="izumi.distage.model.planning.PlanningHook#hookDefinition" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="hookDefinition(defn:izumi.distage.model.definition.ModuleBase):izumi.distage.model.definition.ModuleBase"></a><a id="hookDefinition(ModuleBase):ModuleBase"></a>
+      <span class="permalink">
+      <a href="../../../izumi/distage/planning/AutoSetHook.html#hookDefinition(defn:izumi.distage.model.definition.ModuleBase):izumi.distage.model.definition.ModuleBase" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">hookDefinition</span><span class="params">(<span name="defn">defn: <a href="../model/definition/ModuleBase.html" class="extype" name="izumi.distage.model.definition.ModuleBase">ModuleBase</a></span>)</span><span class="result">: <a href="../model/definition/ModuleBase.html" class="extype" name="izumi.distage.model.definition.ModuleBase">ModuleBase</a></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../model/planning/PlanningHook.html" class="extype" name="izumi.distage.model.planning.PlanningHook">PlanningHook</a></dd></dl></div>
+    </li><li name="izumi.distage.model.planning.PlanningHook#hookWiring" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="hookWiring(binding:izumi.distage.model.definition.Binding.ImplBinding,wiring:izumi.distage.model.reflection.universe.RuntimeDIUniverse.Wiring):izumi.distage.model.reflection.universe.RuntimeDIUniverse.Wiring"></a><a id="hookWiring(ImplBinding,model.reflection.universe.RuntimeDIUniverse.Wiring):model.reflection.universe.RuntimeDIUniverse.Wiring"></a>
+      <span class="permalink">
+      <a href="../../../izumi/distage/planning/AutoSetHook.html#hookWiring(binding:izumi.distage.model.definition.Binding.ImplBinding,wiring:izumi.distage.model.reflection.universe.RuntimeDIUniverse.Wiring):izumi.distage.model.reflection.universe.RuntimeDIUniverse.Wiring" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">hookWiring</span><span class="params">(<span name="binding">binding: <a href="../model/definition/Binding$$ImplBinding.html" class="extype" name="izumi.distage.model.definition.Binding.ImplBinding">ImplBinding</a></span>, <span name="wiring">wiring: <a href="../model/reflection/universe/RuntimeDIUniverse$.html#WiringextendsAnyRef" class="extmbr" name="izumi.distage.model.plan.WithDIWiring.Wiring">model.reflection.universe.RuntimeDIUniverse.Wiring</a></span>)</span><span class="result">: <a href="../model/reflection/universe/RuntimeDIUniverse$.html#WiringextendsAnyRef" class="extmbr" name="izumi.distage.model.plan.WithDIWiring.Wiring">model.reflection.universe.RuntimeDIUniverse.Wiring</a></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../model/planning/PlanningHook.html" class="extype" name="izumi.distage.model.planning.PlanningHook">PlanningHook</a></dd></dl></div>
+    </li><li name="izumi.distage.planning.AutoSetHook#instanceType" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="instanceType:izumi.distage.model.reflection.universe.RuntimeDIUniverse.SafeType"></a><a id="instanceType:model.reflection.universe.RuntimeDIUniverse.SafeType"></a>
+      <span class="permalink">
+      <a href="../../../izumi/distage/planning/AutoSetHook.html#instanceType:izumi.distage.model.reflection.universe.RuntimeDIUniverse.SafeType" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">instanceType</span><span class="result">: <a href="../model/reflection/universe/RuntimeDIUniverse$.html#SafeTypeextendsSafeType0[WithDISafeType.this.u.type]withProductwithSerializable" class="extmbr" name="izumi.distage.model.reflection.universe.WithDISafeType.SafeType">model.reflection.universe.RuntimeDIUniverse.SafeType</a></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
     </li><li name="scala.Any#isInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <span class="permalink">
-      <a href="../../../izumi/distage/planning/PlannerDefaultImpl.html#isInstanceOf[T0]:Boolean" title="Permalink">
+      <a href="../../../izumi/distage/planning/AutoSetHook.html#isInstanceOf[T0]:Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -509,26 +563,10 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li name="izumi.distage.planning.PlannerDefaultImpl#merge" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="merge(a:izumi.distage.model.plan.AbstractPlan,b:izumi.distage.model.plan.AbstractPlan):izumi.distage.model.plan.OrderedPlan"></a><a id="merge(AbstractPlan,AbstractPlan):OrderedPlan"></a>
-      <span class="permalink">
-      <a href="../../../izumi/distage/planning/PlannerDefaultImpl.html#merge(a:izumi.distage.model.plan.AbstractPlan,b:izumi.distage.model.plan.AbstractPlan):izumi.distage.model.plan.OrderedPlan" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">merge</span><span class="params">(<span name="a">a: <a href="../model/plan/AbstractPlan.html" class="extype" name="izumi.distage.model.plan.AbstractPlan">AbstractPlan</a></span>, <span name="b">b: <a href="../model/plan/AbstractPlan.html" class="extype" name="izumi.distage.model.plan.AbstractPlan">AbstractPlan</a></span>)</span><span class="result">: <a href="../model/plan/OrderedPlan.html" class="extype" name="izumi.distage.model.plan.OrderedPlan">OrderedPlan</a></span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="izumi.distage.planning.PlannerDefaultImpl">PlannerDefaultImpl</a> → <a href="../model/Planner.html" class="extype" name="izumi.distage.model.Planner">Planner</a></dd></dl></div>
     </li><li name="scala.AnyRef#ne" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a><a id="ne(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../../izumi/distage/planning/PlannerDefaultImpl.html#ne(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../../izumi/distage/planning/AutoSetHook.html#ne(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -544,7 +582,7 @@
     </li><li name="scala.AnyRef#notify" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notify():Unit"></a>
       <span class="permalink">
-      <a href="../../../izumi/distage/planning/PlannerDefaultImpl.html#notify():Unit" title="Permalink">
+      <a href="../../../izumi/distage/planning/AutoSetHook.html#notify():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -565,7 +603,7 @@
     </li><li name="scala.AnyRef#notifyAll" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notifyAll():Unit"></a>
       <span class="permalink">
-      <a href="../../../izumi/distage/planning/PlannerDefaultImpl.html#notifyAll():Unit" title="Permalink">
+      <a href="../../../izumi/distage/planning/AutoSetHook.html#notifyAll():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -583,10 +621,10 @@
                 <span class="name">@HotSpotIntrinsicCandidate</span><span class="args">()</span>
               
         </dd></dl></div>
-    </li><li name="izumi.distage.planning.PlannerDefaultImpl#plan" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="plan(input:izumi.distage.model.PlannerInput):izumi.distage.model.plan.OrderedPlan"></a><a id="plan(PlannerInput):OrderedPlan"></a>
+    </li><li name="izumi.distage.model.planning.PlanningHook#phase00PostCompletion" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="phase00PostCompletion(plan:izumi.distage.model.plan.DodgyPlan):izumi.distage.model.plan.DodgyPlan"></a><a id="phase00PostCompletion(DodgyPlan):DodgyPlan"></a>
       <span class="permalink">
-      <a href="../../../izumi/distage/planning/PlannerDefaultImpl.html#plan(input:izumi.distage.model.PlannerInput):izumi.distage.model.plan.OrderedPlan" title="Permalink">
+      <a href="../../../izumi/distage/planning/AutoSetHook.html#phase00PostCompletion(plan:izumi.distage.model.plan.DodgyPlan):izumi.distage.model.plan.DodgyPlan" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -595,30 +633,14 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">plan</span><span class="params">(<span name="input">input: <a href="../model/PlannerInput.html" class="extype" name="izumi.distage.model.PlannerInput">PlannerInput</a></span>)</span><span class="result">: <a href="../model/plan/OrderedPlan.html" class="extype" name="izumi.distage.model.plan.OrderedPlan">OrderedPlan</a></span>
+        <span class="name">phase00PostCompletion</span><span class="params">(<span name="plan">plan: <a href="../model/plan/DodgyPlan.html" class="extype" name="izumi.distage.model.plan.DodgyPlan">DodgyPlan</a></span>)</span><span class="result">: <a href="../model/plan/DodgyPlan.html" class="extype" name="izumi.distage.model.plan.DodgyPlan">DodgyPlan</a></span>
       </span>
       
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="izumi.distage.planning.PlannerDefaultImpl">PlannerDefaultImpl</a> → <a href="../model/Planner.html" class="extype" name="izumi.distage.model.Planner">Planner</a></dd></dl></div>
-    </li><li name="izumi.distage.model.Planner#plan" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="plan(input:izumi.distage.model.definition.ModuleBase,gcMode:izumi.distage.model.GCMode):izumi.distage.model.plan.OrderedPlan"></a><a id="plan(ModuleBase,GCMode):OrderedPlan"></a>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../model/planning/PlanningHook.html" class="extype" name="izumi.distage.model.planning.PlanningHook">PlanningHook</a></dd></dl></div>
+    </li><li name="izumi.distage.model.planning.PlanningHook#phase10PostGC" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="phase10PostGC(plan:izumi.distage.model.plan.SemiPlan):izumi.distage.model.plan.SemiPlan"></a><a id="phase10PostGC(SemiPlan):SemiPlan"></a>
       <span class="permalink">
-      <a href="../../../izumi/distage/planning/PlannerDefaultImpl.html#plan(input:izumi.distage.model.definition.ModuleBase,gcMode:izumi.distage.model.GCMode):izumi.distage.model.plan.OrderedPlan" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">final </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">plan</span><span class="params">(<span name="input">input: <a href="../model/definition/ModuleBase.html" class="extype" name="izumi.distage.model.definition.ModuleBase">ModuleBase</a></span>, <span name="gcMode">gcMode: <a href="../model/GCMode.html" class="extype" name="izumi.distage.model.GCMode">GCMode</a></span>)</span><span class="result">: <a href="../model/plan/OrderedPlan.html" class="extype" name="izumi.distage.model.plan.OrderedPlan">OrderedPlan</a></span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../model/Planner.html" class="extype" name="izumi.distage.model.Planner">Planner</a></dd></dl></div>
-    </li><li name="izumi.distage.planning.PlannerDefaultImpl#planNoRewrite" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="planNoRewrite(input:izumi.distage.model.PlannerInput):izumi.distage.model.plan.OrderedPlan"></a><a id="planNoRewrite(PlannerInput):OrderedPlan"></a>
-      <span class="permalink">
-      <a href="../../../izumi/distage/planning/PlannerDefaultImpl.html#planNoRewrite(input:izumi.distage.model.PlannerInput):izumi.distage.model.plan.OrderedPlan" title="Permalink">
+      <a href="../../../izumi/distage/planning/AutoSetHook.html#phase10PostGC(plan:izumi.distage.model.plan.SemiPlan):izumi.distage.model.plan.SemiPlan" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -627,14 +649,14 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">planNoRewrite</span><span class="params">(<span name="input">input: <a href="../model/PlannerInput.html" class="extype" name="izumi.distage.model.PlannerInput">PlannerInput</a></span>)</span><span class="result">: <a href="../model/plan/OrderedPlan.html" class="extype" name="izumi.distage.model.plan.OrderedPlan">OrderedPlan</a></span>
+        <span class="name">phase10PostGC</span><span class="params">(<span name="plan">plan: <a href="../model/plan/SemiPlan.html" class="extype" name="izumi.distage.model.plan.SemiPlan">SemiPlan</a></span>)</span><span class="result">: <a href="../model/plan/SemiPlan.html" class="extype" name="izumi.distage.model.plan.SemiPlan">SemiPlan</a></span>
       </span>
       
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="izumi.distage.planning.PlannerDefaultImpl">PlannerDefaultImpl</a> → <a href="../model/Planner.html" class="extype" name="izumi.distage.model.Planner">Planner</a></dd></dl></div>
-    </li><li name="izumi.distage.planning.PlannerDefaultImpl#prepare" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="prepare(input:izumi.distage.model.PlannerInput):izumi.distage.model.plan.DodgyPlan"></a><a id="prepare(PlannerInput):DodgyPlan"></a>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../model/planning/PlanningHook.html" class="extype" name="izumi.distage.model.planning.PlanningHook">PlanningHook</a></dd></dl></div>
+    </li><li name="izumi.distage.model.planning.PlanningHook#phase20Customization" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="phase20Customization(plan:izumi.distage.model.plan.SemiPlan):izumi.distage.model.plan.SemiPlan"></a><a id="phase20Customization(SemiPlan):SemiPlan"></a>
       <span class="permalink">
-      <a href="../../../izumi/distage/planning/PlannerDefaultImpl.html#prepare(input:izumi.distage.model.PlannerInput):izumi.distage.model.plan.DodgyPlan" title="Permalink">
+      <a href="../../../izumi/distage/planning/AutoSetHook.html#phase20Customization(plan:izumi.distage.model.plan.SemiPlan):izumi.distage.model.plan.SemiPlan" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -643,14 +665,14 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">prepare</span><span class="params">(<span name="input">input: <a href="../model/PlannerInput.html" class="extype" name="izumi.distage.model.PlannerInput">PlannerInput</a></span>)</span><span class="result">: <a href="../model/plan/DodgyPlan.html" class="extype" name="izumi.distage.model.plan.DodgyPlan">DodgyPlan</a></span>
+        <span class="name">phase20Customization</span><span class="params">(<span name="plan">plan: <a href="../model/plan/SemiPlan.html" class="extype" name="izumi.distage.model.plan.SemiPlan">SemiPlan</a></span>)</span><span class="result">: <a href="../model/plan/SemiPlan.html" class="extype" name="izumi.distage.model.plan.SemiPlan">SemiPlan</a></span>
       </span>
       
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="izumi.distage.planning.PlannerDefaultImpl">PlannerDefaultImpl</a> → <a href="../model/Planner.html" class="extype" name="izumi.distage.model.Planner">Planner</a></dd></dl></div>
-    </li><li name="izumi.distage.planning.PlannerDefaultImpl#rewrite" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="rewrite(module:izumi.distage.model.definition.ModuleBase):izumi.distage.model.definition.ModuleBase"></a><a id="rewrite(ModuleBase):ModuleBase"></a>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../model/planning/PlanningHook.html" class="extype" name="izumi.distage.model.planning.PlanningHook">PlanningHook</a></dd></dl></div>
+    </li><li name="izumi.distage.planning.AutoSetHook#phase45PreForwardingCleanup" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="phase45PreForwardingCleanup(plan:izumi.distage.model.plan.SemiPlan):izumi.distage.model.plan.SemiPlan"></a><a id="phase45PreForwardingCleanup(SemiPlan):SemiPlan"></a>
       <span class="permalink">
-      <a href="../../../izumi/distage/planning/PlannerDefaultImpl.html#rewrite(module:izumi.distage.model.definition.ModuleBase):izumi.distage.model.definition.ModuleBase" title="Permalink">
+      <a href="../../../izumi/distage/planning/AutoSetHook.html#phase45PreForwardingCleanup(plan:izumi.distage.model.plan.SemiPlan):izumi.distage.model.plan.SemiPlan" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -659,14 +681,78 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">rewrite</span><span class="params">(<span name="module">module: <a href="../model/definition/ModuleBase.html" class="extype" name="izumi.distage.model.definition.ModuleBase">ModuleBase</a></span>)</span><span class="result">: <a href="../model/definition/ModuleBase.html" class="extype" name="izumi.distage.model.definition.ModuleBase">ModuleBase</a></span>
+        <span class="name">phase45PreForwardingCleanup</span><span class="params">(<span name="plan">plan: <a href="../model/plan/SemiPlan.html" class="extype" name="izumi.distage.model.plan.SemiPlan">SemiPlan</a></span>)</span><span class="result">: <a href="../model/plan/SemiPlan.html" class="extype" name="izumi.distage.model.plan.SemiPlan">SemiPlan</a></span>
       </span>
       
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="izumi.distage.planning.PlannerDefaultImpl">PlannerDefaultImpl</a> → <a href="../model/Planner.html" class="extype" name="izumi.distage.model.Planner">Planner</a></dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="izumi.distage.planning.AutoSetHook">AutoSetHook</a> → <a href="../model/planning/PlanningHook.html" class="extype" name="izumi.distage.model.planning.PlanningHook">PlanningHook</a></dd></dl></div>
+    </li><li name="izumi.distage.planning.AutoSetHook#phase50PreForwarding" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="phase50PreForwarding(plan:izumi.distage.model.plan.SemiPlan):izumi.distage.model.plan.SemiPlan"></a><a id="phase50PreForwarding(SemiPlan):SemiPlan"></a>
+      <span class="permalink">
+      <a href="../../../izumi/distage/planning/AutoSetHook.html#phase50PreForwarding(plan:izumi.distage.model.plan.SemiPlan):izumi.distage.model.plan.SemiPlan" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">phase50PreForwarding</span><span class="params">(<span name="plan">plan: <a href="../model/plan/SemiPlan.html" class="extype" name="izumi.distage.model.plan.SemiPlan">SemiPlan</a></span>)</span><span class="result">: <a href="../model/plan/SemiPlan.html" class="extype" name="izumi.distage.model.plan.SemiPlan">SemiPlan</a></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="izumi.distage.planning.AutoSetHook">AutoSetHook</a> → <a href="../model/planning/PlanningHook.html" class="extype" name="izumi.distage.model.planning.PlanningHook">PlanningHook</a></dd></dl></div>
+    </li><li name="izumi.distage.planning.AutoSetHook#phase90AfterForwarding" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="phase90AfterForwarding(plan:izumi.distage.model.plan.OrderedPlan):izumi.distage.model.plan.OrderedPlan"></a><a id="phase90AfterForwarding(OrderedPlan):OrderedPlan"></a>
+      <span class="permalink">
+      <a href="../../../izumi/distage/planning/AutoSetHook.html#phase90AfterForwarding(plan:izumi.distage.model.plan.OrderedPlan):izumi.distage.model.plan.OrderedPlan" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">phase90AfterForwarding</span><span class="params">(<span name="plan">plan: <a href="../model/plan/OrderedPlan.html" class="extype" name="izumi.distage.model.plan.OrderedPlan">OrderedPlan</a></span>)</span><span class="result">: <a href="../model/plan/OrderedPlan.html" class="extype" name="izumi.distage.model.plan.OrderedPlan">OrderedPlan</a></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="izumi.distage.planning.AutoSetHook">AutoSetHook</a> → <a href="../model/planning/PlanningHook.html" class="extype" name="izumi.distage.model.planning.PlanningHook">PlanningHook</a></dd></dl></div>
+    </li><li name="izumi.distage.planning.AutoSetHook#setElementType" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="setElementType:izumi.distage.model.reflection.universe.RuntimeDIUniverse.SafeType"></a><a id="setElementType:model.reflection.universe.RuntimeDIUniverse.SafeType"></a>
+      <span class="permalink">
+      <a href="../../../izumi/distage/planning/AutoSetHook.html#setElementType:izumi.distage.model.reflection.universe.RuntimeDIUniverse.SafeType" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">setElementType</span><span class="result">: <a href="../model/reflection/universe/RuntimeDIUniverse$.html#SafeTypeextendsSafeType0[WithDISafeType.this.u.type]withProductwithSerializable" class="extmbr" name="izumi.distage.model.reflection.universe.WithDISafeType.SafeType">model.reflection.universe.RuntimeDIUniverse.SafeType</a></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
+    </li><li name="izumi.distage.planning.AutoSetHook#setKey" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="setKey:izumi.distage.model.reflection.universe.RuntimeDIUniverse.DIKey"></a><a id="setKey:model.reflection.universe.RuntimeDIUniverse.DIKey"></a>
+      <span class="permalink">
+      <a href="../../../izumi/distage/planning/AutoSetHook.html#setKey:izumi.distage.model.reflection.universe.RuntimeDIUniverse.DIKey" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">setKey</span><span class="result">: <a href="../model/reflection/universe/RuntimeDIUniverse$.html#DIKeyextendsAnyRef" class="extmbr" name="izumi.distage.model.references.WithDIKey.DIKey">model.reflection.universe.RuntimeDIUniverse.DIKey</a></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
     </li><li name="scala.AnyRef#synchronized" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
       <span class="permalink">
-      <a href="../../../izumi/distage/planning/PlannerDefaultImpl.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
+      <a href="../../../izumi/distage/planning/AutoSetHook.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -682,7 +768,7 @@
     </li><li name="scala.AnyRef#toString" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="toString():String"></a>
       <span class="permalink">
-      <a href="../../../izumi/distage/planning/PlannerDefaultImpl.html#toString():String" title="Permalink">
+      <a href="../../../izumi/distage/planning/AutoSetHook.html#toString():String" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -695,42 +781,10 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="izumi.distage.model.Planner#triSplitExistingPlan" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="triSplitExistingPlan(_appModule:izumi.distage.model.definition.ModuleBase,primaryRoots:Set[izumi.distage.model.reflection.universe.RuntimeDIUniverse.DIKey],disabled:Set[izumi.distage.model.reflection.universe.RuntimeDIUniverse.DIKey],primaryPlan:izumi.distage.model.plan.OrderedPlan)(extractSubRoots:izumi.distage.model.plan.OrderedPlan=&gt;Set[izumi.distage.model.reflection.universe.RuntimeDIUniverse.DIKey]):izumi.distage.model.TriSplittedPlan"></a><a id="triSplitExistingPlan(ModuleBase,Set[model.reflection.universe.RuntimeDIUniverse.DIKey],Set[model.reflection.universe.RuntimeDIUniverse.DIKey],OrderedPlan)((OrderedPlan)⇒Set[model.reflection.universe.RuntimeDIUniverse.DIKey]):TriSplittedPlan"></a>
-      <span class="permalink">
-      <a href="../../../izumi/distage/planning/PlannerDefaultImpl.html#triSplitExistingPlan(_appModule:izumi.distage.model.definition.ModuleBase,primaryRoots:Set[izumi.distage.model.reflection.universe.RuntimeDIUniverse.DIKey],disabled:Set[izumi.distage.model.reflection.universe.RuntimeDIUniverse.DIKey],primaryPlan:izumi.distage.model.plan.OrderedPlan)(extractSubRoots:izumi.distage.model.plan.OrderedPlan=&gt;Set[izumi.distage.model.reflection.universe.RuntimeDIUniverse.DIKey]):izumi.distage.model.TriSplittedPlan" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">final </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">triSplitExistingPlan</span><span class="params">(<span name="_appModule">_appModule: <a href="../model/definition/ModuleBase.html" class="extype" name="izumi.distage.model.definition.ModuleBase">ModuleBase</a></span>, <span name="primaryRoots">primaryRoots: <span class="extype" name="scala.Predef.Set">Set</span>[<a href="../model/reflection/universe/RuntimeDIUniverse$.html#DIKeyextendsAnyRef" class="extmbr" name="izumi.distage.model.references.WithDIKey.DIKey">model.reflection.universe.RuntimeDIUniverse.DIKey</a>]</span>, <span name="disabled">disabled: <span class="extype" name="scala.Predef.Set">Set</span>[<a href="../model/reflection/universe/RuntimeDIUniverse$.html#DIKeyextendsAnyRef" class="extmbr" name="izumi.distage.model.references.WithDIKey.DIKey">model.reflection.universe.RuntimeDIUniverse.DIKey</a>]</span>, <span name="primaryPlan">primaryPlan: <a href="../model/plan/OrderedPlan.html" class="extype" name="izumi.distage.model.plan.OrderedPlan">OrderedPlan</a></span>)</span><span class="params">(<span name="extractSubRoots">extractSubRoots: (<a href="../model/plan/OrderedPlan.html" class="extype" name="izumi.distage.model.plan.OrderedPlan">OrderedPlan</a>) ⇒ <span class="extype" name="scala.Predef.Set">Set</span>[<a href="../model/reflection/universe/RuntimeDIUniverse$.html#DIKeyextendsAnyRef" class="extmbr" name="izumi.distage.model.references.WithDIKey.DIKey">model.reflection.universe.RuntimeDIUniverse.DIKey</a>]</span>)</span><span class="result">: <a href="../model/TriSplittedPlan.html" class="extype" name="izumi.distage.model.TriSplittedPlan">TriSplittedPlan</a></span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../model/Planner.html" class="extype" name="izumi.distage.model.Planner">Planner</a></dd></dl></div>
-    </li><li name="izumi.distage.model.Planner#triSplitPlan" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="triSplitPlan(appModule:izumi.distage.model.definition.ModuleBase,primaryRoots:Set[izumi.distage.model.reflection.universe.RuntimeDIUniverse.DIKey])(extractSubRoots:izumi.distage.model.plan.OrderedPlan=&gt;Set[izumi.distage.model.reflection.universe.RuntimeDIUniverse.DIKey]):izumi.distage.model.TriSplittedPlan"></a><a id="triSplitPlan(ModuleBase,Set[model.reflection.universe.RuntimeDIUniverse.DIKey])((OrderedPlan)⇒Set[model.reflection.universe.RuntimeDIUniverse.DIKey]):TriSplittedPlan"></a>
-      <span class="permalink">
-      <a href="../../../izumi/distage/planning/PlannerDefaultImpl.html#triSplitPlan(appModule:izumi.distage.model.definition.ModuleBase,primaryRoots:Set[izumi.distage.model.reflection.universe.RuntimeDIUniverse.DIKey])(extractSubRoots:izumi.distage.model.plan.OrderedPlan=&gt;Set[izumi.distage.model.reflection.universe.RuntimeDIUniverse.DIKey]):izumi.distage.model.TriSplittedPlan" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">final </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">triSplitPlan</span><span class="params">(<span name="appModule">appModule: <a href="../model/definition/ModuleBase.html" class="extype" name="izumi.distage.model.definition.ModuleBase">ModuleBase</a></span>, <span name="primaryRoots">primaryRoots: <span class="extype" name="scala.Predef.Set">Set</span>[<a href="../model/reflection/universe/RuntimeDIUniverse$.html#DIKeyextendsAnyRef" class="extmbr" name="izumi.distage.model.references.WithDIKey.DIKey">model.reflection.universe.RuntimeDIUniverse.DIKey</a>]</span>)</span><span class="params">(<span name="extractSubRoots">extractSubRoots: (<a href="../model/plan/OrderedPlan.html" class="extype" name="izumi.distage.model.plan.OrderedPlan">OrderedPlan</a>) ⇒ <span class="extype" name="scala.Predef.Set">Set</span>[<a href="../model/reflection/universe/RuntimeDIUniverse$.html#DIKeyextendsAnyRef" class="extmbr" name="izumi.distage.model.references.WithDIKey.DIKey">model.reflection.universe.RuntimeDIUniverse.DIKey</a>]</span>)</span><span class="result">: <a href="../model/TriSplittedPlan.html" class="extype" name="izumi.distage.model.TriSplittedPlan">TriSplittedPlan</a></span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../model/Planner.html" class="extype" name="izumi.distage.model.Planner">Planner</a></dd></dl></div>
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long,x$2:Int):Unit"></a><a id="wait(Long,Int):Unit"></a>
       <span class="permalink">
-      <a href="../../../izumi/distage/planning/PlannerDefaultImpl.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
+      <a href="../../../izumi/distage/planning/AutoSetHook.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -752,7 +806,7 @@
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long):Unit"></a><a id="wait(Long):Unit"></a>
       <span class="permalink">
-      <a href="../../../izumi/distage/planning/PlannerDefaultImpl.html#wait(x$1:Long):Unit" title="Permalink">
+      <a href="../../../izumi/distage/planning/AutoSetHook.html#wait(x$1:Long):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -776,7 +830,7 @@
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <span class="permalink">
-      <a href="../../../izumi/distage/planning/PlannerDefaultImpl.html#wait():Unit" title="Permalink">
+      <a href="../../../izumi/distage/planning/AutoSetHook.html#wait():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -806,7 +860,7 @@
               <ol><li name="scala.AnyRef#finalize" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="finalize():Unit"></a>
       <span class="permalink">
-      <a href="../../../izumi/distage/planning/PlannerDefaultImpl.html#finalize():Unit" title="Permalink">
+      <a href="../../../izumi/distage/planning/AutoSetHook.html#finalize():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -834,8 +888,8 @@
         </div>
 
         <div id="inheritedMembers">
-        <div class="parent" name="izumi.distage.model.Planner">
-              <h3>Inherited from <a href="../model/Planner.html" class="extype" name="izumi.distage.model.Planner">Planner</a></h3>
+        <div class="parent" name="izumi.distage.model.planning.PlanningHook">
+              <h3>Inherited from <a href="../model/planning/PlanningHook.html" class="extype" name="izumi.distage.model.planning.PlanningHook">PlanningHook</a></h3>
             </div><div class="parent" name="scala.AnyRef">
               <h3>Inherited from <a href="../../../scala/index.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a></h3>
             </div><div class="parent" name="scala.Any">
