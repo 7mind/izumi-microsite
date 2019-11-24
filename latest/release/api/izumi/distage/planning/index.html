@@ -247,8 +247,8 @@
       
     </li><li class="current-entities indented3">
                         <span class="separator"></span>
-                        <a class="class" href="AssignableFromAutoSetHook.html" title="A hook that will collect all implementations with types that are"></a>
-                        <a href="AssignableFromAutoSetHook.html" title="A hook that will collect all implementations with types that are">AssignableFromAutoSetHook</a>
+                        <a class="class" href="AutoSetHook.html" title="A hook that will collect all implementations with types that are"></a>
+                        <a href="AutoSetHook.html" title="A hook that will collect all implementations with types that are">AutoSetHook</a>
                       </li><li class="current-entities indented3">
                         <a class="object" href="AutoSetModule$.html" title=""></a>
                         <a class="class" href="AutoSetModule.html" title="Auto-Sets collect all bindings with static types &lt;: T into a summonable Set[T]"></a>
@@ -448,10 +448,10 @@
 
         <div id="types" class="types members">
               <h3>Type Members</h3>
-              <ol><li name="izumi.distage.planning.AssignableFromAutoSetHook" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="AssignableFromAutoSetHook[INSTANCE,BINDING]extendsPlanningHook"></a><a id="AssignableFromAutoSetHook[INSTANCE,BINDING]:AssignableFromAutoSetHook[INSTANCE,BINDING]"></a>
+              <ol><li name="izumi.distage.planning.AutoSetHook" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="AutoSetHook[INSTANCE,BINDING]extendsPlanningHook"></a><a id="AutoSetHook[INSTANCE,BINDING]:AutoSetHook[INSTANCE,BINDING]"></a>
       <span class="permalink">
-      <a href="../../../izumi/distage/planning/AssignableFromAutoSetHook.html" title="Permalink">
+      <a href="../../../izumi/distage/planning/AutoSetHook.html" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -460,11 +460,11 @@
         <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <a title="A hook that will collect all implementations with types that are" href="AssignableFromAutoSetHook.html"><span class="name">AssignableFromAutoSetHook</span></a><span class="tparams">[<span name="INSTANCE">INSTANCE</span>, <span name="BINDING">BINDING</span>]</span><span class="result"> extends <a href="../model/planning/PlanningHook.html" class="extype" name="izumi.distage.model.planning.PlanningHook">PlanningHook</a></span>
+        <a title="A hook that will collect all implementations with types that are" href="AutoSetHook.html"><span class="name">AutoSetHook</span></a><span class="tparams">[<span name="INSTANCE">INSTANCE</span>, <span name="BINDING">BINDING</span>]</span><span class="result"> extends <a href="../model/planning/PlanningHook.html" class="extype" name="izumi.distage.model.planning.PlanningHook">PlanningHook</a></span>
       </span>
       
       <p class="shortcomment cmt">A hook that will collect all implementations with types that are </p><div class="fullcomment"><div class="comment cmt"><p>A hook that will collect all implementations with types that are </p><pre>_ <span class="kw">&lt;:</span> T</pre><p> into a <code>Set[T]</code> set binding
-available for summoning</p><p>Usage:</p><pre><span class="kw">val</span> collectCloseables = <span class="kw">new</span> AssignableFromAutoSetHook[AutoCloseable, AutoCloseable](identity)
+available for summoning</p><p>Usage:</p><pre><span class="kw">val</span> collectCloseables = <span class="kw">new</span> AutoSetHook[AutoCloseable, AutoCloseable](identity)
 
 <span class="kw">val</span> injector = Injector(<span class="kw">new</span> BootstrapModuleDef {
   many[PlanningHook]
@@ -479,10 +479,11 @@ available for summoning</p><p>Usage:</p><pre><span class="kw">val</span> collect
   <span class="cmt">// Therefore resources should closed in the *opposite order*</span>
   <span class="cmt">// e.g. if C depends on B depends on A, create: A -&gt; B -&gt; C, close: C -&gt; B -&gt; A</span>
   closeables.reverse.foreach(_.close())
-}</pre><p>Auto-Sets are NOT subject to <a href="gc/TracingDIGC.html" class="extype" name="izumi.distage.planning.gc.TracingDIGC">Garbage Collection</a>, they are assembled *after* garbage collection is done,
-as such they can't contain garbage by construction.</p><p>_ &lt;: T
+}</pre><p>Auto-Sets are NOT subject to <a href="gc/TracingDIGC.html" class="extype" name="izumi.distage.planning.gc.TracingDIGC">Garbage Collection</a>, they are assembled
+*after* garbage collection is done, as such they can't contain garbage by construction
+and they cannot be designated as GC root keys.</p><p>_ &lt;: T
 }}}
-available for summoning</p><p>Usage:</p><pre><span class="kw">val</span> collectCloseables = <span class="kw">new</span> AssignableFromAutoSetHook[AutoCloseable, AutoCloseable](identity)
+available for summoning</p><p>Usage:</p><pre><span class="kw">val</span> collectCloseables = <span class="kw">new</span> AutoSetHook[AutoCloseable, AutoCloseable](identity)
 
 <span class="kw">val</span> injector = Injector(<span class="kw">new</span> BootstrapModuleDef {
   many[PlanningHook]
@@ -497,8 +498,10 @@ available for summoning</p><p>Usage:</p><pre><span class="kw">val</span> collect
   <span class="cmt">// Therefore resources should closed in the *opposite order*</span>
   <span class="cmt">// e.g. if C depends on B depends on A, create: A -&gt; B -&gt; C, close: C -&gt; B -&gt; A</span>
   closeables.reverse.foreach(_.close())
-}</pre><p>Auto-Sets are NOT subject to <a href="gc/TracingDIGC.html" class="extype" name="izumi.distage.planning.gc.TracingDIGC">Garbage Collection</a>, they are assembled *after* garbage collection is done,
-as such they can't contain garbage by construction.</p></div></div>
+}</pre><p>Auto-Sets are NOT subject to <a href="gc/TracingDIGC.html" class="extype" name="izumi.distage.planning.gc.TracingDIGC">Garbage Collection</a>, they are assembled
+*after* garbage collection is done, as such they can't contain garbage by construction
+and they cannot be designated as GC root keys.
+</p></div></div>
     </li><li name="izumi.distage.planning.AutoSetModule" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
       <a id="AutoSetModuleextendsBootstrapModuleDef"></a><a id="AutoSetModule:AutoSetModule"></a>
       <span class="permalink">
