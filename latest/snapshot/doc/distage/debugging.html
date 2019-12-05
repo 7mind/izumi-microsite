@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="x-ua-compatible" content="ie=edge">
 <meta name="description" content="microsite">
-<meta name="generator" content="Paradox, paradox-material-theme=0.9.18-SNAPSHOT, mkdocs-material=3.0.3">
+<meta name="generator" content="Paradox, paradox-material-theme=0.10.0-SNAPSHOT, mkdocs-material=3.0.3">
 
 <meta name="lang:clipboard.copy" content="Copy to clipboard">
 <meta name="lang:clipboard.copied" content="Copied to clipboard">
@@ -145,12 +145,11 @@ data-md-source="github">
   <li><a href="../distage/index.html" class="page">distage: Staged Dependency Injection</a>
   <ul>
     <li><a href="../distage/basics.html" class="page">Basics</a></li>
-    <li><a href="../distage/config_injection.html" class="page">Config Injection</a></li>
     <li><a href="../distage/other-features.html" class="page">Other Features</a></li>
     <li><a href="../distage/debugging.html" class="active page">Debugging</a></li>
-    <li><a href="../distage/cookbook.html" class="page">Cookbook</a></li>
-    <li><a href="../distage/roles.html" class="page">Role-Based Applications</a></li>
-    <li><a href="../distage/testkit.html" class="page">Testkit</a></li>
+    <li><a href="../distage/distage-config.html" class="page">distage-config</a></li>
+    <li><a href="../distage/distage-framework.html" class="page">distage-framework</a></li>
+    <li><a href="../distage/distage-testkit.html" class="page">distage-testkit</a></li>
     <li><a href="../distage/reference.html" class="page">Syntax Summary</a></li>
   </ul></li>
   <li><a href="../logstage/index.html" class="page">LogStage</a>
@@ -168,6 +167,7 @@ data-md-source="github">
 <ul>
   <li><a href="../distage/debugging.html#debugging" class="header">Debugging</a>
   <ul>
+    <li><a href="../distage/debugging.html#testing-plans" class="header">Testing Plans</a></li>
     <li><a href="../distage/debugging.html#pretty-printing-plans" class="header">Pretty-printing plans</a></li>
     <li><a href="../distage/debugging.html#graphviz-rendering" class="header">Graphviz rendering</a></li>
   </ul></li>
@@ -178,7 +178,7 @@ data-md-source="github">
 <ul style="display: none">
 <li class="md-nav__item md-version" id="project.version">
 <label class="md-nav__link" for="__version">
-<i class="md-icon" title="Version">label_outline</i> 0.9.18*
+<i class="md-icon" title="Version">label_outline</i> 0.10.0*
 </label>
 </li>
 </ul>
@@ -193,6 +193,7 @@ data-md-source="github">
 <ul>
   <li><a href="../distage/debugging.html#debugging" class="header">Debugging</a>
   <ul>
+    <li><a href="../distage/debugging.html#testing-plans" class="header">Testing Plans</a></li>
     <li><a href="../distage/debugging.html#pretty-printing-plans" class="header">Pretty-printing plans</a></li>
     <li><a href="../distage/debugging.html#graphviz-rendering" class="header">Graphviz rendering</a></li>
   </ul></li>
@@ -206,27 +207,96 @@ data-md-source="github">
 <article class="md-content__inner md-typeset">
 <div class="md-content__searchable">
 <h1><a href="#debugging" name="debugging" class="anchor"><span class="anchor-link"></span></a>Debugging</h1>
-<h3><a href="#pretty-printing-plans" name="pretty-printing-plans" class="anchor"><span class="anchor-link"></span></a>Pretty-printing plans</h3>
-<p>You can print the <code>plan</code> to get detailed info on what will happen during instantiation. The printout includes file:line info so your IDE can show you where the binding was defined!</p>
-<pre class="prettyprint"><code class="language-scala">val plan = Injector().plan(module)
+<div class="toc ">
+<ul>
+  <li><a href="../distage/debugging.html#testing-plans" class="header">Testing Plans</a></li>
+  <li><a href="../distage/debugging.html#pretty-printing-plans" class="header">Pretty-printing plans</a></li>
+  <li><a href="../distage/debugging.html#graphviz-rendering" class="header">Graphviz rendering</a></li>
+</ul>
+</div>
+<h3><a href="#testing-plans" name="testing-plans" class="anchor"><span class="anchor-link"></span></a>Testing Plans</h3>
+<p>Use <code>OrderedPlan#assertImportsResolvedOrThrow</code> method to test whether all dependencies in a given plan are present and the plan will execute correctly when passed to <code>Injector#produce</code>.</p>
+<pre class="prettyprint"><code class="language-scala">import distage.{DIKey, GCMode, ModuleDef, Injector}
 
-System.err.println(plan)
+class A(b: B)
+class B
+
+val badModule = new ModuleDef {
+  make[A]
+}
+// badModule: AnyRef with ModuleDef = Module(make[{type.repl.Session::repl.Session.App0::repl.Session.App0.A}].from(call(&lt;function1&gt;(repl.Session::repl.Session.App0::repl.Session.App0.B): repl.Session::repl.Session.App0::repl.Session.App0.A)) ((debugging.md:21)))
+
+val badPlan = Injector().plan(badModule, GCMode.NoGC)
+// badPlan: izumi.distage.model.plan.OrderedPlan = {type.repl.Session::repl.Session.App0::repl.Session.App0.B} (debugging.md:21) := import {type.repl.Session::repl.Session.App0::repl.Session.App0.B} // required for {type.repl.Session::repl.Session.App0::repl.Session.App0.A}
+// {type.repl.Session::repl.Session.App0::repl.Session.App0.A} (debugging.md:21) := call(&lt;function1&gt;(repl.Session::repl.Session.App0::repl.Session.App0.B): repl.Session::repl.Session.App0::repl.Session.App0.A) {
+//   arg b: repl.Session::repl.Session.App0::repl.Session.App0.B = lookup({type.repl.Session::repl.Session.App0::repl.Session.App0.B})
+// }
+</code></pre>
+<pre class="prettyprint"><code class="language-scala">badPlan.assertImportsResolvedOrThrow
+// izumi.distage.model.exceptions.InvalidPlanException: 
+// - Instance is not available in the object graph: {type.repl.Session::repl.Session.App0::repl.Session.App0.B}.
+// Required by refs:
+//  - {type.repl.Session::repl.Session.App0::repl.Session.App0.A}
+// 	at izumi.distage.model.plan.impl.OrderedPlanOps.$anonfun$assertImportsResolved$1(OrderedPlanOps.scala:44)
+// 	at scala.util.Either$LeftProjection.map(Either.scala:573)
+// 	at izumi.distage.model.plan.impl.OrderedPlanOps.assertImportsResolved(OrderedPlanOps.scala:43)
+// 	at izumi.distage.model.plan.impl.OrderedPlanOps.assertImportsResolved$(OrderedPlanOps.scala:40)
+// 	at izumi.distage.model.plan.OrderedPlan.assertImportsResolved(AbstractPlan.scala:36)
+// 	at izumi.distage.model.plan.impl.OrderedPlanOps.assertImportsResolvedOrThrow(OrderedPlanOps.scala:54)
+// 	at izumi.distage.model.plan.impl.OrderedPlanOps.assertImportsResolvedOrThrow$(OrderedPlanOps.scala:53)
+// 	at izumi.distage.model.plan.OrderedPlan.assertImportsResolvedOrThrow(AbstractPlan.scala:36)
+// 	at repl.Session$App0$$anonfun$5.apply(debugging.md:32)
+// 	at repl.Session$App0$$anonfun$5.apply(debugging.md:32)
+</code></pre>
+<pre class="prettyprint"><code class="language-scala">val goodModule = new ModuleDef {
+  make[A]
+  make[B]
+}
+// goodModule: AnyRef with ModuleDef = Module(make[{type.repl.Session::repl.Session.App0::repl.Session.App0.A}].from(call(&lt;function1&gt;(repl.Session::repl.Session.App0::repl.Session.App0.B): repl.Session::repl.Session.App0::repl.Session.App0.A)) ((debugging.md:40)), make[{type.repl.Session::repl.Session.App0::repl.Session.App0.B}].from(call(&lt;function1&gt;(): repl.Session::repl.Session.App0::repl.Session.App0.B)) ((debugging.md:41)))
+
+val plan = Injector().plan(goodModule, GCMode.NoGC)
+// plan: izumi.distage.model.plan.OrderedPlan = {type.repl.Session::repl.Session.App0::repl.Session.App0.B} (debugging.md:41) := call(&lt;function1&gt;(): repl.Session::repl.Session.App0::repl.Session.App0.B) {}
+// {type.repl.Session::repl.Session.App0::repl.Session.App0.A} (debugging.md:40) := call(&lt;function1&gt;(repl.Session::repl.Session.App0::repl.Session.App0.B): repl.Session::repl.Session.App0::repl.Session.App0.A) {
+//   arg b: repl.Session::repl.Session.App0::repl.Session.App0.B = lookup({type.repl.Session::repl.Session.App0::repl.Session.App0.B})
+// }
+
+plan.assertImportsResolvedOrThrow
+// res1: izumi.distage.model.plan.OrderedPlan = {type.repl.Session::repl.Session.App0::repl.Session.App0.B} (debugging.md:41) := call(&lt;function1&gt;(): repl.Session::repl.Session.App0::repl.Session.App0.B) {}
+// {type.repl.Session::repl.Session.App0::repl.Session.App0.A} (debugging.md:40) := call(&lt;function1&gt;(repl.Session::repl.Session.App0::repl.Session.App0.B): repl.Session::repl.Session.App0::repl.Session.App0.A) {
+//   arg b: repl.Session::repl.Session.App0::repl.Session.App0.B = lookup({type.repl.Session::repl.Session.App0::repl.Session.App0.B})
+// }
+</code></pre>
+<h3><a href="#pretty-printing-plans" name="pretty-printing-plans" class="anchor"><span class="anchor-link"></span></a>Pretty-printing plans</h3>
+<p>You can print the output of <code>plan.render()</code> to get detailed info on what will happen during instantiation. The printout includes source and line numbers so your IDE can show you where the binding was defined!</p>
+<pre class="prettyprint"><code class="language-scala">println(plan.render())
+// {type.Session::App0::B} (debugging.md:41) := call(&lt;function1&gt;(): Session::App0::B) {}
+// {type.Session::App0::A} (debugging.md:40) := call(&lt;function1&gt;(Session::App0::B): Session::App0::A) {
+//   arg b: Session::App0::B = lookup({type.Session::App0::B})
+// }
 </code></pre>
 <p><img src="media/print-test-plan.png" alt="print-test-plan" /></p>
 <p>You can also query a plan to see the dependencies and reverse dependencies of a specific class and their order of instantiation:</p>
 <pre class="prettyprint"><code class="language-scala">// Print dependencies
-System.err.println(plan.topology.dependencies.tree(DIKey.get[Circular1]))
+println(plan.topology.dependencies.tree(DIKey.get[A]))
+// DepNode({type.repl.Session::repl.Session.App0::repl.Session.App0.A},DependencyGraph(Map({type.repl.Session::repl.Session.App0::repl.Session.App0.B} -&gt; Set(), {type.repl.Session::repl.Session.App0::repl.Session.App0.A} -&gt; Set({type.repl.Session::repl.Session.App0::repl.Session.App0.B})),Depends),0,None,Set())
+
 // Print reverse dependencies
-System.err.println(plan.topology.dependees.tree(DIKey.get[Circular1]))
+println(plan.topology.dependees.tree(DIKey.get[B]))
+// DepNode({type.repl.Session::repl.Session.App0::repl.Session.App0.B},DependencyGraph(Map({type.repl.Session::repl.Session.App0::repl.Session.App0.A} -&gt; Set(), {type.repl.Session::repl.Session.App0::repl.Session.App0.B} -&gt; Set({type.repl.Session::repl.Session.App0::repl.Session.App0.A})),Required),0,None,Set())
 </code></pre>
+<p>The printer highlights circular dependencies:</p>
 <p><img src="media/print-dependencies.png" alt="print-dependencies" /></p>
-<p>The printer highlights circular dependencies.</p>
-<p>distage also uses some macros to create <code>TagK</code>s and <a href="#function-bindings">function bindings</a>, you can turn on macro debug output during compilation by setting <code>-Dizumi.debug.macro.rtti=true</code> java property:</p>
-<pre class="prettyprint"><code class="language-bash">sbt -Dizumi.debug.macro.rtti=true compile
+<p>To debug macros used by <code>distage</code> you may use the following Java Properties:</p>
+<pre class="prettyprint"><code class="language-bash">sbt -Dizumi.debug.macro.rtti=true compile # fundamentals-reflection &amp; LightTypeTag macros
+sbt -Dizumi.debug.macro.distage.constructors=true compile # izumi.distage.constructors.* macros
+sbt -Dizumi.debug.macro.distage.providermagnet=true compile # ProviderMagnet macro
 </code></pre>
 <h3><a href="#graphviz-rendering" name="graphviz-rendering" class="anchor"><span class="anchor-link"></span></a>Graphviz rendering</h3>
 <p>Add <code>GraphDumpBootstrapModule</code> to your <code>Injector</code>&rsquo;s configuration to enable dumping of graphviz files with a graphical representation of the <code>Plan</code>.</p>
-<pre class="prettyprint"><code class="language-scala">val injector = Injector(new GraphDumpBootstrapModule())
+<pre class="prettyprint"><code class="language-scala">import distage.GraphDumpBootstrapModule
+
+val injector = Injector(GraphDumpBootstrapModule())
+// injector: Injector = izumi.distage.InjectorDefaultImpl@2160b141
 </code></pre>
 <p>Data will be saved dumped to <code>./target/plan-last-full.gv</code> and <code>./target/plan-last-nogc.gv</code> in current working directory. </p>
 <p>You&rsquo;ll need a <code>GraphViz</code> installation to render these files into a viewable PNG images:</p>
@@ -241,7 +311,7 @@ Edit this page
 </div>
 <div class="print-only">
 <span class="md-source-file md-version">
-0.9.18*
+0.10.0*
 </span>
 </div>
 </article>
@@ -264,13 +334,13 @@ Other Features
 </span>
 </div>
 </a>
-<a href="../distage/cookbook.html" title="Cookbook" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+<a href="../distage/distage-config.html" title="distage-config" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
 <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
 <span class="md-flex__ellipsis">
 <span class="md-footer-nav__direction">
 Next
 </span>
-Cookbook
+distage-config
 </span>
 </div>
 <div class="md-flex__cell md-flex__cell--shrink">
