@@ -145,7 +145,7 @@ data-md-source="github">
   <li><a href="../distage/index.html" class="page">distage: Staged Dependency Injection</a>
   <ul>
     <li><a href="../distage/basics.html" class="page">Basics</a></li>
-    <li><a href="../distage/other-features.html" class="page">Other Features</a></li>
+    <li><a href="../distage/advanced-features.html" class="page">Advanced Features</a></li>
     <li><a href="../distage/debugging.html" class="page">Debugging</a></li>
     <li><a href="../distage/distage-config.html" class="page">distage-config</a></li>
     <li><a href="../distage/distage-framework.html" class="active page">distage-framework</a></li>
@@ -219,7 +219,7 @@ data-md-source="github">
 <p><code>distage-framework</code> module contains the distage Role API:</p>
 <pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;io.7mind.izumi&quot; %% &quot;distage-framework&quot; % &quot;0.10.0-SNAPSHOT&quot;
 </code></pre>
-<p>With default <code>RoleLauncher</code> implementation, roles to be launched are chosen by command-line parameters: <code>./launcher role1 role2 role3</code>. Only the components required by the chosen roles will be created, everything else will be pruned. (see: <a href="other-features.html#garbage-collection">GC</a>)</p>
+<p>With default <code>RoleLauncher</code> implementation, roles to be launched are chosen by command-line parameters: <code>./launcher role1 role2 role3</code>. Only the components required by the chosen roles will be created, everything else will be pruned. (see: <a href="advanced-features.html#garbage-collection">GC</a>)</p>
 <p>Further reading: <a href="https://github.com/7mind/slides/blob/master/02-roles/target/roles.pdf">Roles: a viable alternative to Microservices</a></p>
 <h3><a href="#plugins" name="plugins" class="anchor"><span class="anchor-link"></span></a>Plugins</h3>
 <p><code>distage-plugins</code> module adds classpath discovery for modules that inherit a marker trait <code>PluginBase</code>. Plugins enable extreme late-binding; e.g. they allow a program to extend itself at launch time by adding new <code>Plugin</code> classes to the classpath. Plugins are compatible with <a href="distage-framework.html#compile-time-checks">compile-time checks</a> as long as they&rsquo;re defined in a separate module.</p>
@@ -246,21 +246,21 @@ object PetStorePlugin extends PluginDef {
     packagesDisabled = Seq.empty,                  // packages to ignore
   )
 )
-// pluginLoader: PluginLoader = izumi.distage.plugins.load.PluginLoaderDefaultImpl@34ab5c79
+// pluginLoader: PluginLoader = izumi.distage.plugins.load.PluginLoaderDefaultImpl@62bff4dd
 
 val appModules = pluginLoader.load()
-// appModules: Seq[PluginBase] = ArrayBuffer(Module(make[{type.com.example.petstore.PetStoreService}].from(call(com.example.petstore.PetStorePlugin$$$Lambda$17585/0x0000000844032040@4bd133af(): com.example.petstore.PetStoreService)) ((PetStorePlugin.scala:7)), make[{type.com.example.petstore.PetStoreController}].from(call(com.example.petstore.PetStorePlugin$$$Lambda$17587/0x0000000844033040@64c1eafc(): com.example.petstore.PetStoreController)) ((PetStorePlugin.scala:8)), make[{type.com.example.petstore.PetRepository}].from(call(com.example.petstore.PetStorePlugin$$$Lambda$17583/0x0000000844031040@55f6cdf8(): com.example.petstore.PetRepository)) ((PetStorePlugin.scala:6))))
+// appModules: Seq[PluginBase] = ArrayBuffer(Module(make[{type.com.example.petstore.PetStoreService}].from(call(com.example.petstore.PetStorePlugin$$$Lambda$17738/0x00000008440ec840@7cd4f728(): com.example.petstore.PetStoreService)) ((PetStorePlugin.scala:7)), make[{type.com.example.petstore.PetStoreController}].from(call(com.example.petstore.PetStorePlugin$$$Lambda$17740/0x00000008440f8040@4390a44f(): com.example.petstore.PetStoreController)) ((PetStorePlugin.scala:8)), make[{type.com.example.petstore.PetRepository}].from(call(com.example.petstore.PetStorePlugin$$$Lambda$17736/0x00000008440ed840@1f16fb54(): com.example.petstore.PetRepository)) ((PetStorePlugin.scala:6))))
 </code></pre>
 <p>Execute collected modules as usual:</p>
 <pre class="prettyprint"><code class="language-scala">// combine all modules into one
 
 val appModule = appModules.merge
-// appModule: PluginBase = Module(make[{type.com.example.petstore.PetStoreService}].from(call(com.example.petstore.PetStorePlugin$$$Lambda$17585/0x0000000844032040@4bd133af(): com.example.petstore.PetStoreService)) ((PetStorePlugin.scala:7)), make[{type.com.example.petstore.PetStoreController}].from(call(com.example.petstore.PetStorePlugin$$$Lambda$17587/0x0000000844033040@64c1eafc(): com.example.petstore.PetStoreController)) ((PetStorePlugin.scala:8)), make[{type.com.example.petstore.PetRepository}].from(call(com.example.petstore.PetStorePlugin$$$Lambda$17583/0x0000000844031040@55f6cdf8(): com.example.petstore.PetRepository)) ((PetStorePlugin.scala:6)))
+// appModule: PluginBase = Module(make[{type.com.example.petstore.PetStoreService}].from(call(com.example.petstore.PetStorePlugin$$$Lambda$17738/0x00000008440ec840@7cd4f728(): com.example.petstore.PetStoreService)) ((PetStorePlugin.scala:7)), make[{type.com.example.petstore.PetStoreController}].from(call(com.example.petstore.PetStorePlugin$$$Lambda$17740/0x00000008440f8040@4390a44f(): com.example.petstore.PetStoreController)) ((PetStorePlugin.scala:8)), make[{type.com.example.petstore.PetRepository}].from(call(com.example.petstore.PetStorePlugin$$$Lambda$17736/0x00000008440ed840@1f16fb54(): com.example.petstore.PetRepository)) ((PetStorePlugin.scala:6)))
 
 // launch
 
 Injector().produce(appModule, GCMode.NoGC).use {
-  _.get[PetStoreController].run
+  _.get[PetStoreController].run()
 }
 // PetStoreController: running!
 // res0: izumi.fundamentals.platform.functional.package.Identity[Unit] = ()
