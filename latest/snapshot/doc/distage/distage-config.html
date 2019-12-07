@@ -216,25 +216,22 @@ val configModule = new ConfigModuleDef {
   makeConfig[Conf](&quot;conf&quot;)
   makeConfig[OtherConf](&quot;conf&quot;).named(&quot;other&quot;)
 }
-// configModule: AnyRef with ConfigModuleDef = Module(make[{type.repl.Session::repl.Session.App0::repl.Session.App0.OtherConf@ConfPathId(conf)}].from(call(izumi.distage.config.ConfigModuleDef$$Lambda$16785/0x0000000843dc8840@66f32f01(izumi.distage.config.model.AppConfig): repl.Session::repl.Session.App0::repl.Session.App0.OtherConf)) ((distage-config.md:38)), make[{type.repl.Session::repl.Session.App0::repl.Session.App0.Conf}].from(using[{type.repl.Session::repl.Session.App0::repl.Session.App0.Conf@ConfPathId(conf)}]) ((distage-config.md:37)), make[{type.repl.Session::repl.Session.App0::repl.Session.App0.OtherConf@other}].from(using[{type.repl.Session::repl.Session.App0::repl.Session.App0.OtherConf@ConfPathId(conf)}]) ((distage-config.md:38)), make[{type.repl.Session::repl.Session.App0::repl.Session.App0.Conf@ConfPathId(conf)}].from(call(izumi.distage.config.ConfigModuleDef$$Lambda$16785/0x0000000843dc8840@66f08f1e(izumi.distage.config.model.AppConfig): repl.Session::repl.Session.App0::repl.Session.App0.Conf)) ((distage-config.md:37)))
+// configModule: AnyRef with ConfigModuleDef = Module(make[{type.repl.Session::repl.Session.App0::repl.Session.App0.OtherConf@other}].from(call(izumi.distage.config.ConfigModuleDef$$Lambda$16408/0x0000000843d02840@560ed496(izumi.distage.config.model.AppConfig): repl.Session::repl.Session.App0::repl.Session.App0.OtherConf)).tagged(Set(ConfTag(conf))) ((distage-config.md:38)), make[{type.repl.Session::repl.Session.App0::repl.Session.App0.Conf}].from(call(izumi.distage.config.ConfigModuleDef$$Lambda$16408/0x0000000843d02840@6d34f24d(izumi.distage.config.model.AppConfig): repl.Session::repl.Session.App0::repl.Session.App0.Conf)).tagged(Set(ConfTag(conf))) ((distage-config.md:37)))
+
+// add config itself to the graph
+val appConfigModule = AppConfigModule(config)
+// appConfigModule: AppConfigModule = Module(make[{type.izumi.distage.config.model.AppConfig}].from(value(AppConfig(Config(SimpleConfigObject({&quot;conf&quot;:{&quot;age&quot;:33,&quot;name&quot;:&quot;John&quot;,&quot;other&quot;:true}}))))) ((ConfigModuleDef.scala:16)))
 
 val appModule = new ModuleDef {
   make[ConfigPrinter]
 }
-// appModule: AnyRef with ModuleDef = Module(make[{type.repl.Session::repl.Session.App0::repl.Session.App0.ConfigPrinter}].from(call(&lt;function1&gt;(repl.Session::repl.Session.App0::repl.Session.App0.Conf, repl.Session::repl.Session.App0::repl.Session.App0.OtherConf): repl.Session::repl.Session.App0::repl.Session.App0.ConfigPrinter)) ((distage-config.md:43)))
+// appModule: AnyRef with ModuleDef = Module(make[{type.repl.Session::repl.Session.App0::repl.Session.App0.ConfigPrinter}].from(call(&lt;function1&gt;(repl.Session::repl.Session.App0::repl.Session.App0.Conf, repl.Session::repl.Session.App0::repl.Session.App0.OtherConf): repl.Session::repl.Session.App0::repl.Session.App0.ConfigPrinter)) ((distage-config.md:46)))
 
-// add config wiring to the graph
-val appConfigModule = AppConfigModule(config)
-// appConfigModule: AppConfigModule = Module(make[{type.izumi.distage.config.model.AppConfig}].from(value(AppConfig(Config(SimpleConfigObject({&quot;conf&quot;:{&quot;age&quot;:33,&quot;name&quot;:&quot;John&quot;,&quot;other&quot;:true}}))))) ((ConfigModuleDef.scala:20)))
-
-val injector = Injector(appConfigModule)
-// injector: Injector = izumi.distage.InjectorDefaultImpl@7a99468b
-
-val objects = injector.produceUnsafe(
-  input = Seq(appModule, configModule).merge,
+val objects = Injector().produceUnsafe(
+  input = Seq(appModule, configModule, appConfigModule).merge,
   mode  = GCMode(DIKey.get[ConfigPrinter])
 )
-// objects: izumi.distage.model.Locator = izumi.distage.LocatorDefaultImpl@4d15e251
+// objects: izumi.distage.model.Locator = izumi.distage.LocatorDefaultImpl@6e7584a0
 
 objects.get[ConfigPrinter].print()
 // name: John, age: 33, other: true
