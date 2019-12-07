@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="x-ua-compatible" content="ie=edge">
 <meta name="description" content="microsite">
-<meta name="generator" content="Paradox, paradox-material-theme=0.10.0-M2, mkdocs-material=3.0.3">
+<meta name="generator" content="Paradox, paradox-material-theme=0.10.0-M3, mkdocs-material=3.0.3">
 
 <meta name="lang:clipboard.copy" content="Copy to clipboard">
 <meta name="lang:clipboard.copied" content="Copied to clipboard">
@@ -145,7 +145,7 @@ data-md-source="github">
   <li><a href="../distage/index.html" class="page">distage: Staged Dependency Injection</a>
   <ul>
     <li><a href="../distage/basics.html" class="page">Basics</a></li>
-    <li><a href="../distage/other-features.html" class="page">Other Features</a></li>
+    <li><a href="../distage/advanced-features.html" class="page">Advanced Features</a></li>
     <li><a href="../distage/debugging.html" class="page">Debugging</a></li>
     <li><a href="../distage/distage-config.html" class="page">distage-config</a></li>
     <li><a href="../distage/distage-framework.html" class="active page">distage-framework</a></li>
@@ -178,7 +178,7 @@ data-md-source="github">
 <ul style="display: none">
 <li class="md-nav__item md-version" id="project.version">
 <label class="md-nav__link" for="__version">
-<i class="md-icon" title="Version">label_outline</i> 0.10.0-M2
+<i class="md-icon" title="Version">label_outline</i> 0.10.0-M3
 </label>
 </li>
 </ul>
@@ -217,14 +217,14 @@ data-md-source="github">
 <h3><a href="#roles" name="roles" class="anchor"><span class="anchor-link"></span></a>Roles</h3>
 <p>A &ldquo;Role&rdquo; is an entrypoint for a specific application hosted in a larger software suite. Bundling multiple roles in a single <code>.jar</code> file can simplify deployment and operations.</p>
 <p><code>distage-framework</code> module contains the distage Role API:</p>
-<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;io.7mind.izumi&quot; %% &quot;distage-framework&quot; % &quot;0.10.0-M2&quot;
+<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;io.7mind.izumi&quot; %% &quot;distage-framework&quot; % &quot;0.10.0-M3&quot;
 </code></pre>
-<p>With default <code>RoleLauncher</code> implementation, roles to be launched are chosen by command-line parameters: <code>./launcher role1 role2 role3</code>. Only the components required by the chosen roles will be created, everything else will be pruned. (see: <a href="other-features.html#garbage-collection">GC</a>)</p>
+<p>With default <code>RoleLauncher</code> implementation, roles to be launched are chosen by command-line parameters: <code>./launcher role1 role2 role3</code>. Only the components required by the chosen roles will be created, everything else will be pruned. (see: <a href="advanced-features.html#garbage-collection">GC</a>)</p>
 <p>Further reading: <a href="https://github.com/7mind/slides/blob/master/02-roles/target/roles.pdf">Roles: a viable alternative to Microservices</a></p>
 <h3><a href="#plugins" name="plugins" class="anchor"><span class="anchor-link"></span></a>Plugins</h3>
 <p><code>distage-plugins</code> module adds classpath discovery for modules that inherit a marker trait <code>PluginBase</code>. Plugins enable extreme late-binding; e.g. they allow a program to extend itself at launch time by adding new <code>Plugin</code> classes to the classpath. Plugins are compatible with <a href="distage-framework.html#compile-time-checks">compile-time checks</a> as long as they&rsquo;re defined in a separate module.</p>
 <p>To use plugins, first add the <code>distage-plugins</code> library:</p>
-<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;io.7mind.izumi&quot; %% &quot;distage-plugins&quot; % &quot;0.10.0-M2&quot;
+<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;io.7mind.izumi&quot; %% &quot;distage-plugins&quot; % &quot;0.10.0-M3&quot;
 </code></pre>
 <p>Create a module extending the <code>PluginDef</code> trait instead of <code>ModuleDef</code>:</p>
 <pre class="prettyprint"><code class="language-scala">// package com.example.petstore
@@ -246,21 +246,21 @@ object PetStorePlugin extends PluginDef {
     packagesDisabled = Seq.empty,                  // packages to ignore
   )
 )
-// pluginLoader: PluginLoader = izumi.distage.plugins.load.PluginLoaderDefaultImpl@5597a450
+// pluginLoader: PluginLoader = izumi.distage.plugins.load.PluginLoaderDefaultImpl@52b00f5f
 
 val appModules = pluginLoader.load()
-// appModules: Seq[PluginBase] = ArrayBuffer(Module(make[{type.com.example.petstore.PetStoreService}].from(call(com.example.petstore.PetStorePlugin$$$Lambda$18225/0x0000000844259040@3f79242c(): com.example.petstore.PetStoreService)) ((PetStorePlugin.scala:7)), make[{type.com.example.petstore.PetStoreController}].from(call(com.example.petstore.PetStorePlugin$$$Lambda$18227/0x000000084425a040@1cfc2caa(): com.example.petstore.PetStoreController)) ((PetStorePlugin.scala:8)), make[{type.com.example.petstore.PetRepository}].from(call(com.example.petstore.PetStorePlugin$$$Lambda$18223/0x0000000844258040@557ba41a(): com.example.petstore.PetRepository)) ((PetStorePlugin.scala:6))))
+// appModules: Seq[PluginBase] = ArrayBuffer(Module(make[{type.com.example.petstore.PetStoreService}].from(call(com.example.petstore.PetStorePlugin$$$Lambda$17953/0x000000084439c040@70e9c83c(): com.example.petstore.PetStoreService)) ((PetStorePlugin.scala:7)), make[{type.com.example.petstore.PetStoreController}].from(call(com.example.petstore.PetStorePlugin$$$Lambda$17955/0x000000084439b040@23ec790a(): com.example.petstore.PetStoreController)) ((PetStorePlugin.scala:8)), make[{type.com.example.petstore.PetRepository}].from(call(com.example.petstore.PetStorePlugin$$$Lambda$17951/0x000000084439d040@77416fad(): com.example.petstore.PetRepository)) ((PetStorePlugin.scala:6))))
 </code></pre>
 <p>Execute collected modules as usual:</p>
 <pre class="prettyprint"><code class="language-scala">// combine all modules into one
 
 val appModule = appModules.merge
-// appModule: PluginBase = Module(make[{type.com.example.petstore.PetStoreService}].from(call(com.example.petstore.PetStorePlugin$$$Lambda$18225/0x0000000844259040@3f79242c(): com.example.petstore.PetStoreService)) ((PetStorePlugin.scala:7)), make[{type.com.example.petstore.PetStoreController}].from(call(com.example.petstore.PetStorePlugin$$$Lambda$18227/0x000000084425a040@1cfc2caa(): com.example.petstore.PetStoreController)) ((PetStorePlugin.scala:8)), make[{type.com.example.petstore.PetRepository}].from(call(com.example.petstore.PetStorePlugin$$$Lambda$18223/0x0000000844258040@557ba41a(): com.example.petstore.PetRepository)) ((PetStorePlugin.scala:6)))
+// appModule: PluginBase = Module(make[{type.com.example.petstore.PetStoreService}].from(call(com.example.petstore.PetStorePlugin$$$Lambda$17953/0x000000084439c040@70e9c83c(): com.example.petstore.PetStoreService)) ((PetStorePlugin.scala:7)), make[{type.com.example.petstore.PetStoreController}].from(call(com.example.petstore.PetStorePlugin$$$Lambda$17955/0x000000084439b040@23ec790a(): com.example.petstore.PetStoreController)) ((PetStorePlugin.scala:8)), make[{type.com.example.petstore.PetRepository}].from(call(com.example.petstore.PetStorePlugin$$$Lambda$17951/0x000000084439d040@77416fad(): com.example.petstore.PetRepository)) ((PetStorePlugin.scala:6)))
 
 // launch
 
 Injector().produce(appModule, GCMode.NoGC).use {
-  _.get[PetStoreController].run
+  _.get[PetStoreController].run()
 }
 // PetStoreController: running!
 // res0: izumi.fundamentals.platform.functional.package.Identity[Unit] = ()
@@ -268,7 +268,7 @@ Injector().produce(appModule, GCMode.NoGC).use {
 <h3><a href="#compile-time-checks" name="compile-time-checks" class="anchor"><span class="anchor-link"></span></a>Compile-time checks</h3>
 <p>An experimental compile-time verification API is available in the <code>distage-framework</code> module.</p>
 <p>To use it add <code>distage-framework</code> library:</p>
-<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;io.7mind.izumi&quot; %% &quot;distage-framework&quot; % &quot;0.10.0-M2&quot;
+<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;io.7mind.izumi&quot; %% &quot;distage-framework&quot; % &quot;0.10.0-M3&quot;
 </code></pre>
 <p>Only plugins defined in a different module can be checked at compile-time, <code>test</code> scope counts as a different module.</p>
 <p>Example:</p>
@@ -326,13 +326,13 @@ final class AppPluginTest extends WordSpec {
 <p>Note: Since version <code>0.10.0</code>, configuration files are no longer checked for correctness by the compile-time checker, see: <a href="https://github.com/7mind/izumi/issues/763">https://github.com/7mind/izumi/issues/763</a></p>
 </div>
 <div>
-<a href="https://github.com/7mind/izumi/tree/v0.10.0-M2/doc/microsite/target/mdoc/distage/distage-framework.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/7mind/izumi/tree/v0.10.0-M3/doc/microsite/target/mdoc/distage/distage-framework.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>
 <div class="print-only">
 <span class="md-source-file md-version">
-0.10.0-M2
+0.10.0-M3
 </span>
 </div>
 </article>
