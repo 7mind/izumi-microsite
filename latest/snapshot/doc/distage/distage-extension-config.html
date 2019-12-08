@@ -20,7 +20,7 @@
 
 <meta name="description" content="microsite">
 <link rel="shortcut icon" href="../assets/images/favicon.png">
-<title>distage-testkit-scalatest ? Izumi Project</title>
+<title>distage-extension-config ? Izumi Project</title>
 <link rel="stylesheet" href="../assets/stylesheets/application.451f80e5.css">
 <link rel="stylesheet" href="../lib/material__tabs/dist/mdc.tabs.min.css">
 <link rel="stylesheet" href="../lib/prettify/prettify.css">
@@ -56,7 +56,7 @@ code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}
 Izumi Project
 </span>
 <span class="md-header-nav__topic">
-distage-testkit-scalatest
+distage-extension-config
 </span>
 </div>
 </div>
@@ -147,10 +147,10 @@ data-md-source="github">
     <li><a href="../distage/basics.html" class="page">Basics</a></li>
     <li><a href="../distage/advanced-features.html" class="page">Advanced Features</a></li>
     <li><a href="../distage/debugging.html" class="page">Debugging</a></li>
-    <li><a href="../distage/distage-extension-config.html" class="page">distage-extension-config</a></li>
+    <li><a href="../distage/distage-extension-config.html" class="active page">distage-extension-config</a></li>
     <li><a href="../distage/distage-framework.html" class="page">distage-framework</a></li>
     <li><a href="../distage/distage-framework-docker.html" class="page">distage-framework-docker</a></li>
-    <li><a href="../distage/distage-testkit-scalatest.html" class="active page">distage-testkit-scalatest</a></li>
+    <li><a href="../distage/distage-testkit-scalatest.html" class="page">distage-testkit-scalatest</a></li>
     <li><a href="../distage/reference.html" class="page">Syntax Summary</a></li>
   </ul></li>
   <li><a href="../logstage/index.html" class="page">LogStage</a>
@@ -164,14 +164,6 @@ data-md-source="github">
   <li><a href="../pper/index.html" class="page">PPER Pattern</a></li>
 </ul>
 <nav class="md-nav md-nav--secondary">
-<label class="md-nav__title" for="__toc">Table of contents</label>
-<ul>
-  <li><a href="../distage/distage-testkit-scalatest.html#distage-testkit-scalatest" class="header">distage-testkit-scalatest</a>
-  <ul>
-    <li><a href="../distage/distage-testkit-scalatest.html#testkit" class="header">Testkit</a></li>
-    <li><a href="../distage/distage-testkit-scalatest.html#integration-checks" class="header">Integration Checks</a></li>
-  </ul></li>
-</ul>
 </nav>
 
 </nav>
@@ -185,124 +177,70 @@ data-md-source="github">
 </div>
 </div>
 </div>
-<div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
-<div class="md-sidebar__scrollwrap">
-<div class="md-sidebar__inner">
-<nav class="md-nav md-nav--secondary">
-<label class="md-nav__title" for="__toc">Table of contents</label>
-<ul>
-  <li><a href="../distage/distage-testkit-scalatest.html#distage-testkit-scalatest" class="header">distage-testkit-scalatest</a>
-  <ul>
-    <li><a href="../distage/distage-testkit-scalatest.html#testkit" class="header">Testkit</a></li>
-    <li><a href="../distage/distage-testkit-scalatest.html#integration-checks" class="header">Integration Checks</a></li>
-  </ul></li>
-</ul>
-</nav>
-
-</div>
-</div>
-</div>
 <div class="md-content">
 <article class="md-content__inner md-typeset">
 <div class="md-content__searchable">
-<h1><a href="#distage-testkit-scalatest" name="distage-testkit-scalatest" class="anchor"><span class="anchor-link"></span></a>distage-testkit-scalatest</h1>
-<div class="toc ">
-<ul>
-  <li><a href="../distage/distage-testkit-scalatest.html#testkit" class="header">Testkit</a></li>
-  <li><a href="../distage/distage-testkit-scalatest.html#integration-checks" class="header">Integration Checks</a></li>
-</ul>
-</div>
-<h3><a href="#testkit" name="testkit" class="anchor"><span class="anchor-link"></span></a>Testkit</h3>
-<p><a href="https://github.com/7mind/distage-livecode">distage Livecode project</a> project shows how to use <code>distage-testkit-scalatest</code>:</p>
-<pre class="prettyprint"><code class="language-scala">package livecode
-
-import distage.{DIKey, ModuleDef}
-import doobie.util.transactor.Transactor
-import izumi.distage.model.definition.StandardAxis
-import izumi.distage.docker.examples.PostgresDocker
-import izumi.distage.testkit.services.DISyntaxZIOEnv
-import izumi.distage.testkit.TestConfig
-import izumi.distage.testkit.scalatest.DistageBIOSpecScalatest
-import livecode.code._
-import livecode.zioenv._
-import zio.{IO, Task, ZIO}
-
-abstract class LivecodeTest extends DistageBIOSpecScalatest[IO] with DISyntaxZIOEnv {
-  override def config = TestConfig(
-    pluginPackages = Some(Seq(&quot;livecode.plugins&quot;)),
-    activation     = StandardAxis.testProdActivation,
-    moduleOverrides = new ModuleDef {
-      make[Rnd[IO]].from[Rnd.Impl[IO]]
-      include(PostgresDockerModule)
-    },
-    memoizedKeys = Set(
-      DIKey.get[Transactor[Task]],
-      DIKey.get[Ladder[IO]],
-      DIKey.get[Profiles[IO]],
-      DIKey.get[PostgresDocker.Container],
-    ),
-  )
-}
-
-trait DummyTest extends LivecodeTest {
-  override final def config = super.config.copy(
-    activation = StandardAxis.testDummyActivation,
-  )
-}
-
-final class LadderTestDummy extends LadderTest with DummyTest
-final class ProfilesTestDummy extends ProfilesTest with DummyTest
-final class RanksTestDummy extends RanksTest with DummyTest
-
-class LadderTest extends LivecodeTest with DummyTest {
-
-  &quot;Ladder&quot; should {
-    // this test gets dependencies through arguments
-    &quot;submit &amp; get&quot; in {
-      (rnd: Rnd[IO], ladder: Ladder[IO]) =&gt;
-        for {
-          user  &lt;- rnd[UserId]
-          score &lt;- rnd[Score]
-          _     &lt;- ladder.submitScore(user, score)
-          res   &lt;- ladder.getScores.map(_.find(_._1 == user).map(_._2))
-          _     = assert(res contains score)
-        } yield ()
-    }
-
-    // other tests get dependencies via ZIO Env:
-    &quot;return higher score higher in the list&quot; in {
-      for {
-        user1  &lt;- rnd[UserId]
-        score1 &lt;- rnd[Score]
-        user2  &lt;- rnd[UserId]
-        score2 &lt;- rnd[Score]
-
-        _      &lt;- ladder.submitScore(user1, score1)
-        _      &lt;- ladder.submitScore(user2, score2)
-        scores &lt;- ladder.getScores
-
-        user1Rank = scores.indexWhere(_._1 == user1)
-        user2Rank = scores.indexWhere(_._1 == user2)
-
-        _ = if (score1 &gt; score2) {
-          assert(user1Rank &lt; user2Rank)
-        } else if (score2 &gt; score1) {
-          assert(user2Rank &lt; user1Rank)
-        }
-      } yield ()
-    }
-  }
-
+<h1><a href="#distage-extension-config" name="distage-extension-config" class="anchor"><span class="anchor-link"></span></a>distage-extension-config</h1>
+<p><code>distage-extension-config</code> library allows summoning case classes and sealed traits from <code>typesafe-config</code> configuration</p>
+<p>To use it, add <code>distage-extension-config</code> library:</p>
+<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;io.7mind.izumi&quot; %% &quot;distage-extension-config&quot; % &quot;0.10.0-SNAPSHOT&quot;
+</code></pre>
+<p>Add a configuration file in HOCON format:</p>
+<pre class="prettyprint"><code class="language-hocon"># resources/application.conf
+conf {
+    name = &quot;John&quot;
+    age = 33
+    other = true
 }
 </code></pre>
-<h3><a href="#integration-checks" name="integration-checks" class="anchor"><span class="anchor-link"></span></a>Integration Checks</h3>
-<p>Implementation classes that inherit from <code>izumi.distage.roles.model.IntegrationCheck</code> can specify a <code>resourceCheck()</code> method that will be called before test instantiation to check if <strong>external test dependencies</strong> (such as docker containers in <a href="distage-framework-docker.html#docker-test-resources">distage-framework-docker</a>) are available for the test or role. If not, the test will be canceled/ignored.</p>
-<p>This feature allows you to e.g. selectively run only the fast in-memory tests that have no external dependencies if you have shut down your test environment.</p>
-<p>Integration checks are executed only in <code>distage-testkit-scalatest</code> tests and <code>distage-framework</code>&rsquo;s <a href="distage-framework.html#roles">Roles</a>.</p>
-<p>Use <a href="/latest/snapshot/api/izumi/distage/roles/services/StartupPlanExecutor.html">StartupPlanExecutor</a> to execute the checks manually.</p>
+<p>Parse it into case classes and summon into your object graph:</p>
+<pre class="prettyprint"><code class="language-scala">import distage.{DIKey, GCMode, ModuleDef, Id, Injector}
+import distage.config.{AppConfigModule, ConfigModuleDef}
+import com.typesafe.config.ConfigFactory
+
+final case class Conf(name: String, age: Int)
+
+final case class OtherConf(other: Boolean)
+
+final class ConfigPrinter(conf: Conf, otherConf: OtherConf @Id(&quot;other&quot;)) {
+  def print() = {
+    println(s&quot;name: ${conf.name}, age: ${conf.age}, other: ${otherConf.other}&quot;)
+  }
+}
+
+// load
+val config = ConfigFactory.defaultApplication()
+// config: com.typesafe.config.Config = Config(SimpleConfigObject({&quot;conf&quot;:{&quot;age&quot;:33,&quot;name&quot;:&quot;John&quot;,&quot;other&quot;:true}}))
+
+// declare paths to parse
+val configModule = new ConfigModuleDef {
+  makeConfig[Conf](&quot;conf&quot;)
+  makeConfig[OtherConf](&quot;conf&quot;).named(&quot;other&quot;)
+}
+// configModule: AnyRef with ConfigModuleDef = Module(make[{type.repl.Session::repl.Session.App0::repl.Session.App0.Conf}].from(call(izumi.distage.config.ConfigModuleDef$$Lambda$15596/0x0000000843b10840@60b1a7ce(izumi.distage.config.model.AppConfig): repl.Session::repl.Session.App0::repl.Session.App0.Conf)).tagged(Set(ConfTag(conf))) ((distage-extension-config.md:37)), make[{type.repl.Session::repl.Session.App0::repl.Session.App0.OtherConf@other}].from(call(izumi.distage.config.ConfigModuleDef$$Lambda$15596/0x0000000843b10840@5bf7d24c(izumi.distage.config.model.AppConfig): repl.Session::repl.Session.App0::repl.Session.App0.OtherConf)).tagged(Set(ConfTag(conf))) ((distage-extension-config.md:38)))
+
+// add config itself to the graph
+val appConfigModule = AppConfigModule(config)
+// appConfigModule: AppConfigModule = Module(make[{type.izumi.distage.config.model.AppConfig}].from(value(AppConfig(Config(SimpleConfigObject({&quot;conf&quot;:{&quot;age&quot;:33,&quot;name&quot;:&quot;John&quot;,&quot;other&quot;:true}}))))) ((ConfigModuleDef.scala:19)))
+
+val appModule = new ModuleDef {
+  make[ConfigPrinter]
+}
+// appModule: AnyRef with ModuleDef = Module(make[{type.repl.Session::repl.Session.App0::repl.Session.App0.ConfigPrinter}].from(call(&lt;function1&gt;(repl.Session::repl.Session.App0::repl.Session.App0.Conf, repl.Session::repl.Session.App0::repl.Session.App0.OtherConf): repl.Session::repl.Session.App0::repl.Session.App0.ConfigPrinter)) ((distage-extension-config.md:46)))
+
+val objects = Injector().produceUnsafe(
+  input = Seq(appModule, configModule, appConfigModule).merge,
+  mode  = GCMode(DIKey.get[ConfigPrinter])
+)
+// objects: izumi.distage.model.Locator = izumi.distage.LocatorDefaultImpl@6007354c
+
+objects.get[ConfigPrinter].print()
+// name: John, age: 33, other: true
+</code></pre>
+<p>Automatic derivation of config codecs is based on <a href="https://github.com/circe/circe-config">circe-config</a> &amp; <a href="https://github.com/circe/circe-derivation">circe-derivation</a>. <a href="https://github.com/circe/circe">Circe</a> codecs for a type will be reused if they exist.</p>
 </div>
 <div>
-<a href="https://github.com/7mind/izumi/tree/master/doc/microsite/target/mdoc/distage/distage-testkit-scalatest.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/7mind/izumi/tree/master/doc/microsite/target/mdoc/distage/distage-extension-config.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>
@@ -318,7 +256,7 @@ Edit this page
 <footer class="md-footer">
 <div class="md-footer-nav">
 <nav class="md-footer-nav__inner md-grid">
-<a href="../distage/distage-framework-docker.html" title="distage-framework-docker" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+<a href="../distage/debugging.html" title="Debugging" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
 <div class="md-flex__cell md-flex__cell--shrink">
 <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
 </div>
@@ -327,17 +265,17 @@ Edit this page
 <span class="md-footer-nav__direction">
 Previous
 </span>
-distage-framework-docker
+Debugging
 </span>
 </div>
 </a>
-<a href="../distage/reference.html" title="Syntax Summary" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+<a href="../distage/distage-framework.html" title="distage-framework" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
 <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
 <span class="md-flex__ellipsis">
 <span class="md-footer-nav__direction">
 Next
 </span>
-Syntax Summary
+distage-framework
 </span>
 </div>
 <div class="md-flex__cell md-flex__cell--shrink">
