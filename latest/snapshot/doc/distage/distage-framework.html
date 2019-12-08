@@ -147,10 +147,10 @@ data-md-source="github">
     <li><a href="../distage/basics.html" class="page">Basics</a></li>
     <li><a href="../distage/advanced-features.html" class="page">Advanced Features</a></li>
     <li><a href="../distage/debugging.html" class="page">Debugging</a></li>
-    <li><a href="../distage/distage-config.html" class="page">distage-config</a></li>
-    <li><a href="../distage/distage-docker.html" class="page">distage-docker</a></li>
+    <li><a href="../distage/distage-extension-config.html" class="page">distage-extension-config</a></li>
     <li><a href="../distage/distage-framework.html" class="active page">distage-framework</a></li>
-    <li><a href="../distage/distage-testkit.html" class="page">distage-testkit</a></li>
+    <li><a href="../distage/distage-framework-docker.html" class="page">distage-framework-docker</a></li>
+    <li><a href="../distage/distage-testkit-scalatest.html" class="page">distage-testkit-scalatest</a></li>
     <li><a href="../distage/reference.html" class="page">Syntax Summary</a></li>
   </ul></li>
   <li><a href="../logstage/index.html" class="page">LogStage</a>
@@ -224,9 +224,9 @@ data-md-source="github">
 <p>There are 2 bundled roles: <a href="/latest/snapshot/api/izumi/distage/roles/examples/Help.html">Help</a> and <a href="/latest/snapshot/api/izumi/distage/roles/examples/ConfigWriter.html">ConfigWriter</a>.</p>
 <p>Further reading: <a href="https://github.com/7mind/slides/blob/master/02-roles/target/roles.pdf">Roles: a viable alternative to Microservices</a></p>
 <h3><a href="#plugins" name="plugins" class="anchor"><span class="anchor-link"></span></a>Plugins</h3>
-<p><code>distage-plugins</code> module adds classpath discovery for modules that inherit a marker trait <code>PluginBase</code>. Plugins enable extreme late-binding; e.g. they allow a program to extend itself at launch time with new <code>Plugin</code> classes on the classpath. Plugins are compatible with <a href="distage-framework.html#compile-time-checks">compile-time checks</a> as long as they&rsquo;re defined in a separate module.</p>
-<p>To use plugins, first add the <code>distage-plugins</code> library:</p>
-<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;io.7mind.izumi&quot; %% &quot;distage-plugins&quot; % &quot;0.10.0-SNAPSHOT&quot;
+<p><code>distage-extension-plugins</code> module adds classpath discovery for modules that inherit a marker trait <code>PluginBase</code>. Plugins enable extreme late-binding; e.g. they allow a program to extend itself at launch time with new <code>Plugin</code> classes on the classpath. Plugins are compatible with <a href="distage-framework.html#compile-time-checks">compile-time checks</a> as long as they&rsquo;re defined in a separate module.</p>
+<p>To use plugins, first add the <code>distage-extension-plugins</code> library:</p>
+<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;io.7mind.izumi&quot; %% &quot;distage-extension-plugins&quot; % &quot;0.10.0-SNAPSHOT&quot;
 </code></pre>
 <p>Create a module extending the <code>PluginDef</code> trait instead of <code>ModuleDef</code>:</p>
 <pre class="prettyprint"><code class="language-scala">// package com.example.petstore
@@ -248,16 +248,16 @@ object PetStorePlugin extends PluginDef {
     packagesDisabled = Seq.empty,                  // packages to ignore
   )
 )
-// pluginLoader: PluginLoader = izumi.distage.plugins.load.PluginLoaderDefaultImpl@5359238e
+// pluginLoader: PluginLoader = izumi.distage.plugins.load.PluginLoaderDefaultImpl@1acbad99
 
 val appModules = pluginLoader.load()
-// appModules: Seq[PluginBase] = ArrayBuffer(Module(make[{type.com.example.petstore.PetStoreService}].from(call(com.example.petstore.PetStorePlugin$$$Lambda$17809/0x00000008440a8040@43211a74(): com.example.petstore.PetStoreService)) ((PetStorePlugin.scala:7)), make[{type.com.example.petstore.PetStoreController}].from(call(com.example.petstore.PetStorePlugin$$$Lambda$17811/0x00000008440a9040@183d1487(): com.example.petstore.PetStoreController)) ((PetStorePlugin.scala:8)), make[{type.com.example.petstore.PetRepository}].from(call(com.example.petstore.PetStorePlugin$$$Lambda$17807/0x000000084409c840@27e85be8(): com.example.petstore.PetRepository)) ((PetStorePlugin.scala:6))))
+// appModules: Seq[PluginBase] = ArrayBuffer(Module(make[{type.com.example.petstore.PetStoreService}].from(call(com.example.petstore.PetStorePlugin$$$Lambda$16506/0x0000000843e2c040@e6ce6(): com.example.petstore.PetStoreService)) ((PetStorePlugin.scala:7)), make[{type.com.example.petstore.PetStoreController}].from(call(com.example.petstore.PetStorePlugin$$$Lambda$16508/0x0000000843e2d040@799123c4(): com.example.petstore.PetStoreController)) ((PetStorePlugin.scala:8)), make[{type.com.example.petstore.PetRepository}].from(call(com.example.petstore.PetStorePlugin$$$Lambda$16504/0x0000000843e2b040@63baa214(): com.example.petstore.PetRepository)) ((PetStorePlugin.scala:6))))
 </code></pre>
 <p>Execute collected modules as usual:</p>
 <pre class="prettyprint"><code class="language-scala">// combine all modules into one
 
 val appModule = appModules.merge
-// appModule: PluginBase = Module(make[{type.com.example.petstore.PetStoreService}].from(call(com.example.petstore.PetStorePlugin$$$Lambda$17809/0x00000008440a8040@43211a74(): com.example.petstore.PetStoreService)) ((PetStorePlugin.scala:7)), make[{type.com.example.petstore.PetStoreController}].from(call(com.example.petstore.PetStorePlugin$$$Lambda$17811/0x00000008440a9040@183d1487(): com.example.petstore.PetStoreController)) ((PetStorePlugin.scala:8)), make[{type.com.example.petstore.PetRepository}].from(call(com.example.petstore.PetStorePlugin$$$Lambda$17807/0x000000084409c840@27e85be8(): com.example.petstore.PetRepository)) ((PetStorePlugin.scala:6)))
+// appModule: PluginBase = Module(make[{type.com.example.petstore.PetStoreService}].from(call(com.example.petstore.PetStorePlugin$$$Lambda$16506/0x0000000843e2c040@e6ce6(): com.example.petstore.PetStoreService)) ((PetStorePlugin.scala:7)), make[{type.com.example.petstore.PetStoreController}].from(call(com.example.petstore.PetStorePlugin$$$Lambda$16508/0x0000000843e2d040@799123c4(): com.example.petstore.PetStoreController)) ((PetStorePlugin.scala:8)), make[{type.com.example.petstore.PetRepository}].from(call(com.example.petstore.PetStorePlugin$$$Lambda$16504/0x0000000843e2b040@63baa214(): com.example.petstore.PetRepository)) ((PetStorePlugin.scala:6)))
 
 // launch
 
@@ -344,7 +344,7 @@ Edit this page
 <footer class="md-footer">
 <div class="md-footer-nav">
 <nav class="md-footer-nav__inner md-grid">
-<a href="../distage/distage-docker.html" title="distage-docker" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+<a href="../distage/distage-extension-config.html" title="distage-extension-config" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
 <div class="md-flex__cell md-flex__cell--shrink">
 <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
 </div>
@@ -353,17 +353,17 @@ Edit this page
 <span class="md-footer-nav__direction">
 Previous
 </span>
-distage-docker
+distage-extension-config
 </span>
 </div>
 </a>
-<a href="../distage/distage-testkit.html" title="distage-testkit" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+<a href="../distage/distage-framework-docker.html" title="distage-framework-docker" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
 <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
 <span class="md-flex__ellipsis">
 <span class="md-footer-nav__direction">
 Next
 </span>
-distage-testkit
+distage-framework-docker
 </span>
 </div>
 <div class="md-flex__cell md-flex__cell--shrink">
