@@ -147,10 +147,10 @@ data-md-source="github">
     <li><a href="../distage/basics.html" class="page">Basics</a></li>
     <li><a href="../distage/advanced-features.html" class="active page">Advanced Features</a></li>
     <li><a href="../distage/debugging.html" class="page">Debugging</a></li>
-    <li><a href="../distage/distage-extension-config.html" class="page">distage-extension-config</a></li>
+    <li><a href="../distage/distage-config.html" class="page">distage-config</a></li>
+    <li><a href="../distage/distage-docker.html" class="page">distage-docker</a></li>
     <li><a href="../distage/distage-framework.html" class="page">distage-framework</a></li>
-    <li><a href="../distage/distage-framework-docker.html" class="page">distage-framework-docker</a></li>
-    <li><a href="../distage/distage-testkit-scalatest.html" class="page">distage-testkit-scalatest</a></li>
+    <li><a href="../distage/distage-testkit.html" class="page">distage-testkit</a></li>
     <li><a href="../distage/reference.html" class="page">Syntax Summary</a></li>
   </ul></li>
   <li><a href="../logstage/index.html" class="page">LogStage</a>
@@ -232,7 +232,7 @@ data-md-source="github">
 <p>A garbage collector is included in <code>distage</code> by default. Given a set of <code>GC root</code> keys, GC will remove all bindings that are neither direct nor transitive dependencies of the supplied roots ? these bindings will be thrown out and never instantiated.</p>
 <p>GC serves two important purposes:</p>
 <ul>
-  <li>It enables faster <a href="distage-testkit-scalatest.html#distage-testkit-scalatest">tests</a> by omitting unrequired instantiations and initialization of potentially heavy resources,</li>
+  <li>It enables faster <a href="distage-testkit.html#distage-testkit">tests</a> by omitting unrequired instantiations and initialization of potentially heavy resources,</li>
   <li>It enables multiple independent applications, aka &ldquo;<a href="distage-framework.html#roles">Roles</a>&rdquo; to be hosted within a single <code>.jar</code> file.</li>
 </ul>
 <p>To use garbage collector, pass GC roots as an argument to <code>Injector.produce*</code> methods:</p>
@@ -260,7 +260,7 @@ val roots = GCMode.GCRoots(Set[DIKey](DIKey.get[A]))
 // with `A` as a GC root
 
 val objects = Injector().produceUnsafe(module, roots)
-// objects: Locator = izumi.distage.LocatorDefaultImpl@1be050b6
+// objects: Locator = izumi.distage.LocatorDefaultImpl@794f0a5a
 
 // A and B are in the object graph
 
@@ -288,7 +288,7 @@ val locator = Injector().produceUnsafe(new ModuleDef {
   make[B]
   make[C]
 }, GCMode.NoGC)
-// locator: izumi.distage.model.Locator = izumi.distage.LocatorDefaultImpl@3f14b837
+// locator: izumi.distage.model.Locator = izumi.distage.LocatorDefaultImpl@5ea034bd
 
 locator.get[A] eq locator.get[B].a
 // res5: Boolean = true
@@ -298,10 +298,10 @@ locator.get[C] eq locator.get[C].c
 // res7: Boolean = true
 </code></pre>
 <h4><a href="#automatic-resolution-with-generated-proxies" name="automatic-resolution-with-generated-proxies" class="anchor"><span class="anchor-link"></span></a>Automatic Resolution with generated proxies</h4>
-<p>The above strategy depends on <code>distage-core-proxy-cglib</code> module which is a default dependency of <code>distage-core</code>.</p>
+<p>The above strategy depends on <code>distage-proxy-cglib</code> module which is a default dependency of <code>distage-core</code>.</p>
 <p>If you want to disable it, use <code>NoProxies</code> bootstrap configuration:</p>
 <pre class="prettyprint"><code class="language-scala">Injector.NoProxies()
-// res8: Injector = izumi.distage.InjectorDefaultImpl@7584294a
+// res8: Injector = izumi.distage.InjectorDefaultImpl@bd6548e
 </code></pre>
 <h4><a href="#manual-resolution-with-by-name-parameters" name="manual-resolution-with-by-name-parameters" class="anchor"><span class="anchor-link"></span></a>Manual Resolution with by-name parameters</h4>
 <p>Most cycles can be resolved manually when identified using By Name parameters.</p>
@@ -331,7 +331,7 @@ val module = new ModuleDef {
 
 val locator = Injector.NoProxies()
   .produceUnsafe(module, GCMode.NoGC)
-// locator: izumi.distage.model.Locator = izumi.distage.LocatorDefaultImpl@68ee7b44
+// locator: izumi.distage.model.Locator = izumi.distage.LocatorDefaultImpl@25947958
 
 locator.get[A].b eq locator.get[B]
 // res10: Boolean = true
@@ -362,7 +362,7 @@ class C(val b: B) extends PrintResource(&quot;C&quot;)
 val bootstrapModule = new BootstrapModuleDef {
   many[PlanningHook].add(new AutoSetHook[PrintResource, PrintResource](identity))
 }
-// bootstrapModule: AnyRef with BootstrapModuleDef = Module(many[{type.scala.collection.immutable.Set[=PlanningHook]}] ((advanced-features.md:162)), many[{type.scala.collection.immutable.Set[=PlanningHook]}].add[{type.izumi.distage.planning.AutoSetHook[=Session::App13::PrintResource,=Session::App13::PrintResource]}].from(call(izumi.distage.model.providers.ProviderMagnet$$$Lambda$15470/0x0000000843a31840@2a6196c2(): izumi.distage.planning.AutoSetHook[=Session::App13::PrintResource,=Session::App13::PrintResource])) ((advanced-features.md:162)))
+// bootstrapModule: AnyRef with BootstrapModuleDef = Module(many[{type.scala.collection.immutable.Set[=PlanningHook]}].add[{type.izumi.distage.planning.AutoSetHook[=Session::App13::PrintResource,=Session::App13::PrintResource]}].from(call(izumi.distage.model.providers.ProviderMagnet$$$Lambda$16841/0x0000000843ccb840@40357b7(): izumi.distage.planning.AutoSetHook[=Session::App13::PrintResource,=Session::App13::PrintResource])) ((advanced-features.md:162)), many[{type.scala.collection.immutable.Set[=PlanningHook]}] ((advanced-features.md:162)))
 
 val appModule = new ModuleDef {
   make[C]
@@ -374,7 +374,7 @@ val appModule = new ModuleDef {
 val resources = Injector(bootstrapModule)
   .produceUnsafe(appModule, GCMode.NoGC)
   .get[Set[PrintResource]]
-// resources: Set[PrintResource] = ListSet(repl.Session$App13$A@3f21eb12, repl.Session$App13$B@5e653f97, repl.Session$App13$C@2e03a52)
+// resources: Set[PrintResource] = ListSet(repl.Session$App13$A@7cecda64, repl.Session$App13$B@743697b3, repl.Session$App13$C@215ad513)
 
 resources.foreach(_.start())
 // A started
@@ -422,7 +422,7 @@ val roots = Set[DIKey](DIKey.get[Set[Elem]])
 
 val locator = Injector().produceUnsafe(PlannerInput(module, roots))
 // Strong constructed
-// locator: Locator = izumi.distage.LocatorDefaultImpl@35778e61
+// locator: Locator = izumi.distage.LocatorDefaultImpl@7fce72a4
 
 locator.get[Set[Elem]].size == 1
 // res17: Boolean = true
@@ -436,7 +436,7 @@ locator.get[Set[Elem]].size == 1
 val locator = Injector().produceUnsafe(PlannerInput(module, roots))
 // Weak constructed
 // Strong constructed
-// locator: Locator = izumi.distage.LocatorDefaultImpl@4cbebaec
+// locator: Locator = izumi.distage.LocatorDefaultImpl@1618afe
 
 locator.get[Set[Elem]].size == 2
 // res19: Boolean = true
@@ -449,7 +449,7 @@ class Path {
   class A
 }
 val path = new Path
-// path: Path = repl.Session$App20$Path@4da40e29
+// path: Path = repl.Session$App20$Path@4ba1b9b4
 
 val module = new ModuleDef {
   make[path.A]
@@ -459,7 +459,7 @@ val module = new ModuleDef {
 Injector()
   .produceUnsafe(module, GCMode.NoGC)
   .get[path.A]
-// res21: path.A = repl.Session$App20$Path$A@7bbb7bb4
+// res21: path.A = repl.Session$App20$Path$A@1c379c1f
 </code></pre>
 <p>Since version <code>0.10</code>, path-dependent types with a type (non-value) prefix are no longer supported, see issue: <a href="https://github.com/7mind/izumi/issues/764">https://github.com/7mind/izumi/issues/764</a></p>
 <h3><a href="#depending-on-locator" name="depending-on-locator" class="anchor"><span class="anchor-link"></span></a>Depending on Locator</h3>
@@ -480,7 +480,7 @@ val module = new ModuleDef {
 // module: AnyRef with ModuleDef = Module(make[{type.repl.Session::repl.Session.App22::repl.Session.App22.C}].from(call(&lt;function1&gt;(): repl.Session::repl.Session.App22::repl.Session.App22.C)) ((advanced-features.md:319)), make[{type.repl.Session::repl.Session.App22::repl.Session.App22.B}].from(call(&lt;function1&gt;(): repl.Session::repl.Session.App22::repl.Session.App22.B)) ((advanced-features.md:318)), make[{type.repl.Session::repl.Session.App22::repl.Session.App22.A}].from(call(&lt;function1&gt;(izumi.distage.model.Locator::izumi.distage.model.Locator.LocatorRef): repl.Session::repl.Session.App22::repl.Session.App22.A)) ((advanced-features.md:317)))
 
 val locator = Injector().produceUnsafe(module, GCMode.NoGC)
-// locator: Locator = izumi.distage.LocatorDefaultImpl@7337facc
+// locator: Locator = izumi.distage.LocatorDefaultImpl@6eac95f0
 
 assert(locator.get[A].c eq locator.get[C])
 </code></pre>
