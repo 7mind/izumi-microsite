@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="x-ua-compatible" content="ie=edge">
 <meta name="description" content="microsite">
-<meta name="generator" content="Paradox, paradox-material-theme=0.10.0-M3, mkdocs-material=3.0.3">
+<meta name="generator" content="Paradox, paradox-material-theme=0.10.0-M4, mkdocs-material=3.0.3">
 
 <meta name="lang:clipboard.copy" content="Copy to clipboard">
 <meta name="lang:clipboard.copied" content="Copied to clipboard">
@@ -147,8 +147,8 @@ data-md-source="github">
     <li><a href="../distage/basics.html" class="page">Basics</a></li>
     <li><a href="../distage/advanced-features.html" class="active page">Advanced Features</a></li>
     <li><a href="../distage/debugging.html" class="page">Debugging</a></li>
-    <li><a href="../distage/distage-config.html" class="page">distage-config</a></li>
     <li><a href="../distage/distage-framework.html" class="page">distage-framework</a></li>
+    <li><a href="../distage/distage-framework-docker.html" class="page">distage-framework-docker</a></li>
     <li><a href="../distage/distage-testkit.html" class="page">distage-testkit</a></li>
     <li><a href="../distage/reference.html" class="page">Syntax Summary</a></li>
   </ul></li>
@@ -181,7 +181,7 @@ data-md-source="github">
 <ul style="display: none">
 <li class="md-nav__item md-version" id="project.version">
 <label class="md-nav__link" for="__version">
-<i class="md-icon" title="Version">label_outline</i> 0.10.0-M3
+<i class="md-icon" title="Version">label_outline</i> 0.10.0-M4
 </label>
 </li>
 </ul>
@@ -231,7 +231,7 @@ data-md-source="github">
 <p>A garbage collector is included in <code>distage</code> by default. Given a set of <code>GC root</code> keys, GC will remove all bindings that are neither direct nor transitive dependencies of the supplied roots ? these bindings will be thrown out and never instantiated.</p>
 <p>GC serves two important purposes:</p>
 <ul>
-  <li>It enables faster <a href="distage-testkit.html#distage-testkit">tests</a> by omitting unrequired instantiations and initialization of potentially heavy resources,</li>
+  <li>It enables faster <a href="distage-testkit.html">tests</a> by omitting unrequired instantiations and initialization of potentially heavy resources,</li>
   <li>It enables multiple independent applications, aka &ldquo;<a href="distage-framework.html#roles">Roles</a>&rdquo; to be hosted within a single <code>.jar</code> file.</li>
 </ul>
 <p>To use garbage collector, pass GC roots as an argument to <code>Injector.produce*</code> methods:</p>
@@ -259,7 +259,7 @@ val roots = GCMode.GCRoots(Set[DIKey](DIKey.get[A]))
 // with `A` as a GC root
 
 val objects = Injector().produceUnsafe(module, roots)
-// objects: Locator = izumi.distage.LocatorDefaultImpl@e8973c5
+// objects: Locator = izumi.distage.LocatorDefaultImpl@688e6ea6
 
 // A and B are in the object graph
 
@@ -287,7 +287,7 @@ val locator = Injector().produceUnsafe(new ModuleDef {
   make[B]
   make[C]
 }, GCMode.NoGC)
-// locator: izumi.distage.model.Locator = izumi.distage.LocatorDefaultImpl@317c7185
+// locator: izumi.distage.model.Locator = izumi.distage.LocatorDefaultImpl@5d56a9f0
 
 locator.get[A] eq locator.get[B].a
 // res5: Boolean = true
@@ -297,10 +297,10 @@ locator.get[C] eq locator.get[C].c
 // res7: Boolean = true
 </code></pre>
 <h4><a href="#automatic-resolution-with-generated-proxies" name="automatic-resolution-with-generated-proxies" class="anchor"><span class="anchor-link"></span></a>Automatic Resolution with generated proxies</h4>
-<p>The above strategy depends on <code>distage-proxy-cglib</code> module which is a default dependency of <code>distage-core</code>.</p>
+<p>The above strategy depends on <code>distage-core-proxy-cglib</code> module which is a default dependency of <code>distage-core</code>.</p>
 <p>If you want to disable it, use <code>NoProxies</code> bootstrap configuration:</p>
 <pre class="prettyprint"><code class="language-scala">Injector.NoProxies()
-// res8: Injector = izumi.distage.InjectorDefaultImpl@51e0dc46
+// res8: Injector = izumi.distage.InjectorDefaultImpl@79e9eca4
 </code></pre>
 <h4><a href="#manual-resolution-with-by-name-parameters" name="manual-resolution-with-by-name-parameters" class="anchor"><span class="anchor-link"></span></a>Manual Resolution with by-name parameters</h4>
 <p>Most cycles can be resolved manually when identified using By Name parameters.</p>
@@ -330,7 +330,7 @@ val module = new ModuleDef {
 
 val locator = Injector.NoProxies()
   .produceUnsafe(module, GCMode.NoGC)
-// locator: izumi.distage.model.Locator = izumi.distage.LocatorDefaultImpl@16d171dc
+// locator: izumi.distage.model.Locator = izumi.distage.LocatorDefaultImpl@7bf38126
 
 locator.get[A].b eq locator.get[B]
 // res10: Boolean = true
@@ -361,7 +361,7 @@ class C(val b: B) extends PrintResource(&quot;C&quot;)
 val bootstrapModule = new BootstrapModuleDef {
   many[PlanningHook].add(new AutoSetHook[PrintResource, PrintResource](identity))
 }
-// bootstrapModule: AnyRef with BootstrapModuleDef = Module(many[{type.scala.collection.immutable.Set[=PlanningHook]}].add[{type.izumi.distage.planning.AutoSetHook[=Session::App13::PrintResource,=Session::App13::PrintResource]}].from(call(izumi.distage.model.definition.dsl.ModuleDefDSL$SetDSLBase$$Lambda$18195/0x000000084448e840@7cb09910(): izumi.distage.planning.AutoSetHook[=Session::App13::PrintResource,=Session::App13::PrintResource])) ((advanced-features.md:162)), many[{type.scala.collection.immutable.Set[=PlanningHook]}] ((advanced-features.md:162)))
+// bootstrapModule: AnyRef with BootstrapModuleDef = Module(many[{type.scala.collection.immutable.Set[=PlanningHook]}] ((advanced-features.md:162)), many[{type.scala.collection.immutable.Set[=PlanningHook]}].add[{type.izumi.distage.planning.AutoSetHook[=Session::App13::PrintResource,=Session::App13::PrintResource]}].from(call(izumi.distage.model.definition.dsl.ModuleDefDSL$SetDSLBase$$Lambda$17334/0x0000000844118840@55472c07(): izumi.distage.planning.AutoSetHook[=Session::App13::PrintResource,=Session::App13::PrintResource])) ((advanced-features.md:162)))
 
 val appModule = new ModuleDef {
   make[C]
@@ -373,7 +373,7 @@ val appModule = new ModuleDef {
 val resources = Injector(bootstrapModule)
   .produceUnsafe(appModule, GCMode.NoGC)
   .get[Set[PrintResource]]
-// resources: Set[PrintResource] = ListSet(repl.Session$App13$A@661d3a20, repl.Session$App13$B@3d4a2ac3, repl.Session$App13$C@67a17a80)
+// resources: Set[PrintResource] = ListSet(repl.Session$App13$A@1cf320e3, repl.Session$App13$B@13bb027b, repl.Session$App13$C@760d550d)
 
 resources.foreach(_.start())
 // A started
@@ -421,7 +421,7 @@ val roots = Set[DIKey](DIKey.get[Set[Elem]])
 
 val locator = Injector().produceUnsafe(PlannerInput(module, roots))
 // Strong constructed
-// locator: Locator = izumi.distage.LocatorDefaultImpl@78fb1645
+// locator: Locator = izumi.distage.LocatorDefaultImpl@29625a22
 
 locator.get[Set[Elem]].size == 1
 // res17: Boolean = true
@@ -435,7 +435,7 @@ locator.get[Set[Elem]].size == 1
 val locator = Injector().produceUnsafe(PlannerInput(module, roots))
 // Weak constructed
 // Strong constructed
-// locator: Locator = izumi.distage.LocatorDefaultImpl@1c20bb8
+// locator: Locator = izumi.distage.LocatorDefaultImpl@19c8c7f1
 
 locator.get[Set[Elem]].size == 2
 // res19: Boolean = true
@@ -448,7 +448,7 @@ class Path {
   class A
 }
 val path = new Path
-// path: Path = repl.Session$App20$Path@68ef757a
+// path: Path = repl.Session$App20$Path@228563c6
 
 val module = new ModuleDef {
   make[path.A]
@@ -458,7 +458,7 @@ val module = new ModuleDef {
 Injector()
   .produceUnsafe(module, GCMode.NoGC)
   .get[path.A]
-// res21: path.A = repl.Session$App20$Path$A@5d37f752
+// res21: path.A = repl.Session$App20$Path$A@2db0d394
 </code></pre>
 <p>Since version <code>0.10</code>, path-dependent types with a type (non-value) prefix are no longer supported, see issue: <a href="https://github.com/7mind/izumi/issues/764">https://github.com/7mind/izumi/issues/764</a></p>
 <h3><a href="#depending-on-locator" name="depending-on-locator" class="anchor"><span class="anchor-link"></span></a>Depending on Locator</h3>
@@ -479,7 +479,7 @@ val module = new ModuleDef {
 // module: AnyRef with ModuleDef = Module(make[{type.repl.Session::repl.Session.App22::repl.Session.App22.C}].from(call(&lt;function1&gt;(): repl.Session::repl.Session.App22::repl.Session.App22.C)) ((advanced-features.md:319)), make[{type.repl.Session::repl.Session.App22::repl.Session.App22.B}].from(call(&lt;function1&gt;(): repl.Session::repl.Session.App22::repl.Session.App22.B)) ((advanced-features.md:318)), make[{type.repl.Session::repl.Session.App22::repl.Session.App22.A}].from(call(&lt;function1&gt;(izumi.distage.model.Locator::izumi.distage.model.Locator.LocatorRef): repl.Session::repl.Session.App22::repl.Session.App22.A)) ((advanced-features.md:317)))
 
 val locator = Injector().produceUnsafe(module, GCMode.NoGC)
-// locator: Locator = izumi.distage.LocatorDefaultImpl@25355cef
+// locator: Locator = izumi.distage.LocatorDefaultImpl@58542df3
 
 assert(locator.get[A].c eq locator.get[C])
 </code></pre>
@@ -501,13 +501,13 @@ val moduleDef: ModuleBase = plan.definition
 </code></pre>
 </div>
 <div>
-<a href="https://github.com/7mind/izumi/tree/v0.10.0-M3/doc/microsite/target/mdoc/distage/advanced-features.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/7mind/izumi/tree/v0.10.0-M4/doc/microsite/target/mdoc/distage/advanced-features.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>
 <div class="print-only">
 <span class="md-source-file md-version">
-0.10.0-M3
+0.10.0-M4
 </span>
 </div>
 </article>
