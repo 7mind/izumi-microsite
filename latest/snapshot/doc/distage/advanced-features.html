@@ -248,7 +248,7 @@ val module = new ModuleDef {
   make[B]
   make[C]
 }
-// module: AnyRef with ModuleDef = Module(make[{type.repl.Session::repl.Session.App0::repl.Session.App0.A}].from(call(&lt;function1&gt;(repl.Session::repl.Session.App0::repl.Session.App0.B): repl.Session::repl.Session.App0::repl.Session.App0.A)) ((advanced-features.md:26)), make[{type.repl.Session::repl.Session.App0::repl.Session.App0.B}].from(call(&lt;function1&gt;(): repl.Session::repl.Session.App0::repl.Session.App0.B)) ((advanced-features.md:27)), make[{type.repl.Session::repl.Session.App0::repl.Session.App0.C}].from(call(&lt;function1&gt;(): repl.Session::repl.Session.App0::repl.Session.App0.C)) ((advanced-features.md:28)))
+// module: AnyRef with ModuleDef = Module(make[{type.repl.Session::repl.Session.App0::repl.Session.App0.C}].from(call(&lt;function1&gt;(): repl.Session::repl.Session.App0::repl.Session.App0.C)) ((advanced-features.md:28)), make[{type.repl.Session::repl.Session.App0::repl.Session.App0.A}].from(call(&lt;function1&gt;(repl.Session::repl.Session.App0::repl.Session.App0.B): repl.Session::repl.Session.App0::repl.Session.App0.A)) ((advanced-features.md:26)), make[{type.repl.Session::repl.Session.App0::repl.Session.App0.B}].from(call(&lt;function1&gt;(): repl.Session::repl.Session.App0::repl.Session.App0.B)) ((advanced-features.md:27)))
 
 // declare `A` as a GC root
 
@@ -259,7 +259,7 @@ val roots = GCMode.GCRoots(Set[DIKey](DIKey.get[A]))
 // with `A` as a GC root
 
 val objects = Injector().produceUnsafe(module, roots)
-// objects: Locator = izumi.distage.LocatorDefaultImpl@4f66f058
+// objects: Locator = izumi.distage.LocatorDefaultImpl@73de643
 
 // A and B are in the object graph
 
@@ -287,7 +287,7 @@ val locator = Injector().produceUnsafe(new ModuleDef {
   make[B]
   make[C]
 }, GCMode.NoGC)
-// locator: izumi.distage.model.Locator = izumi.distage.LocatorDefaultImpl@54082748
+// locator: izumi.distage.model.Locator = izumi.distage.LocatorDefaultImpl@256820e0
 
 locator.get[A] eq locator.get[B].a
 // res5: Boolean = true
@@ -300,7 +300,7 @@ locator.get[C] eq locator.get[C].c
 <p>The above strategy depends on <code>distage-core-proxy-cglib</code> module which is a default dependency of <code>distage-core</code>.</p>
 <p>If you want to disable it, use <code>NoProxies</code> bootstrap configuration:</p>
 <pre class="prettyprint"><code class="language-scala">Injector.NoProxies()
-// res8: Injector = izumi.distage.InjectorDefaultImpl@1b0dfc7d
+// res8: Injector = izumi.distage.InjectorDefaultImpl@47523657
 </code></pre>
 <h4><a href="#manual-resolution-with-by-name-parameters" name="manual-resolution-with-by-name-parameters" class="anchor"><span class="anchor-link"></span></a>Manual Resolution with by-name parameters</h4>
 <p>Most cycles can be resolved manually when identified using By Name parameters.</p>
@@ -324,13 +324,13 @@ val module = new ModuleDef {
   make[B]
   make[C]
 }
-// module: AnyRef with ModuleDef = Module(make[{type.repl.Session::repl.Session.App9::repl.Session.App9.C}].from(call(&lt;function1&gt;(repl.Session::repl.Session.App9::repl.Session.App9.C): repl.Session::repl.Session.App9::repl.Session.App9.C)) ((advanced-features.md:114)), make[{type.repl.Session::repl.Session.App9::repl.Session.App9.B}].from(call(&lt;function1&gt;(repl.Session::repl.Session.App9::repl.Session.App9.A): repl.Session::repl.Session.App9::repl.Session.App9.B)) ((advanced-features.md:113)), make[{type.repl.Session::repl.Session.App9::repl.Session.App9.A}].from(call(&lt;function1&gt;(repl.Session::repl.Session.App9::repl.Session.App9.B): repl.Session::repl.Session.App9::repl.Session.App9.A)) ((advanced-features.md:112)))
+// module: AnyRef with ModuleDef = Module(make[{type.repl.Session::repl.Session.App9::repl.Session.App9.A}].from(call(&lt;function1&gt;(repl.Session::repl.Session.App9::repl.Session.App9.B): repl.Session::repl.Session.App9::repl.Session.App9.A)) ((advanced-features.md:112)), make[{type.repl.Session::repl.Session.App9::repl.Session.App9.C}].from(call(&lt;function1&gt;(repl.Session::repl.Session.App9::repl.Session.App9.C): repl.Session::repl.Session.App9::repl.Session.App9.C)) ((advanced-features.md:114)), make[{type.repl.Session::repl.Session.App9::repl.Session.App9.B}].from(call(&lt;function1&gt;(repl.Session::repl.Session.App9::repl.Session.App9.A): repl.Session::repl.Session.App9::repl.Session.App9.B)) ((advanced-features.md:113)))
 
 // disable proxies and execute the module
 
 val locator = Injector.NoProxies()
   .produceUnsafe(module, GCMode.NoGC)
-// locator: izumi.distage.model.Locator = izumi.distage.LocatorDefaultImpl@5bc0afbb
+// locator: izumi.distage.model.Locator = izumi.distage.LocatorDefaultImpl@29ca2528
 
 locator.get[A].b eq locator.get[B]
 // res10: Boolean = true
@@ -361,19 +361,19 @@ class C(val b: B) extends PrintResource(&quot;C&quot;)
 val bootstrapModule = new BootstrapModuleDef {
   many[PlanningHook].add(new AutoSetHook[PrintResource, PrintResource](identity))
 }
-// bootstrapModule: AnyRef with BootstrapModuleDef = Module(many[{type.scala.collection.immutable.Set[=PlanningHook]}] ((advanced-features.md:162)), many[{type.scala.collection.immutable.Set[=PlanningHook]}].add[{type.izumi.distage.planning.AutoSetHook[=Session::App13::PrintResource,=Session::App13::PrintResource]}].from(call(izumi.distage.model.providers.ProviderMagnet$$$Lambda$15580/0x0000000843a63840@3f21c8d7(): izumi.distage.planning.AutoSetHook[=Session::App13::PrintResource,=Session::App13::PrintResource])) ((advanced-features.md:162)))
+// bootstrapModule: AnyRef with BootstrapModuleDef = Module(many[{type.scala.collection.immutable.Set[=PlanningHook]}].add[{type.izumi.distage.planning.AutoSetHook[=Session::App13::PrintResource,=Session::App13::PrintResource]}].from(call(izumi.distage.model.providers.ProviderMagnet$$$Lambda$15539/0x0000000843a3a840@1b35d9ff(): izumi.distage.planning.AutoSetHook[=Session::App13::PrintResource,=Session::App13::PrintResource])) ((advanced-features.md:162)), many[{type.scala.collection.immutable.Set[=PlanningHook]}] ((advanced-features.md:162)))
 
 val appModule = new ModuleDef {
   make[C]
   make[B]
   make[A]
 }
-// appModule: AnyRef with ModuleDef = Module(make[{type.repl.Session::repl.Session.App13::repl.Session.App13.A}].from(call(&lt;function1&gt;(): repl.Session::repl.Session.App13::repl.Session.App13.A)) ((advanced-features.md:169)), make[{type.repl.Session::repl.Session.App13::repl.Session.App13.B}].from(call(&lt;function1&gt;(repl.Session::repl.Session.App13::repl.Session.App13.A): repl.Session::repl.Session.App13::repl.Session.App13.B)) ((advanced-features.md:168)), make[{type.repl.Session::repl.Session.App13::repl.Session.App13.C}].from(call(&lt;function1&gt;(repl.Session::repl.Session.App13::repl.Session.App13.B): repl.Session::repl.Session.App13::repl.Session.App13.C)) ((advanced-features.md:167)))
+// appModule: AnyRef with ModuleDef = Module(make[{type.repl.Session::repl.Session.App13::repl.Session.App13.B}].from(call(&lt;function1&gt;(repl.Session::repl.Session.App13::repl.Session.App13.A): repl.Session::repl.Session.App13::repl.Session.App13.B)) ((advanced-features.md:168)), make[{type.repl.Session::repl.Session.App13::repl.Session.App13.A}].from(call(&lt;function1&gt;(): repl.Session::repl.Session.App13::repl.Session.App13.A)) ((advanced-features.md:169)), make[{type.repl.Session::repl.Session.App13::repl.Session.App13.C}].from(call(&lt;function1&gt;(repl.Session::repl.Session.App13::repl.Session.App13.B): repl.Session::repl.Session.App13::repl.Session.App13.C)) ((advanced-features.md:167)))
 
 val resources = Injector(bootstrapModule)
   .produceUnsafe(appModule, GCMode.NoGC)
   .get[Set[PrintResource]]
-// resources: Set[PrintResource] = ListSet(repl.Session$App13$A@1d6c1ef, repl.Session$App13$B@4288750c, repl.Session$App13$C@41d56ef6)
+// resources: Set[PrintResource] = ListSet(repl.Session$App13$A@737b40d4, repl.Session$App13$B@593d1d66, repl.Session$App13$C@5761975f)
 
 resources.foreach(_.start())
 // A started
@@ -410,7 +410,7 @@ val module = new ModuleDef {
     .ref[Strong]
     .weak[Weak]
 }
-// module: AnyRef with ModuleDef = Module(make[{type.repl.Session::repl.Session.App16::repl.Session.App16.Strong}].from(call(&lt;function1&gt;(): repl.Session::repl.Session.App16::repl.Session.App16.Strong)) ((advanced-features.md:207)), many[{type.scala.collection.immutable.Set[=Session::App16::Elem]}] ((advanced-features.md:210)), many[{type.scala.collection.immutable.Set[=Session::App16::Elem]}].add[{type.repl.Session::repl.Session.App16::repl.Session.App16.Weak}].from(weak[{type.repl.Session::repl.Session.App16::repl.Session.App16.Weak}]) ((advanced-features.md:212)), many[{type.scala.collection.immutable.Set[=Session::App16::Elem]}].add[{type.repl.Session::repl.Session.App16::repl.Session.App16.Strong}].from(using[{type.repl.Session::repl.Session.App16::repl.Session.App16.Strong}]) ((advanced-features.md:211)), make[{type.repl.Session::repl.Session.App16::repl.Session.App16.Weak}].from(call(&lt;function1&gt;(): repl.Session::repl.Session.App16::repl.Session.App16.Weak)) ((advanced-features.md:208)))
+// module: AnyRef with ModuleDef = Module(make[{type.repl.Session::repl.Session.App16::repl.Session.App16.Strong}].from(call(&lt;function1&gt;(): repl.Session::repl.Session.App16::repl.Session.App16.Strong)) ((advanced-features.md:207)), make[{type.repl.Session::repl.Session.App16::repl.Session.App16.Weak}].from(call(&lt;function1&gt;(): repl.Session::repl.Session.App16::repl.Session.App16.Weak)) ((advanced-features.md:208)), many[{type.scala.collection.immutable.Set[=Session::App16::Elem]}].add[{type.repl.Session::repl.Session.App16::repl.Session.App16.Strong}].from(using[{type.repl.Session::repl.Session.App16::repl.Session.App16.Strong}]) ((advanced-features.md:211)), many[{type.scala.collection.immutable.Set[=Session::App16::Elem]}].add[{type.repl.Session::repl.Session.App16::repl.Session.App16.Weak}].from(weak[{type.repl.Session::repl.Session.App16::repl.Session.App16.Weak}]) ((advanced-features.md:212)), many[{type.scala.collection.immutable.Set[=Session::App16::Elem]}] ((advanced-features.md:210)))
 
 // Designate Set[Elem] as the garbage collection root,
 // everything that Set[Elem] does not strongly depend on will be garbage collected
@@ -421,7 +421,7 @@ val roots = Set[DIKey](DIKey.get[Set[Elem]])
 
 val locator = Injector().produceUnsafe(PlannerInput(module, roots))
 // Strong constructed
-// locator: Locator = izumi.distage.LocatorDefaultImpl@76101a70
+// locator: Locator = izumi.distage.LocatorDefaultImpl@3ff53850
 
 locator.get[Set[Elem]].size == 1
 // res17: Boolean = true
@@ -435,7 +435,7 @@ locator.get[Set[Elem]].size == 1
 val locator = Injector().produceUnsafe(PlannerInput(module, roots))
 // Weak constructed
 // Strong constructed
-// locator: Locator = izumi.distage.LocatorDefaultImpl@65a79eed
+// locator: Locator = izumi.distage.LocatorDefaultImpl@74655f3e
 
 locator.get[Set[Elem]].size == 2
 // res19: Boolean = true
@@ -448,7 +448,7 @@ class Path {
   class A
 }
 val path = new Path
-// path: Path = repl.Session$App20$Path@32128bc7
+// path: Path = repl.Session$App20$Path@3239026c
 
 val module = new ModuleDef {
   make[path.A]
@@ -458,7 +458,7 @@ val module = new ModuleDef {
 Injector()
   .produceUnsafe(module, GCMode.NoGC)
   .get[path.A]
-// res21: path.A = repl.Session$App20$Path$A@4287e78c
+// res21: path.A = repl.Session$App20$Path$A@32e02818
 </code></pre>
 <p>Since version <code>0.10</code>, path-dependent types with a type (non-value) prefix are no longer supported, see issue: <a href="https://github.com/7mind/izumi/issues/764">https://github.com/7mind/izumi/issues/764</a></p>
 <h3><a href="#depending-on-locator" name="depending-on-locator" class="anchor"><span class="anchor-link"></span></a>Depending on Locator</h3>
@@ -479,7 +479,7 @@ val module = new ModuleDef {
 // module: AnyRef with ModuleDef = Module(make[{type.repl.Session::repl.Session.App22::repl.Session.App22.C}].from(call(&lt;function1&gt;(): repl.Session::repl.Session.App22::repl.Session.App22.C)) ((advanced-features.md:319)), make[{type.repl.Session::repl.Session.App22::repl.Session.App22.B}].from(call(&lt;function1&gt;(): repl.Session::repl.Session.App22::repl.Session.App22.B)) ((advanced-features.md:318)), make[{type.repl.Session::repl.Session.App22::repl.Session.App22.A}].from(call(&lt;function1&gt;(izumi.distage.model.Locator::izumi.distage.model.Locator.LocatorRef): repl.Session::repl.Session.App22::repl.Session.App22.A)) ((advanced-features.md:317)))
 
 val locator = Injector().produceUnsafe(module, GCMode.NoGC)
-// locator: Locator = izumi.distage.LocatorDefaultImpl@3826bdfe
+// locator: Locator = izumi.distage.LocatorDefaultImpl@528e8ef8
 
 assert(locator.get[A].c eq locator.get[C])
 </code></pre>
@@ -488,8 +488,8 @@ assert(locator.get[A].c eq locator.get[C])
 
 val plan: OrderedPlan = locator.plan
 // plan: OrderedPlan = {type.Locator::LocatorRef} (advanced-features.md:317) := import {type.izumi.distage.model.Locator::izumi.distage.model.Locator.LocatorRef} // required for {type.Session::App22::A}
-// {type.Session::App22::C} (advanced-features.md:319) := call(&lt;function1&gt;(): Session::App22::C) {}
 // {type.Session::App22::B} (advanced-features.md:318) := call(&lt;function1&gt;(): Session::App22::B) {}
+// {type.Session::App22::C} (advanced-features.md:319) := call(&lt;function1&gt;(): Session::App22::C) {}
 // {type.Session::App22::A} (advanced-features.md:317) := call(&lt;function1&gt;(Locator::LocatorRef): Session::App22::A) {
 //   arg all: Locator::LocatorRef = lookup({type.Locator::LocatorRef})
 // }
@@ -497,7 +497,7 @@ val plan: OrderedPlan = locator.plan
 // Bindings from which the Plan was built
 
 val moduleDef: ModuleBase = plan.definition
-// moduleDef: ModuleBase = Module(make[{type.repl.Session::repl.Session.App22::repl.Session.App22.C}].from(call(&lt;function1&gt;(): repl.Session::repl.Session.App22::repl.Session.App22.C)) ((advanced-features.md:319)), make[{type.repl.Session::repl.Session.App22::repl.Session.App22.B}].from(call(&lt;function1&gt;(): repl.Session::repl.Session.App22::repl.Session.App22.B)) ((advanced-features.md:318)), make[{type.repl.Session::repl.Session.App22::repl.Session.App22.A}].from(call(&lt;function1&gt;(izumi.distage.model.Locator::izumi.distage.model.Locator.LocatorRef): repl.Session::repl.Session.App22::repl.Session.App22.A)) ((advanced-features.md:317)))
+// moduleDef: ModuleBase = Module(make[{type.repl.Session::repl.Session.App22::repl.Session.App22.B}].from(call(&lt;function1&gt;(): repl.Session::repl.Session.App22::repl.Session.App22.B)) ((advanced-features.md:318)), make[{type.repl.Session::repl.Session.App22::repl.Session.App22.C}].from(call(&lt;function1&gt;(): repl.Session::repl.Session.App22::repl.Session.App22.C)) ((advanced-features.md:319)), make[{type.repl.Session::repl.Session.App22::repl.Session.App22.A}].from(call(&lt;function1&gt;(izumi.distage.model.Locator::izumi.distage.model.Locator.LocatorRef): repl.Session::repl.Session.App22::repl.Session.App22.A)) ((advanced-features.md:317)))
 </code></pre>
 </div>
 <div>
