@@ -152,12 +152,7 @@ data-md-source="github">
     <li><a href="../distage/distage-testkit.html" class="page">distage-testkit</a></li>
     <li><a href="../distage/reference.html" class="page">Syntax Summary</a></li>
   </ul></li>
-  <li><a href="../logstage/index.html" class="active page">LogStage</a>
-  <ul>
-    <li><a href="../logstage/policy.html" class="page">Rendering policy</a></li>
-    <li><a href="../logstage/config.html" class="page">Logstage Config</a></li>
-    <li><a href="../logstage/custom_ctx.html" class="page">Custom Context</a></li>
-  </ul></li>
+  <li><a href="../logstage/index.html" class="active page">LogStage</a></li>
   <li><a href="../sbt/index.html" class="page">SBT Toolkit</a></li>
   <li><a href="../manifesto/index.html" class="page">Productivity and challenges</a></li>
   <li><a href="../pper/index.html" class="page">PPER Pattern</a></li>
@@ -230,21 +225,29 @@ data-md-source="github">
 import scala.util.Random
 
 val logger = IzLogger()
+// logger: IzLogger = izumi.logstage.api.IzLogger@269c1c21
 
 val justAnArg = &quot;example&quot;
+// justAnArg: String = &quot;example&quot;
 val justAList = List[Any](10, &quot;green&quot;, &quot;bottles&quot;)
+// justAList: List[Any] = List(10, &quot;green&quot;, &quot;bottles&quot;)
 
 logger.trace(s&quot;Argument: $justAnArg, another arg: $justAList&quot;)
 
 // custom name, not based on `val` name
+
 logger.info(s&quot;Named expression: ${Random.nextInt() -&gt; &quot;random number&quot;}&quot;)
 
 // print result without a name
+
 logger.warn(s&quot;Invisible argument: ${Random.nextInt() -&gt; &quot;random number&quot; -&gt; null}&quot;)
 
 // add following fields to all messages printed by a new logger value
+
 val ctxLogger = logger(&quot;userId&quot; -&gt; &quot;user@google.com&quot;, &quot;company&quot; -&gt; &quot;acme&quot;)
+// ctxLogger: IzLogger = izumi.logstage.api.IzLogger@3f46bfc8
 val delta = Random.nextInt(1000)
+// delta: Int = 572
 
 ctxLogger.info(s&quot;Processing time: $delta&quot;)
 </code></pre>
@@ -322,12 +325,20 @@ libraryDependencies ++= Seq(
 import logstage.circe._
 
 val jsonSink = ConsoleSink.json(prettyPrint = true)
+// jsonSink: ConsoleSink = izumi.logstage.sink.ConsoleSink@227b398c
 val textSink = ConsoleSink.text(colored = true)
+// textSink: ConsoleSink = izumi.logstage.sink.ConsoleSink@5c297cc9
 
 val sinks = List(jsonSink, textSink)
+// sinks: List[ConsoleSink] = List(
+//   izumi.logstage.sink.ConsoleSink@227b398c,
+//   izumi.logstage.sink.ConsoleSink@5c297cc9
+// )
 
 val logger: IzLogger = IzLogger(Trace, sinks)
+// logger: IzLogger = izumi.logstage.api.IzLogger@72267c75
 val contextLogger: IzLogger = logger(Map(&quot;key&quot; -&gt; &quot;value&quot;))
+// contextLogger: IzLogger = izumi.logstage.api.IzLogger@6d1994e4
 
 logger.info(&quot;Hey&quot;)
 
@@ -339,10 +350,10 @@ contextLogger.info(s&quot;Hey&quot;)
 import cats.effect.IO
 
 val logger = IzLogger()
-// logger: IzLogger = izumi.logstage.api.IzLogger@5dc710d3
+// logger: IzLogger = izumi.logstage.api.IzLogger@1a327329
 
 val log = LogIO.fromLogger[IO](logger)
-// log: LogIO[IO] = logstage.LogIO$$anon$1@260bbda5
+// log: LogIO[IO] = logstage.LogIO$$anon$1@41ca714
 
 log.info(s&quot;Hey! I&#39;m logging with ${log}stage!&quot;).unsafeRunSync()
 </code></pre>
@@ -350,21 +361,25 @@ log.info(s&quot;Hey! I&#39;m logging with ${log}stage!&quot;).unsafeRunSync()
 </code></pre>
 <p><code>LogstageZIO.withFiberId</code> provides a <code>LogBIO</code> instance that logs the current ZIO <code>FiberId</code> in addition to the thread id:</p>
 <p>Example: </p>
-<pre class="prettyprint"><code class="language-scala">import logstage.LogstageZIO
+<pre class="prettyprint"><code class="language-scala">import logstage.{IzLogger, LogstageZIO}
 import zio.{IO, DefaultRuntime}
 
-val log: LogBIO[IO] = LogstageZIO.withFiberId(logger)
-// log: LogBIO[IO] = logstage.LogstageZIO$$anon$1@3efe8b98
+val log = LogstageZIO.withFiberId(IzLogger())
+// log: logstage.package.LogBIO[IO] = logstage.LogstageZIO$$anon$1@39bceda5
 
 val rts = new DefaultRuntime {}
-// rts: AnyRef with DefaultRuntime = repl.Session$App9$$anon$1@27191c66
+// rts: AnyRef with DefaultRuntime = repl.Session$App10$$anon$1@5d0d6a88
 rts.unsafeRun {
   log.info(s&quot;Hey! I&#39;m logging with ${log}stage!&quot;)
 }
 </code></pre>
 <pre><code>I 2019-03-29T23:21:48.760Z[Europe/Dublin] r.S.App9.res10 ...main-12:5384  (00_logstage.md:123) {fiberId=0} Hey! I&#39;m logging with log=logstage.LogstageZIO$$anon$1@c39104astage!
 </code></pre>
-<p><code>LogIO</code>/<code>LogBIO</code> algebras can be extended with custom context, same as <code>IzLogger</code>:</p>
+<p><code>LogIO</code>/<code>LogBIO</code> algebras can be extended with custom context using their <code>.apply</code> method, same as <code>IzLogger</code>:</p>
+<pre class="prettyprint"><code class="language-scala">import com.example.Entity
+
+def load(entity: Entity): cats.effect.IO[Unit] = cats.effect.IO.unit
+</code></pre>
 <pre class="prettyprint"><code class="language-scala">import cats.effect.IO
 import cats.implicits._
 import logstage._
@@ -372,7 +387,7 @@ import io.circe.Printer
 import io.circe.syntax._
 
 def importEntity(entity: Entity)(implicit log: LogIO[IO]): IO[Unit] = {
-  val ctxLog = log(&quot;ID&quot; -&gt; someEntity.id, &quot;entityAsJSON&quot; -&gt; entity.asJson.pretty(Printer.spaces2))
+  val ctxLog = log(&quot;ID&quot; -&gt; entity.id, &quot;entityAsJSON&quot; -&gt; entity.asJson.printWith(Printer.spaces2))
 
   load(entity).handleErrorWith {
     case error =&gt;
@@ -388,11 +403,13 @@ def importEntity(entity: Entity)(implicit log: LogIO[IO]): IO[Unit] = {
 import izumi.logstage.api.routing.StaticLogRouter
 
 val myLogger = IzLogger()
-// myLogger: IzLogger = izumi.logstage.api.IzLogger@599f7cb2
+// myLogger: IzLogger = izumi.logstage.api.IzLogger@54afe13b
 
 // configure SLF4j to use the same router that `myLogger` uses
 StaticLogRouter.instance.setup(myLogger.router)
 </code></pre>
+<p>@@@ index</p>
+<p>@@@</p>
 </div>
 <div>
 <a href="https://github.com/7mind/izumi/tree/master/doc/microsite/target/mdoc/logstage/00_logstage.md" title="Edit this page" class="md-source-file md-edit">
@@ -424,13 +441,13 @@ Syntax Summary
 </span>
 </div>
 </a>
-<a href="../logstage/policy.html" title="Rendering policy" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+<a href="../sbt/index.html" title="SBT Toolkit" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
 <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
 <span class="md-flex__ellipsis">
 <span class="md-footer-nav__direction">
 Next
 </span>
-Rendering policy
+SBT Toolkit
 </span>
 </div>
 <div class="md-flex__cell md-flex__cell--shrink">
