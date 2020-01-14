@@ -254,7 +254,7 @@ val roots = GCMode.GCRoots(Set[DIKey](DIKey.get[A]))
 // with `A` as a GC root
 
 val objects = Injector().produceUnsafe(module, roots)
-// objects: Locator = izumi.distage.LocatorDefaultImpl@701757cc
+// objects: Locator = izumi.distage.LocatorDefaultImpl@655672e3
 
 // A and B are in the object graph
 
@@ -282,7 +282,7 @@ val locator = Injector().produceUnsafe(new ModuleDef {
   make[B]
   make[C]
 }, GCMode.NoGC)
-// locator: izumi.distage.model.Locator = izumi.distage.LocatorDefaultImpl@5b65b8e9
+// locator: izumi.distage.model.Locator = izumi.distage.LocatorDefaultImpl@497bc197
 
 locator.get[A] eq locator.get[B].a
 // res5: Boolean = true
@@ -295,7 +295,7 @@ locator.get[C] eq locator.get[C].c
 <p>The above strategy depends on <code>distage-core-proxy-cglib</code> module which is a default dependency of <code>distage-core</code>.</p>
 <p>If you want to disable it, use <code>NoProxies</code> bootstrap configuration:</p>
 <pre class="prettyprint"><code class="language-scala">Injector.NoProxies()
-// res8: Injector = izumi.distage.InjectorDefaultImpl@5b538b85
+// res8: Injector = izumi.distage.InjectorDefaultImpl@1630d1cd
 </code></pre>
 <h4><a href="#manual-resolution-with-by-name-parameters" name="manual-resolution-with-by-name-parameters" class="anchor"><span class="anchor-link"></span></a>Manual Resolution with by-name parameters</h4>
 <p>Most cycles can be resolved manually when identified using By Name parameters.</p>
@@ -325,7 +325,7 @@ val module = new ModuleDef {
 
 val locator = Injector.NoProxies()
   .produceUnsafe(module, GCMode.NoGC)
-// locator: izumi.distage.model.Locator = izumi.distage.LocatorDefaultImpl@11722d5e
+// locator: izumi.distage.model.Locator = izumi.distage.LocatorDefaultImpl@506402d3
 
 locator.get[A].b eq locator.get[B]
 // res10: Boolean = true
@@ -356,7 +356,7 @@ class C(val b: B) extends PrintResource(&quot;C&quot;)
 val bootstrapModule = new BootstrapModuleDef {
   many[PlanningHook].add(new AutoSetHook[PrintResource, PrintResource](identity))
 }
-// bootstrapModule: AnyRef with BootstrapModuleDef = Module(many[{type.scala.collection.immutable.Set[=PlanningHook]}].add[{type.izumi.distage.planning.AutoSetHook[=Session::App13::PrintResource,=Session::App13::PrintResource]}].from(call(izumi.distage.model.providers.ProviderMagnet$$$Lambda$15588/0x0000000843a6c040@6efb1eba(): izumi.distage.planning.AutoSetHook[=Session::App13::PrintResource,=Session::App13::PrintResource])) ((advanced-features.md:162)), many[{type.scala.collection.immutable.Set[=PlanningHook]}] ((advanced-features.md:162)))
+// bootstrapModule: AnyRef with BootstrapModuleDef = Module(many[{type.scala.collection.immutable.Set[=PlanningHook]}].add[{type.izumi.distage.planning.AutoSetHook[=Session::App13::PrintResource,=Session::App13::PrintResource]}].from(call(izumi.distage.model.providers.ProviderMagnet$$$Lambda$15730/0x0000000843acf040@577160d1(): izumi.distage.planning.AutoSetHook[=Session::App13::PrintResource,=Session::App13::PrintResource])) ((advanced-features.md:162)), many[{type.scala.collection.immutable.Set[=PlanningHook]}] ((advanced-features.md:162)))
 
 val appModule = new ModuleDef {
   make[C]
@@ -368,7 +368,7 @@ val appModule = new ModuleDef {
 val resources = Injector(bootstrapModule)
   .produceUnsafe(appModule, GCMode.NoGC)
   .get[Set[PrintResource]]
-// resources: Set[PrintResource] = ListSet(repl.Session$App13$A@7e167c79, repl.Session$App13$B@629de91c, repl.Session$App13$C@382ebd08)
+// resources: Set[PrintResource] = ListSet(repl.Session$App13$A@4e2f2e64, repl.Session$App13$B@6f455aee, repl.Session$App13$C@294e2cc7)
 
 resources.foreach(_.start())
 // A started
@@ -416,7 +416,7 @@ val roots = Set[DIKey](DIKey.get[Set[Elem]])
 
 val locator = Injector().produceUnsafe(PlannerInput(module, roots))
 // Strong constructed
-// locator: Locator = izumi.distage.LocatorDefaultImpl@7913eab8
+// locator: Locator = izumi.distage.LocatorDefaultImpl@6a30bc62
 
 locator.get[Set[Elem]].size == 1
 // res17: Boolean = true
@@ -430,7 +430,7 @@ locator.get[Set[Elem]].size == 1
 val locator = Injector().produceUnsafe(PlannerInput(module, roots))
 // Weak constructed
 // Strong constructed
-// locator: Locator = izumi.distage.LocatorDefaultImpl@4f404bf0
+// locator: Locator = izumi.distage.LocatorDefaultImpl@493aa224
 
 locator.get[Set[Elem]].size == 2
 // res19: Boolean = true
@@ -443,7 +443,7 @@ class Path {
   class A
 }
 val path = new Path
-// path: Path = repl.Session$App20$Path@76de61ef
+// path: Path = repl.Session$App20$Path@7e56284
 
 val module = new ModuleDef {
   make[path.A]
@@ -453,7 +453,7 @@ val module = new ModuleDef {
 Injector()
   .produceUnsafe(module, GCMode.NoGC)
   .get[path.A]
-// res21: path.A = repl.Session$App20$Path$A@2ff84ab0
+// res21: path.A = repl.Session$App20$Path$A@422f10c0
 </code></pre>
 <p>Since version <code>0.10</code>, path-dependent types with a type (non-value) prefix are no longer supported, see issue: <a href="https://github.com/7mind/izumi/issues/764">https://github.com/7mind/izumi/issues/764</a></p>
 <h3><a href="#depending-on-locator" name="depending-on-locator" class="anchor"><span class="anchor-link"></span></a>Depending on Locator</h3>
@@ -474,7 +474,7 @@ val module = new ModuleDef {
 // module: AnyRef with ModuleDef = Module(make[{type.repl.Session::repl.Session.App22::repl.Session.App22.C}].from(call(&lt;function1&gt;(): repl.Session::repl.Session.App22::repl.Session.App22.C)) ((advanced-features.md:319)), make[{type.repl.Session::repl.Session.App22::repl.Session.App22.B}].from(call(&lt;function1&gt;(): repl.Session::repl.Session.App22::repl.Session.App22.B)) ((advanced-features.md:318)), make[{type.repl.Session::repl.Session.App22::repl.Session.App22.A}].from(call(&lt;function1&gt;(izumi.distage.model.Locator::izumi.distage.model.Locator.LocatorRef): repl.Session::repl.Session.App22::repl.Session.App22.A)) ((advanced-features.md:317)))
 
 val locator = Injector().produceUnsafe(module, GCMode.NoGC)
-// locator: Locator = izumi.distage.LocatorDefaultImpl@4f89292b
+// locator: Locator = izumi.distage.LocatorDefaultImpl@628d637d
 
 assert(locator.get[A].c eq locator.get[C])
 </code></pre>
