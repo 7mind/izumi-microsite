@@ -227,8 +227,8 @@
                         <a href="StandardAxis$.html" title="">StandardAxis</a>
                       </li><li class="current-entities indented4">
                         <span class="separator"></span>
-                        <a class="class" href="With.html" title=""></a>
-                        <a href="With.html" title="">With</a>
+                        <a class="class" href="With.html" title="This annotation lets you choose a more specific implementation for a result of factory method other than its return type."></a>
+                        <a href="With.html" title="This annotation lets you choose a more specific implementation for a result of factory method other than its return type.">With</a>
                       </li><li name="izumi.distage.model.effect" visbl="pub" class="indented4 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="effect"></a><a id="effect:effect"></a>
       <span class="permalink">
@@ -760,7 +760,7 @@ Injector().produce(module).run {
       </span>
       
       
-    </li><li name="izumi.distage.model.definition.With" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="izumi.distage.model.definition.With" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="With[T]extendsAnnotationwithDIStageAnnotation"></a><a id="With[T]:With[T]"></a>
       <span class="permalink">
       <a href="../../../../izumi/distage/model/definition/With.html" title="Permalink">
@@ -772,10 +772,36 @@ Injector().produce(module).run {
         <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <a title="" href="With.html"><span class="name">With</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends <span class="extype" name="scala.annotation.Annotation">Annotation</span> with <a href="DIStageAnnotation.html" class="extype" name="izumi.distage.model.definition.DIStageAnnotation">DIStageAnnotation</a></span>
+        <a title="This annotation lets you choose a more specific implementation for a result of factory method other than its return type." href="With.html"><span class="name">With</span></a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends <span class="extype" name="scala.annotation.Annotation">Annotation</span> with <a href="DIStageAnnotation.html" class="extype" name="izumi.distage.model.definition.DIStageAnnotation">DIStageAnnotation</a></span>
       </span>
       
-      
+      <p class="shortcomment cmt">This annotation lets you choose a more specific implementation
+for a result of factory method other than its return type.</p><div class="fullcomment"><div class="comment cmt"><p>This annotation lets you choose a more specific implementation
+for a result of factory method other than its return type.</p><p>Example:</p><pre><span class="kw">trait</span> Actor {
+  <span class="kw">def</span> id: UUID
+}
+
+<span class="kw">trait</span> ActorFactory {
+  @With[ActorImpl]
+  <span class="kw">def</span> newActor(id: UUID): Actor
+}
+
+<span class="kw">class</span> ActorImpl(<span class="kw">val</span> id: UUID, someDependency: SomeDependency) <span class="kw">extends</span> Actor
+<span class="kw">class</span> SomeDependency
+
+<span class="kw">val</span> module = <span class="kw">new</span> ModuleDef {
+  make[ActorFactory]
+  <span class="cmt">// generated factory implementation:</span>
+  <span class="cmt">//</span>
+  <span class="cmt">// make[ActorFactory].from {</span>
+  <span class="cmt">//  (someDependency: SomeDependency) =&gt;</span>
+  <span class="cmt">//    new ActorFactory {</span>
+  <span class="cmt">//      override def newActor(id: UUID): Actor = {</span>
+  <span class="cmt">//        new ActorImpl(id, someDependency)</span>
+  <span class="cmt">//      }</span>
+  <span class="cmt">//    }</span>
+  <span class="cmt">// }</span>
+}</pre></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p>Documentation for <a href="https://izumi.7mind.io/latest/release/doc/distage/basics.html#auto-factories" target="_blank">Auto-Factories</a></p></span></dd></dl></div>
     </li></ol>
             </div>
 
