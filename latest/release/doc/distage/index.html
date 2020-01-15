@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="x-ua-compatible" content="ie=edge">
 <meta name="description" content="microsite">
-<meta name="generator" content="Paradox, paradox-material-theme=0.10.0-M12, mkdocs-material=3.0.3">
+<meta name="generator" content="Paradox, paradox-material-theme=0.10.0-M13-ZIORC16, mkdocs-material=3.0.3">
 
 <meta name="lang:clipboard.copy" content="Copy to clipboard">
 <meta name="lang:clipboard.copied" content="Copied to clipboard">
@@ -20,7 +20,7 @@
 
 <meta name="description" content="microsite">
 <link rel="shortcut icon" href="../assets/images/favicon.png">
-<title>distage: Staged Dependency Injection ? Izumi Project</title>
+<title>distage: Staged Dependency Injection · Izumi Project</title>
 <link rel="stylesheet" href="../assets/stylesheets/application.451f80e5.css">
 <link rel="stylesheet" href="../lib/material__tabs/dist/mdc.tabs.min.css">
 <link rel="stylesheet" href="../lib/prettify/prettify.css">
@@ -152,12 +152,7 @@ data-md-source="github">
     <li><a href="../distage/distage-testkit.html" class="page">distage-testkit</a></li>
     <li><a href="../distage/reference.html" class="page">Syntax Summary</a></li>
   </ul></li>
-  <li><a href="../logstage/index.html" class="page">LogStage</a>
-  <ul>
-    <li><a href="../logstage/policy.html" class="page">Rendering policy</a></li>
-    <li><a href="../logstage/config.html" class="page">Logstage Config</a></li>
-    <li><a href="../logstage/custom_ctx.html" class="page">Custom Context</a></li>
-  </ul></li>
+  <li><a href="../logstage/index.html" class="page">LogStage</a></li>
   <li><a href="../sbt/index.html" class="page">SBT Toolkit</a></li>
   <li><a href="../manifesto/index.html" class="page">Productivity and challenges</a></li>
   <li><a href="../pper/index.html" class="page">PPER Pattern</a></li>
@@ -167,7 +162,7 @@ data-md-source="github">
 <ul>
   <li><a href="../distage/index.html#distage-staged-dependency-injection" class="header">distage: Staged Dependency Injection</a>
   <ul>
-    <li><a href="../distage/index.html#why-use-distage-" class="header">Why use distage?</a></li>
+    <li><a href="../distage/index.html#why-distage-" class="header">Why distage?</a></li>
     <li><a href="../distage/index.html#faq" class="header">FAQ</a></li>
     <li><a href="../distage/index.html#further-reading" class="header">Further reading</a></li>
   </ul></li>
@@ -178,7 +173,7 @@ data-md-source="github">
 <ul style="display: none">
 <li class="md-nav__item md-version" id="project.version">
 <label class="md-nav__link" for="__version">
-<i class="md-icon" title="Version">label_outline</i> 0.10.0-M12
+<i class="md-icon" title="Version">label_outline</i> 0.10.0-M13-ZIORC16
 </label>
 </li>
 </ul>
@@ -193,7 +188,7 @@ data-md-source="github">
 <ul>
   <li><a href="../distage/index.html#distage-staged-dependency-injection" class="header">distage: Staged Dependency Injection</a>
   <ul>
-    <li><a href="../distage/index.html#why-use-distage-" class="header">Why use distage?</a></li>
+    <li><a href="../distage/index.html#why-distage-" class="header">Why distage?</a></li>
     <li><a href="../distage/index.html#faq" class="header">FAQ</a></li>
     <li><a href="../distage/index.html#further-reading" class="header">Further reading</a></li>
   </ul></li>
@@ -207,36 +202,39 @@ data-md-source="github">
 <article class="md-content__inner md-typeset">
 <div class="md-content__searchable">
 <h1><a href="#distage-staged-dependency-injection" name="distage-staged-dependency-injection" class="anchor"><span class="anchor-link"></span></a>distage: Staged Dependency Injection</h1>
-<p><code>distage</code> is a pragmatic module system for functional Scala, it aims to combine simplicity and expressivity of pure FP with the flexibility and extreme late-binding that&rsquo;s traditionally associated with object-oriented dependency injection frameworks, such as Guice.</p>
-<p><code>distage</code> is suitable for structuring applications in <a href="basics.html#tagless-final-style">Tagless Final Style</a>, with <a href="basics.html#auto-traits">ZIO Environment</a>, or in imperative Scala style.</p>
-<h2><a href="#why-use-distage-" name="why-use-distage-" class="anchor"><span class="anchor-link"></span></a>Why use distage?</h2>
+<p><code>distage</code> is a pragmatic module system for functional Scala, it aims to combine simplicity and expressiveness of pure FP with the flexibility and extreme late-binding, traditionally associated with object-oriented dependency injection frameworks, such as Guice.</p>
+<p><code>distage</code> is suitable for wiring applications in <a href="basics.html#tagless-final-style">Tagless Final Style</a>, in <a href="basics.html#auto-traits">ZIO Environment</a> style, or in imperative Scala style.</p>
+<h2><a href="#why-distage-" name="why-distage-" class="anchor"><span class="anchor-link"></span></a>Why distage?</h2>
 <ol>
   <li><strong>Faster applications and tests</strong>: <code>distage</code> guarantees that no unnecessary instantiations will happen during your tests or application startup.</li>
   <li><strong>Quick failure detection</strong>: <code>distage</code> performs all the integration checks for your application and tests even before any instantiations happened.</li>
   <li><strong>Simple tests</strong>: <code>distage</code> eliminates all the hard work of setting up your test environments, especially configurable ones.</li>
-  <li><strong>Better integration tests</strong>: <code>distage</code> provides you great memoization support for your tests so you may reuse expensive resources (like database connections) across multiple integration tests, gaining performance and without sacrificing correctness.</li>
-  <li><strong>Simple development workflow</strong>: <a href="distage-framework.html">distage-framework</a> module allows you to develop Role-Based Applications &ndash; a fusion of Microservices and Monoliths.  You may run all your services in one process for development purposes (and even switch to mock implementations with a single commandline argument).</li>
+  <li><strong>Better integration tests</strong>: <a href="distage-testkit.html">distage-testkit</a> allows you to reuse expensive resources (like database connections and docker containers) across multiple integration tests, gaining performance and without sacrificing correctness.</li>
+  <li><strong>Simple development workflow</strong>: <a href="distage-framework.html">distage-framework</a> allows you to develop Role-Based Applications, a fusion of Microservices and Monoliths,  letting you run all your services in one process for development purposes (and even switch to mock implementations with a single commandline argument).</li>
   <li><strong>Fast compile times and low mental overhead</strong>: Unlike fully compile-time DIs, <code>distage</code> does not impose a compile time penalty. <code>distage</code> extensions are simple to write and do not require type-level programming.</li>
   <li><strong>Simple debugging</strong>: <code>distage</code> provides you important insights about your application and allows you to introspect and modify it on the fly, before any instantiations happen.</li>
   <li><strong>High Correctness</strong>: <code>distage</code> supports resources and lifecycle natively and guarantees proper cleanups even when something went wrong.</li>
-  <li><strong>No reflection</strong>: <code>distage</code> generates all constructors and <a href="https://blog.7mind.io/lightweight-reflection.html">type info</a> at compile-time and does not use Scala reflection. As such, it&rsquo;s compatible with Graal Native Image and (soon) Scala.js.</li>
-  <li><strong>Non-invasive</strong>: <code>distage</code> is designed to not impact the way your Scala code is written. It just removes all the initialization boilerplate. You don&rsquo;t need to learn magic tricks to write components in a distage application.</li>
+  <li><strong>No reflection</strong>: <code>distage</code> generates constructors and <a href="https://blog.7mind.io/lightweight-reflection.html">type information</a> at compile-time and does not use Scala reflection. As such, it&rsquo;s compatible with Graal Native Image and Scala.js.</li>
+  <li><strong>Non-invasive</strong>: <code>distage</code> is designed to not impact the way your Scala code is written, it just removes all the initialization boilerplate. You don&rsquo;t need to learn magic tricks to write components in a distage application.</li>
 </ol>
 <p><code>distage</code> is recommended by industry leaders:</p>
 <blockquote>
   <p>Given its native support for type classes and higher-kinded types &ndash; both features indispensable to functional programming &ndash; distage is one of the leading dependency injection libraries out there. Bonus points for being built by a wicked-smart team that contributes to ZIO! </p>
-  <p>-? <em>John A. De Goes</em></p>
+  <p>-– <em>John A. De Goes</em></p>
 </blockquote>
 <h2><a href="#faq" name="faq" class="anchor"><span class="anchor-link"></span></a>FAQ</h2>
 <p><strong>Q</strong>: How to pronounce <code>distage</code>?</p>
 <p><strong>A</strong>: &lsquo;Dee-stage&rsquo;</p>
 <p><strong>Q</strong>: Isn&rsquo;t it unsafe to use runtime dependency injection?</p>
-<p><strong>A</strong>: <code>distage</code> is split into two stages, first a wiring <code>plan</code> is calculated, only afterwards it is executed. This <code>Plan</code> value can be <a href="debugging.html#testing-plans">tested</a> for errors in an ordinary test suite ? if it is well-formed, the wiring will succeed at runtime. This test can also be performed at compile-time ? <code>distage-framework</code> module contains <a href="distage-framework.html#compile-time-checks">macros</a> for aborting compilation in case of erroneous wiring.</p>
+<p><strong>A</strong>: <code>distage</code> is split into two stages, first a wiring <code>plan</code> is calculated, only afterwards it is executed. Because of this, you can <a href="debugging.html#testing-plans">test</a> the <code>Plan</code> for errors very fast, without executing any effects of your wiring – if tests pass, the wiring will succeed at runtime. Testing can also be performed at compile-time – <code>distage-framework</code> module a few experimental <a href="distage-framework.html#compile-time-checks">macros</a> for aborting compilation on planning errors.</p>
+<p><strong>Q</strong>: How do I switch between production and test implementations of components?</p>
+<p><strong>A</strong>: Use <a href="basics.html#activation-axis">Activation Axis</a></p>
 <h2><a href="#further-reading" name="further-reading" class="anchor"><span class="anchor-link"></span></a>Further reading</h2>
 <ul>
-  <li><a href="https://github.com/7mind/distage-livecode">Example Project</a></li>
+  <li><a href="https://github.com/7mind/distage-example">Example Project</a></li>
   <li><a href="https://www.slideshare.net/7mind/scalaua-distage-staged-dependency-injection">ScalaUA Presentation</a></li>
-  <li><a href="basics.html">Basics</a></li>
+  <li>
+  <p><a href="basics.html">Basics</a></p></li>
   <li><a href="advanced-features.html">Advanced features</a></li>
   <li><a href="debugging.html">Debugging</a></li>
   <li><a href="distage-framework.html">distage-framework</a></li>
@@ -246,13 +244,13 @@ data-md-source="github">
 </ul>
 </div>
 <div>
-<a href="https://github.com/7mind/izumi/tree/v0.10.0-M12/doc/microsite/target/mdoc/distage/00_distage.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/7mind/izumi/tree/v0.10.0-M13-ZIORC16/doc/microsite/target/mdoc/distage/00_distage.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>
 <div class="print-only">
 <span class="md-source-file md-version">
-0.10.0-M12
+0.10.0-M13-ZIORC16
 </span>
 </div>
 </article>

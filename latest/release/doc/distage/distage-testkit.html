@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="x-ua-compatible" content="ie=edge">
 <meta name="description" content="microsite">
-<meta name="generator" content="Paradox, paradox-material-theme=0.10.0-M12, mkdocs-material=3.0.3">
+<meta name="generator" content="Paradox, paradox-material-theme=0.10.0-M13-ZIORC16, mkdocs-material=3.0.3">
 
 <meta name="lang:clipboard.copy" content="Copy to clipboard">
 <meta name="lang:clipboard.copied" content="Copied to clipboard">
@@ -20,7 +20,7 @@
 
 <meta name="description" content="microsite">
 <link rel="shortcut icon" href="../assets/images/favicon.png">
-<title>distage-testkit ? Izumi Project</title>
+<title>distage-testkit · Izumi Project</title>
 <link rel="stylesheet" href="../assets/stylesheets/application.451f80e5.css">
 <link rel="stylesheet" href="../lib/material__tabs/dist/mdc.tabs.min.css">
 <link rel="stylesheet" href="../lib/prettify/prettify.css">
@@ -152,12 +152,7 @@ data-md-source="github">
     <li><a href="../distage/distage-testkit.html" class="active page">distage-testkit</a></li>
     <li><a href="../distage/reference.html" class="page">Syntax Summary</a></li>
   </ul></li>
-  <li><a href="../logstage/index.html" class="page">LogStage</a>
-  <ul>
-    <li><a href="../logstage/policy.html" class="page">Rendering policy</a></li>
-    <li><a href="../logstage/config.html" class="page">Logstage Config</a></li>
-    <li><a href="../logstage/custom_ctx.html" class="page">Custom Context</a></li>
-  </ul></li>
+  <li><a href="../logstage/index.html" class="page">LogStage</a></li>
   <li><a href="../sbt/index.html" class="page">SBT Toolkit</a></li>
   <li><a href="../manifesto/index.html" class="page">Productivity and challenges</a></li>
   <li><a href="../pper/index.html" class="page">PPER Pattern</a></li>
@@ -177,7 +172,7 @@ data-md-source="github">
 <ul style="display: none">
 <li class="md-nav__item md-version" id="project.version">
 <label class="md-nav__link" for="__version">
-<i class="md-icon" title="Version">label_outline</i> 0.10.0-M12
+<i class="md-icon" title="Version">label_outline</i> 0.10.0-M13-ZIORC16
 </label>
 </li>
 </ul>
@@ -212,48 +207,66 @@ data-md-source="github">
 </ul>
 </div>
 <h3><a href="#testkit" name="testkit" class="anchor"><span class="anchor-link"></span></a>Testkit</h3>
-<p><a href="https://github.com/7mind/distage-livecode">distage Livecode project</a> project shows how to use <code>distage-testkit</code>:</p>
-<pre class="prettyprint"><code class="language-scala">package livecode
+<p><a href="https://github.com/7mind/distage-example">distage Example Project</a> project shows how to use <code>distage-testkit</code>, there&rsquo;s also an overview in the <a href="https://www.youtube.com/watch?v=CzpvjkUukAs">Hyper-pragmatic Pure FP Testing with distage-testkit</a> talk. </p>
+<p>Further documentation still TBD: <a href="https://github.com/7mind/izumi/issues/820">Issue #820</a></p>
+<p>Some example code from <a href="https://github.com/7mind/distage-example">distage-example</a>:</p>
+<pre class="prettyprint"><code class="language-scala">package leaderboard
 
-import distage.{DIKey, ModuleDef}
-import doobie.util.transactor.Transactor
-import izumi.distage.model.definition.StandardAxis
-import izumi.distage.docker.examples.PostgresDocker
-import izumi.distage.testkit.services.DISyntaxZIOEnv
+import com.typesafe.config.ConfigFactory
+import distage.{DIKey, Injector, ModuleDef}
+import izumi.distage.config.AppConfigModule
+import izumi.distage.framework.model.PluginSource
+import izumi.distage.model.definition.Activation
+import izumi.distage.model.definition.StandardAxis.Repo
+import izumi.distage.model.plan.GCMode
+import izumi.distage.plugins.PluginConfig
 import izumi.distage.testkit.TestConfig
 import izumi.distage.testkit.scalatest.DistageBIOSpecScalatest
-import livecode.code._
-import livecode.zioenv._
+import izumi.distage.testkit.services.DISyntaxZIOEnv
+import izumi.logstage.api.logger.LogRouter
+import leaderboard.model.{QueryFailure, Score, UserId, UserProfile}
+import leaderboard.plugins.{LeaderboardPlugin, ZIOPlugin}
+import leaderboard.repo.{Ladder, Profiles}
+import leaderboard.zioenv._
+import logstage.di.LogstageModule
 import zio.{IO, Task, ZIO}
 
-abstract class LivecodeTest extends DistageBIOSpecScalatest[IO] with DISyntaxZIOEnv {
+abstract class LeaderboardTest extends DistageBIOSpecScalatest[IO] with DISyntaxZIOEnv {
   override def config = TestConfig(
-    pluginPackages = Some(Seq(&quot;livecode.plugins&quot;)),
-    activation     = StandardAxis.testProdActivation,
+    pluginSource = PluginSource(PluginConfig.cached(packagesEnabled = Seq(&quot;leaderboard.plugins&quot;))),
     moduleOverrides = new ModuleDef {
       make[Rnd[IO]].from[Rnd.Impl[IO]]
+      // For testing, setup a docker container with postgres,
+      // instead of trying to connect to an external database
       include(PostgresDockerModule)
     },
-    memoizedKeys = Set(
-      DIKey.get[Transactor[Task]],
+    // instantiate Ladder &amp; Profiles only once per test-run and
+    // share them and all their dependencies across all tests.
+    // this includes the Postgres Docker container above and
+    // table DDLs 
+    memoizationRoots = Set(
       DIKey.get[Ladder[IO]],
       DIKey.get[Profiles[IO]],
-      DIKey.get[PostgresDocker.Container],
     ),
   )
 }
 
-trait DummyTest extends LivecodeTest {
+trait DummyTest extends LeaderboardTest {
   override final def config = super.config.copy(
-    activation = StandardAxis.testDummyActivation,
+    activation = Activation(Repo -&gt; Repo.Dummy),
+  )
+}
+
+trait ProdTest extends LeaderboardTest {
+  override final def config = super.config.copy(
+    activation = Activation(Repo -&gt; Repo.Prod),
   )
 }
 
 final class LadderTestDummy extends LadderTest with DummyTest
-final class ProfilesTestDummy extends ProfilesTest with DummyTest
-final class RanksTestDummy extends RanksTest with DummyTest
+final class LadderTestPostgres extends LadderTest with ProdTest
 
-class LadderTest extends LivecodeTest with DummyTest {
+abstract class LadderTest extends LeaderboardTest {
 
   &quot;Ladder&quot; should {
     // this test gets dependencies through arguments
@@ -269,7 +282,7 @@ class LadderTest extends LivecodeTest with DummyTest {
     }
 
     // other tests get dependencies via ZIO Env:
-    &quot;return higher score higher in the list&quot; in {
+    &quot;assign a higher position in the list to a higher score&quot; in {
       for {
         user1  &lt;- rnd[UserId]
         score1 &lt;- rnd[Score]
@@ -301,13 +314,13 @@ class LadderTest extends LivecodeTest with DummyTest {
 <p>Use <a href="/latest/release/api/izumi/distage/roles/services/StartupPlanExecutor.html">StartupPlanExecutor</a> to execute the checks manually.</p>
 </div>
 <div>
-<a href="https://github.com/7mind/izumi/tree/v0.10.0-M12/doc/microsite/target/mdoc/distage/distage-testkit.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/7mind/izumi/tree/v0.10.0-M13-ZIORC16/doc/microsite/target/mdoc/distage/distage-testkit.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>
 <div class="print-only">
 <span class="md-source-file md-version">
-0.10.0-M12
+0.10.0-M13-ZIORC16
 </span>
 </div>
 </article>

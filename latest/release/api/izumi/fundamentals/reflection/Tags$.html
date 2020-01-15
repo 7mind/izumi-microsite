@@ -151,10 +151,6 @@
                         <a href="DebugProperties$.html" title="Java properties and macro settings that control behavior and debug output of Lightweight Reflection macros">DebugProperties</a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
-                        <a class="object" href="ProjectAttributeMacro$.html" title=""></a>
-                        <a href="ProjectAttributeMacro$.html" title="">ProjectAttributeMacro</a>
-                      </li><li class="current-entities indented3">
-                        <span class="separator"></span>
                         <a class="object" href="ReflectionUtil$.html" title=""></a>
                         <a href="ReflectionUtil$.html" title="">ReflectionUtil</a>
                       </li><li class="current-entities indented3">
@@ -333,11 +329,11 @@ This is especially helpful for applying <a href="https://www.beyondthelines.net/
   make[MyService[F]]
   make[F[<span class="std">Int</span>]].named(<span class="lit">"lucky-number"</span>).from(Monad[F].pure(<span class="num">7</span>))
 }</pre><p>Without a <code>TagK</code> constraint above, this example would fail with <code>no TypeTag available for MyService[F]</code> error</p><p>Currently some limitations apply as to when a <code>Tag</code> will be correctly constructed:
-  * Type Parameters do not yet resolve inside structural refinements, e.g. T in </p><pre>Tag[{ <span class="kw">def</span> x: T}]</pre><p>  * Type Parameters do not yet resolve inside higher-kinded type lambdas, e.g. T in </p><pre>TagK[Either[T, ?]]</pre><p>  * TagK* does not resolve for constructors with bounded parameters, e.g. S in </p><pre><span class="kw">class</span> Abc[S <span class="kw">&lt;:</span> <span class="std">String</span>]; TagK[Abc]</pre><p>    (You can still have a bound in partial application: e.g. </p><pre><span class="kw">class</span> Abc[S <span class="kw">&lt;:</span> <span class="std">String</span>, A]; TagK[Abc[<span class="lit">"hi"</span>, ?]]</pre><p>  * Further details at <a href="https://github.com/7mind/izumi/pull/369" target="_blank">https://github.com/7mind/izumi/pull/369</a>
+  * Type Parameters do not yet resolve inside structural refinements, e.g. T in </p><pre>Tag[{ <span class="kw">def</span> x: T}]</pre><p>  * TagK* does not resolve for constructors with bounded parameters, e.g. S in </p><pre><span class="kw">class</span> Abc[S <span class="kw">&lt;:</span> <span class="std">String</span>]; TagK[Abc]</pre><p>    (You can still have a bound in partial application: e.g. </p><pre><span class="kw">class</span> Abc[S <span class="kw">&lt;:</span> <span class="std">String</span>, A]; TagK[Abc[<span class="lit">"hi"</span>, ?]]</pre><p>  * Further details at <a href="https://github.com/7mind/izumi/issues/374" target="_blank">https://github.com/7mind/izumi/issues/374</a>
 </p></div><dl class="attributes block"> <dt>Annotations</dt><dd>
                 <span class="name">@implicitNotFound</span><span class="args">(<span>
       
-      <span class="defval" name="&quot;could not find implicit value for Tag[F[Throwable,Nothing]]. Did you forget to put on a Tag, TagK or TagKK context bound on one of the parameters in F[Throwable,Nothing]? e.g. def x[T: Tag, F[_]: TagK] = ...\n\n\n&lt;trace&gt;: \n  deriving Tag for F[Throwable,Nothing], dealiased: F[Throwable,Nothing]:\n  succeeded for: F[Throwable,Nothing]&quot;">...</span>
+      <span class="defval" name="&quot;could not find implicit value for Tag[izumi.distage.model.effect.DIEffect[[β$4$]F[Throwable,β$4$]]]. Did you forget to put on a Tag, TagK or TagKK context bound on one of the parameters in izumi.distage.model.effect.DIEffect[[β$4$]F[Throwable,β$4$]]? e.g. def x[T: Tag, F[_]: TagK] = ...\n\n\n&lt;trace&gt;: \n  deriving Tag for izumi.distage.model.effect.DIEffect[[β$4$]F[Throwable,β$4$]], dealiased: izumi.distage.model.effect.DIEffect[[β$4$]F[Throwable,β$4$]]:\n  succeeded for: izumi.distage.model.effect.DIEffect[[β$4$]F[Throwable,β$4$]]&quot;">...</span>
     </span>)</span>
               
         </dd><dt>See also</dt><dd><span class="cmt"><p>&quot;Lightweight Scala Reflection and why Dotty needs TypeTags reimplemented&quot; https://blog.7mind.io/lightweight-reflection.html</p></span></dd></dl></div>
@@ -356,7 +352,7 @@ This is especially helpful for applying <a href="https://www.beyondthelines.net/
         <span class="name">TagK</span><span class="tparams">[<span name="K">K<span class="tparams">[<span name="_">_</span>]</span></span>]</span><span class="result alias"> = <a href="Tags$$HKTag.html" class="extype" name="izumi.fundamentals.reflection.Tags.HKTag">HKTag</a>[<a href="../../../scala/index.html#AnyRef=Object" class="extmbr" name="scala.AnyRef">AnyRef</a> { type Arg[A] = K[A] }]</span>
       </span>
       
-      <p class="shortcomment cmt"><code>TagK</code> is a <span class="extype" name="scala.reflect.api.TypeTags.TypeTag">scala.reflect.api.TypeTags.TypeTag</span> for higher-kinded types.</p><div class="fullcomment"><div class="comment cmt"><p><code>TagK</code> is a <span class="extype" name="scala.reflect.api.TypeTags.TypeTag">scala.reflect.api.TypeTags.TypeTag</span> for higher-kinded types.</p><p>Example:</p><pre><span class="kw">def</span> containerTypesEqual[F[_]: TagK, K[_]: TagK]): <span class="std">Boolean</span> = TagK[F].tag.tpe =:= TagK[K].tag.tpe
+      <p class="shortcomment cmt"><code>TagK</code> is like a <span class="extype" name="scala.reflect.api.TypeTags.TypeTag">scala.reflect.api.TypeTags.TypeTag</span> but for higher-kinded types.</p><div class="fullcomment"><div class="comment cmt"><p><code>TagK</code> is like a <span class="extype" name="scala.reflect.api.TypeTags.TypeTag">scala.reflect.api.TypeTags.TypeTag</span> but for higher-kinded types.</p><p>Example:</p><pre><span class="kw">def</span> containerTypesEqual[F[_]: TagK, K[_]: TagK]): <span class="std">Boolean</span> = TagK[F].tag.tpe =:= TagK[K].tag.tpe
 
 containerTypesEqual[<span class="std">Set</span>, collection.immutable.<span class="std">Set</span>] == <span class="kw">true</span>
 containerTypesEqual[<span class="std">Array</span>, <span class="std">List</span>] == <span class="kw">false</span></pre></div></div>
