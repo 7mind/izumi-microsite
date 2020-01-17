@@ -135,13 +135,6 @@ data-md-source="github">
 
 </div>
 <ul>
-  <li><a href="../idealingua/index.html" class="page">IdeaLingua RPC &amp; Domain Modeling Language</a>
-  <ul>
-    <li><a href="../idealingua/language-reference.html" class="page">Idealingua Language Reference</a></li>
-    <li><a href="../idealingua/json.html" class="page">JSON Wire Format</a></li>
-    <li><a href="../idealingua/cogen.html" class="page">Code generator reference</a></li>
-    <li><a href="../idealingua/cogen-circe.html" class="page">Circe serialization reference</a></li>
-  </ul></li>
   <li><a href="../distage/index.html" class="page">distage: Staged Dependency Injection</a>
   <ul>
     <li><a href="../distage/basics.html" class="page">Basics</a></li>
@@ -153,6 +146,13 @@ data-md-source="github">
     <li><a href="../distage/reference.html" class="page">Syntax Summary</a></li>
   </ul></li>
   <li><a href="../logstage/index.html" class="page">LogStage</a></li>
+  <li><a href="../idealingua/index.html" class="page">IdeaLingua RPC &amp; Domain Modeling Language</a>
+  <ul>
+    <li><a href="../idealingua/language-reference.html" class="page">Idealingua Language Reference</a></li>
+    <li><a href="../idealingua/json.html" class="page">JSON Wire Format</a></li>
+    <li><a href="../idealingua/cogen.html" class="page">Code generator reference</a></li>
+    <li><a href="../idealingua/cogen-circe.html" class="page">Circe serialization reference</a></li>
+  </ul></li>
   <li><a href="../sbt/index.html" class="page">SBT Toolkit</a></li>
   <li><a href="../manifesto/index.html" class="page">Productivity and challenges</a></li>
   <li><a href="../pper/index.html" class="page">PPER Pattern</a></li>
@@ -257,11 +257,11 @@ val configModule = new ConfigModuleDef {
   makeConfig[Conf](&quot;conf&quot;)
   makeConfig[OtherConf](&quot;conf&quot;).named(&quot;other&quot;)
 }
-// configModule: AnyRef with ConfigModuleDef = Module(make[{type.repl.Session::repl.Session.App0::repl.Session.App0.Conf}].from(call(izumi.distage.config.ConfigModuleDef$$Lambda$16461/0x0000000843dba840@fceb43b(izumi.distage.config.model.AppConfig): repl.Session::repl.Session.App0::repl.Session.App0.Conf)).tagged(Set(ConfTag(conf))) ((distage-framework.md:37)), make[{type.repl.Session::repl.Session.App0::repl.Session.App0.OtherConf@other}].from(call(izumi.distage.config.ConfigModuleDef$$Lambda$16461/0x0000000843dba840@3c6e188f(izumi.distage.config.model.AppConfig): repl.Session::repl.Session.App0::repl.Session.App0.OtherConf)).tagged(Set(ConfTag(conf))) ((distage-framework.md:38)))
+// configModule: AnyRef with ConfigModuleDef = Module(make[{type.repl.Session::repl.Session.App0::repl.Session.App0.Conf}].from(call(izumi.distage.config.ConfigModuleDef$$Lambda$16444/0x0000000843dbc840@3bdf7aee(izumi.distage.config.model.AppConfig): repl.Session::repl.Session.App0::repl.Session.App0.Conf)).tagged(Set(ConfTag(conf))) ((distage-framework.md:37)), make[{type.repl.Session::repl.Session.App0::repl.Session.App0.OtherConf@other}].from(call(izumi.distage.config.ConfigModuleDef$$Lambda$16444/0x0000000843dbc840@170453f4(izumi.distage.config.model.AppConfig): repl.Session::repl.Session.App0::repl.Session.App0.OtherConf)).tagged(Set(ConfTag(conf))) ((distage-framework.md:38)))
 
 // add config itself to the graph
 val appConfigModule = AppConfigModule(config)
-// appConfigModule: AppConfigModule = Module(make[{type.izumi.distage.config.model.AppConfig}].from(value(AppConfig(Config(SimpleConfigObject({&quot;conf&quot;:{&quot;age&quot;:33,&quot;name&quot;:&quot;John&quot;,&quot;other&quot;:true}}))))) ((ConfigModuleDef.scala:19)))
+// appConfigModule: AppConfigModule = Module(make[{type.izumi.distage.config.model.AppConfig}].from(value(AppConfig(Config(SimpleConfigObject({&quot;conf&quot;:{&quot;age&quot;:33,&quot;name&quot;:&quot;John&quot;,&quot;other&quot;:true}}))): izumi.distage.config.model.AppConfig)) ((ConfigModuleDef.scala:20)))
 
 val appModule = new ModuleDef {
   make[ConfigPrinter]
@@ -272,7 +272,7 @@ val objects = Injector().produceUnsafe(
   input = Seq(appModule, configModule, appConfigModule).merge,
   mode  = GCMode(DIKey.get[ConfigPrinter])
 )
-// objects: izumi.distage.model.Locator = izumi.distage.LocatorDefaultImpl@220119a9
+// objects: izumi.distage.model.Locator = izumi.distage.LocatorDefaultImpl@492e3c50
 
 objects.get[ConfigPrinter].print()
 // name: John, age: 33, other: true
@@ -301,16 +301,16 @@ object PetStorePlugin extends PluginDef {
     packagesEnabled = Seq(&quot;com.example.petstore&quot;) // packages to scan
   )
 )
-// pluginLoader: PluginLoader = izumi.distage.plugins.load.PluginLoaderDefaultImpl@9eb333
+// pluginLoader: PluginLoader = izumi.distage.plugins.load.PluginLoaderDefaultImpl@497ca8a9
 
 val appModules = pluginLoader.load()
-// appModules: Seq[PluginBase] = List(Module(make[{type.com.example.petstore.PetRepository}].from(call(com.example.petstore.PetStorePlugin$$$Lambda$16707/0x0000000843ed9840@6df2a0ac(): com.example.petstore.PetRepository)) ((PetStorePlugin.scala:6)), make[{type.com.example.petstore.PetStoreService}].from(call(com.example.petstore.PetStorePlugin$$$Lambda$16709/0x0000000843eda840@471420ea(): com.example.petstore.PetStoreService)) ((PetStorePlugin.scala:7)), make[{type.com.example.petstore.PetStoreController}].from(call(com.example.petstore.PetStorePlugin$$$Lambda$16711/0x0000000843edb840@32661410(): com.example.petstore.PetStoreController)) ((PetStorePlugin.scala:8))))
+// appModules: Seq[PluginBase] = List(Module(make[{type.com.example.petstore.PetRepository}].from(call(com.example.petstore.PetStorePlugin$$$Lambda$16693/0x0000000843ecb040@6fec19bb(): com.example.petstore.PetRepository)) ((PetStorePlugin.scala:6)), make[{type.com.example.petstore.PetStoreService}].from(call(com.example.petstore.PetStorePlugin$$$Lambda$16695/0x0000000843ecc040@571864aa(): com.example.petstore.PetStoreService)) ((PetStorePlugin.scala:7)), make[{type.com.example.petstore.PetStoreController}].from(call(com.example.petstore.PetStorePlugin$$$Lambda$16697/0x0000000843ecd040@7b0db700(): com.example.petstore.PetStoreController)) ((PetStorePlugin.scala:8))))
 </code></pre>
 <p>Execute collected modules as usual:</p>
 <pre class="prettyprint"><code class="language-scala">// combine all modules into one
 
 val appModule = appModules.merge
-// appModule: PluginBase = Module(make[{type.com.example.petstore.PetRepository}].from(call(com.example.petstore.PetStorePlugin$$$Lambda$16707/0x0000000843ed9840@6df2a0ac(): com.example.petstore.PetRepository)) ((PetStorePlugin.scala:6)), make[{type.com.example.petstore.PetStoreService}].from(call(com.example.petstore.PetStorePlugin$$$Lambda$16709/0x0000000843eda840@471420ea(): com.example.petstore.PetStoreService)) ((PetStorePlugin.scala:7)), make[{type.com.example.petstore.PetStoreController}].from(call(com.example.petstore.PetStorePlugin$$$Lambda$16711/0x0000000843edb840@32661410(): com.example.petstore.PetStoreController)) ((PetStorePlugin.scala:8)))
+// appModule: PluginBase = Module(make[{type.com.example.petstore.PetRepository}].from(call(com.example.petstore.PetStorePlugin$$$Lambda$16693/0x0000000843ecb040@6fec19bb(): com.example.petstore.PetRepository)) ((PetStorePlugin.scala:6)), make[{type.com.example.petstore.PetStoreService}].from(call(com.example.petstore.PetStorePlugin$$$Lambda$16695/0x0000000843ecc040@571864aa(): com.example.petstore.PetStoreService)) ((PetStorePlugin.scala:7)), make[{type.com.example.petstore.PetStoreController}].from(call(com.example.petstore.PetStorePlugin$$$Lambda$16697/0x0000000843ecd040@7b0db700(): com.example.petstore.PetStoreController)) ((PetStorePlugin.scala:8)))
 
 // launch
 

@@ -135,13 +135,6 @@ data-md-source="github">
 
 </div>
 <ul>
-  <li><a href="../idealingua/index.html" class="page">IdeaLingua RPC &amp; Domain Modeling Language</a>
-  <ul>
-    <li><a href="../idealingua/language-reference.html" class="page">Idealingua Language Reference</a></li>
-    <li><a href="../idealingua/json.html" class="page">JSON Wire Format</a></li>
-    <li><a href="../idealingua/cogen.html" class="page">Code generator reference</a></li>
-    <li><a href="../idealingua/cogen-circe.html" class="page">Circe serialization reference</a></li>
-  </ul></li>
   <li><a href="../distage/index.html" class="page">distage: Staged Dependency Injection</a>
   <ul>
     <li><a href="../distage/basics.html" class="page">Basics</a></li>
@@ -153,6 +146,13 @@ data-md-source="github">
     <li><a href="../distage/reference.html" class="page">Syntax Summary</a></li>
   </ul></li>
   <li><a href="../logstage/index.html" class="active page">LogStage</a></li>
+  <li><a href="../idealingua/index.html" class="page">IdeaLingua RPC &amp; Domain Modeling Language</a>
+  <ul>
+    <li><a href="../idealingua/language-reference.html" class="page">Idealingua Language Reference</a></li>
+    <li><a href="../idealingua/json.html" class="page">JSON Wire Format</a></li>
+    <li><a href="../idealingua/cogen.html" class="page">Code generator reference</a></li>
+    <li><a href="../idealingua/cogen-circe.html" class="page">Circe serialization reference</a></li>
+  </ul></li>
   <li><a href="../sbt/index.html" class="page">SBT Toolkit</a></li>
   <li><a href="../manifesto/index.html" class="page">Productivity and challenges</a></li>
   <li><a href="../pper/index.html" class="page">PPER Pattern</a></li>
@@ -225,7 +225,7 @@ data-md-source="github">
 import scala.util.Random
 
 val logger = IzLogger()
-// logger: IzLogger = izumi.logstage.api.IzLogger@7db43ecd
+// logger: IzLogger = izumi.logstage.api.IzLogger@19ea32bc
 
 val justAnArg = &quot;example&quot;
 // justAnArg: String = &quot;example&quot;
@@ -245,9 +245,9 @@ logger.warn(s&quot;Invisible argument: ${Random.nextInt() -&gt; &quot;random num
 // add following fields to all messages printed by a new logger value
 
 val ctxLogger = logger(&quot;userId&quot; -&gt; &quot;user@google.com&quot;, &quot;company&quot; -&gt; &quot;acme&quot;)
-// ctxLogger: IzLogger = izumi.logstage.api.IzLogger@7e379b5
+// ctxLogger: IzLogger = izumi.logstage.api.IzLogger@637d4d9a
 val delta = Random.nextInt(1000)
-// delta: Int = 527
+// delta: Int = 872
 
 ctxLogger.info(s&quot;Processing time: $delta&quot;)
 </code></pre>
@@ -325,20 +325,20 @@ libraryDependencies ++= Seq(
 import logstage.circe._
 
 val jsonSink = ConsoleSink.json(prettyPrint = true)
-// jsonSink: ConsoleSink = izumi.logstage.sink.ConsoleSink@5bb2ba2b
+// jsonSink: ConsoleSink = izumi.logstage.sink.ConsoleSink@495197bb
 val textSink = ConsoleSink.text(colored = true)
-// textSink: ConsoleSink = izumi.logstage.sink.ConsoleSink@4b9837bd
+// textSink: ConsoleSink = izumi.logstage.sink.ConsoleSink@4ef4394f
 
 val sinks = List(jsonSink, textSink)
 // sinks: List[ConsoleSink] = List(
-//   izumi.logstage.sink.ConsoleSink@5bb2ba2b,
-//   izumi.logstage.sink.ConsoleSink@4b9837bd
+//   izumi.logstage.sink.ConsoleSink@495197bb,
+//   izumi.logstage.sink.ConsoleSink@4ef4394f
 // )
 
 val logger: IzLogger = IzLogger(Trace, sinks)
-// logger: IzLogger = izumi.logstage.api.IzLogger@8f28790
+// logger: IzLogger = izumi.logstage.api.IzLogger@1c035aae
 val contextLogger: IzLogger = logger(Map(&quot;key&quot; -&gt; &quot;value&quot;))
-// contextLogger: IzLogger = izumi.logstage.api.IzLogger@4effc18a
+// contextLogger: IzLogger = izumi.logstage.api.IzLogger@41dcc8b0
 
 logger.info(&quot;Hey&quot;)
 
@@ -350,10 +350,10 @@ contextLogger.info(s&quot;Hey&quot;)
 import cats.effect.IO
 
 val logger = IzLogger()
-// logger: IzLogger = izumi.logstage.api.IzLogger@73f8513b
+// logger: IzLogger = izumi.logstage.api.IzLogger@37dba087
 
 val log = LogIO.fromLogger[IO](logger)
-// log: LogIO[IO] = logstage.LogIO$$anon$1@5ecf3650
+// log: LogIO[IO] = logstage.LogIO$$anon$1@6a51d40f
 
 log.info(s&quot;Hey! I&#39;m logging with ${log}stage!&quot;).unsafeRunSync()
 </code></pre>
@@ -365,10 +365,10 @@ log.info(s&quot;Hey! I&#39;m logging with ${log}stage!&quot;).unsafeRunSync()
 import zio.{IO, DefaultRuntime}
 
 val log = LogstageZIO.withFiberId(IzLogger())
-// log: logstage.package.LogBIO[IO] = logstage.LogstageZIO$$anon$1@1851bc3a
+// log: logstage.package.LogBIO[IO] = logstage.LogstageZIO$$anon$1@3898d8d3
 
 val rts = new DefaultRuntime {}
-// rts: AnyRef with DefaultRuntime = repl.Session$App10$$anon$1@7166fabb
+// rts: AnyRef with DefaultRuntime = repl.Session$App10$$anon$1@3248bf73
 rts.unsafeRun {
   log.info(s&quot;Hey! I&#39;m logging with ${log}stage!&quot;)
 }
@@ -403,7 +403,7 @@ def importEntity(entity: Entity)(implicit log: LogIO[IO]): IO[Unit] = {
 import izumi.logstage.api.routing.StaticLogRouter
 
 val myLogger = IzLogger()
-// myLogger: IzLogger = izumi.logstage.api.IzLogger@40a61c25
+// myLogger: IzLogger = izumi.logstage.api.IzLogger@58fdee25
 
 // configure SLF4j to use the same router that `myLogger` uses
 StaticLogRouter.instance.setup(myLogger.router)
@@ -441,13 +441,13 @@ Syntax Summary
 </span>
 </div>
 </a>
-<a href="../sbt/index.html" title="SBT Toolkit" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+<a href="../idealingua/index.html" title="IdeaLingua RPC & Domain Modeling Language" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
 <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
 <span class="md-flex__ellipsis">
 <span class="md-footer-nav__direction">
 Next
 </span>
-SBT Toolkit
+IdeaLingua RPC & Domain Modeling Language
 </span>
 </div>
 <div class="md-flex__cell md-flex__cell--shrink">
