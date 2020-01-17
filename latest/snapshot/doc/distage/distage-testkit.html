@@ -210,24 +210,21 @@ data-md-source="github">
 <p><a href="https://github.com/7mind/distage-example">distage Example Project</a> project shows how to use <code>distage-testkit</code>, there&rsquo;s also an overview in the <a href="https://www.youtube.com/watch?v=CzpvjkUukAs">Hyper-pragmatic Pure FP Testing with distage-testkit</a> talk. </p>
 <p>Further documentation still TBD: <a href="https://github.com/7mind/izumi/issues/820">Issue #820</a></p>
 <p>Some example code from <a href="https://github.com/7mind/distage-example">distage-example</a>:</p>
-<pre class="prettyprint"><code class="language-scala">package leaderboard
-
-import distage.{DIKey, ModuleDef}
-import izumi.distage.framework.model.PluginSource
+<pre class="prettyprint"><code class="language-scala">import distage.{DIKey, ModuleDef}
 import izumi.distage.model.definition.Activation
 import izumi.distage.model.definition.StandardAxis.Repo
 import izumi.distage.plugins.PluginConfig
 import izumi.distage.testkit.TestConfig
 import izumi.distage.testkit.scalatest.DistageBIOSpecScalatest
 import izumi.distage.testkit.services.DISyntaxZIOEnv
-import leaderboard.model.{QueryFailure, Score, UserId, UserProfile}
+import leaderboard.model.{Score, UserId}
 import leaderboard.repo.{Ladder, Profiles}
-import leaderboard.zioenv._
+import leaderboard.zioenv.{ladder, rnd}
 import zio.{IO, ZIO}
 
 abstract class LeaderboardTest extends DistageBIOSpecScalatest[IO] with DISyntaxZIOEnv {
   override def config = TestConfig(
-    pluginSource = PluginSource(PluginConfig.cached(packagesEnabled = Seq(&quot;leaderboard.plugins&quot;))),
+    pluginConfig = PluginConfig.cached(packagesEnabled = Seq(&quot;leaderboard.plugins&quot;)),
     moduleOverrides = new ModuleDef {
       make[Rnd[IO]].from[Rnd.Impl[IO]]
       // For testing, setup a docker container with postgres,
