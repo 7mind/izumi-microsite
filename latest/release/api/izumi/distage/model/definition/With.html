@@ -227,8 +227,12 @@
                         <a href="StandardAxis$.html" title="">StandardAxis</a>
                       </li><li class="current-entities indented4">
                         <span class="separator"></span>
-                        <a class="class" href="" title=""></a>
-                        <a href="" title="">With</a>
+                        <a class="class" href="" title="This annotation lets you choose a more specific implementation for a result of factory method other than its return type."></a>
+                        <a href="" title="This annotation lets you choose a more specific implementation for a result of factory method other than its return type.">With</a>
+                      </li><li class="current-entities indented4">
+                        <span class="separator"></span>
+                        <a class="class" href="impl.html" title="An optional, documentation-only annotation conveying that an abstract class or a trait is the 'actual' implementation of its supertypes and will be bound later in DI with izumi.distage.constructors.TraitConstructor or izumi.distage.constructors.FactoryConstructor"></a>
+                        <a href="impl.html" title="An optional, documentation-only annotation conveying that an abstract class or a trait is the 'actual' implementation of its supertypes and will be bound later in DI with izumi.distage.constructors.TraitConstructor or izumi.distage.constructors.FactoryConstructor">impl</a>
                       </li>
               </ul>
             </div>
@@ -257,7 +261,32 @@
       </h4>
 
       
-          <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>This annotation lets you choose a more specific implementation
+for a result of factory method other than its return type.</p><p>Example:</p><pre><span class="kw">trait</span> Actor {
+  <span class="kw">def</span> id: UUID
+}
+
+<span class="kw">trait</span> ActorFactory {
+  @With[ActorImpl]
+  <span class="kw">def</span> newActor(id: UUID): Actor
+}
+
+<span class="kw">class</span> ActorImpl(<span class="kw">val</span> id: UUID, someDependency: SomeDependency) <span class="kw">extends</span> Actor
+<span class="kw">class</span> SomeDependency
+
+<span class="kw">val</span> module = <span class="kw">new</span> ModuleDef {
+  make[ActorFactory]
+  <span class="cmt">// generated factory implementation:</span>
+  <span class="cmt">//</span>
+  <span class="cmt">// make[ActorFactory].from {</span>
+  <span class="cmt">//  (someDependency: SomeDependency) =&gt;</span>
+  <span class="cmt">//    new ActorFactory {</span>
+  <span class="cmt">//      override def newActor(id: UUID): Actor = {</span>
+  <span class="cmt">//        new ActorImpl(id, someDependency)</span>
+  <span class="cmt">//      }</span>
+  <span class="cmt">//    }</span>
+  <span class="cmt">// }</span>
+}</pre></div><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p><a href="https://izumi.7mind.io/latest/release/doc/distage/basics.html#auto-factories" target="_blank">Auto-Factories</a></p></span></dd></dl><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
           </span>
