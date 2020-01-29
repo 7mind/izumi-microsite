@@ -162,9 +162,9 @@ data-md-source="github">
 <ul>
   <li><a href="../logstage/index.html#logstage" class="header">LogStage</a>
   <ul>
+    <li><a href="../logstage/index.html#dependencies" class="header">Dependencies</a></li>
     <li><a href="../logstage/index.html#overview" class="header">Overview</a></li>
     <li><a href="../logstage/index.html#syntax-reference" class="header">Syntax Reference</a></li>
-    <li><a href="../logstage/index.html#dependencies" class="header">Dependencies</a></li>
     <li><a href="../logstage/index.html#basic-setup" class="header">Basic setup</a></li>
     <li><a href="../logstage/index.html#log-algebras" class="header">Log algebras</a></li>
     <li><a href="../logstage/index.html#slf4j-router" class="header">SLF4J Router</a></li>
@@ -191,9 +191,9 @@ data-md-source="github">
 <ul>
   <li><a href="../logstage/index.html#logstage" class="header">LogStage</a>
   <ul>
+    <li><a href="../logstage/index.html#dependencies" class="header">Dependencies</a></li>
     <li><a href="../logstage/index.html#overview" class="header">Overview</a></li>
     <li><a href="../logstage/index.html#syntax-reference" class="header">Syntax Reference</a></li>
-    <li><a href="../logstage/index.html#dependencies" class="header">Dependencies</a></li>
     <li><a href="../logstage/index.html#basic-setup" class="header">Basic setup</a></li>
     <li><a href="../logstage/index.html#log-algebras" class="header">Log algebras</a></li>
     <li><a href="../logstage/index.html#slf4j-router" class="header">SLF4J Router</a></li>
@@ -219,13 +219,29 @@ data-md-source="github">
   <li>Method-level logging granularity. Can configure methods <code>com.example.Service.start</code> and <code>com.example.Service.doSomething</code> independently,</li>
   <li>Slf4J adapters: route legacy Slf4J logs into LogStage router</li>
 </ol>
+<h2><a href="#dependencies" name="dependencies" class="anchor"><span class="anchor-link"></span></a>Dependencies</h2>
+<pre class="prettyprint"><code class="language-scala">libraryDependencies ++= Seq(
+  // LogStage core library
+  &quot;io.7mind.izumi&quot; %% &quot;logstage-core&quot; % &quot;0.10.1-SNAPSHOT&quot;,
+  // Json output
+  &quot;io.7mind.izumi&quot; %% &quot;logstage-rendering-circe&quot; % &quot;0.10.1-SNAPSHOT&quot;,
+  // Router from Slf4j to LogStage
+  &quot;io.7mind.izumi&quot; %% &quot;logstage-adapter-slf4j&quot; % &quot;0.10.1-SNAPSHOT&quot;,
+  // Configure LogStage with Typesafe Config
+  &quot;io.7mind.izumi&quot; %% &quot;logstage-config&quot; % &quot;0.10.1-SNAPSHOT&quot;,
+  // LogStage integration with DIStage
+  &quot;io.7mind.izumi&quot; %% &quot;distage-extension-logstage&quot; % &quot;0.10.1-SNAPSHOT&quot;,
+  // Router from LogStage to Slf4J
+  &quot;io.7mind.izumi&quot; %% &quot;logstage-sink-slf4j &quot; % &quot;0.10.1-SNAPSHOT&quot;,
+)
+</code></pre>
 <h2><a href="#overview" name="overview" class="anchor"><span class="anchor-link"></span></a>Overview</h2>
 <p>The following snippet:</p>
-<pre class="prettyprint"><code class="language-scala">import logstage._
+<pre class="prettyprint"><code class="language-scala">import logstage.IzLogger
 import scala.util.Random
 
 val logger = IzLogger()
-// logger: package.IzLogger.Logger = izumi.logstage.api.IzLogger@c2c8dc6
+// logger: logstage.package.IzLogger.Logger = izumi.logstage.api.IzLogger@36bda6cb
 
 val justAnArg = &quot;example&quot;
 // justAnArg: String = &quot;example&quot;
@@ -245,9 +261,9 @@ logger.warn(s&quot;Invisible argument: ${Random.nextInt() -&gt; &quot;random num
 // add following fields to all messages printed by a new logger value
 
 val ctxLogger = logger(&quot;userId&quot; -&gt; &quot;user@google.com&quot;, &quot;company&quot; -&gt; &quot;acme&quot;)
-// ctxLogger: IzLogger = izumi.logstage.api.IzLogger@35e5579f
+// ctxLogger: IzLogger = izumi.logstage.api.IzLogger@3dc3c87d
 val delta = Random.nextInt(1000)
-// delta: Int = 507
+// delta: Int = 947
 
 ctxLogger.info(s&quot;Processing time: $delta&quot;)
 </code></pre>
@@ -282,63 +298,25 @@ ctxLogger.info(s&quot;Processing time: $delta&quot;)
 <p>5) De-camelcased name:  <code>scala
    logger.info(${camelCaseName-&gt; &#39; &#39;})
 </code></p>
-<h2><a href="#dependencies" name="dependencies" class="anchor"><span class="anchor-link"></span></a>Dependencies</h2>
-<pre class="prettyprint"><code class="language-scala">// LogStage core
-libraryDependencies += Izumi.R.logstage_core
-
-// Optional
-libraryDependencies ++= Seq(
-  // Json output
-  Izumi.R.logstage_rendering_circe,
-  // Router from Slf4j to LogStage
-  Izumi.R.logstage_adapter-slf4j,
-  // Configure LogStage with Typesafe Config
-  Izumi.R.logstage_config,
-  // LogStage integration with DIStage 
-  Izumi.R.logstage_di,
-  // Router from LogStage to Slf4J
-  Izumi.R.logstage_sink_slf4j,
-)
-</code></pre>
-<p>or</p>
-<pre class="prettyprint"><code class="language-scala">val izumi_version = &quot;0.10.1-SNAPSHOT&quot;
-// LogStage core
-libraryDependencies += &quot;io.7mind.izumi&quot; %% &quot;logstage-core&quot; % izumi_version
-
-// Optional
-libraryDependencies ++= Seq(
-  // Json output
-  &quot;io.7mind.izumi&quot; %% &quot;logstage-rendering-circe&quot; % izumi_version,
-  // Router from Slf4j to LogStage
-  &quot;io.7mind.izumi&quot; %% &quot;logstage-adapter-slf4j&quot; % izumi_version,    
-  // Configure LogStage with Typesafe Config
-  &quot;io.7mind.izumi&quot; %% &quot;logstage-config&quot; % izumi_version,
-  // LogStage integration with DIStage 
-  &quot;io.7mind.izumi&quot; %% &quot;distage-extension-logstage&quot; % izumi_version,
-  // Router from LogStage to Slf4J
-  &quot;io.7mind.izumi&quot; %% &quot;logstage-sink-slf4j &quot; % izumi_version,
-)
-</code></pre>
-<p>If you&rsquo;re not using <a href="../sbt/index.html#bills-of-materials">sbt-izumi-deps</a> plugin.</p>
 <h2><a href="#basic-setup" name="basic-setup" class="anchor"><span class="anchor-link"></span></a>Basic setup</h2>
-<pre class="prettyprint"><code class="language-scala">import logstage._
-import logstage.circe._
+<pre class="prettyprint"><code class="language-scala">import logstage.{ConsoleSink, IzLogger, Trace}
+import logstage.circe.LogstageCirceRenderingPolicy
 
-val jsonSink = ConsoleSink.json(prettyPrint = true)
-// jsonSink: ConsoleSink = izumi.logstage.sink.ConsoleSink@2a5f864e
 val textSink = ConsoleSink.text(colored = true)
-// textSink: ConsoleSink = izumi.logstage.sink.ConsoleSink@716bade6
+// textSink: ConsoleSink = izumi.logstage.sink.ConsoleSink@6b7495a2
+val jsonSink = ConsoleSink(LogstageCirceRenderingPolicy(prettyPrint = true))
+// jsonSink: ConsoleSink = izumi.logstage.sink.ConsoleSink@46caae85
 
 val sinks = List(jsonSink, textSink)
 // sinks: List[ConsoleSink] = List(
-//   izumi.logstage.sink.ConsoleSink@2a5f864e,
-//   izumi.logstage.sink.ConsoleSink@716bade6
+//   izumi.logstage.sink.ConsoleSink@46caae85,
+//   izumi.logstage.sink.ConsoleSink@6b7495a2
 // )
 
 val logger: IzLogger = IzLogger(Trace, sinks)
-// logger: IzLogger = izumi.logstage.api.IzLogger@61fa3176
+// logger: IzLogger = izumi.logstage.api.IzLogger@2deeeecd
 val contextLogger: IzLogger = logger(Map(&quot;key&quot; -&gt; &quot;value&quot;))
-// contextLogger: IzLogger = izumi.logstage.api.IzLogger@4223c92c
+// contextLogger: IzLogger = izumi.logstage.api.IzLogger@401bbfbe
 
 logger.info(&quot;Hey&quot;)
 
@@ -346,14 +324,14 @@ contextLogger.info(s&quot;Hey&quot;)
 </code></pre>
 <h2><a href="#log-algebras" name="log-algebras" class="anchor"><span class="anchor-link"></span></a>Log algebras</h2>
 <p><code>LogIO</code> and <code>LogBIO</code> algebras provide a purely-functional API for one- and two-parameter effect types respectively:</p>
-<pre class="prettyprint"><code class="language-scala">import logstage._
+<pre class="prettyprint"><code class="language-scala">import logstage.{IzLogger, LogIO}
 import cats.effect.IO
 
 val logger = IzLogger()
-// logger: package.IzLogger.Logger = izumi.logstage.api.IzLogger@289477b8
+// logger: logstage.package.IzLogger.Logger = izumi.logstage.api.IzLogger@f2cc13e
 
 val log = LogIO.fromLogger[IO](logger)
-// log: LogIO[IO] = logstage.LogIO$$anon$1@6683b49b
+// log: LogIO[IO] = logstage.LogIO$$anon$1@43f7c7a8
 
 log.info(s&quot;Hey! I&#39;m logging with ${log}stage!&quot;).unsafeRunSync()
 </code></pre>
@@ -365,10 +343,10 @@ log.info(s&quot;Hey! I&#39;m logging with ${log}stage!&quot;).unsafeRunSync()
 import zio.{IO, DefaultRuntime}
 
 val log = LogstageZIO.withFiberId(IzLogger())
-// log: logstage.package.LogBIO[IO] = logstage.LogstageZIO$$anon$1@6fc7f4a
+// log: logstage.package.LogBIO[IO] = logstage.LogstageZIO$$anon$1@1ce619e9
 
 val rts = new DefaultRuntime {}
-// rts: AnyRef with DefaultRuntime = repl.Session$App10$$anon$1@5bfa454f
+// rts: AnyRef with DefaultRuntime = repl.Session$App10$$anon$1@116aa4f2
 rts.unsafeRun {
   log.info(s&quot;Hey! I&#39;m logging with ${log}stage!&quot;)
 }
@@ -382,7 +360,7 @@ def load(entity: Entity): cats.effect.IO[Unit] = cats.effect.IO.unit
 </code></pre>
 <pre class="prettyprint"><code class="language-scala">import cats.effect.IO
 import cats.implicits._
-import logstage._
+import logstage.LogIO
 import io.circe.Printer
 import io.circe.syntax._
 
@@ -399,11 +377,11 @@ def importEntity(entity: Entity)(implicit log: LogIO[IO]): IO[Unit] = {
 <h2><a href="#slf4j-router" name="slf4j-router" class="anchor"><span class="anchor-link"></span></a>SLF4J Router</h2>
 <p>When not configured, <code>logstage-adapter-slf4j</code> will log messages with level <code>&gt;= Info</code> to <code>stdout</code>.</p>
 <p>Due to the global mutable nature of <code>slf4j</code>, to configure slf4j logging you&rsquo;ll have to mutate a global singleton <code>StaticLogRouter</code>. Replace its <code>LogRouter</code> with the same one you use elsewhere in your application to use the same configuration for Slf4j. </p>
-<pre class="prettyprint"><code class="language-scala">import logstage._
+<pre class="prettyprint"><code class="language-scala">import logstage.IzLogger
 import izumi.logstage.api.routing.StaticLogRouter
 
 val myLogger = IzLogger()
-// myLogger: package.IzLogger.Logger = izumi.logstage.api.IzLogger@50d8c03f
+// myLogger: logstage.package.IzLogger.Logger = izumi.logstage.api.IzLogger@7826b2d0
 
 // configure SLF4j to use the same router that `myLogger` uses
 StaticLogRouter.instance.setup(myLogger.router)
