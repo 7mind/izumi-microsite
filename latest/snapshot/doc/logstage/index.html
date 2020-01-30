@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="x-ua-compatible" content="ie=edge">
 <meta name="description" content="microsite">
-<meta name="generator" content="Paradox, paradox-material-theme=0.10.1-SNAPSHOT, mkdocs-material=3.0.3">
+<meta name="generator" content="Paradox, paradox-material-theme=0.10.2-SNAPSHOT, mkdocs-material=3.0.3">
 
 <meta name="lang:clipboard.copy" content="Copy to clipboard">
 <meta name="lang:clipboard.copied" content="Copied to clipboard">
@@ -176,7 +176,7 @@ data-md-source="github">
 <ul style="display: none">
 <li class="md-nav__item md-version" id="project.version">
 <label class="md-nav__link" for="__version">
-<i class="md-icon" title="Version">label_outline</i> 0.10.1*
+<i class="md-icon" title="Version">label_outline</i> 0.10.2*
 </label>
 </li>
 </ul>
@@ -222,17 +222,17 @@ data-md-source="github">
 <h2><a href="#dependencies" name="dependencies" class="anchor"><span class="anchor-link"></span></a>Dependencies</h2>
 <pre class="prettyprint"><code class="language-scala">libraryDependencies ++= Seq(
   // LogStage core library
-  &quot;io.7mind.izumi&quot; %% &quot;logstage-core&quot; % &quot;0.10.1-SNAPSHOT&quot;,
+  &quot;io.7mind.izumi&quot; %% &quot;logstage-core&quot; % &quot;0.10.2-SNAPSHOT&quot;,
   // Json output
-  &quot;io.7mind.izumi&quot; %% &quot;logstage-rendering-circe&quot; % &quot;0.10.1-SNAPSHOT&quot;,
+  &quot;io.7mind.izumi&quot; %% &quot;logstage-rendering-circe&quot; % &quot;0.10.2-SNAPSHOT&quot;,
   // Router from Slf4j to LogStage
-  &quot;io.7mind.izumi&quot; %% &quot;logstage-adapter-slf4j&quot; % &quot;0.10.1-SNAPSHOT&quot;,
+  &quot;io.7mind.izumi&quot; %% &quot;logstage-adapter-slf4j&quot; % &quot;0.10.2-SNAPSHOT&quot;,
   // Configure LogStage with Typesafe Config
-  &quot;io.7mind.izumi&quot; %% &quot;logstage-config&quot; % &quot;0.10.1-SNAPSHOT&quot;,
+  &quot;io.7mind.izumi&quot; %% &quot;logstage-config&quot; % &quot;0.10.2-SNAPSHOT&quot;,
   // LogStage integration with DIStage
-  &quot;io.7mind.izumi&quot; %% &quot;distage-extension-logstage&quot; % &quot;0.10.1-SNAPSHOT&quot;,
+  &quot;io.7mind.izumi&quot; %% &quot;distage-extension-logstage&quot; % &quot;0.10.2-SNAPSHOT&quot;,
   // Router from LogStage to Slf4J
-  &quot;io.7mind.izumi&quot; %% &quot;logstage-sink-slf4j &quot; % &quot;0.10.1-SNAPSHOT&quot;,
+  &quot;io.7mind.izumi&quot; %% &quot;logstage-sink-slf4j &quot; % &quot;0.10.2-SNAPSHOT&quot;,
 )
 </code></pre>
 <h2><a href="#overview" name="overview" class="anchor"><span class="anchor-link"></span></a>Overview</h2>
@@ -241,7 +241,7 @@ data-md-source="github">
 import scala.util.Random
 
 val logger = IzLogger()
-// logger: logstage.package.IzLogger.Logger = izumi.logstage.api.IzLogger@5f24e51
+// logger: logstage.package.IzLogger.Logger = izumi.logstage.api.IzLogger@33a441fb
 
 val justAnArg = &quot;example&quot;
 // justAnArg: String = &quot;example&quot;
@@ -261,9 +261,9 @@ logger.warn(s&quot;Invisible argument: ${Random.nextInt() -&gt; &quot;random num
 // add following fields to all messages printed by a new logger value
 
 val ctxLogger = logger(&quot;userId&quot; -&gt; &quot;user@google.com&quot;, &quot;company&quot; -&gt; &quot;acme&quot;)
-// ctxLogger: IzLogger = izumi.logstage.api.IzLogger@1f3b3128
+// ctxLogger: IzLogger = izumi.logstage.api.IzLogger@44586480
 val delta = Random.nextInt(1000)
-// delta: Int = 348
+// delta: Int = 510
 
 ctxLogger.info(s&quot;Processing time: $delta&quot;)
 </code></pre>
@@ -303,20 +303,20 @@ ctxLogger.info(s&quot;Processing time: $delta&quot;)
 import logstage.circe.LogstageCirceRenderingPolicy
 
 val textSink = ConsoleSink.text(colored = true)
-// textSink: ConsoleSink = izumi.logstage.sink.ConsoleSink@545cdc2b
+// textSink: ConsoleSink = izumi.logstage.sink.ConsoleSink@10fa0139
 val jsonSink = ConsoleSink(LogstageCirceRenderingPolicy(prettyPrint = true))
-// jsonSink: ConsoleSink = izumi.logstage.sink.ConsoleSink@308e7d1f
+// jsonSink: ConsoleSink = izumi.logstage.sink.ConsoleSink@27af46ba
 
 val sinks = List(jsonSink, textSink)
 // sinks: List[ConsoleSink] = List(
-//   izumi.logstage.sink.ConsoleSink@308e7d1f,
-//   izumi.logstage.sink.ConsoleSink@545cdc2b
+//   izumi.logstage.sink.ConsoleSink@27af46ba,
+//   izumi.logstage.sink.ConsoleSink@10fa0139
 // )
 
 val logger: IzLogger = IzLogger(Trace, sinks)
-// logger: IzLogger = izumi.logstage.api.IzLogger@3cd1d99
+// logger: IzLogger = izumi.logstage.api.IzLogger@782527ea
 val contextLogger: IzLogger = logger(Map(&quot;key&quot; -&gt; &quot;value&quot;))
-// contextLogger: IzLogger = izumi.logstage.api.IzLogger@728470ee
+// contextLogger: IzLogger = izumi.logstage.api.IzLogger@3d21763a
 
 logger.info(&quot;Hey&quot;)
 
@@ -328,10 +328,10 @@ contextLogger.info(s&quot;Hey&quot;)
 import cats.effect.IO
 
 val logger = IzLogger()
-// logger: logstage.package.IzLogger.Logger = izumi.logstage.api.IzLogger@27d68413
+// logger: logstage.package.IzLogger.Logger = izumi.logstage.api.IzLogger@32789c82
 
 val log = LogIO.fromLogger[IO](logger)
-// log: LogIO[IO] = logstage.LogIO$$anon$1@635f6c80
+// log: LogIO[IO] = logstage.LogIO$$anon$1@29b6f06a
 
 log.info(s&quot;Hey! I&#39;m logging with ${log}stage!&quot;).unsafeRunSync()
 </code></pre>
@@ -343,10 +343,10 @@ log.info(s&quot;Hey! I&#39;m logging with ${log}stage!&quot;).unsafeRunSync()
 import zio.{IO, DefaultRuntime}
 
 val log = LogstageZIO.withFiberId(IzLogger())
-// log: logstage.package.LogBIO[IO] = logstage.LogstageZIO$$anon$1@555fb7e8
+// log: logstage.package.LogBIO[IO] = logstage.LogstageZIO$$anon$1@5924fe7b
 
 val rts = new DefaultRuntime {}
-// rts: AnyRef with DefaultRuntime = repl.Session$App10$$anon$1@398e2ef8
+// rts: AnyRef with DefaultRuntime = repl.Session$App10$$anon$1@50c04b98
 rts.unsafeRun {
   log.info(s&quot;Hey! I&#39;m logging with ${log}stage!&quot;)
 }
@@ -381,7 +381,7 @@ def importEntity(entity: Entity)(implicit log: LogIO[IO]): IO[Unit] = {
 import izumi.logstage.api.routing.StaticLogRouter
 
 val myLogger = IzLogger()
-// myLogger: logstage.package.IzLogger.Logger = izumi.logstage.api.IzLogger@2a6bc3c6
+// myLogger: logstage.package.IzLogger.Logger = izumi.logstage.api.IzLogger@26aa518e
 
 // configure SLF4j to use the same router that `myLogger` uses
 StaticLogRouter.instance.setup(myLogger.router)
@@ -396,7 +396,7 @@ Edit this page
 </div>
 <div class="print-only">
 <span class="md-source-file md-version">
-0.10.1*
+0.10.2*
 </span>
 </div>
 </article>
