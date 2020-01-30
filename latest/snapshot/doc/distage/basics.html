@@ -269,10 +269,10 @@ final class HelloByeApp(greeter: Greeter, byer: Byer) {
 <pre class="prettyprint"><code class="language-scala">val plan = Injector().plan(HelloByeModule, GCMode.NoGC)
 // plan: izumi.distage.model.plan.OrderedPlan = {type.Session::App0::Greeter} (basics.md:66) := call(&lt;function1&gt;(): Session::App0::PrintGreeter) {}
 // {type.PlannerInput} (InjectorDefaultImpl.scala:63) := value izumi.distage.model.PlannerInput#-765236905
-// {type.InjectorFactory} (InjectorDefaultImpl.scala:64) := value distage.Injector$#1652658934
-// {type.BootstrapModule} (InjectorDefaultImpl.scala:65) := value izumi.distage.model.definition.BootstrapContextModule$$anon$1#833921940
+// {type.InjectorFactory} (InjectorDefaultImpl.scala:64) := value distage.Injector$#1284014145
+// {type.BootstrapModule} (InjectorDefaultImpl.scala:65) := value izumi.distage.model.definition.BootstrapContextModule$$anon$1#1964608435
 // {type.Session::App0::Byer} (basics.md:67) := call(&lt;function1&gt;(): Session::App0::PrintByer) {}
-// {type.Bootloader} (InjectorDefaultImpl.scala:66) := call(izumi.distage.InjectorDefaultImpl$$anon$1$$Lambda$16547/0x0000000843dab040@17e8fdb9(BootstrapModule, PlannerInput, InjectorFactory): Bootloader) {
+// {type.Bootloader} (InjectorDefaultImpl.scala:66) := call(izumi.distage.InjectorDefaultImpl$$anon$1$$Lambda$17065/0x0000000843f94840@61015503(BootstrapModule, PlannerInput, InjectorFactory): Bootloader) {
 //   arg bootstrapModule: BootstrapModule = lookup({type.BootstrapModule})
 //   arg input: PlannerInput = lookup({type.PlannerInput})
 //   arg injectorFactory: InjectorFactory = lookup({type.InjectorFactory})
@@ -286,7 +286,7 @@ final class HelloByeApp(greeter: Greeter, byer: Byer) {
 <pre class="prettyprint"><code class="language-scala">// Interpret into DIResource
 
 val resource = Injector().produce(plan)
-// resource: izumi.distage.model.definition.DIResource.DIResourceBase[izumi.fundamentals.platform.functional.package.Identity, izumi.distage.model.Locator] = izumi.distage.model.definition.DIResource$$anon$10@6d8e3382
+// resource: izumi.distage.model.definition.DIResource.DIResourceBase[izumi.fundamentals.platform.functional.package.Identity, izumi.distage.model.Locator] = izumi.distage.model.definition.DIResource$$anon$10@6c0c1f2e
 
 // Use the object graph:
 // After `.use` exits, all objects will be deallocated,
@@ -314,7 +314,7 @@ new ModuleDef {
       }
   }
 }
-// res2: AnyRef with ModuleDef = Module(make[{type.repl.Session::repl.Session.App0::repl.Session.App0.Byer@byer-2}].from(call(&lt;function1&gt;(repl.Session::repl.Session.App0::repl.Session.App0.Byer): {java.lang.Object &amp; repl.Session::repl.Session.App0::repl.Session.App0.Byer})) ((basics.md:98)), make[{type.repl.Session::repl.Session.App0::repl.Session.App0.Byer@byer-1}].from(call(&lt;function1&gt;(): repl.Session::repl.Session.App0::repl.Session.App0.PrintByer)) ((basics.md:97)))
+// res2: AnyRef with ModuleDef = Module(make[{type.repl.Session::repl.Session.App0::repl.Session.App0.Byer@byer-1}].from(call(&lt;function1&gt;(): repl.Session::repl.Session.App0::repl.Session.App0.PrintByer)) ((basics.md:97)), make[{type.repl.Session::repl.Session.App0::repl.Session.App0.Byer@byer-2}].from(call(&lt;function1&gt;(repl.Session::repl.Session.App0::repl.Session.App0.Byer): {java.lang.Object &amp; repl.Session::repl.Session.App0::repl.Session.App0.Byer})) ((basics.md:98)))
 </code></pre>
 <p>You can abstract over annotations with type aliases or with string constants:</p>
 <pre class="prettyprint"><code class="language-scala">object Ids {
@@ -359,7 +359,7 @@ val CombinedModule = HelloByeModule overridenBy TwoImplsModule
 // Choose component configuration when making an Injector:
 
 val capsInjector = Injector(Activation(Style -&gt; Style.AllCaps))
-// capsInjector: Injector = izumi.distage.InjectorDefaultImpl@5bb808ac
+// capsInjector: Injector = izumi.distage.InjectorDefaultImpl@1eeebf58
 
 // Check the result:
 
@@ -433,13 +433,13 @@ val module = new ModuleDef {
   addImplicit[Bracket[IO, Throwable]]
   make[MyApp]
 }
-// module: AnyRef with ModuleDef = Module(make[{type.repl.Session::repl.Session.App5::repl.Session.App5.MyApp}].from(call(&lt;function1&gt;(repl.Session::repl.Session.App5::repl.Session.App5.DBConnection, repl.Session::repl.Session.App5::repl.Session.App5.MessageQueueConnection): repl.Session::repl.Session.App5::repl.Session.App5.MyApp)) ((basics.md:219)), make[{type.cats.effect.Bracket[=λ %1:0 → IO[+1:0],=Throwable]}].from(value(cats.effect.IOLowPriorityInstances$IOEffect@4515e5ae: cats.effect.Bracket[=λ %1:0 → IO[+1:0],=Throwable])) ((basics.md:218)), make[{type.repl.Session::repl.Session.App5::repl.Session.App5.MessageQueueConnection}].from(allocate[λ %0 → cats.effect.IO[+0]](call(izumi.distage.model.reflection.universe.RuntimeDIUniverse.Provider$ProviderImpl$$Lambda$17303/0x0000000844145840@5fc02d69(cats.effect.Bracket[=λ %0 → IO[+0],=Throwable]): izumi.distage.model.definition.DIResource::izumi.distage.model.definition.DIResource.FromCats[=λ %1:0 → IO[+1:0],=Session::App5::MessageQueueConnection]))) ((basics.md:217)), make[{type.repl.Session::repl.Session.App5::repl.Session.App5.DBConnection}].from(allocate[λ %0 → cats.effect.IO[+0]](call(izumi.distage.model.reflection.universe.RuntimeDIUniverse.Provider$ProviderImpl$$Lambda$17303/0x0000000844145840@19d1820f(cats.effect.Bracket[=λ %0 → IO[+0],=Throwable]): izumi.distage.model.definition.DIResource::izumi.distage.model.definition.DIResource.FromCats[=λ %1:0 → IO[+1:0],=Session::App5::DBConnection]))) ((basics.md:216)))
+// module: AnyRef with ModuleDef = Module(make[{type.repl.Session::repl.Session.App5::repl.Session.App5.MyApp}].from(call(&lt;function1&gt;(repl.Session::repl.Session.App5::repl.Session.App5.DBConnection, repl.Session::repl.Session.App5::repl.Session.App5.MessageQueueConnection): repl.Session::repl.Session.App5::repl.Session.App5.MyApp)) ((basics.md:219)), make[{type.repl.Session::repl.Session.App5::repl.Session.App5.DBConnection}].from(allocate[λ %0 → cats.effect.IO[+0]](call(izumi.distage.model.reflection.universe.RuntimeDIUniverse.Provider$ProviderImpl$$Lambda$17129/0x0000000844025840@68645e33(cats.effect.Bracket[=λ %0 → IO[+0],=Throwable]): izumi.distage.model.definition.DIResource::izumi.distage.model.definition.DIResource.FromCats[=λ %1:0 → IO[+1:0],=Session::App5::DBConnection]))) ((basics.md:216)), make[{type.cats.effect.Bracket[=λ %1:0 → IO[+1:0],=Throwable]}].from(value(cats.effect.IOLowPriorityInstances$IOEffect@18dda964: cats.effect.Bracket[=λ %1:0 → IO[+1:0],=Throwable])) ((basics.md:218)), make[{type.repl.Session::repl.Session.App5::repl.Session.App5.MessageQueueConnection}].from(allocate[λ %0 → cats.effect.IO[+0]](call(izumi.distage.model.reflection.universe.RuntimeDIUniverse.Provider$ProviderImpl$$Lambda$17129/0x0000000844025840@78676c1d(cats.effect.Bracket[=λ %0 → IO[+0],=Throwable]): izumi.distage.model.definition.DIResource::izumi.distage.model.definition.DIResource.FromCats[=λ %1:0 → IO[+1:0],=Session::App5::MessageQueueConnection]))) ((basics.md:217)))
 </code></pre>
 <p>Will produce the following output:</p>
 <pre class="prettyprint"><code class="language-scala">import distage.DIKey
 
 val objectGraphResource = Injector().produceF[IO](module, GCMode(root = DIKey.get[MyApp]))
-// objectGraphResource: izumi.distage.model.definition.DIResource.DIResourceBase[IO, izumi.distage.model.Locator] = izumi.distage.model.definition.DIResource$$anon$10@7eae891f
+// objectGraphResource: izumi.distage.model.definition.DIResource.DIResourceBase[IO, izumi.distage.model.Locator] = izumi.distage.model.definition.DIResource$$anon$10@37cdf71b
 
 objectGraphResource
   .use(_.get[MyApp].run)
@@ -481,7 +481,7 @@ val closedInit = Injector()
       init
 }
 // true
-// closedInit: izumi.fundamentals.platform.functional.package.Identity[Init] = repl.Session$App7$Init@1d8e7607
+// closedInit: izumi.fundamentals.platform.functional.package.Identity[Init] = repl.Session$App7$Init@7da722ea
 
 println(closedInit.initialized)
 // false
@@ -511,7 +511,7 @@ implicit val timer = IO.timer(global)
 <pre class="prettyprint"><code class="language-scala">val homeRoute = HttpRoutes.of[IO] { 
   case GET -&gt; Root / &quot;home&quot; =&gt; Ok(s&quot;Home page!&quot;) 
 }
-// homeRoute: HttpRoutes[IO] = Kleisli(org.http4s.HttpRoutes$$$Lambda$17342/0x000000084416f840@67691018)
+// homeRoute: HttpRoutes[IO] = Kleisli(org.http4s.HttpRoutes$$$Lambda$17164/0x000000084404f840@154d3543)
 
 object HomeRouteModule extends ModuleDef {
   many[HttpRoutes[IO]]
@@ -523,7 +523,7 @@ object HomeRouteModule extends ModuleDef {
 <pre class="prettyprint"><code class="language-scala">val blogRoute = HttpRoutes.of[IO] { 
   case GET -&gt; Root / &quot;blog&quot; / post =&gt; Ok(s&quot;Blog post ``$post&#39;&#39;!&quot;) 
 }
-// blogRoute: HttpRoutes[IO] = Kleisli(org.http4s.HttpRoutes$$$Lambda$17342/0x000000084416f840@29110dfa)
+// blogRoute: HttpRoutes[IO] = Kleisli(org.http4s.HttpRoutes$$$Lambda$17164/0x000000084404f840@1ae54e08)
 
 object BlogRouteModule extends ModuleDef {  
   many[HttpRoutes[IO]]
@@ -554,16 +554,16 @@ val finalModule = Seq(
   BlogRouteModule,
   HttpServerModule,
 ).merge
-// finalModule: izumi.distage.model.definition.Module = Module(make[{type.org.http4s.client.Client[=λ %1:0 → IO[+1:0]]}].from(allocate[λ %0 → cats.effect.IO[+0]](call(izumi.distage.model.reflection.universe.RuntimeDIUniverse.Provider$ProviderImpl$$Lambda$17303/0x0000000844145840@29efbd06(cats.effect.Bracket[=λ %0 → IO[+0],=Throwable]): izumi.distage.model.definition.DIResource::izumi.distage.model.definition.DIResource.FromCats[=λ %1:0 → IO[+1:0],=Client[=λ %2:0 → IO[+2:0]]]))) ((basics.md:370)), make[{type.org.http4s.server.Server[=λ %1:0 → IO[+1:0]]}].from(allocate[λ %0 → cats.effect.IO[+0]](call(izumi.distage.model.reflection.universe.RuntimeDIUniverse.Provider$ProviderImpl$$Lambda$17303/0x0000000844145840@473fc872(scala.collection.immutable.Set[=Kleisli[=λ %2:0 → OptionT[=λ %4:0 → IO[+4:0],=2:0],-Request[=λ %3:0 → IO[+3:0]],=Response[=λ %3:0 → IO[+3:0]]]], cats.effect.Bracket[=λ %0 → IO[+0],=Throwable]): izumi.distage.model.definition.DIResource::izumi.distage.model.definition.DIResource.FromCats[=λ %1:0 → IO[+1:0],=Server[=λ %2:0 → IO[+2:0]]]))) ((basics.md:369)), make[{type.cats.effect.Bracket[=λ %1:0 → IO[+1:0],=Throwable]}].from(value(cats.effect.IOInstances$$anon$2@4f4a9ddd: cats.effect.Bracket[=λ %1:0 → IO[+1:0],=Throwable])) ((basics.md:371)), many[{type.scala.collection.immutable.Set[=Kleisli[=λ %2:0 → OptionT[=λ %4:0 → IO[+4:0],=2:0],-Request[=λ %3:0 → IO[+3:0]],=Response[=λ %3:0 → IO[+3:0]]]]}] ((basics.md:334)), many[{type.scala.collection.immutable.Set[=Kleisli[=λ %2:0 → OptionT[=λ %4:0 → IO[+4:0],=2:0],-Request[=λ %3:0 → IO[+3:0]],=Response[=λ %3:0 → IO[+3:0]]]]}].add[{type.cats.data.Kleisli[=λ %1:0 → OptionT[=λ %3:0 → IO[+3:0],=1:0],-Request[=λ %2:0 → IO[+2:0]],=Response[=λ %2:0 → IO[+2:0]]]}].from(call(izumi.distage.model.providers.ProviderMagnet$$$Lambda$16339/0x0000000843cde840@68f9e95d(): cats.data.Kleisli[=λ %1:0 → OptionT[=λ %3:0 → IO[+3:0],=1:0],-Request[=λ %2:0 → IO[+2:0]],=Response[=λ %2:0 → IO[+2:0]]])) ((basics.md:335)), many[{type.scala.collection.immutable.Set[=Kleisli[=λ %2:0 → OptionT[=λ %4:0 → IO[+4:0],=2:0],-Request[=λ %3:0 → IO[+3:0]],=Response[=λ %3:0 → IO[+3:0]]]]}].add[{type.cats.data.Kleisli[=λ %1:0 → OptionT[=λ %3:0 → IO[+3:0],=1:0],-Request[=λ %2:0 → IO[+2:0]],=Response[=λ %2:0 → IO[+2:0]]]}].from(call(izumi.distage.model.providers.ProviderMagnet$$$Lambda$16339/0x0000000843cde840@49265765(): cats.data.Kleisli[=λ %1:0 → OptionT[=λ %3:0 → IO[+3:0],=1:0],-Request[=λ %2:0 → IO[+2:0]],=Response[=λ %2:0 → IO[+2:0]]])) ((basics.md:349)))
+// finalModule: izumi.distage.model.definition.Module = Module(make[{type.org.http4s.client.Client[=λ %1:0 → IO[+1:0]]}].from(allocate[λ %0 → cats.effect.IO[+0]](call(izumi.distage.model.reflection.universe.RuntimeDIUniverse.Provider$ProviderImpl$$Lambda$17129/0x0000000844025840@6c7a20af(cats.effect.Bracket[=λ %0 → IO[+0],=Throwable]): izumi.distage.model.definition.DIResource::izumi.distage.model.definition.DIResource.FromCats[=λ %1:0 → IO[+1:0],=Client[=λ %2:0 → IO[+2:0]]]))) ((basics.md:370)), many[{type.scala.collection.immutable.Set[=Kleisli[=λ %2:0 → OptionT[=λ %4:0 → IO[+4:0],=2:0],-Request[=λ %3:0 → IO[+3:0]],=Response[=λ %3:0 → IO[+3:0]]]]}].add[{type.cats.data.Kleisli[=λ %1:0 → OptionT[=λ %3:0 → IO[+3:0],=1:0],-Request[=λ %2:0 → IO[+2:0]],=Response[=λ %2:0 → IO[+2:0]]]}].from(call(izumi.distage.model.providers.ProviderMagnet$$$Lambda$16856/0x0000000843ec6840@280eefb8(): cats.data.Kleisli[=λ %1:0 → OptionT[=λ %3:0 → IO[+3:0],=1:0],-Request[=λ %2:0 → IO[+2:0]],=Response[=λ %2:0 → IO[+2:0]]])) ((basics.md:335)), many[{type.scala.collection.immutable.Set[=Kleisli[=λ %2:0 → OptionT[=λ %4:0 → IO[+4:0],=2:0],-Request[=λ %3:0 → IO[+3:0]],=Response[=λ %3:0 → IO[+3:0]]]]}].add[{type.cats.data.Kleisli[=λ %1:0 → OptionT[=λ %3:0 → IO[+3:0],=1:0],-Request[=λ %2:0 → IO[+2:0]],=Response[=λ %2:0 → IO[+2:0]]]}].from(call(izumi.distage.model.providers.ProviderMagnet$$$Lambda$16856/0x0000000843ec6840@549530d7(): cats.data.Kleisli[=λ %1:0 → OptionT[=λ %3:0 → IO[+3:0],=1:0],-Request[=λ %2:0 → IO[+2:0]],=Response[=λ %2:0 → IO[+2:0]]])) ((basics.md:349)), make[{type.org.http4s.server.Server[=λ %1:0 → IO[+1:0]]}].from(allocate[λ %0 → cats.effect.IO[+0]](call(izumi.distage.model.reflection.universe.RuntimeDIUniverse.Provider$ProviderImpl$$Lambda$17129/0x0000000844025840@6430b143(scala.collection.immutable.Set[=Kleisli[=λ %2:0 → OptionT[=λ %4:0 → IO[+4:0],=2:0],-Request[=λ %3:0 → IO[+3:0]],=Response[=λ %3:0 → IO[+3:0]]]], cats.effect.Bracket[=λ %0 → IO[+0],=Throwable]): izumi.distage.model.definition.DIResource::izumi.distage.model.definition.DIResource.FromCats[=λ %1:0 → IO[+1:0],=Server[=λ %2:0 → IO[+2:0]]]))) ((basics.md:369)), many[{type.scala.collection.immutable.Set[=Kleisli[=λ %2:0 → OptionT[=λ %4:0 → IO[+4:0],=2:0],-Request[=λ %3:0 → IO[+3:0]],=Response[=λ %3:0 → IO[+3:0]]]]}] ((basics.md:334)), make[{type.cats.effect.Bracket[=λ %1:0 → IO[+1:0],=Throwable]}].from(value(cats.effect.IOInstances$$anon$2@333ec9a8: cats.effect.Bracket[=λ %1:0 → IO[+1:0],=Throwable])) ((basics.md:371)))
 
 // wire the graph
 val objects = Injector().produceF[IO](finalModule, GCMode.NoGC).unsafeGet().unsafeRunSync()
-// objects: izumi.distage.model.Locator = izumi.distage.LocatorDefaultImpl@1d75d4ca
+// objects: izumi.distage.model.Locator = izumi.distage.LocatorDefaultImpl@59f28a32
 
 val server = objects.get[Server[IO]]
 // server: Server[IO] = BlazeServer(/127.0.0.1:8080)
 val client = objects.get[Client[IO]]
-// client: Client[IO] = org.http4s.client.Client$$anon$1@2430f34e
+// client: Client[IO] = org.http4s.client.Client$$anon$1@65edd9b
 </code></pre>
 <p>Check if it works:</p>
 <pre class="prettyprint"><code class="language-scala">// check home page
@@ -611,7 +611,7 @@ def dummyKVStore[F[+_, +_]: BIOMonadError: BIOPrimitives]: F[Nothing, KVStore[F]
 val kvStoreModule = new ModuleDef {
   make[KVStore[IO]].fromEffect(dummyKVStore[IO])
 }
-// kvStoreModule: AnyRef with ModuleDef = Module(make[{type.repl.Session::repl.Session.App13::repl.Session.App13.KVStore[=λ %1:0,%1:1 → ZIO[-Any,+1:0,+1:1]]}].from(effect[λ %0 → zio.ZIO[-Any,+Nothing,+0]](value(zio.ZIO$FlatMap@505d68ac: zio.ZIO[-Any,+Nothing,+Session::App13::KVStore[=λ %1:0,%1:1 → ZIO[-Any,+1:0,+1:1]]]))) ((basics.md:449)))
+// kvStoreModule: AnyRef with ModuleDef = Module(make[{type.repl.Session::repl.Session.App13::repl.Session.App13.KVStore[=λ %1:0,%1:1 → ZIO[-Any,+1:0,+1:1]]}].from(effect[λ %0 → zio.ZIO[-Any,+Nothing,+0]](value(zio.ZIO$FlatMap@361bb8b3: zio.ZIO[-Any,+Nothing,+Session::App13::KVStore[=λ %1:0,%1:1 → ZIO[-Any,+1:0,+1:1]]]))) ((basics.md:449)))
 
 val io = Injector()
   .produceGetF[Task, KVStore[IO]](kvStoreModule)
@@ -624,7 +624,7 @@ val io = Injector()
         res2 &lt;- kv.get(&quot;apple&quot;)
       } yield res1 + res2
   }
-// io: Task[String] = zio.ZIO$CheckInterrupt@682bcf15
+// io: Task[String] = zio.ZIO$CheckInterrupt@27474d98
 
 new zio.DefaultRuntime{}.unsafeRun(io)
 // res14: String = pieipad
@@ -651,10 +651,10 @@ trait World {
 // using service functions from everywhere
 
 val hello: URIO[{def hello: Hello}, String] = ZIO.accessM(_.hello.hello)
-// hello: URIO[{def hello: App15.this.Hello}, String] = zio.ZIO$Read@789168ed
+// hello: URIO[{def hello: App15.this.Hello}, String] = zio.ZIO$Read@663bc039
 
 val world: URIO[{def world: World}, String] = ZIO.accessM(_.world.world)
-// world: URIO[{def world: App15.this.World}, String] = zio.ZIO$Read@2314ae4f
+// world: URIO[{def world: App15.this.World}, String] = zio.ZIO$Read@4079e61e
 
 // service implementations
 
@@ -666,7 +666,7 @@ val makeHello = {
     putStrLn(&quot;Shutting down Enterprise Hellower&quot;)
   }
 }
-// makeHello: zio.ZManaged[Console, Nothing, AnyRef with Hello{val hello: zio.UIO[String]}] = zio.ZManaged@7b36e036
+// makeHello: zio.ZManaged[Console, Nothing, AnyRef with Hello{val hello: zio.UIO[String]}] = zio.ZManaged@1748d576
 
 val makeWorld = {
   for {
@@ -675,7 +675,7 @@ val makeWorld = {
     val world = counter.get.map(c =&gt; if (c &lt; 1) &quot;World&quot; else &quot;THE World&quot;)
   }
 }
-// makeWorld: ZIO[Any, Nothing, AnyRef with World{val world: zio.ZIO[Any,Nothing,String]}] = zio.ZIO$FlatMap@70e7795c
+// makeWorld: ZIO[Any, Nothing, AnyRef with World{val world: zio.ZIO[Any,Nothing,String]}] = zio.ZIO$FlatMap@360c147f
 
 // the main function
 
@@ -686,7 +686,7 @@ val turboFunctionalHelloWorld = {
     _     &lt;- putStrLn(s&quot;$hello $world&quot;)
   } yield ()
 }
-// turboFunctionalHelloWorld: ZIO[AnyRef with AnyRef with Console{def hello: App15.this.Hello;def world: App15.this.World}, Nothing, Unit] = zio.ZIO$FlatMap@1e456a00
+// turboFunctionalHelloWorld: ZIO[AnyRef with AnyRef with Console{def hello: App15.this.Hello;def world: App15.this.World}, Nothing, Unit] = zio.ZIO$FlatMap@7faa8f9f
 
 // a generic function that creates an `R` trait where all fields are populated from the object graph
 
@@ -700,12 +700,12 @@ val definition = new ModuleDef {
   make[Console.Service[Any]].fromValue(Console.Live.console)
   make[UIO[Unit]].from(provideCake(turboFunctionalHelloWorld.provide))
 }
-// definition: AnyRef with ModuleDef = Module(make[{type.repl.Session::repl.Session.App15::repl.Session.App15.Hello}].from(allocate[λ %0 → zio.ZIO[-Any,+Nothing,+0]](call(izumi.distage.model.reflection.universe.RuntimeDIUniverse.Provider$ProviderImpl$$Lambda$17303/0x0000000844145840@77a0ef33(zio.console.Console::zio.console.Console.Service[=Any]): izumi.distage.model.definition.DIResource::izumi.distage.model.definition.DIResource.FromZIO[=Any,=Nothing,=({Object &amp; Session::App15::Hello} &amp; {def hello(): ZIO[-Any,+Nothing,+String]})]))) ((basics.md:537)), make[{type.zio.ZIO[-Any,+Nothing,+Unit]}].from(call(izumi.distage.model.reflection.universe.RuntimeDIUniverse.Provider$ProviderImpl$$Lambda$17303/0x0000000844145840@478b011b(repl.Session::repl.Session.App15::repl.Session.App15.Hello, repl.Session::repl.Session.App15::repl.Session.App15.World, zio.console.Console::zio.console.Console.Service[=Any]): zio.ZIO[-Any,+Nothing,+Unit])) ((basics.md:540)), make[{type.repl.Session::repl.Session.App15::repl.Session.App15.World}].from(effect[λ %0 → zio.ZIO[-Any,+Nothing,+0]](value(zio.ZIO$FlatMap@70e7795c: zio.ZIO[-Any,+Nothing,+({Object &amp; Session::App15::World} &amp; {def world(): ZIO[-Any,+Nothing,+String]})]))) ((basics.md:538)), make[{type.zio.console.Console::zio.console.Console.Service[=Any]}].from(value(zio.console.Console$Live$$anon$1@7652fd62: zio.console.Console::zio.console.Console.Service[=Any])) ((basics.md:539)))
+// definition: AnyRef with ModuleDef = Module(make[{type.repl.Session::repl.Session.App15::repl.Session.App15.Hello}].from(allocate[λ %0 → zio.ZIO[-Any,+Nothing,+0]](call(izumi.distage.model.reflection.universe.RuntimeDIUniverse.Provider$ProviderImpl$$Lambda$17129/0x0000000844025840@3f774fa0(zio.console.Console::zio.console.Console.Service[=Any]): izumi.distage.model.definition.DIResource::izumi.distage.model.definition.DIResource.FromZIO[=Any,=Nothing,=({Object &amp; Session::App15::Hello} &amp; {def hello(): ZIO[-Any,+Nothing,+String]})]))) ((basics.md:537)), make[{type.zio.console.Console::zio.console.Console.Service[=Any]}].from(value(zio.console.Console$Live$$anon$1@7778ecb5: zio.console.Console::zio.console.Console.Service[=Any])) ((basics.md:539)), make[{type.zio.ZIO[-Any,+Nothing,+Unit]}].from(call(izumi.distage.model.reflection.universe.RuntimeDIUniverse.Provider$ProviderImpl$$Lambda$17129/0x0000000844025840@70e0fcb4(repl.Session::repl.Session.App15::repl.Session.App15.Hello, repl.Session::repl.Session.App15::repl.Session.App15.World, zio.console.Console::zio.console.Console.Service[=Any]): zio.ZIO[-Any,+Nothing,+Unit])) ((basics.md:540)), make[{type.repl.Session::repl.Session.App15::repl.Session.App15.World}].from(effect[λ %0 → zio.ZIO[-Any,+Nothing,+0]](value(zio.ZIO$FlatMap@360c147f: zio.ZIO[-Any,+Nothing,+({Object &amp; Session::App15::World} &amp; {def world(): ZIO[-Any,+Nothing,+String]})]))) ((basics.md:538)))
 
 val main = Injector()
   .produceGetF[Task, UIO[Unit]](definition)
   .useEffect
-// main: Task[Unit] = zio.ZIO$CheckInterrupt@18fb68d6
+// main: Task[Unit] = zio.ZIO$CheckInterrupt@19fff3b4
 
 new zio.DefaultRuntime{}.unsafeRun(main)
 // Creating Enterprise Hellower...
@@ -843,7 +843,7 @@ val factoryModule = new ModuleDef {
   make[Actor.Factory]
   make[Actor.Configuration].from(Actor.Configuration(allCaps = false))
 }
-// factoryModule: AnyRef with ModuleDef = Module(make[{type.repl.Session::repl.Session.App19::repl.Session.App19.Actor::repl.Session.App19.Actor.Configuration}].from(call(izumi.distage.model.providers.ProviderMagnet$$$Lambda$16339/0x0000000843cde840@53580ef5(): repl.Session::repl.Session.App19::repl.Session.App19.Actor::repl.Session.App19.Actor.Configuration)) ((basics.md:714)), make[{type.repl.Session::repl.Session.App19::repl.Session.App19.Actor::repl.Session.App19.Actor.Factory}].from(call(&lt;function1&gt;(repl.Session::repl.Session.App19::repl.Session.App19.Actor::repl.Session.App19.Actor.Configuration): repl.Session::repl.Session.App19::repl.Session.App19.Actor::repl.Session.App19.Actor.Factory)) ((basics.md:713)))
+// factoryModule: AnyRef with ModuleDef = Module(make[{type.repl.Session::repl.Session.App19::repl.Session.App19.Actor::repl.Session.App19.Actor.Configuration}].from(call(izumi.distage.model.providers.ProviderMagnet$$$Lambda$16856/0x0000000843ec6840@73db64d9(): repl.Session::repl.Session.App19::repl.Session.App19.Actor::repl.Session.App19.Actor.Configuration)) ((basics.md:714)), make[{type.repl.Session::repl.Session.App19::repl.Session.App19.Actor::repl.Session.App19.Actor.Factory}].from(call(&lt;function1&gt;(repl.Session::repl.Session.App19::repl.Session.App19.Actor::repl.Session.App19.Actor.Configuration): repl.Session::repl.Session.App19::repl.Session.App19.Actor::repl.Session.App19.Actor.Factory)) ((basics.md:713)))
 
 Injector()
   .produceGet[Actor.Factory](factoryModule)
@@ -927,7 +927,7 @@ def SyncProgram[F[_]: TagK: Sync] = ProgramModule[F] ++ SyncInterpreters[F]
 // create object graph Resource
 
 val objectsResource = Injector().produceF[IO](SyncProgram[IO], GCMode.NoGC)
-// objectsResource: izumi.distage.model.definition.DIResource.DIResourceBase[IO, izumi.distage.model.Locator] = izumi.distage.model.definition.DIResource$$anon$10@dfcbb3e
+// objectsResource: izumi.distage.model.definition.DIResource.DIResourceBase[IO, izumi.distage.model.Locator] = izumi.distage.model.definition.DIResource$$anon$10@7982f14c
 
 // run
 
@@ -939,7 +939,7 @@ objectsResource.use(_.get[TaglessProgram[IO]].program).unsafeRunSync()
 import zio.Task
 
 val ZIOProgram = ProgramModule[Task] ++ SyncInterpreters[Task]
-// ZIOProgram: Module = Module(make[{type.cats.Monad[=λ %0 → ZIO[-Any,+Throwable,+0]]}].from(value(zio.interop.CatsConcurrent@e7cece3: cats.Monad[=λ %0 → ZIO[-Any,+Throwable,+0]])) ((basics.md:771)), make[{type.repl.Session::repl.Session.App21::repl.Session.App21.Interaction[=λ %0 → ZIO[-Any,+Throwable,+0]]}].from(call(&lt;function1&gt;(cats.effect.Sync[=λ %0 → ZIO[-Any,+Throwable,+0]]): repl.Session::repl.Session.App21::repl.Session.App21.SyncInteraction[=λ %0 → ZIO[-Any,+Throwable,+0]])) ((basics.md:793)), make[{type.repl.Session::repl.Session.App21::repl.Session.App21.TaglessProgram[=λ %0 → ZIO[-Any,+Throwable,+0]]}].from(call(&lt;function1&gt;(cats.Monad[=λ %0 → ZIO[-Any,+Throwable,+0]], repl.Session::repl.Session.App21::repl.Session.App21.Validation[=λ %0 → ZIO[-Any,+Throwable,+0]], repl.Session::repl.Session.App21::repl.Session.App21.Interaction[=λ %0 → ZIO[-Any,+Throwable,+0]]): repl.Session::repl.Session.App21::repl.Session.App21.TaglessProgram[=λ %0 → ZIO[-Any,+Throwable,+0]])) ((basics.md:770)), make[{type.cats.effect.Sync[=λ %0 → ZIO[-Any,+Throwable,+0]]}].from(value(zio.interop.CatsConcurrent@e7cece3: cats.effect.Sync[=λ %0 → ZIO[-Any,+Throwable,+0]])) ((basics.md:794)), make[{type.repl.Session::repl.Session.App21::repl.Session.App21.Validation[=λ %0 → ZIO[-Any,+Throwable,+0]]}].from(call(&lt;function1&gt;(cats.effect.Sync[=λ %0 → ZIO[-Any,+Throwable,+0]]): repl.Session::repl.Session.App21::repl.Session.App21.SyncValidation[=λ %0 → ZIO[-Any,+Throwable,+0]])) ((basics.md:792)))
+// ZIOProgram: Module = Module(make[{type.repl.Session::repl.Session.App21::repl.Session.App21.Interaction[=λ %0 → ZIO[-Any,+Throwable,+0]]}].from(call(&lt;function1&gt;(cats.effect.Sync[=λ %0 → ZIO[-Any,+Throwable,+0]]): repl.Session::repl.Session.App21::repl.Session.App21.SyncInteraction[=λ %0 → ZIO[-Any,+Throwable,+0]])) ((basics.md:793)), make[{type.cats.effect.Sync[=λ %0 → ZIO[-Any,+Throwable,+0]]}].from(value(zio.interop.CatsConcurrent@4fdf025e: cats.effect.Sync[=λ %0 → ZIO[-Any,+Throwable,+0]])) ((basics.md:794)), make[{type.cats.Monad[=λ %0 → ZIO[-Any,+Throwable,+0]]}].from(value(zio.interop.CatsConcurrent@4fdf025e: cats.Monad[=λ %0 → ZIO[-Any,+Throwable,+0]])) ((basics.md:771)), make[{type.repl.Session::repl.Session.App21::repl.Session.App21.TaglessProgram[=λ %0 → ZIO[-Any,+Throwable,+0]]}].from(call(&lt;function1&gt;(cats.Monad[=λ %0 → ZIO[-Any,+Throwable,+0]], repl.Session::repl.Session.App21::repl.Session.App21.Validation[=λ %0 → ZIO[-Any,+Throwable,+0]], repl.Session::repl.Session.App21::repl.Session.App21.Interaction[=λ %0 → ZIO[-Any,+Throwable,+0]]): repl.Session::repl.Session.App21::repl.Session.App21.TaglessProgram[=λ %0 → ZIO[-Any,+Throwable,+0]])) ((basics.md:770)), make[{type.repl.Session::repl.Session.App21::repl.Session.App21.Validation[=λ %0 → ZIO[-Any,+Throwable,+0]]}].from(call(&lt;function1&gt;(cats.effect.Sync[=λ %0 → ZIO[-Any,+Throwable,+0]]): repl.Session::repl.Session.App21::repl.Session.App21.SyncValidation[=λ %0 → ZIO[-Any,+Throwable,+0]])) ((basics.md:792)))
 </code></pre>
 <p>We may even choose different interpreters at runtime:</p>
 <pre class="prettyprint"><code class="language-scala">import zio.RIO
@@ -955,7 +955,7 @@ val RealInterpretersZIO = {
     make[Interaction[RIO[Console, ?]]].from(RealInteractionZIO)
   }
 }
-// RealInterpretersZIO: Module = Module(make[{type.cats.effect.Sync[=λ %0 → ZIO[-Console,+Throwable,+0]]}].from(value(zio.interop.CatsConcurrent@e7cece3: cats.effect.Sync[=λ %0 → ZIO[-Console,+Throwable,+0]])) ((basics.md:794)), make[{type.repl.Session::repl.Session.App21::repl.Session.App21.Interaction[=λ %1:0 → ZIO[-Console,+Throwable,+1:0]]}].from(call(izumi.distage.model.providers.ProviderMagnet$$$Lambda$16339/0x0000000843cde840@1e4023d2(): repl.Session::repl.Session.App21::repl.Session.App21.RealInteractionZIO)) ((basics.md:837)), make[{type.repl.Session::repl.Session.App21::repl.Session.App21.Validation[=λ %0 → ZIO[-Console,+Throwable,+0]]}].from(call(&lt;function1&gt;(cats.effect.Sync[=λ %0 → ZIO[-Console,+Throwable,+0]]): repl.Session::repl.Session.App21::repl.Session.App21.SyncValidation[=λ %0 → ZIO[-Console,+Throwable,+0]])) ((basics.md:792)))
+// RealInterpretersZIO: Module = Module(make[{type.cats.effect.Sync[=λ %0 → ZIO[-Console,+Throwable,+0]]}].from(value(zio.interop.CatsConcurrent@4fdf025e: cats.effect.Sync[=λ %0 → ZIO[-Console,+Throwable,+0]])) ((basics.md:794)), make[{type.repl.Session::repl.Session.App21::repl.Session.App21.Interaction[=λ %1:0 → ZIO[-Console,+Throwable,+1:0]]}].from(call(izumi.distage.model.providers.ProviderMagnet$$$Lambda$16856/0x0000000843ec6840@51d7bf09(): repl.Session::repl.Session.App21::repl.Session.App21.RealInteractionZIO)) ((basics.md:837)), make[{type.repl.Session::repl.Session.App21::repl.Session.App21.Validation[=λ %0 → ZIO[-Console,+Throwable,+0]]}].from(call(&lt;function1&gt;(cats.effect.Sync[=λ %0 → ZIO[-Console,+Throwable,+0]]): repl.Session::repl.Session.App21::repl.Session.App21.SyncValidation[=λ %0 → ZIO[-Console,+Throwable,+0]])) ((basics.md:792)))
 
 def chooseInterpreters(isDummy: Boolean) = {
   val interpreters = if (isDummy) SyncInterpreters[RIO[Console, ?]]
@@ -967,7 +967,7 @@ def chooseInterpreters(isDummy: Boolean) = {
 // execute
 
 chooseInterpreters(true)
-// res23: izumi.distage.model.definition.DIResource.DIResourceBase[zio.ZIO[Console, Throwable, β$5$], TaglessProgram[zio.ZIO[Console, Throwable, β$6$]]] = izumi.distage.model.definition.DIResource$$anon$9@7d5b8bb5
+// res23: izumi.distage.model.definition.DIResource.DIResourceBase[zio.ZIO[Console, Throwable, β$5$], TaglessProgram[zio.ZIO[Console, Throwable, β$6$]]] = izumi.distage.model.definition.DIResource$$anon$9@4555ba53
 </code></pre>
 <p>Modules can be polymorphic over arbitrary kinds - use <code>TagKK</code> to abstract over bifunctors:</p>
 <pre class="prettyprint"><code class="language-scala">class BifunctorIOModule[F[_, _]: TagKK] extends ModuleDef
