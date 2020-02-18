@@ -134,25 +134,21 @@
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="izumi.distage.config">config</a></dd></dl></div>
     </li><li class="current-entities indented4">
-                        <a class="object" href="CirceConfigInstances$.html" title=""></a>
-                        <a class="trait" href="CirceConfigInstances.html" title=""></a>
-                        <a href="CirceConfigInstances.html" title="">CirceConfigInstances</a>
-                      </li><li class="current-entities indented4">
-                        <a class="object" href="CirceDerivationConfigStyle$.html" title=""></a>
-                        <a class="class" href="CirceDerivationConfigStyle.html" title=""></a>
-                        <a href="CirceDerivationConfigStyle.html" title="">CirceDerivationConfigStyle</a>
-                      </li><li class="current-entities indented4">
                         <a class="object" href="ConfigReader$.html" title=""></a>
-                        <a class="trait" href="" title="Config reader that uses Circe Json Decoder instance for a type to decode Typesafe Config."></a>
-                        <a href="" title="Config reader that uses Circe Json Decoder instance for a type to decode Typesafe Config.">ConfigReader</a>
-                      </li><li class="current-entities indented4">
-                        <span class="separator"></span>
-                        <a class="trait" href="LowPriorityCirceConfigInstances.html" title=""></a>
-                        <a href="LowPriorityCirceConfigInstances.html" title="">LowPriorityCirceConfigInstances</a>
+                        <a class="trait" href="" title="Config reader that uses pureconfig.ConfigReader instance for a type to decode Typesafe Config."></a>
+                        <a href="" title="Config reader that uses pureconfig.ConfigReader instance for a type to decode Typesafe Config.">ConfigReader</a>
                       </li><li class="current-entities indented4">
                         <span class="separator"></span>
                         <a class="trait" href="LowPriorityConfigReaderInstances.html" title=""></a>
                         <a href="LowPriorityConfigReaderInstances.html" title="">LowPriorityConfigReaderInstances</a>
+                      </li><li class="current-entities indented4">
+                        <a class="object" href="PureconfigAutoDerive$.html" title=""></a>
+                        <a class="class" href="PureconfigAutoDerive.html" title="Derive pureconfig.ConfigReader for A and for its fields recursively with pureconfig-magnolia"></a>
+                        <a href="PureconfigAutoDerive.html" title="Derive pureconfig.ConfigReader for A and for its fields recursively with pureconfig-magnolia">PureconfigAutoDerive</a>
+                      </li><li class="current-entities indented4">
+                        <a class="object" href="PureconfigInstances$.html" title=""></a>
+                        <a class="trait" href="PureconfigInstances.html" title=""></a>
+                        <a href="PureconfigInstances.html" title="">PureconfigInstances</a>
                       </li>
               </ul>
             </div>
@@ -183,17 +179,19 @@
       </h4>
 
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Config reader that uses Circe Json Decoder instance for a type
-to decode Typesafe Config.</p><p>Always automatically derives a codec if it's not available.</p><p>Automatic derivation will also make additional Decoder instances
-in <a href="CirceConfigInstances.html" class="extype" name="izumi.distage.config.codec.CirceConfigInstances">CirceConfigInstances</a> available. If you want to use this
-deriving strategy for your own Decoder instance, you may use
-<code>ConfigReader.deriveDecoder</code>:</p><pre><span class="kw">case</span> <span class="kw">class</span> Abc(a: Duration, b: Regex, c: URL) <span class="cmt">// types for which there is no default instance in Circe</span>
-<span class="kw">object</span> Abc {
-  <span class="kw">implicit</span> <span class="kw">val</span> decoder: Decoder[Abc] = ConfigReader.deriveDecoder
-}</pre><p>Or just import <a href="CirceConfigInstances.html" class="extype" name="izumi.distage.config.codec.CirceConfigInstances">CirceConfigInstances</a>:</p><pre><span class="kw">object</span> Abc {
-  <span class="kw">import</span> CirceConfigInstances._
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Config reader that uses pureconfig.ConfigReader instance for a type
+to decode Typesafe Config.</p><p>Always automatically derives a codec if it's not available.</p><p>Automatic derivation will use **<code>camelCase</code>** fields, not <code>snake-case</code> fields,
+as in default pureconfig. It also override pureconfig's default <code>type</code> field
+type discriminator for sealed traits. Instead, using <code>circe</code>-like format with a single-key object. Example:</p><pre><span class="kw">sealed</span> <span class="kw">trait</span> AorB
+<span class="kw">final</span> <span class="kw">case</span> <span class="kw">class</span> A(a: <span class="std">Int</span>) <span class="kw">extends</span> AorB
+<span class="kw">final</span> <span class="kw">case</span> <span class="kw">class</span> B(b: <span class="std">String</span>) <span class="kw">extends</span> AorB
 
-  <span class="kw">implicit</span> <span class="kw">val</span> decoder: Decoder[Abc] = io.circe.derivation.deriveDecoder
+<span class="kw">final</span> <span class="kw">case</span> <span class="kw">class</span> Config(values: <span class="std">List</span>[AorB])</pre><p>in config:</p><pre>config {
+  values = [{ A { a = <span class="num">5</span> } }, { B { b = cba } }]
+}</pre><p>It will also work without importing <code>pureconfig.generic.auto._</code></p><p>If you want to use it to recursively derive a pureconfig codec,
+you may use <code>PureconfigAutoDerive[T]</code>:</p><pre><span class="kw">final</span> <span class="kw">case</span> <span class="kw">class</span> Abc(a: Duration, b: Regex, c: URL)
+<span class="kw">object</span> Abc {
+  <span class="kw">implicit</span> <span class="kw">val</span> configReader: pureconfig.ConfigReader[Abc] = PureconfigAutoDerive[Abc]
 }</pre></div><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
