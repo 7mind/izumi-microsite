@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="x-ua-compatible" content="ie=edge">
 <meta name="description" content="microsite">
-<meta name="generator" content="Paradox, paradox-material-theme=0.10.2-M6, mkdocs-material=3.0.3">
+<meta name="generator" content="Paradox, paradox-material-theme=0.10.2-M7-ZIORC16, mkdocs-material=3.0.3">
 
 <meta name="lang:clipboard.copy" content="Copy to clipboard">
 <meta name="lang:clipboard.copied" content="Copied to clipboard">
@@ -173,7 +173,7 @@ data-md-source="github">
 <ul style="display: none">
 <li class="md-nav__item md-version" id="project.version">
 <label class="md-nav__link" for="__version">
-<i class="md-icon" title="Version">label_outline</i> 0.10.2-M6
+<i class="md-icon" title="Version">label_outline</i> 0.10.2-M7-ZIORC16
 </label>
 </li>
 </ul>
@@ -223,11 +223,13 @@ val badModule = new ModuleDef {
 
 val badPlan = Injector().plan(badModule, GCMode.NoGC)
 // badPlan: izumi.distage.model.plan.OrderedPlan = {type.Session::App0::B} (debugging.md:21) := import {type.repl.Session::repl.Session.App0::repl.Session.App0.B} // required for {type.Session::App0::A}
-// {type.PlannerInput} (InjectorDefaultImpl.scala:63) := value izumi.distage.model.PlannerInput#1675207882
-// {type.InjectorFactory} (InjectorDefaultImpl.scala:64) := value distage.Injector$#1659916447
-// {type.BootstrapModule} (InjectorDefaultImpl.scala:65) := value izumi.distage.model.definition.BootstrapContextModule$$anon$1#-1104045937
-// {type.Bootloader} (InjectorDefaultImpl.scala:66) := call(izumi.distage.InjectorDefaultImpl$$anon$1$$Lambda$16574/0x0000000843de1840@21404f9c(BootstrapModule, PlannerInput, InjectorFactory): Bootloader) {
+// {type.Activation} (InjectorDefaultImpl.scala:67) := value izumi.distage.model.definition.Activation#-1609326920
+// {type.PlannerInput} (InjectorDefaultImpl.scala:64) := value izumi.distage.model.PlannerInput#1675207882
+// {type.InjectorFactory} (InjectorDefaultImpl.scala:65) := value distage.Injector$#639562738
+// {type.BootstrapModule} (InjectorDefaultImpl.scala:66) := value izumi.distage.model.definition.BootstrapModule$$anon$1#269909999
+// {type.Bootloader} (InjectorDefaultImpl.scala:68) := call(izumi.distage.InjectorDefaultImpl$$anon$1$$Lambda$16574/0x0000000843e1c840@2bd28a3c(BootstrapModule, Activation, PlannerInput, InjectorFactory): Bootloader) {
 //   arg bootstrapModule: BootstrapModule = lookup({type.BootstrapModule})
+//   arg activation: Activation = lookup({type.Activation})
 //   arg input: PlannerInput = lookup({type.PlannerInput})
 //   arg injectorFactory: InjectorFactory = lookup({type.InjectorFactory})
 // }
@@ -259,12 +261,14 @@ val badPlan = Injector().plan(badModule, GCMode.NoGC)
 // goodModule: AnyRef with ModuleDef = Module(make[{type.repl.Session::repl.Session.App0::repl.Session.App0.A}].from(call(&lt;function1&gt;(repl.Session::repl.Session.App0::repl.Session.App0.B): repl.Session::repl.Session.App0::repl.Session.App0.A)) ((debugging.md:40)), make[{type.repl.Session::repl.Session.App0::repl.Session.App0.B}].from(call(&lt;function1&gt;(): repl.Session::repl.Session.App0::repl.Session.App0.B)) ((debugging.md:41)))
 
 val plan = Injector().plan(goodModule, GCMode.NoGC)
-// plan: izumi.distage.model.plan.OrderedPlan = {type.PlannerInput} (InjectorDefaultImpl.scala:63) := value izumi.distage.model.PlannerInput#494913340
-// {type.InjectorFactory} (InjectorDefaultImpl.scala:64) := value distage.Injector$#1659916447
-// {type.BootstrapModule} (InjectorDefaultImpl.scala:65) := value izumi.distage.model.definition.BootstrapContextModule$$anon$1#-1104045937
+// plan: izumi.distage.model.plan.OrderedPlan = {type.Activation} (InjectorDefaultImpl.scala:67) := value izumi.distage.model.definition.Activation#-1609326920
+// {type.PlannerInput} (InjectorDefaultImpl.scala:64) := value izumi.distage.model.PlannerInput#494913340
+// {type.InjectorFactory} (InjectorDefaultImpl.scala:65) := value distage.Injector$#639562738
+// {type.BootstrapModule} (InjectorDefaultImpl.scala:66) := value izumi.distage.model.definition.BootstrapModule$$anon$1#269909999
 // {type.Session::App0::B} (debugging.md:41) := call(&lt;function1&gt;(): Session::App0::B) {}
-// {type.Bootloader} (InjectorDefaultImpl.scala:66) := call(izumi.distage.InjectorDefaultImpl$$anon$1$$Lambda$16574/0x0000000843de1840@21404f9c(BootstrapModule, PlannerInput, InjectorFactory): Bootloader) {
+// {type.Bootloader} (InjectorDefaultImpl.scala:68) := call(izumi.distage.InjectorDefaultImpl$$anon$1$$Lambda$16574/0x0000000843e1c840@2bd28a3c(BootstrapModule, Activation, PlannerInput, InjectorFactory): Bootloader) {
 //   arg bootstrapModule: BootstrapModule = lookup({type.BootstrapModule})
+//   arg activation: Activation = lookup({type.Activation})
 //   arg input: PlannerInput = lookup({type.PlannerInput})
 //   arg injectorFactory: InjectorFactory = lookup({type.InjectorFactory})
 // }
@@ -277,12 +281,14 @@ plan.assertImportsResolvedOrThrow
 <h3><a href="#pretty-printing-plans" name="pretty-printing-plans" class="anchor"><span class="anchor-link"></span></a>Pretty-printing plans</h3>
 <p>You can print the output of <code>plan.render()</code> to get detailed info on what will happen during instantiation. The printout includes source and line numbers so your IDE can show you where the binding was defined!</p>
 <pre class="prettyprint"><code class="language-scala">println(plan.render())
-// {type.PlannerInput} (InjectorDefaultImpl.scala:63) := value izumi.distage.model.PlannerInput#494913340
-// {type.InjectorFactory} (InjectorDefaultImpl.scala:64) := value distage.Injector$#1659916447
-// {type.BootstrapModule} (InjectorDefaultImpl.scala:65) := value izumi.distage.model.definition.BootstrapContextModule$$anon$1#-1104045937
+// {type.Activation} (InjectorDefaultImpl.scala:67) := value izumi.distage.model.definition.Activation#-1609326920
+// {type.PlannerInput} (InjectorDefaultImpl.scala:64) := value izumi.distage.model.PlannerInput#494913340
+// {type.InjectorFactory} (InjectorDefaultImpl.scala:65) := value distage.Injector$#639562738
+// {type.BootstrapModule} (InjectorDefaultImpl.scala:66) := value izumi.distage.model.definition.BootstrapModule$$anon$1#269909999
 // {type.Session::App0::B} (debugging.md:41) := call(&lt;function1&gt;(): Session::App0::B) {}
-// {type.Bootloader} (InjectorDefaultImpl.scala:66) := call(izumi.distage.InjectorDefaultImpl$$anon$1$$Lambda$16574/0x0000000843de1840@21404f9c(BootstrapModule, PlannerInput, InjectorFactory): Bootloader) {
+// {type.Bootloader} (InjectorDefaultImpl.scala:68) := call(izumi.distage.InjectorDefaultImpl$$anon$1$$Lambda$16574/0x0000000843e1c840@2bd28a3c(BootstrapModule, Activation, PlannerInput, InjectorFactory): Bootloader) {
 //   arg bootstrapModule: BootstrapModule = lookup({type.BootstrapModule})
+//   arg activation: Activation = lookup({type.Activation})
 //   arg input: PlannerInput = lookup({type.PlannerInput})
 //   arg injectorFactory: InjectorFactory = lookup({type.InjectorFactory})
 // }
@@ -294,11 +300,11 @@ plan.assertImportsResolvedOrThrow
 <p>You can also query a plan to see the dependencies and reverse dependencies of a specific class and their order of instantiation:</p>
 <pre class="prettyprint"><code class="language-scala">// Print dependencies
 println(plan.topology.dependencies.tree(DIKey.get[A]))
-// DepNode({type.repl.Session::repl.Session.App0::repl.Session.App0.A},DependencyGraph(Map({type.izumi.distage.model.recursive.Bootloader} -&gt; Set({type.izumi.distage.model.definition.BootstrapModule}, {type.izumi.distage.InjectorFactory}, {type.izumi.distage.model.PlannerInput}), {type.izumi.distage.model.PlannerInput} -&gt; Set(), {type.izumi.distage.InjectorFactory} -&gt; Set(), {type.izumi.distage.model.definition.BootstrapModule} -&gt; Set(), {type.repl.Session::repl.Session.App0::repl.Session.App0.A} -&gt; Set({type.repl.Session::repl.Session.App0::repl.Session.App0.B}), {type.repl.Session::repl.Session.App0::repl.Session.App0.B} -&gt; Set()),Depends),0,None,Set())
+// DepNode({type.repl.Session::repl.Session.App0::repl.Session.App0.A},DependencyGraph(Map({type.izumi.distage.model.definition.Activation} -&gt; Set(), {type.izumi.distage.model.recursive.Bootloader} -&gt; Set({type.izumi.distage.model.definition.BootstrapModule}, {type.izumi.distage.InjectorFactory}, {type.izumi.distage.model.PlannerInput}, {type.izumi.distage.model.definition.Activation}), {type.izumi.distage.model.PlannerInput} -&gt; Set(), {type.izumi.distage.InjectorFactory} -&gt; Set(), {type.izumi.distage.model.definition.BootstrapModule} -&gt; Set(), {type.repl.Session::repl.Session.App0::repl.Session.App0.A} -&gt; Set({type.repl.Session::repl.Session.App0::repl.Session.App0.B}), {type.repl.Session::repl.Session.App0::repl.Session.App0.B} -&gt; Set()),Depends),0,None,Set())
 
 // Print reverse dependencies
 println(plan.topology.dependees.tree(DIKey.get[B]))
-// DepNode({type.repl.Session::repl.Session.App0::repl.Session.App0.B},DependencyGraph(Map({type.izumi.distage.model.recursive.Bootloader} -&gt; Set(), {type.izumi.distage.model.PlannerInput} -&gt; Set({type.izumi.distage.model.recursive.Bootloader}), {type.izumi.distage.InjectorFactory} -&gt; Set({type.izumi.distage.model.recursive.Bootloader}), {type.izumi.distage.model.definition.BootstrapModule} -&gt; Set({type.izumi.distage.model.recursive.Bootloader}), {type.repl.Session::repl.Session.App0::repl.Session.App0.A} -&gt; Set(), {type.repl.Session::repl.Session.App0::repl.Session.App0.B} -&gt; Set({type.repl.Session::repl.Session.App0::repl.Session.App0.A})),Required),0,None,Set())
+// DepNode({type.repl.Session::repl.Session.App0::repl.Session.App0.B},DependencyGraph(Map({type.izumi.distage.model.definition.Activation} -&gt; Set({type.izumi.distage.model.recursive.Bootloader}), {type.izumi.distage.model.recursive.Bootloader} -&gt; Set(), {type.izumi.distage.model.PlannerInput} -&gt; Set({type.izumi.distage.model.recursive.Bootloader}), {type.izumi.distage.InjectorFactory} -&gt; Set({type.izumi.distage.model.recursive.Bootloader}), {type.izumi.distage.model.definition.BootstrapModule} -&gt; Set({type.izumi.distage.model.recursive.Bootloader}), {type.repl.Session::repl.Session.App0::repl.Session.App0.A} -&gt; Set(), {type.repl.Session::repl.Session.App0::repl.Session.App0.B} -&gt; Set({type.repl.Session::repl.Session.App0::repl.Session.App0.A})),Required),0,None,Set())
 </code></pre>
 <p>The printer highlights circular dependencies:</p>
 <p><img src="media/print-dependencies.png" alt="print-dependencies" /></p>
@@ -312,7 +318,7 @@ sbt -Dizumi.debug.macro.distage.providermagnet=true compile # ProviderMagnet mac
 <pre class="prettyprint"><code class="language-scala">import distage.GraphDumpBootstrapModule
 
 val injector = Injector(GraphDumpBootstrapModule())
-// injector: Injector = izumi.distage.InjectorDefaultImpl@1713ca7a
+// injector: Injector = izumi.distage.InjectorDefaultImpl@7955d377
 </code></pre>
 <p>Data will be saved dumped to <code>./target/plan-last-full.gv</code> and <code>./target/plan-last-nogc.gv</code> in current working directory. </p>
 <p>You&rsquo;ll need a <code>GraphViz</code> installation to render these files into a viewable PNG images:</p>
@@ -321,13 +327,13 @@ val injector = Injector(GraphDumpBootstrapModule())
 <p><img src="media/plan-graph.png" alt="plan-graph" /></p>
 </div>
 <div>
-<a href="https://github.com/7mind/izumi/tree/v0.10.2-M6/doc/microsite/target/mdoc/distage/debugging.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/7mind/izumi/tree/v0.10.2-M7-ZIORC16/doc/microsite/target/mdoc/distage/debugging.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>
 <div class="print-only">
 <span class="md-source-file md-version">
-0.10.2-M6
+0.10.2-M7-ZIORC16
 </span>
 </div>
 </article>
