@@ -146,6 +146,7 @@ data-md-source="github">
     <li><a href="../distage/reference.html" class="page">Syntax Summary</a></li>
   </ul></li>
   <li><a href="../logstage/index.html" class="page">LogStage</a></li>
+  <li><a href="../bio/index.html" class="page">BIO</a></li>
   <li><a href="../idealingua/index.html" class="page">IdeaLingua RPC/DML</a>
   <ul>
     <li><a href="../idealingua/language-reference.html" class="page">Idealingua Language Reference</a></li>
@@ -215,14 +216,13 @@ import izumi.distage.model.definition.Activation
 import izumi.distage.model.definition.StandardAxis.Repo
 import izumi.distage.plugins.PluginConfig
 import izumi.distage.testkit.TestConfig
-import izumi.distage.testkit.scalatest.{AssertIO, DistageBIOSpecScalatest}
-import izumi.distage.testkit.services.DISyntaxZIOEnv
+import izumi.distage.testkit.scalatest.{AssertIO, DistageBIOEnvSpecScalatest}
 import leaderboard.model.{Score, UserId}
 import leaderboard.repo.{Ladder, Profiles}
 import leaderboard.zioenv.{ladder, rnd}
-import zio.IO
+import zio.{ZIO, IO}
 
-abstract class LeaderboardTest extends DistageBIOSpecScalatest[IO] with DISyntaxZIOEnv with AssertIO {
+abstract class LeaderboardTest extends DistageBIOEnvSpecScalatest[ZIO] with AssertIO {
   override def config = super.config.copy(
     pluginConfig = PluginConfig.cached(packagesEnabled = Seq(&quot;leaderboard.plugins&quot;)),
     moduleOverrides = new ModuleDef {
@@ -293,6 +293,30 @@ abstract class LadderTest extends LeaderboardTest {
           assertIO(user2Rank &lt; user1Rank)
         } else IO.unit
       } yield ()
+    }
+
+    // you can also mix arguments and env at the same time
+    &quot;assign a higher position in the list to a higher score 2&quot; in {
+      ladder: Ladder[IO] =&gt;
+          for {
+            user1  &lt;- rnd[UserId]
+            score1 &lt;- rnd[Score]
+            user2  &lt;- rnd[UserId]
+            score2 &lt;- rnd[Score]
+    
+            _      &lt;- ladder.submitScore(user1, score1)
+            _      &lt;- ladder.submitScore(user2, score2)
+            scores &lt;- ladder.getScores
+    
+            user1Rank = scores.indexWhere(_._1 == user1)
+            user2Rank = scores.indexWhere(_._1 == user2)
+    
+            _ &lt;- if (score1 &gt; score2) {
+              assertIO(user1Rank &lt; user2Rank)
+            } else if (score2 &gt; score1) {
+              assertIO(user2Rank &lt; user1Rank)
+            } else IO.unit
+          } yield ()
     }
   }
 
