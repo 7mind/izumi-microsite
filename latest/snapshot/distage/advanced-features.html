@@ -261,15 +261,15 @@ val gc = GCMode(root = DIKey.get[A])
 val objects = Injector().produce(module, gc).unsafeGet()
 // B!
 // A!
-// objects: izumi.fundamentals.platform.functional.package.Identity[Locator] = izumi.distage.LocatorDefaultImpl@2ec4c088
+// objects: izumi.fundamentals.platform.functional.package.Identity[Locator] = izumi.distage.LocatorDefaultImpl@7b5ee587
 
 // A and B are in the object graph
 
 objects.find[A]
-// res1: Option[A] = Some(repl.Session$App0$A@45375cb7)
+// res1: Option[A] = Some(repl.Session$App0$A@7b30102c)
 
 objects.find[B]
-// res2: Option[B] = Some(repl.Session$App0$B@edf5c25)
+// res2: Option[B] = Some(repl.Session$App0$B@28a95b34)
 
 // C is missing
 
@@ -285,10 +285,10 @@ val objects = Injector().produce(module, GCMode(DIKey.get[A])).unsafeGet()
 // C!
 // B!
 // A!
-// objects: izumi.fundamentals.platform.functional.package.Identity[Locator] = izumi.distage.LocatorDefaultImpl@6389d02
+// objects: izumi.fundamentals.platform.functional.package.Identity[Locator] = izumi.distage.LocatorDefaultImpl@72ff1802
 
 objects.find[C]
-// res5: Option[C] = Some(repl.Session$App4$C@6c364b2d)
+// res5: Option[C] = Some(repl.Session$App4$C@74479f42)
 </code></pre>
 <h3><a href="#circular-dependencies-support" name="circular-dependencies-support" class="anchor"><span class="anchor-link"></span></a>Circular Dependencies Support</h3>
 <p><code>distage</code> automatically resolves arbitrary circular dependencies, including self-references:</p>
@@ -303,7 +303,7 @@ val objects = Injector().produce(new ModuleDef {
   make[B]
   make[C]
 }, GCMode.NoGC).unsafeGet()
-// objects: izumi.fundamentals.platform.functional.package.Identity[izumi.distage.model.Locator] = izumi.distage.LocatorDefaultImpl@26aeb312
+// objects: izumi.fundamentals.platform.functional.package.Identity[izumi.distage.model.Locator] = izumi.distage.LocatorDefaultImpl@37273877
 
 objects.get[A] eq objects.get[B].a
 // res7: Boolean = true
@@ -316,7 +316,7 @@ objects.get[C] eq objects.get[C].c
 <p>The above strategy depends on <code>distage-core-proxy-cglib</code> module which is a default dependency of <code>distage-core</code>.</p>
 <p>If you want to disable it, use <code>NoProxies</code> bootstrap configuration:</p>
 <pre class="prettyprint"><code class="language-scala">Injector.NoProxies()
-// res10: Injector = izumi.distage.InjectorDefaultImpl@42849e24
+// res10: Injector = izumi.distage.InjectorDefaultImpl@4b5aa20c
 </code></pre>
 <p>Proxies are not supported on Scala.js.</p>
 <h4><a href="#manual-resolution-with-by-name-parameters" name="manual-resolution-with-by-name-parameters" class="anchor"><span class="anchor-link"></span></a>Manual Resolution with by-name parameters</h4>
@@ -347,7 +347,7 @@ val module = new ModuleDef {
 val locator = Injector.NoProxies()
   .produce(module, GCMode.NoGC)
   .unsafeGet()
-// locator: izumi.fundamentals.platform.functional.package.Identity[izumi.distage.model.Locator] = izumi.distage.LocatorDefaultImpl@2a6c1393
+// locator: izumi.fundamentals.platform.functional.package.Identity[izumi.distage.model.Locator] = izumi.distage.LocatorDefaultImpl@3e68c094
 
 locator.get[A].b eq locator.get[B]
 // res12: Boolean = true
@@ -378,7 +378,7 @@ val bootstrapModule = new BootstrapModuleDef {
   many[PlanningHook]
     .add(new AutoSetHook[PrintResource, PrintResource](identity))
 }
-// bootstrapModule: AnyRef with BootstrapModuleDef = Module(many[{type.scala.collection.immutable.Set[=PlanningHook]}] ((advanced-features.md:207)), many[{type.scala.collection.immutable.Set[=PlanningHook]}].add[{type.izumi.distage.planning.AutoSetHook[=Session::App15::PrintResource,=Session::App15::PrintResource]}].from(call(izumi.distage.model.providers.ProviderMagnet$$$Lambda$17303/0x00000008427ba840@4293c858(): izumi.distage.planning.AutoSetHook[=Session::App15::PrintResource,=Session::App15::PrintResource])) ((advanced-features.md:208)))
+// bootstrapModule: AnyRef with BootstrapModuleDef = Module(many[{type.scala.collection.immutable.Set[=PlanningHook]}] ((advanced-features.md:207)), many[{type.scala.collection.immutable.Set[=PlanningHook]}].add[{type.izumi.distage.planning.AutoSetHook[=Session::App15::PrintResource,=Session::App15::PrintResource]}].from(call(izumi.distage.model.providers.ProviderMagnet$$$Lambda$17175/0x00000008441f8840@677b420f(): izumi.distage.planning.AutoSetHook[=Session::App15::PrintResource,=Session::App15::PrintResource])) ((advanced-features.md:208)))
 
 val appModule = new ModuleDef {
   make[A]
@@ -390,7 +390,7 @@ val appModule = new ModuleDef {
 val resources = Injector(bootstrapModule)
   .produce(appModule, GCMode.NoGC)
   .use(_.get[Set[PrintResource]])
-// resources: izumi.fundamentals.platform.functional.package.Identity[Set[PrintResource]] = ListSet(repl.Session$App15$A@541df4be, repl.Session$App15$B@33d1fe8, repl.Session$App15$C@2e5b1294)
+// resources: izumi.fundamentals.platform.functional.package.Identity[Set[PrintResource]] = ListSet(repl.Session$App15$A@2959c24f, repl.Session$App15$B@75740e60, repl.Session$App15$C@43a9fccc)
 
 resources.foreach(_.start())
 // A started
@@ -438,7 +438,7 @@ val roots = Set[DIKey](DIKey.get[Set[Elem]])
 
 val objects = Injector().produce(PlannerInput(module, roots)).unsafeGet()
 // Strong constructed
-// objects: izumi.fundamentals.platform.functional.package.Identity[Locator] = izumi.distage.LocatorDefaultImpl@44632a38
+// objects: izumi.fundamentals.platform.functional.package.Identity[Locator] = izumi.distage.LocatorDefaultImpl@46bf2926
 
 // Strong is around
 
@@ -464,17 +464,17 @@ objects.get[Set[Elem]]
 val objects = Injector().produce(PlannerInput(module, roots)).unsafeGet()
 // Weak constructed
 // Strong constructed
-// objects: izumi.fundamentals.platform.functional.package.Identity[Locator] = izumi.distage.LocatorDefaultImpl@10439ef4
+// objects: izumi.fundamentals.platform.functional.package.Identity[Locator] = izumi.distage.LocatorDefaultImpl@749f30b1
 
 // Weak is around
 
 objects.find[Weak]
-// res23: Option[Weak] = Some(repl.Session$App22$Weak@3b262e52)
+// res23: Option[Weak] = Some(repl.Session$App22$Weak@1280a223)
 
 // both Strong and Weak are in the Set
 
 objects.get[Set[Elem]]
-// res24: Set[Elem] = Set(repl.Session$App22$Weak@3b262e52, repl.Session$App22$Strong@b707e7c)
+// res24: Set[Elem] = Set(repl.Session$App22$Weak@1280a223, repl.Session$App22$Strong@79abd105)
 </code></pre>
 <h3><a href="#inner-classes-and-path-dependent-types" name="inner-classes-and-path-dependent-types" class="anchor"><span class="anchor-link"></span></a>Inner Classes and Path-Dependent Types</h3>
 <p>Path-dependent types with a value prefix will be instantiated normally:</p>
@@ -484,7 +484,7 @@ class Path {
   class A
 }
 val path = new Path
-// path: Path = repl.Session$App25$Path@593729b0
+// path: Path = repl.Session$App25$Path@2ab0a24d
 
 val module = new ModuleDef {
   make[path.A]
@@ -494,7 +494,7 @@ val module = new ModuleDef {
 Injector()
   .produce(module, GCMode.NoGC)
   .use(_.get[path.A])
-// res26: izumi.fundamentals.platform.functional.package.Identity[path.A] = repl.Session$App25$Path$A@7b527bbe
+// res26: izumi.fundamentals.platform.functional.package.Identity[path.A] = repl.Session$App25$Path$A@22f8c811
 </code></pre>
 <p>Since version <code>0.10</code>, support for path-dependent types with a non-value (type) prefix hasn&rsquo;t reimplemented after a rewrite of the internals, see issue: <a href="https://github.com/7mind/izumi/issues/764">https://github.com/7mind/izumi/issues/764</a></p>
 <p>However, there&rsquo;s a gotcha with value prefixes, when seen by distage they&rsquo;re based on the <strong>literal variable name</strong> of the prefix, not the full type information available to the compiler, therefore the following usage will fail:</p>
@@ -503,9 +503,9 @@ Injector()
 }
 
 val path1 = new Path
-// path1: Path = repl.Session$App25$Path@666556a6
+// path1: Path = repl.Session$App25$Path@2b231240
 val path2 = new Path
-// path2: Path = repl.Session$App25$Path@688abfaa
+// path2: Path = repl.Session$App25$Path@a873c00
 </code></pre>
 <pre class="prettyprint"><code class="language-scala">Injector()
   .produceRun(pathModule(path1) ++ pathModule(path2)) {
@@ -740,16 +740,16 @@ def pathModule[A: Tag: ClassConstructor](p: Path.Aux[A]) = new ModuleDef {
 }
 
 val path1 = new Path
-// path1: Path = repl.Session$App27$Path@215c30a7
+// path1: Path = repl.Session$App27$Path@624ac110
 val path2 = new Path
-// path2: Path = repl.Session$App27$Path@55401f4b
+// path2: Path = repl.Session$App27$Path@5cd33eb8
 
 Injector()
   .produceRun(pathModule(path1) ++ pathModule(path2)) {
     (p1a: path1.A, p2a: path2.A) =&gt;
       println((p1a, p2a))
   }
-// (repl.Session$App27$Path$A@5744b678,repl.Session$App27$Path$A@4ca7dce0)
+// (repl.Session$App27$Path$A@373ec785,repl.Session$App27$Path$A@5be6ea7d)
 </code></pre>
 <p>Now the example works, because the <code>A</code> inside <code>pathModule</code> is <code>path1.A</code> &amp; <code>path2.A</code> respectively, the same as it is later in <code>produceRun</code></p>
 <h3><a href="#depending-on-locator" name="depending-on-locator" class="anchor"><span class="anchor-link"></span></a>Depending on Locator</h3>
@@ -772,19 +772,19 @@ val module = new ModuleDef {
 // module: AnyRef with ModuleDef = Module(make[{type.repl.Session::repl.Session.App29::repl.Session.App29.A}].from(call(Class(izumi.distage.model.recursive.LocatorRef): repl.Session::repl.Session.App29::repl.Session.App29.A)) ((advanced-features.md:440)), make[{type.repl.Session::repl.Session.App29::repl.Session.App29.B}].from(call(Class(): repl.Session::repl.Session.App29::repl.Session.App29.B)) ((advanced-features.md:441)), make[{type.repl.Session::repl.Session.App29::repl.Session.App29.C}].from(call(Class(): repl.Session::repl.Session.App29::repl.Session.App29.C)) ((advanced-features.md:442)))
 
 val objects = Injector().produce(module, GCMode.NoGC).unsafeGet()
-// objects: izumi.fundamentals.platform.functional.package.Identity[izumi.distage.model.Locator] = izumi.distage.LocatorDefaultImpl@758befee
+// objects: izumi.fundamentals.platform.functional.package.Identity[izumi.distage.model.Locator] = izumi.distage.LocatorDefaultImpl@73d8679a
 
 // A took C from the object graph
 
 objects.get[A].c
-// res30: C = repl.Session$App29$C@21f637f9
+// res30: C = repl.Session$App29$C@178ef5f2
 
 // this C is the same C as in this `objects` value
 
 val thisC = objects.get[C]
-// thisC: C = repl.Session$App29$C@21f637f9
+// thisC: C = repl.Session$App29$C@178ef5f2
 val thatC = objects.get[A].c
-// thatC: C = repl.Session$App29$C@21f637f9
+// thatC: C = repl.Session$App29$C@178ef5f2
 
 assert(thisC == thatC)
 </code></pre>
@@ -797,9 +797,9 @@ val plan: OrderedPlan = objects.plan
 // plan: OrderedPlan = {type.LocatorRef} (advanced-features.md:440) := import {type.izumi.distage.model.recursive.LocatorRef} // required for {type.Session::App29::A}
 // {type.Activation} (InjectorDefaultImpl.scala:67) := value izumi.distage.model.definition.Activation#-1609326920
 // {type.Session::App29::B} (advanced-features.md:441) := call(Class(): Session::App29::B) {}
-// {type.InjectorFactory} (InjectorDefaultImpl.scala:65) := value distage.Injector$#78933107
+// {type.InjectorFactory} (InjectorDefaultImpl.scala:65) := value distage.Injector$#1336550779
 // {type.Session::App29::C} (advanced-features.md:442) := call(Class(): Session::App29::C) {}
-// {type.BootstrapModule} (InjectorDefaultImpl.scala:66) := value izumi.distage.model.definition.BootstrapModule$$anon$1#-550533395
+// {type.BootstrapModule} (InjectorDefaultImpl.scala:66) := value izumi.distage.model.definition.BootstrapModule$$anon$1#-746191086
 // {type.PlannerInput} (InjectorDefaultImpl.scala:64) := value izumi.distage.model.PlannerInput#1220240083
 // {type.Bootloader} (InjectorDefaultImpl.scala:68) := call(Class(BootstrapModule, Activation, PlannerInput, InjectorFactory): Bootloader) {
 //   arg bootstrapModule: BootstrapModule = lookup({type.BootstrapModule})
@@ -814,7 +814,7 @@ val plan: OrderedPlan = objects.plan
 // Bindings from which the Plan was built (after GC)
 
 val bindings: ModuleBase = plan.definition
-// bindings: ModuleBase = Module(make[{type.repl.Session::repl.Session.App29::repl.Session.App29.A}].from(call(Class(izumi.distage.model.recursive.LocatorRef): repl.Session::repl.Session.App29::repl.Session.App29.A)) ((advanced-features.md:440)), make[{type.izumi.distage.model.definition.BootstrapModule}].from(value(Module(make[{type.izumi.distage.model.planning.PlanningHook}].from(call(Class(scala.collection.immutable.Set[=PlanningHook]): izumi.distage.planning.PlanningHookAggregate)) ((BootstrapLocator.scala:150)), make[{type.izumi.distage.model.provisioning.strategies.SetStrategy}].from(call(Class(): izumi.distage.provisioning.strategies.SetStrategyDefaultImpl)) ((BootstrapLocator.scala:137)), make[{type.izumi.distage.planning.BindingTranslator}].from(call(Class(izumi.distage.model.planning.PlanningHook): izumi.distage.planning.BindingTranslator::izumi.distage.planning.BindingTranslator.Impl)) ((BootstrapLocator.scala:152)), make[{type.izumi.distage.model.provisioning.strategies.ProviderStrategy}].from(call(Class(): izumi.distage.provisioning.strategies.ProviderStrategyDefaultImpl)) ((BootstrapLocator.scala:138)), make[{type.izumi.distage.model.planning.PlanAnalyzer}].from(call(Class(): izumi.distage.planning.PlanAnalyzerDefaultImpl)) ((BootstrapLocator.scala:132)), make[{type.izumi.distage.model.provisioning.strategies.ProxyStrategy}].from(call(Class(izumi.distage.model.provisioning.proxies.ProxyProvider, izumi.distage.model.reflection.MirrorProvider): izumi.distage.provisioning.strategies.ProxyStrategyDefaultImpl)) ((BootstrapLocator.scala:154)), make[{type.izumi.distage.model.provisioning.ProvisioningFailureInterceptor}].from(call(Class(): izumi.distage.model.provisioning.ProvisioningFailureInterceptor::izumi.distage.model.provisioning.ProvisioningFailureInterceptor.DefaultImpl)) ((BootstrapLocator.scala:144)), make[{type.izumi.distage.model.definition.Activation}].from(value(Activation(Map()): izumi.distage.model.definition.Activation)) ((BootstrapLocator.scala:34)), make[{type.izumi.distage.model.provisioning.strategies.EffectStrategy}].from(call(Class(): izumi.distage.provisioning.strategies.EffectStrategyDefaultImpl)) ((BootstrapLocator.scala:141)), make[{type.izumi.distage.model.provisioning.PlanInterpreter}].from(call(Class(izumi.distage.model.provisioning.strategies.SetStrategy, izumi.distage.model.provisioning.strategies.ProxyStrategy, izumi.distage.model.provisioning.strategies.ProviderStrategy, izumi.distage.model.provisioning.strategies.ImportStrategy, izumi.distage.model.provisioning.strategies.InstanceStrategy, izumi.distage.model.provisioning.strategies.EffectStrategy, izumi.distage.model.provisioning.strategies.ResourceStrategy, izumi.distage.model.provisioning.ProvisioningFailureInterceptor, izumi.distage.provisioning.ProvisionOperationVerifier): izumi.distage.provisioning.PlanInterpreterDefaultRuntimeImpl)) ((BootstrapLocator.scala:143)), make[{type.izumi.distage.provisioning.ProvisionOperationVerifier}].from(call(Class(izumi.distage.model.reflection.MirrorProvider): izumi.distage.provisioning.ProvisionOperationVerifier::izumi.distage.provisioning.ProvisionOperationVerifier.Default)) ((BootstrapLocator.scala:127)), make[{type.izumi.distage.model.planning.SanityChecker}].from(call(Class(izumi.distage.model.planning.PlanAnalyzer): izumi.distage.planning.SanityCheckerDefaultImpl)) ((BootstrapLocator.scala:135)), make[{type.izumi.distage.model.provisioning.strategies.ResourceStrategy}].from(call(Class(): izumi.distage.provisioning.strategies.ResourceStrategyDefaultImpl)) ((BootstrapLocator.scala:142)), make[{type.izumi.distage.model.provisioning.strategies.InstanceStrategy}].from(call(Class(): izumi.distage.provisioning.strategies.InstanceStrategyDefaultImpl)) ((BootstrapLocator.scala:140)), many[{type.scala.collection.immutable.Set[=PlanningHook]}] ((BootstrapLocator.scala:147)), make[{type.izumi.distage.model.provisioning.proxies.ProxyProvider}].from(call(Class(): izumi.distage.provisioning.strategies.cglib.CglibProxyProvider)) ((CglibBootstrap.scala:11)), many[{type.scala.collection.immutable.Set[=PlanningObserver]}] ((BootstrapLocator.scala:146)), make[{type.izumi.distage.model.planning.DIGarbageCollector}].from(call(Singleton(): izumi.distage.planning.gc.TracingDIGC)) ((BootstrapLocator.scala:130)), make[{type.izumi.distage.model.Planner}].from(call(Class(izumi.distage.model.planning.ForwardingRefResolver, izumi.distage.model.planning.SanityChecker, izumi.distage.model.planning.DIGarbageCollector, izumi.distage.model.planning.PlanningObserver, izumi.distage.model.planning.PlanMergingPolicy, izumi.distage.model.planning.PlanningHook, izumi.distage.planning.BindingTranslator, izumi.distage.model.planning.PlanAnalyzer, izumi.distage.model.reflection.MirrorProvider): izumi.distage.planning.PlannerDefaultImpl)) ((BootstrapLocator.scala:136)), make[{type.izumi.distage.model.planning.ForwardingRefResolver}].from(call(Class(izumi.distage.model.planning.PlanAnalyzer, scala.Boolean): izumi.distage.planning.ForwardingRefResolverDefaultImpl)) ((BootstrapLocator.scala:134)), make[{type.izumi.distage.model.reflection.MirrorProvider}].from(value(izumi.distage.model.reflection.MirrorProvider$Impl$@3bb80842: izumi.distage.model.reflection.MirrorProvider::izumi.distage.model.reflection.MirrorProvider.Impl)) ((BootstrapLocator.scala:129)), make[{type.izumi.distage.model.provisioning.strategies.ImportStrategy}].from(call(Class(): izumi.distage.provisioning.strategies.ImportStrategyDefaultImpl)) ((BootstrapLocator.scala:139)), make[{type.izumi.distage.model.planning.PlanMergingPolicy}].from(call(Class(izumi.distage.model.definition.Activation): izumi.distage.planning.PruningPlanMergingPolicyDefaultImpl)) ((BootstrapLocator.scala:133)), make[{type.izumi.distage.model.planning.PlanningObserver}].from(call(Class(scala.collection.immutable.Set[=PlanningObserver]): izumi.distage.planning.PlanningObserverAggregate)) ((BootstrapLocator.scala:149)), make[{type.scala.Boolean@distage.init-proxies-asap}].from(value(true: scala.Boolean)) ((BootstrapLocator.scala:125))): izumi.distage.model.definition.BootstrapModule)) ((InjectorDefaultImpl.scala:66)), make[{type.izumi.distage.model.definition.Activation}].from(value(Activation(Map()): izumi.distage.model.definition.Activation)) ((InjectorDefaultImpl.scala:67)), make[{type.repl.Session::repl.Session.App29::repl.Session.App29.B}].from(call(Class(): repl.Session::repl.Session.App29::repl.Session.App29.B)) ((advanced-features.md:441)), make[{type.repl.Session::repl.Session.App29::repl.Session.App29.C}].from(call(Class(): repl.Session::repl.Session.App29::repl.Session.App29.C)) ((advanced-features.md:442)), make[{type.izumi.distage.InjectorFactory}].from(value(distage.Injector$@4b46c73: izumi.distage.InjectorFactory)) ((InjectorDefaultImpl.scala:65)), make[{type.izumi.distage.model.PlannerInput}].from(value(PlannerInput(Module(make[{type.repl.Session::repl.Session.App29::repl.Session.App29.A}].from(call(Class(izumi.distage.model.recursive.LocatorRef): repl.Session::repl.Session.App29::repl.Session.App29.A)) ((advanced-features.md:440)), make[{type.repl.Session::repl.Session.App29::repl.Session.App29.B}].from(call(Class(): repl.Session::repl.Session.App29::repl.Session.App29.B)) ((advanced-features.md:441)), make[{type.repl.Session::repl.Session.App29::repl.Session.App29.C}].from(call(Class(): repl.Session::repl.Session.App29::repl.Session.App29.C)) ((advanced-features.md:442))),NoGC): izumi.distage.model.PlannerInput)) ((InjectorDefaultImpl.scala:64)), make[{type.izumi.distage.model.recursive.Bootloader}].from(call(Class(izumi.distage.model.definition.BootstrapModule, izumi.distage.model.definition.Activation, izumi.distage.model.PlannerInput, izumi.distage.InjectorFactory): izumi.distage.model.recursive.Bootloader)) ((InjectorDefaultImpl.scala:68)))
+// bindings: ModuleBase = Module(make[{type.repl.Session::repl.Session.App29::repl.Session.App29.A}].from(call(Class(izumi.distage.model.recursive.LocatorRef): repl.Session::repl.Session.App29::repl.Session.App29.A)) ((advanced-features.md:440)), make[{type.izumi.distage.InjectorFactory}].from(value(distage.Injector$@4faa257b: izumi.distage.InjectorFactory)) ((InjectorDefaultImpl.scala:65)), make[{type.izumi.distage.model.definition.Activation}].from(value(Activation(Map()): izumi.distage.model.definition.Activation)) ((InjectorDefaultImpl.scala:67)), make[{type.izumi.distage.model.definition.BootstrapModule}].from(value(Module(make[{type.izumi.distage.model.planning.PlanningHook}].from(call(Class(scala.collection.immutable.Set[=PlanningHook]): izumi.distage.planning.PlanningHookAggregate)) ((BootstrapLocator.scala:150)), make[{type.izumi.distage.model.provisioning.strategies.SetStrategy}].from(call(Class(): izumi.distage.provisioning.strategies.SetStrategyDefaultImpl)) ((BootstrapLocator.scala:137)), make[{type.izumi.distage.planning.BindingTranslator}].from(call(Class(izumi.distage.model.planning.PlanningHook): izumi.distage.planning.BindingTranslator::izumi.distage.planning.BindingTranslator.Impl)) ((BootstrapLocator.scala:152)), make[{type.izumi.distage.model.provisioning.strategies.ProviderStrategy}].from(call(Class(): izumi.distage.provisioning.strategies.ProviderStrategyDefaultImpl)) ((BootstrapLocator.scala:138)), make[{type.izumi.distage.model.planning.PlanAnalyzer}].from(call(Class(): izumi.distage.planning.PlanAnalyzerDefaultImpl)) ((BootstrapLocator.scala:132)), make[{type.izumi.distage.model.provisioning.strategies.ProxyStrategy}].from(call(Class(izumi.distage.model.provisioning.proxies.ProxyProvider, izumi.distage.model.reflection.MirrorProvider): izumi.distage.provisioning.strategies.ProxyStrategyDefaultImpl)) ((BootstrapLocator.scala:154)), make[{type.izumi.distage.model.planning.ForwardingRefResolver}].from(call(Class(izumi.distage.model.planning.PlanAnalyzer, scala.Boolean): izumi.distage.planning.ForwardingRefResolverDefaultImpl)) ((BootstrapLocator.scala:134)), make[{type.izumi.distage.model.provisioning.ProvisioningFailureInterceptor}].from(call(Class(): izumi.distage.model.provisioning.ProvisioningFailureInterceptor::izumi.distage.model.provisioning.ProvisioningFailureInterceptor.DefaultImpl)) ((BootstrapLocator.scala:144)), make[{type.izumi.distage.model.provisioning.strategies.EffectStrategy}].from(call(Class(): izumi.distage.provisioning.strategies.EffectStrategyDefaultImpl)) ((BootstrapLocator.scala:141)), make[{type.izumi.distage.model.provisioning.PlanInterpreter}].from(call(Class(izumi.distage.model.provisioning.strategies.SetStrategy, izumi.distage.model.provisioning.strategies.ProxyStrategy, izumi.distage.model.provisioning.strategies.ProviderStrategy, izumi.distage.model.provisioning.strategies.ImportStrategy, izumi.distage.model.provisioning.strategies.InstanceStrategy, izumi.distage.model.provisioning.strategies.EffectStrategy, izumi.distage.model.provisioning.strategies.ResourceStrategy, izumi.distage.model.provisioning.ProvisioningFailureInterceptor, izumi.distage.provisioning.ProvisionOperationVerifier): izumi.distage.provisioning.PlanInterpreterDefaultRuntimeImpl)) ((BootstrapLocator.scala:143)), make[{type.izumi.distage.provisioning.ProvisionOperationVerifier}].from(call(Class(izumi.distage.model.reflection.MirrorProvider): izumi.distage.provisioning.ProvisionOperationVerifier::izumi.distage.provisioning.ProvisionOperationVerifier.Default)) ((BootstrapLocator.scala:127)), make[{type.izumi.distage.model.planning.SanityChecker}].from(call(Class(izumi.distage.model.planning.PlanAnalyzer): izumi.distage.planning.SanityCheckerDefaultImpl)) ((BootstrapLocator.scala:135)), make[{type.izumi.distage.model.provisioning.strategies.ResourceStrategy}].from(call(Class(): izumi.distage.provisioning.strategies.ResourceStrategyDefaultImpl)) ((BootstrapLocator.scala:142)), make[{type.izumi.distage.model.provisioning.strategies.InstanceStrategy}].from(call(Class(): izumi.distage.provisioning.strategies.InstanceStrategyDefaultImpl)) ((BootstrapLocator.scala:140)), many[{type.scala.collection.immutable.Set[=PlanningHook]}] ((BootstrapLocator.scala:147)), make[{type.izumi.distage.model.provisioning.proxies.ProxyProvider}].from(call(Class(): izumi.distage.provisioning.strategies.cglib.CglibProxyProvider)) ((CglibBootstrap.scala:11)), many[{type.scala.collection.immutable.Set[=PlanningObserver]}] ((BootstrapLocator.scala:146)), make[{type.izumi.distage.model.planning.DIGarbageCollector}].from(call(Singleton(): izumi.distage.planning.gc.TracingDIGC)) ((BootstrapLocator.scala:130)), make[{type.izumi.distage.model.Planner}].from(call(Class(izumi.distage.model.planning.ForwardingRefResolver, izumi.distage.model.planning.SanityChecker, izumi.distage.model.planning.DIGarbageCollector, izumi.distage.model.planning.PlanningObserver, izumi.distage.model.planning.PlanMergingPolicy, izumi.distage.model.planning.PlanningHook, izumi.distage.planning.BindingTranslator, izumi.distage.model.planning.PlanAnalyzer, izumi.distage.model.reflection.MirrorProvider): izumi.distage.planning.PlannerDefaultImpl)) ((BootstrapLocator.scala:136)), make[{type.izumi.distage.model.provisioning.strategies.ImportStrategy}].from(call(Class(): izumi.distage.provisioning.strategies.ImportStrategyDefaultImpl)) ((BootstrapLocator.scala:139)), make[{type.izumi.distage.model.planning.PlanMergingPolicy}].from(call(Class(izumi.distage.model.definition.Activation): izumi.distage.planning.PruningPlanMergingPolicyDefaultImpl)) ((BootstrapLocator.scala:133)), make[{type.izumi.distage.model.definition.Activation}].from(value(Activation(Map()): izumi.distage.model.definition.Activation)) ((BootstrapLocator.scala:34)), make[{type.izumi.distage.model.reflection.MirrorProvider}].from(value(izumi.distage.model.reflection.MirrorProvider$Impl$@38368223: izumi.distage.model.reflection.MirrorProvider::izumi.distage.model.reflection.MirrorProvider.Impl)) ((BootstrapLocator.scala:129)), make[{type.izumi.distage.model.planning.PlanningObserver}].from(call(Class(scala.collection.immutable.Set[=PlanningObserver]): izumi.distage.planning.PlanningObserverAggregate)) ((BootstrapLocator.scala:149)), make[{type.scala.Boolean@distage.init-proxies-asap}].from(value(true: scala.Boolean)) ((BootstrapLocator.scala:125))): izumi.distage.model.definition.BootstrapModule)) ((InjectorDefaultImpl.scala:66)), make[{type.repl.Session::repl.Session.App29::repl.Session.App29.B}].from(call(Class(): repl.Session::repl.Session.App29::repl.Session.App29.B)) ((advanced-features.md:441)), make[{type.repl.Session::repl.Session.App29::repl.Session.App29.C}].from(call(Class(): repl.Session::repl.Session.App29::repl.Session.App29.C)) ((advanced-features.md:442)), make[{type.izumi.distage.model.PlannerInput}].from(value(PlannerInput(Module(make[{type.repl.Session::repl.Session.App29::repl.Session.App29.A}].from(call(Class(izumi.distage.model.recursive.LocatorRef): repl.Session::repl.Session.App29::repl.Session.App29.A)) ((advanced-features.md:440)), make[{type.repl.Session::repl.Session.App29::repl.Session.App29.B}].from(call(Class(): repl.Session::repl.Session.App29::repl.Session.App29.B)) ((advanced-features.md:441)), make[{type.repl.Session::repl.Session.App29::repl.Session.App29.C}].from(call(Class(): repl.Session::repl.Session.App29::repl.Session.App29.C)) ((advanced-features.md:442))),NoGC): izumi.distage.model.PlannerInput)) ((InjectorDefaultImpl.scala:64)), make[{type.izumi.distage.model.recursive.Bootloader}].from(call(Class(izumi.distage.model.definition.BootstrapModule, izumi.distage.model.definition.Activation, izumi.distage.model.PlannerInput, izumi.distage.InjectorFactory): izumi.distage.model.recursive.Bootloader)) ((InjectorDefaultImpl.scala:68)))
 </code></pre>
 <p>The plan and bindings in Locator are saved in the state they were AFTER <a href="advanced-features.html#garbage-collection">Garbage Collection</a> has been performed. Objects can request the original input via a <code>PlannerInput</code> parameter:</p>
 <pre class="prettyprint"><code class="language-scala">import distage.{DIKey, GCMode, ModuleDef, PlannerInput, Injector}
@@ -830,7 +830,7 @@ val input = PlannerInput(module, GCMode(root = DIKey.get[InjectionInfo]))
 // input: PlannerInput = PlannerInput(Module(make[{type.repl.Session::repl.Session.App32::repl.Session.App32.InjectionInfo}].from(call(Class(izumi.distage.model.PlannerInput): repl.Session::repl.Session.App32::repl.Session.App32.InjectionInfo)) ((advanced-features.md:486))),GCRoots(Set({type.repl.Session::repl.Session.App32::repl.Session.App32.InjectionInfo})))
 
 val injectionInfo = Injector().produce(input).unsafeGet().get[InjectionInfo]
-// injectionInfo: InjectionInfo = repl.Session$App32$InjectionInfo@b81d42b
+// injectionInfo: InjectionInfo = repl.Session$App32$InjectionInfo@66c68c0
 
 // the PlannerInput in `InjectionInfo` is the same as `input`
 
