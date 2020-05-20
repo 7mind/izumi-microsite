@@ -257,10 +257,10 @@ val module = new ConfigModuleDef {
       |}&quot;&quot;&quot;.stripMargin
   )))
 }
-// module: AnyRef with ConfigModuleDef = make[{type.repl.Session::repl.Session.App0::repl.Session.App0.Conf}].from(call(izumi.distage.config.ConfigModuleDef$$Lambda$18829/0x000000084473e840@59f511(izumi.distage.config.model.AppConfig): repl.Session::repl.Session.App0::repl.Session.App0.Conf)).tagged(Set(ConfTag(conf))) ((distage-framework.md:37))
-// make[{type.izumi.distage.config.model.AppConfig}].from(call(izumi.distage.model.providers.ProviderMagnet$$$Lambda$17191/0x000000084403f040@336bf175(): izumi.distage.config.model.AppConfig)) ((distage-framework.md:41))
-// make[{type.repl.Session::repl.Session.App0::repl.Session.App0.OtherConf@other}].from(call(izumi.distage.config.ConfigModuleDef$$Lambda$18829/0x000000084473e840@c0a1383(izumi.distage.config.model.AppConfig): repl.Session::repl.Session.App0::repl.Session.App0.OtherConf)).tagged(Set(ConfTag(conf))) ((distage-framework.md:38))
+// module: AnyRef with ConfigModuleDef = make[{type.repl.Session::repl.Session.App0::repl.Session.App0.OtherConf@other}].from(call(izumi.distage.config.ConfigModuleDef$$Lambda$18818/0x0000000844995840@5328e90(izumi.distage.config.model.AppConfig): repl.Session::repl.Session.App0::repl.Session.App0.OtherConf)).tagged(Set(ConfTag(conf))) ((distage-framework.md:38))
+// make[{type.repl.Session::repl.Session.App0::repl.Session.App0.Conf}].from(call(izumi.distage.config.ConfigModuleDef$$Lambda$18818/0x0000000844995840@13b2f3a4(izumi.distage.config.model.AppConfig): repl.Session::repl.Session.App0::repl.Session.App0.Conf)).tagged(Set(ConfTag(conf))) ((distage-framework.md:37))
 // make[{type.repl.Session::repl.Session.App0::repl.Session.App0.ConfigPrinter}].from(call(Class(repl.Session::repl.Session.App0::repl.Session.App0.Conf, repl.Session::repl.Session.App0::repl.Session.App0.OtherConf): repl.Session::repl.Session.App0::repl.Session.App0.ConfigPrinter)) ((distage-framework.md:34))
+// make[{type.izumi.distage.config.model.AppConfig}].from(call(izumi.distage.model.providers.ProviderMagnet$$$Lambda$17180/0x0000000844297040@51884434(): izumi.distage.config.model.AppConfig)) ((distage-framework.md:41))
 
 Injector().produceRun(module) {
   configPrinter: ConfigPrinter =&gt;
@@ -269,7 +269,7 @@ Injector().produceRun(module) {
 // name: John, age: 33, other: true
 </code></pre>
 <p>Automatic derivation of config codecs is based on <a href="https://github.com/pureconfig/pureconfig">pureconfig-magnolia</a>. Pureconfig codecs for a type will be used if they exist.</p>
-<p>Default configuration in <a href="distage-testkit.html">distage-testkit</a>&rsquo;s tests and in <a href="distage-framework.html">distage-framework</a>&rsquo;s Roles will try to read the configurations from resources with names:</p>
+<p>You don&rsquo;t have to explicitly <code>make[AppConfig]</code> in <a href="distage-testkit.html">distage-testkit</a>&rsquo;s tests and in <a href="distage-framework.html">distage-framework</a>&rsquo;s Roles, unless you want to override default behavior. By default, tests and roles will try to read the configurations from resources with the following names, in order:</p>
 <pre><code>- $roleName.conf
 - $roleName-reference.conf
 - $roleName-reference-dev.conf
@@ -280,7 +280,7 @@ Injector().produceRun(module) {
 - common-reference.conf
 - common-reference-dev.conf
 </code></pre>
-<p>In order. You don&rsquo;t have to supply an <code>AppConfig</code> in tests or roles, unless you want to override default behavior.</p>
+<p>Where <code>distage-testkit</code> uses <a href="/latest/snapshot/api/izumi/distage/testkit/TestConfig.html#testBaseName"><code>TestConfig#testBaseName</code></a> instead of <code>roleName</code> </p>
 <h3><a href="#plugins" name="plugins" class="anchor"><span class="anchor-link"></span></a>Plugins</h3>
 <p><code>distage-extension-plugins</code> module adds classpath discovery for modules that inherit a marker trait <code>PluginBase</code>. Plugins enable extreme late-binding; e.g. they allow a program to extend itself at launch time with new <code>Plugin</code> classes on the classpath. Plugins are compatible with <a href="distage-framework.html#compile-time-checks">compile-time checks</a> as long as they&rsquo;re defined in a separate module.</p>
 <p>To use plugins, first add the <code>distage-extension-plugins</code> library:</p>
@@ -323,7 +323,7 @@ Injector()
   .produceGet[PetStoreController](appModule)
   .use(_.run())
 // PetStoreController: running!
-// res3: izumi.fundamentals.platform.functional.package.Identity[Unit] = ()
+// res4: izumi.fundamentals.platform.functional.package.Identity[Unit] = ()
 </code></pre>
 <h3><a href="#compile-time-checks" name="compile-time-checks" class="anchor"><span class="anchor-link"></span></a>Compile-time checks</h3>
 <p>An experimental compile-time verification API is available in the <code>distage-framework</code> module.</p>
