@@ -227,7 +227,7 @@ data-md-source="github">
 <pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;io.7mind.izumi&quot; %% &quot;distage-extension-config&quot; % &quot;0.10.9-SNAPSHOT&quot;
 </code></pre>
 <p>Use helper functions in <code>ConfigModuleDef</code> to parse the Typesafe Config instance bound to <code>AppConfig</code> into case classes:</p>
-<pre class="prettyprint"><code class="language-scala">import distage.{DIKey, GCMode, ModuleDef, Id, Injector}
+<pre class="prettyprint"><code class="language-scala">import distage.{DIKey, Roots, ModuleDef, Id, Injector}
 import distage.config.{AppConfig, ConfigModuleDef}
 import com.typesafe.config.ConfigFactory
 
@@ -257,10 +257,10 @@ val module = new ConfigModuleDef {
       |}&quot;&quot;&quot;.stripMargin
   )))
 }
-// module: AnyRef with ConfigModuleDef = make[{type.repl.Session::repl.Session.App0::repl.Session.App0.OtherConf@other}].from(call(izumi.distage.config.ConfigModuleDef$$$Lambda$18825/0x000000084472c040@49aed9d1(izumi.distage.config.model.AppConfig): repl.Session::repl.Session.App0::repl.Session.App0.OtherConf)).tagged(Set(ConfTag(conf))) ((distage-framework.md:38))
-// make[{type.repl.Session::repl.Session.App0::repl.Session.App0.Conf}].from(call(izumi.distage.config.ConfigModuleDef$$$Lambda$18825/0x000000084472c040@683f855c(izumi.distage.config.model.AppConfig): repl.Session::repl.Session.App0::repl.Session.App0.Conf)).tagged(Set(ConfTag(conf))) ((distage-framework.md:37))
-// make[{type.izumi.distage.config.model.AppConfig}].from(call(izumi.distage.model.providers.ProviderMagnet$$$Lambda$17192/0x000000084402a840@789b2db2(): izumi.distage.config.model.AppConfig)) ((distage-framework.md:41))
+// module: AnyRef with ConfigModuleDef = make[{type.izumi.distage.config.model.AppConfig}].from(call(izumi.distage.model.providers.ProviderMagnet$$$Lambda$17165/0x000000084402a840@77933c1f(): izumi.distage.config.model.AppConfig)) ((distage-framework.md:41))
 // make[{type.repl.Session::repl.Session.App0::repl.Session.App0.ConfigPrinter}].from(call(Class(repl.Session::repl.Session.App0::repl.Session.App0.Conf, repl.Session::repl.Session.App0::repl.Session.App0.OtherConf): repl.Session::repl.Session.App0::repl.Session.App0.ConfigPrinter)) ((distage-framework.md:34))
+// make[{type.repl.Session::repl.Session.App0::repl.Session.App0.Conf}].from(call(izumi.distage.config.ConfigModuleDef$$$Lambda$18799/0x000000084472c840@52265eb3(izumi.distage.config.model.AppConfig): repl.Session::repl.Session.App0::repl.Session.App0.Conf)).tagged(Set(ConfTag(conf))) ((distage-framework.md:37))
+// make[{type.repl.Session::repl.Session.App0::repl.Session.App0.OtherConf@other}].from(call(izumi.distage.config.ConfigModuleDef$$$Lambda$18799/0x000000084472c840@2d650260(izumi.distage.config.model.AppConfig): repl.Session::repl.Session.App0::repl.Session.App0.OtherConf)).tagged(Set(ConfTag(conf))) ((distage-framework.md:38))
 
 Injector().produceRun(module) {
   configPrinter: ConfigPrinter =&gt;
@@ -359,7 +359,7 @@ final class AppPlugin extends PluginDef with ConfigModuleDef {
 // Declare OtherService as an external dependency
 final class AppRequirements extends ModuleRequirements(
   // If we remove this line, compilation will rightfully break
-  Set(DIKey.get[OtherService])
+  Set(DIKey[OtherService])
 )
 </code></pre>
 <p>In config:</p>
