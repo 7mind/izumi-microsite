@@ -229,7 +229,7 @@ data-md-source="github">
   <li><a href="../distage/basics.html#effect-bindings" class="header">Effect Bindings</a></li>
   <li><a href="../distage/basics.html#zio-has-bindings" class="header">ZIO Has Bindings</a>
   <ul>
-    <li><a href="../distage/basics.html#turning-zio-environment-dependencies-into-arguments-and-vice-versa" class="header">Turning ZIO Environment dependencies into arguments and vice-versa</a></li>
+    <li><a href="../distage/basics.html#converting-between-zio-environment-dependencies-and-parameters" class="header">Converting between ZIO environment dependencies and parameters</a></li>
   </ul></li>
   <li><a href="../distage/basics.html#auto-traits" class="header">Auto-Traits</a></li>
   <li><a href="../distage/basics.html#auto-factories" class="header">Auto-Factories</a></li>
@@ -246,14 +246,14 @@ trait Greeter {
 }
 
 final class PrintGreeter extends Greeter {
-  override def hello(name: String) = println(s&quot;Hello $name!&quot;) 
+  override def hello(name: String) = println(s&quot;Hello $name!&quot;)
 }
 
 trait Byer {
   def bye(name: String): Unit
 }
 
-final class PrintByer extends Byer {  
+final class PrintByer extends Byer {
   override def bye(name: String) = println(s&quot;Bye $name!&quot;)
 }
 
@@ -261,7 +261,7 @@ final class HelloByeApp(greeter: Greeter, byer: Byer) {
   def run(): Unit = {
     println(&quot;What&#39;s your name?&quot;)
     val name = readLine()
-    
+
     greeter.hello(name)
     byer.bye(name)
   }
@@ -271,16 +271,16 @@ final class HelloByeApp(greeter: Greeter, byer: Byer) {
 <pre class="prettyprint"><code class="language-scala">val HelloByeModule = new ModuleDef {
   make[Greeter].from[PrintGreeter]
   make[Byer].from[PrintByer]
-  make[HelloByeApp] // `.from` is not required for concrete classes 
+  make[HelloByeApp] // `.from` is not required for concrete classes
 }
-// HelloByeModule: AnyRef with ModuleDef = 
+// HelloByeModule: AnyRef with ModuleDef =
 // make[{type.repl.Session::repl.Session.App0::repl.Session.App0.Greeter}].from(call(Class(): repl.Session::repl.Session.App0::repl.Session.App0.PrintGreeter)) ((basics.md:66))
 // make[{type.repl.Session::repl.Session.App0::repl.Session.App0.HelloByeApp}].from(call(Class(repl.Session::repl.Session.App0::repl.Session.App0.Greeter, repl.Session::repl.Session.App0::repl.Session.App0.Byer): repl.Session::repl.Session.App0::repl.Session.App0.HelloByeApp)) ((basics.md:68))
 // make[{type.repl.Session::repl.Session.App0::repl.Session.App0.Byer}].from(call(Class(): repl.Session::repl.Session.App0::repl.Session.App0.PrintByer)) ((basics.md:67))
 </code></pre>
 <p><code>ModuleDef</code> merely contains a description of the desired object graph, let&rsquo;s transform that high-level description into an actionable series of steps - an <a href="/api/izumi/distage/model/plan/OrderedPlan.html">OrderedPlan</a>, a datatype we can <a href="debugging.html#pretty-printing-plans">inspect</a>, <a href="debugging.html#testing-plans">test</a> or <a href="distage-framework.html#compile-time-checks">verify at compile-time</a> – without actually creating any objects or executing any effects.</p>
 <pre class="prettyprint"><code class="language-scala">val plan = Injector().plan(HelloByeModule, Roots.Everything)
-// plan: izumi.distage.model.plan.OrderedPlan = 
+// plan: izumi.distage.model.plan.OrderedPlan =
 // {type.Activation} (InjectorDefaultImpl.scala:67) := value izumi.distage.model.definition.Activation#-1609326920
 // {type.Session::App0::Byer} (basics.md:67) := call(Class(): Session::App0::PrintByer) {}
 // {type.InjectorFactory} (InjectorDefaultImpl.scala:65) := value distage.Injector$#141871861
@@ -330,7 +330,7 @@ new ModuleDef {
       }
   }
 }
-// res2: AnyRef with ModuleDef = 
+// res2: AnyRef with ModuleDef =
 // make[{type.repl.Session::repl.Session.App0::repl.Session.App0.Byer@byer-2}].from(call(&lt;function1&gt;(repl.Session::repl.Session.App0::repl.Session.App0.Byer): repl.Session::repl.Session.App0::repl.Session.App0.Byer)) ((basics.md:98))
 // make[{type.repl.Session::repl.Session.App0::repl.Session.App0.Byer@byer-1}].from(call(Class(): repl.Session::repl.Session.App0::repl.Session.App0.PrintByer)) ((basics.md:97))
 </code></pre>
@@ -362,19 +362,19 @@ object Style extends Axis {
 val TwoImplsModule = new ModuleDef {
   make[Greeter].tagged(Style.Normal)
     .from[PrintGreeter]
-  
+
   make[Greeter].tagged(Style.AllCaps)
     .from[AllCapsGreeter]
 }
-// TwoImplsModule: AnyRef with ModuleDef = 
+// TwoImplsModule: AnyRef with ModuleDef =
 // make[{type.repl.Session::repl.Session.App0::repl.Session.App0.Greeter}].from(call(Class(): repl.Session::repl.Session.App0::repl.Session.App0.PrintGreeter)).tagged(Set(AxisTag(style:normal))) ((basics.md:134))
 // make[{type.repl.Session::repl.Session.App0::repl.Session.App0.Greeter}].from(call(Class(): repl.Session::repl.Session.App0::repl.Session.App0.AllCapsGreeter)).tagged(Set(AxisTag(style:allcaps))) ((basics.md:137))
 
 // Combine previous `HelloByeModule` with our new module
-// While overriding `make[Greeter]` bindings from the first module 
+// While overriding `make[Greeter]` bindings from the first module
 
 val CombinedModule = HelloByeModule overridenBy TwoImplsModule
-// CombinedModule: izumi.distage.model.definition.Module = 
+// CombinedModule: izumi.distage.model.definition.Module =
 // make[{type.repl.Session::repl.Session.App0::repl.Session.App0.Greeter}].from(call(Class(): repl.Session::repl.Session.App0::repl.Session.App0.PrintGreeter)).tagged(Set(AxisTag(style:normal))) ((basics.md:134))
 // make[{type.repl.Session::repl.Session.App0::repl.Session.App0.Greeter}].from(call(Class(): repl.Session::repl.Session.App0::repl.Session.App0.AllCapsGreeter)).tagged(Set(AxisTag(style:allcaps))) ((basics.md:137))
 // make[{type.repl.Session::repl.Session.App0::repl.Session.App0.HelloByeApp}].from(call(Class(repl.Session::repl.Session.App0::repl.Session.App0.Greeter, repl.Session::repl.Session.App0::repl.Session.App0.Byer): repl.Session::repl.Session.App0::repl.Session.App0.HelloByeApp)) ((basics.md:68))
@@ -438,7 +438,7 @@ val TestModule = new ModuleDef {
   make[Greeter].tagged(Style.Normal, Env.Test).from[TestPrintGreeter]
   make[Greeter].tagged(Style.AllCaps).from[AllCapsGreeter]
 }
-// TestModule: AnyRef with ModuleDef = 
+// TestModule: AnyRef with ModuleDef =
 // make[{type.repl.Session::repl.Session.App0::repl.Session.App0.Greeter}].from(call(Class(): repl.Session::repl.Session.App0::repl.Session.App0.PrintGreeter)).tagged(Set(AxisTag(style:normal), AxisTag(env:prod))) ((basics.md:190))
 // make[{type.repl.Session::repl.Session.App0::repl.Session.App0.Greeter}].from(call(Class(): repl.Session::repl.Session.App0::repl.Session.App0.TestPrintGreeter)).tagged(Set(AxisTag(style:normal), AxisTag(env:test))) ((basics.md:191))
 // make[{type.repl.Session::repl.Session.App0::repl.Session.App0.Greeter}].from(call(Class(): repl.Session::repl.Session.App0::repl.Session.App0.AllCapsGreeter)).tagged(Set(AxisTag(style:allcaps))) ((basics.md:192))
@@ -477,16 +477,16 @@ class DBConnection
 class MessageQueueConnection
 
 val dbResource = Resource.make(
-  acquire = IO { 
+  acquire = IO {
     println(&quot;Connecting to DB!&quot;)
-    new DBConnection 
+    new DBConnection
 })(release = _ =&gt; IO(println(&quot;Disconnecting DB&quot;)))
 // dbResource: Resource[IO, DBConnection] = Allocate(&lt;function1&gt;)
 
 val mqResource = Resource.make(
   acquire = IO {
    println(&quot;Connecting to Message Queue!&quot;)
-   new MessageQueueConnection 
+   new MessageQueueConnection
 })(release = _ =&gt; IO(println(&quot;Disconnecting Message Queue&quot;)))
 // mqResource: Resource[IO, MessageQueueConnection] = Allocate(&lt;function1&gt;)
 
@@ -500,7 +500,7 @@ val module = new ModuleDef {
   addImplicit[Bracket[IO, Throwable]]
   make[MyApp]
 }
-// module: AnyRef with ModuleDef = 
+// module: AnyRef with ModuleDef =
 // make[{type.cats.effect.Bracket[=λ %1:0 → IO[+1:0],=Throwable]}].from(value(cats.effect.IOLowPriorityInstances$IOEffect@1dc57bf6: cats.effect.Bracket[=λ %1:0 → IO[+1:0],=Throwable])) ((basics.md:254))
 // make[{type.repl.Session::repl.Session.App9::repl.Session.App9.DBConnection}].from(allocate[λ %0 → cats.effect.IO[+0]](call(izumi.distage.model.reflection.Provider$ProviderImpl$$Lambda$18487/0x000000084286c040@206d1e64(cats.effect.Bracket[=λ %0 → IO[+0],=Throwable]): izumi.distage.model.definition.DIResource::izumi.distage.model.definition.DIResource.FromCats[=λ %1:0 → IO[+1:0],=Session::App9::DBConnection]))) ((basics.md:252))
 // make[{type.repl.Session::repl.Session.App9::repl.Session.App9.MessageQueueConnection}].from(allocate[λ %0 → cats.effect.IO[+0]](call(izumi.distage.model.reflection.Provider$ProviderImpl$$Lambda$18487/0x000000084286c040@3a5abaa0(cats.effect.Bracket[=λ %0 → IO[+0],=Throwable]): izumi.distage.model.definition.DIResource::izumi.distage.model.definition.DIResource.FromCats[=λ %1:0 → IO[+1:0],=Session::App9::MessageQueueConnection]))) ((basics.md:253))
@@ -542,7 +542,7 @@ class InitResource extends DIResource.Simple[Init] {
 val module = new ModuleDef {
   make[Init].fromResource[InitResource]
 }
-// module: AnyRef with ModuleDef = 
+// module: AnyRef with ModuleDef =
 // make[{type.repl.Session::repl.Session.App11::repl.Session.App11.Init}].from(allocate[λ %0 → 0](call(Class(): repl.Session::repl.Session.App11::repl.Session.App11.InitResource))) ((basics.md:300))
 
 val closedInit = Injector()
@@ -580,8 +580,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 implicit val contextShift = IO.contextShift(global)
 implicit val timer = IO.timer(global)
 </code></pre>
-<pre class="prettyprint"><code class="language-scala">val homeRoute = HttpRoutes.of[IO] { 
-  case GET -&gt; Root / &quot;home&quot; =&gt; Ok(s&quot;Home page!&quot;) 
+<pre class="prettyprint"><code class="language-scala">val homeRoute = HttpRoutes.of[IO] {
+  case GET -&gt; Root / &quot;home&quot; =&gt; Ok(s&quot;Home page!&quot;)
 }
 // homeRoute: HttpRoutes[IO] = Kleisli(org.http4s.HttpRoutes$$$Lambda$18530/0x00000008429cb840@2da6ccba)
 
@@ -592,12 +592,12 @@ object HomeRouteModule extends ModuleDef {
 </code></pre>
 <p>We&rsquo;ve used <code>many</code> method to declare an open <code>Set</code> of http routes and then added one HTTP route into it. When module definitions are combined, <code>Sets</code> for the same binding will be merged together. You can summon a Set Bindings by summoning a scala <code>Set</code>, as in <code>Set[HttpRoutes[IO]]</code>.</p>
 <p>Let&rsquo;s define a new module with another route:</p>
-<pre class="prettyprint"><code class="language-scala">val blogRoute = HttpRoutes.of[IO] { 
-  case GET -&gt; Root / &quot;blog&quot; / post =&gt; Ok(s&quot;Blog post ``$post&#39;&#39;!&quot;) 
+<pre class="prettyprint"><code class="language-scala">val blogRoute = HttpRoutes.of[IO] {
+  case GET -&gt; Root / &quot;blog&quot; / post =&gt; Ok(s&quot;Blog post ``$post&#39;&#39;!&quot;)
 }
 // blogRoute: HttpRoutes[IO] = Kleisli(org.http4s.HttpRoutes$$$Lambda$18530/0x00000008429cb840@1523f81e)
 
-object BlogRouteModule extends ModuleDef {  
+object BlogRouteModule extends ModuleDef {
   many[HttpRoutes[IO]]
     .add(blogRoute)
 }
@@ -607,7 +607,7 @@ object BlogRouteModule extends ModuleDef {
   // create a top-level router by combining all the routes
   val router: HttpApp[IO] = routes.toList.foldK.orNotFound
 
-  // return a Resource value that will setup an http4s server 
+  // return a Resource value that will setup an http4s server
   BlazeServerBuilder[IO]
     .bindHttp(8080, &quot;localhost&quot;)
     .withHttpApp(router)
@@ -666,7 +666,7 @@ def dummyKVStore[F[+_, +_]: BIOMonadError: BIOPrimitives]: F[Nothing, KVStore[F]
     def put(key: String, value: String): F[Nothing, Unit] = {
       ref.update_(_ + (key -&gt; value))
     }
-  
+
     def get(key: String): F[NoSuchElementException, String] = {
       for {
         map &lt;- ref.get
@@ -794,7 +794,7 @@ zio.Runtime.default.unsafeRun(main)
 // Hello World
 // Shutting down Enterprise Hellower
 </code></pre>
-<h4><a href="#turning-zio-environment-dependencies-into-arguments-and-vice-versa" name="turning-zio-environment-dependencies-into-arguments-and-vice-versa" class="anchor"><span class="anchor-link"></span></a>Turning ZIO Environment dependencies into arguments and vice-versa</h4>
+<h4><a href="#converting-between-zio-environment-dependencies-and-parameters" name="converting-between-zio-environment-dependencies-and-parameters" class="anchor"><span class="anchor-link"></span></a>Converting between ZIO environment dependencies and parameters</h4>
 <p>Any ZIO Service that requires an environment can be turned into a service without an environment dependency by providing the dependency in each method. This pattern can be generalized by implementing an instance of <code>cats.Contravariant</code> (or <code>cats.tagless.FunctorK</code>) for your services and using it to turn environment dependencies into constructor parameters – that way ZIO Environment can be used uniformly for declaration of dependencies, but the dependencies used inside the service do not leak to other services calling it. Details: <a href="https://gitter.im/ZIO/Core?at=5dbb06a86570b076740f6db2">https://gitter.im/ZIO/Core?at=5dbb06a86570b076740f6db2</a></p>
 <p>Example:</p>
 <pre class="prettyprint"><code class="language-scala">import cats.Contravariant
@@ -827,7 +827,7 @@ object dependerImpl extends Depender[DependeeR] {
 }
 object dependeeImpl extends Dependee[DependerR] {
   def x(y: String): URIO[DependerR, Int] = {
-    if (y == &quot;hello&quot;) UIO(5) 
+    if (y == &quot;hello&quot;) UIO(5)
     else depender.y.map(y.length + _.length)
   }
 }
@@ -887,7 +887,7 @@ object PlusedInt {
     *
     * `def a: Int @Id(&quot;a&quot;)` and
     * `def b: Int @Id(&quot;b&quot;)`
-    * 
+    *
     * When an abstract type is declared as an implementation,
     * its no-argument abstract defs &amp; vals are considered as
     * dependency parameters by TraitConstructor. (empty-parens and
@@ -895,7 +895,7 @@ object PlusedInt {
     *
     * Here, using an abstract class directly as an implementation
     * lets us avoid writing a lengthier constructor, like this one:
-    * 
+    *
     * {{{
     *   final class Impl(
     *     pluser: Pluser,
@@ -923,7 +923,7 @@ Injector()
     make[Pluser]
     make[PlusedInt].from[PlusedInt.Impl]
   }) {
-    plusedInt: PlusedInt =&gt; 
+    plusedInt: PlusedInt =&gt;
       plusedInt.result
   }
 // res25: Int = 3
@@ -967,7 +967,7 @@ trait ActorFactory {
 <p><code>@With</code> annotation can be used to specify the implementation class, to avoid leaking the implementation type in factory method result:</p>
 <pre class="prettyprint"><code class="language-scala">import distage.{ModuleDef, Injector, With}
 
-trait Actor { 
+trait Actor {
   def receive(msg: Any): Unit
 }
 
@@ -990,7 +990,7 @@ val factoryModule = new ModuleDef {
   make[Actor.Factory]
   make[Actor.Configuration].from(Actor.Configuration(allCaps = false))
 }
-// factoryModule: AnyRef with ModuleDef = 
+// factoryModule: AnyRef with ModuleDef =
 // make[{type.repl.Session::repl.Session.App26::repl.Session.App26.Actor::repl.Session.App26.Actor.Configuration}].from(call(izumi.distage.model.definition.dsl.ModuleDefDSL$MakeDSLBase$$Lambda$19251/0x00000008446d6840@327be43f(): repl.Session::repl.Session.App26::repl.Session.App26.Actor::repl.Session.App26.Actor.Configuration)) ((basics.md:892))
 // make[{type.repl.Session::repl.Session.App26::repl.Session.App26.Actor::repl.Session.App26.Actor.Factory}].from(call(Factory(repl.Session::repl.Session.App26::repl.Session.App26.Actor::repl.Session.App26.Actor.Configuration): repl.Session::repl.Session.App26::repl.Session.App26.Actor::repl.Session.App26.Actor.Factory)) ((basics.md:891))
 
@@ -1055,7 +1055,7 @@ def ProgramModule[F[_]: TagK: Monad] = new ModuleDef {
   def minSize(s: String, n: Int): F[Boolean] = F.delay(s.size &gt;= n)
   def hasNumber(s: String): F[Boolean]       = F.delay(s.exists(c =&gt; &quot;0123456789&quot;.contains(c)))
 }
-  
+
 final class SyncInteraction[F[_]](implicit F: Sync[F]) extends Interaction[F] {
   def tell(s: String): F[Unit]  = F.delay(println(s))
   def ask(s: String): F[String] = F.delay(&quot;This could have been user input 1&quot;)
@@ -1088,7 +1088,7 @@ objectsResource.use(_.get[TaglessProgram[IO]].program).unsafeRunSync()
 import zio.Task
 
 val ZIOProgram = ProgramModule[Task] ++ SyncInterpreters[Task]
-// ZIOProgram: Module = 
+// ZIOProgram: Module =
 // make[{type.repl.Session::repl.Session.App28::repl.Session.App28.Validation[=λ %0 → ZIO[-Any,+Throwable,+0]]}].from(call(Class(cats.effect.Sync[=λ %0 → ZIO[-Any,+Throwable,+0]]): repl.Session::repl.Session.App28::repl.Session.App28.SyncValidation[=λ %0 → ZIO[-Any,+Throwable,+0]])) ((basics.md:970))
 // make[{type.repl.Session::repl.Session.App28::repl.Session.App28.TaglessProgram[=λ %0 → ZIO[-Any,+Throwable,+0]]}].from(call(Class(cats.Monad[=λ %0 → ZIO[-Any,+Throwable,+0]], repl.Session::repl.Session.App28::repl.Session.App28.Validation[=λ %0 → ZIO[-Any,+Throwable,+0]], repl.Session::repl.Session.App28::repl.Session.App28.Interaction[=λ %0 → ZIO[-Any,+Throwable,+0]]): repl.Session::repl.Session.App28::repl.Session.App28.TaglessProgram[=λ %0 → ZIO[-Any,+Throwable,+0]])) ((basics.md:948))
 // make[{type.repl.Session::repl.Session.App28::repl.Session.App28.Interaction[=λ %0 → ZIO[-Any,+Throwable,+0]]}].from(call(Class(cats.effect.Sync[=λ %0 → ZIO[-Any,+Throwable,+0]]): repl.Session::repl.Session.App28::repl.Session.App28.SyncInteraction[=λ %0 → ZIO[-Any,+Throwable,+0]])) ((basics.md:971))
@@ -1109,7 +1109,7 @@ val RealInterpretersZIO = {
     make[Interaction[RIO[Console, ?]]].from(RealInteractionZIO)
   }
 }
-// RealInterpretersZIO: Module = 
+// RealInterpretersZIO: Module =
 // make[{type.repl.Session::repl.Session.App28::repl.Session.App28.Validation[=λ %0 → ZIO[-Has[=package::Console::Service],+Throwable,+0]]}].from(call(Class(cats.effect.Sync[=λ %0 → ZIO[-Has[=package::Console::Service],+Throwable,+0]]): repl.Session::repl.Session.App28::repl.Session.App28.SyncValidation[=λ %0 → ZIO[-Has[=package::Console::Service],+Throwable,+0]])) ((basics.md:970))
 // make[{type.repl.Session::repl.Session.App28::repl.Session.App28.Interaction[=λ %1:0 → ZIO[-Has[=package::Console::Service],+Throwable,+1:0]]}].from(call(izumi.distage.model.definition.dsl.ModuleDefDSL$MakeDSLBase$$Lambda$19251/0x00000008446d6840@611302bd(): repl.Session::repl.Session.App28::repl.Session.App28.RealInteractionZIO)) ((basics.md:1015))
 // make[{type.cats.effect.Sync[=λ %0 → ZIO[-Has[=package::Console::Service],+Throwable,+0]]}].from(value(zio.interop.CatsConcurrent@1e48bcef: cats.effect.Sync[=λ %0 → ZIO[-Has[=package::Console::Service],+Throwable,+0]])) ((basics.md:972))
@@ -1151,7 +1151,7 @@ trait AppEntrypoint {
 
 object Main extends App {
   def run(args: List[String]): IO[ExitCode] = {
-    
+
     // `distage.Module` has a Monoid instance
 
     val myModules = ProgramModule[IO] |+| SyncInterpreters[IO]
@@ -1168,7 +1168,7 @@ object Main extends App {
       }
 
       // `produceF` specifies an Effect to run in.
-      // Effects used in Resource and Effect Bindings 
+      // Effects used in Resource and Effect Bindings
       // should match the effect in `produceF`
 
       _ &lt;- Injector().produceF[IO](newPlan).use {
