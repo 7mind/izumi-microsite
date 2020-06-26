@@ -336,7 +336,7 @@ import izumi.logstage.distage.LogIOModule
 
 val distageFrameworkModules = new ModuleDef {
   // required for docker
-  include(new DockerSupportModule[IO])
+  include(DockerSupportModule[IO])
 
   // standard distage framework modules
   include(AppConfigModule(ConfigFactory.defaultApplication))
@@ -424,15 +424,21 @@ class ElasticSearchPlusPostgresModule[F[_]: TagK] extends ModuleDef {
 <h3><a href="#usage-in-integration-tests" name="usage-in-integration-tests" class="anchor"><span class="anchor-link"></span></a>Usage in Integration Tests</h3>
 <p>A common use case is using Docker containers to provide service implementations for integration test, such as using a PostgreSQL container for verifying an application that uses a PostgreSQL database. <code>distage</code> container resources are easy to integrate as providers.</p>
 <p>Consider the example application below. This application is written to depend on a <a href="https://tpolecat.github.io/doobie/">doobie</a> <code>Transactor</code>, which is constructed from a <code>PostgresServerConfig</code>.</p>
-<pre class="prettyprint"><code class="language-scala">import doobie._
+<pre class="prettyprint"><code class="language-scala">import doobie.Transactor
 import doobie.syntax.connectionio._
 import doobie.syntax.string._
 
 class PostgresExampleApp(xa: Transactor[IO]) {
-  def plusOne(a: Int): IO[Int] =
+  def plusOne(a: Int): IO[Int] = {
     sql&quot;select ${a} + 1&quot;.query[Int].unique.transact(xa)
+  }
 
-  val run: IO[Unit] = plusOne(1).flatMap(v =&gt; IO(println(s&quot;1 + 1 = ${v}.&quot;)))
+  val run: IO[Unit] = {
+    for {
+      v &lt;- plusOne(1)
+      _ &lt;- IO(println(s&quot;1 + 1 = ${v}.&quot;))
+    } yield ()
+  }
 }
 
 // the postgres configuration used to construct the Transactor
@@ -441,21 +447,21 @@ case class PostgresServerConfig(
   port: Int,
   database: String,
   username: String,
-  password: String
+  password: String,
 )
 
 class TransactorFromConfigModule extends ModuleDef {
-  import scala.concurrent.ExecutionContext.global
-
-  implicit val contextShift = IO.contextShift(global)
-  implicit val timer = IO.timer(global)
-
   make[Transactor[IO]].from { config: PostgresServerConfig =&gt;
+    import scala.concurrent.ExecutionContext.global
+
+    implicit val contextShift = IO.contextShift(global)
+    implicit val timer = IO.timer(global)
+
     Transactor.fromDriverManager[IO](
       &quot;org.postgresql.Driver&quot;,
       s&quot;jdbc:postgresql://${config.host}:${config.port}/${config.database}&quot;,
       config.username,
-      config.password
+      config.password,
     )
   }
 }
@@ -487,7 +493,6 @@ class TransactorFromConfigModule extends ModuleDef {
 import distage.DIKey
 
 class PostgresExampleAppIntegTest extends DistageSpecScalatest[IO] with AssertCIO {
-
   override def config = super.config.copy(
     moduleOverrides = new ModuleDef {
       include(new TransactorFromConfigModule)
@@ -499,19 +504,20 @@ class PostgresExampleAppIntegTest extends DistageSpecScalatest[IO] with AssertCI
       DIKey[PostgresServerConfig]
     )
   )
+
   &quot;distage docker&quot; should {
-    &quot;support integ tests using containers&quot; in {
+    &quot;support integration tests using containers&quot; in {
       app: PostgresExampleApp =&gt;
-      for {
-        v &lt;- app.plusOne(1)
-        _ &lt;- assertIO(v == 2)
-      } yield ()
+        for {
+          v &lt;- app.plusOne(1)
+          _ &lt;- assertIO(v == 2)
+        } yield ()
     }
   }
 }
 </code></pre>
 <p>Typically, this would be run by the test runner. For completeness, the example can be run directly using:</p>
-<pre class="prettyprint"><code class="language-scala">def postgresDockerIntegExample = {
+<pre class="prettyprint"><code class="language-scala">def postgresDockerIntegrationExample = {
   val applicationModules = new ModuleDef {
     include(new TransactorFromConfigModule)
     include(new IntegUsingDockerModule)
@@ -519,12 +525,12 @@ class PostgresExampleAppIntegTest extends DistageSpecScalatest[IO] with AssertCI
     make[PostgresExampleApp]
   }
 
-  Injector().produceGetF[IO, PostgresExampleApp](applicationModules).use { app =&gt;
-    app.run
-  }
+  Injector()
+    .produceGetF[IO, PostgresExampleApp](applicationModules)
+    .use(app =&gt; app.run)
 }
 
-postgresDockerIntegExample.unsafeRunSync()
+postgresDockerIntegrationExample.unsafeRunSync()
 // 1 + 1 = 2.
 </code></pre>
 <h3><a href="#docker-container-environment" name="docker-container-environment" class="anchor"><span class="anchor-link"></span></a>Docker Container Environment</h3>
@@ -598,31 +604,31 @@ docker {
 </ol>
 <pre class="prettyprint"><code class="language-scala">import izumi.distage.docker.Docker
 
-class CustomDockerConfigExampleModule[F[_] : TagK] extends ModuleDef {
-  include(new DockerSupportModule[F] overridenBy new ModuleDef {
+class CustomDockerConfigExampleModule[F[_]: TagK] extends ModuleDef {
+  include(DockerSupportModule[F] overridenBy new ModuleDef {
     make[Docker.ClientConfig].from {
       Docker.ClientConfig(
-        readTimeoutMs = 10000,
+        readTimeoutMs    = 10000,
         connectTimeoutMs = 10000,
-        allowReuse = false,
-        useRemote = true,
-        useRegistry = true,
-        remote = Option {
+        allowReuse       = false,
+        useRemote        = true,
+        useRegistry      = true,
+        remote           = Some(
           Docker.RemoteDockerConfig(
-            host = &quot;tcp://localhost:2376&quot;,
+            host      = &quot;tcp://localhost:2376&quot;,
             tlsVerify = true,
-            certPath = &quot;/home/user/.docker/certs&quot;,
-            config = &quot;/home/user/.docker&quot;
+            certPath  = &quot;/home/user/.docker/certs&quot;,
+            config    = &quot;/home/user/.docker&quot;,
           )
-        },
-        registry = Option {
+        ),
+        registry = Some(
           Docker.DockerRegistryConfig(
-            url = &quot;https://index.docker.io/v1/&quot;,
+            url      = &quot;https://index.docker.io/v1/&quot;,
             username = &quot;dockeruser&quot;,
             password = &quot;ilovedocker&quot;,
-            email = &quot;dockeruser@github.com&quot;
+            email    = &quot;dockeruser@github.com&quot;,
           )
-        },
+        ),
       )
     }
   })
@@ -647,7 +653,7 @@ class CustomDockerConfigExampleModule[F[_] : TagK] extends ModuleDef {
   override def config = super.config.copy(
     moduleOverrides = new ModuleDef {
       include(distageFrameworkModules)
-      include(new PostgresDockerModule[IO])
+      include(PostgresDockerModule[IO])
     },
     memoizationRoots = Set(
       DIKey[PostgresDocker.Container]
