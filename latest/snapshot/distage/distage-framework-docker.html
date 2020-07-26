@@ -364,7 +364,7 @@ minimalExample.unsafeRunSync()
 <h3><a href="#config-api" name="config-api" class="anchor"><span class="anchor-link"></span></a>Config API</h3>
 <p>The <a href="/latest/snapshot/api/izumi/distage/docker/DockerContainer$$DockerProviderExtensions.html"><code>DockerProviderExtensions</code></a> provides additional APIs for modiying the container definition.</p>
 <h4><a href="#modifyconfig" name="modifyconfig" class="anchor"><span class="anchor-link"></span></a><code>modifyConfig</code></h4>
-<p>Use <a href="/latest/snapshot/api/izumi/distage/docker/DockerContainer$$DockerProviderExtensions.html#modifyConfig"><code>modifyConfig</code></a> to modify the configuration of a container. The modifier is instantiated to a <code>ProviderMagnet</code>, which will summon any additional dependencies.</p>
+<p>Use <a href="/latest/snapshot/api/izumi/distage/docker/DockerContainer$$DockerProviderExtensions.html#modifyConfig"><code>modifyConfig</code></a> to modify the configuration of a container. The modifier is instantiated to a <code>Functoid</code>, which will summon any additional dependencies.</p>
 <p>For example, to change the user of the PostgreSQL container:</p>
 <pre class="prettyprint"><code class="language-scala">class PostgresRunAsAdminModule[F[_]: TagK] extends ModuleDef {
   make[PostgresDocker.Container].fromResource {
@@ -578,9 +578,9 @@ postgresDockerIntegrationExample.unsafeRunSync()
 </code></pre>
 <p>The use of <code>connectToNetwork</code> automatically adds a dependency on <code>TestClusterNetwork.Network</code> to each container.</p>
 <h4><a href="#container-network-reuse" name="container-network-reuse" class="anchor"><span class="anchor-link"></span></a>Container Network Reuse</h4>
-<p>Container networks, like containers, are reused by default. If there is an existing network that matches a definition then that network will be used. This can be disabled by setting the <code>reuse</code> configuration to false:</p>
+<p>Container networks, like containers, are reused by default. If there is an existing network that matches a definition then that network will be used. This can be disabled by setting the <code>reuse</code> configuration to <code>DockerReusePolicy.KillOnExitNoReuse</code>:</p>
 <pre class="prettyprint"><code class="language-mdoc:silent">object AlwaysFreshNetwork extends ContainerNetworkDef {
-  override def config: Config = Config(reuse = false)
+  override def config: Config = Config(reuse = Docker.DockerReusePolicy.KillOnExitNoReuse)
 }
 </code></pre>
 <p>For an existing network to be reused, the config and object name at time of creation must be the match the current configuration value and object.</p>
@@ -596,13 +596,14 @@ include &quot;docker-reference.conf&quot;
 # override docker object fields
 docker {
   readTimeoutMs = 60000
-  allowReuse = false
+  globalReuse = &quot;always-kill&quot;
 }
 </code></pre>
 <ol>
   <li>Override the <code>DockerSupportModule</code> using <code>overridenBy</code>:</li>
 </ol>
 <pre class="prettyprint"><code class="language-scala">import izumi.distage.docker.Docker
+import izumi.distage.docker.Docker.DockerReusePolicy
 
 class CustomDockerConfigExampleModule[F[_]: TagK] extends ModuleDef {
   include(DockerSupportModule[F] overridenBy new ModuleDef {
@@ -610,7 +611,7 @@ class CustomDockerConfigExampleModule[F[_]: TagK] extends ModuleDef {
       Docker.ClientConfig(
         readTimeoutMs    = 10000,
         connectTimeoutMs = 10000,
-        allowReuse       = false,
+        globalReuse      = DockerReusePolicy.ReuseEnabled,
         useRemote        = true,
         useRegistry      = true,
         remote           = Some(
@@ -639,14 +640,19 @@ class CustomDockerConfigExampleModule[F[_]: TagK] extends ModuleDef {
 <h4><a href="#matching-containers-for-reuse" name="matching-containers-for-reuse" class="anchor"><span class="anchor-link"></span></a>Matching Containers for Reuse</h4>
 <p>For an existing container to be reused, all the following must be true:</p>
 <ul>
-  <li>The current client config has <code>allowReuse == true</code>.</li>
-  <li>The container config has <code>reuse == true</code>.</li>
+  <li>The current client config has <code>globalReuse == DockerReusePolicy.ReuseEnabled</code></li>
+  <li>The container config has <code>reuse == DockerReusePolicy.ReuseEnabled</code></li>
   <li>The running container was created for reuse.</li>
   <li>The running container uses the same image as the container config.</li>
   <li>All ports requested in the container config must be mapped for the running container.</li>
 </ul>
 <h4><a href="#configuring-reuse" name="configuring-reuse" class="anchor"><span class="anchor-link"></span></a>Configuring Reuse</h4>
-<p>The <code>ContainerDef.Config.reuse</code> should be false to disable reuse for a specific container. While <code>Docker.ClientConfig.allowReuse</code> should be false to disable reuse throughout the application.</p>
+<p><code>DockerReusePolicy</code> has 2 possible values:</p>
+<ul>
+  <li><code>ReuseEnabled</code>: the resource (container or network) will be always freed after use and existing matching containers will not be reused</li>
+  <li><code>ReuseDisabled</code>: the resource will be always be freed after use but existing matching containers will be reused</li>
+</ul>
+<p>The <code>ContainerDef.Config.reuse</code> should be <code>DockerReusePolicy.ReuseDisabled</code> to disable reuse for a specific container. While <code>Docker.ClientConfig.globalReuse</code> should be <code>DockerReusePolicy.ReuseDisabled</code> to disable reuse throughout the application.</p>
 <h4><a href="#improving-reuse-performance" name="improving-reuse-performance" class="anchor"><span class="anchor-link"></span></a>Improving Reuse Performance</h4>
 <p>When utilizing reuse, the performance cost of inspecting the Docker system can be avoided using memoization roots. For example, in this integration test the container resource is not reconstructed for each test. Because the resource is not reconstructed there is no repeated inspection of the Docker system.</p>
 <pre class="prettyprint"><code class="language-scala">class NoReuseByMemoizationExampleTest extends DistageSpecScalatest[IO] {
