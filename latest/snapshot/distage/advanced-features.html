@@ -264,15 +264,15 @@ val gc = Roots(root = DIKey[A])
 val objects = Injector().produce(module, gc).unsafeGet()
 // B!
 // A!
-// objects: izumi.fundamentals.platform.functional.package.Identity[Locator] = izumi.distage.LocatorDefaultImpl@6ca40efd
+// objects: izumi.fundamentals.platform.functional.package.Identity[Locator] = izumi.distage.LocatorDefaultImpl@3424dbea
 
 // A and B are in the object graph
 
 objects.find[A]
-// res1: Option[A] = Some(repl.MdocSession$App0$A@78e33c18)
+// res1: Option[A] = Some(repl.MdocSession$App0$A@29304abe)
 
 objects.find[B]
-// res2: Option[B] = Some(repl.MdocSession$App0$B@6165fd61)
+// res2: Option[B] = Some(repl.MdocSession$App0$B@2e114442)
 
 // C is missing
 
@@ -288,10 +288,10 @@ val objects = Injector().produce(module, Roots(DIKey[A])).unsafeGet()
 // C!
 // B!
 // A!
-// objects: izumi.fundamentals.platform.functional.package.Identity[Locator] = izumi.distage.LocatorDefaultImpl@3b46f506
+// objects: izumi.fundamentals.platform.functional.package.Identity[Locator] = izumi.distage.LocatorDefaultImpl@5d5c0b03
 
 objects.find[C]
-// res5: Option[C] = Some(repl.MdocSession$App4$C@77d9d775)
+// res5: Option[C] = Some(repl.MdocSession$App4$C@4fb570c9)
 </code></pre>
 <h3><a href="#circular-dependencies-support" name="circular-dependencies-support" class="anchor"><span class="anchor-link"></span></a>Circular Dependencies Support</h3>
 <p><code>distage</code> automatically resolves arbitrary circular dependencies, including self-references:</p>
@@ -306,7 +306,7 @@ val objects = Injector().produce(new ModuleDef {
   make[B]
   make[C]
 }, Roots.Everything).unsafeGet()
-// objects: izumi.fundamentals.platform.functional.package.Identity[izumi.distage.model.Locator] = izumi.distage.LocatorDefaultImpl@163b366a
+// objects: izumi.fundamentals.platform.functional.package.Identity[izumi.distage.model.Locator] = izumi.distage.LocatorDefaultImpl@647ba63b
 
 objects.get[A] eq objects.get[B].a
 // res7: Boolean = true
@@ -319,7 +319,7 @@ objects.get[C] eq objects.get[C].c
 <p>The above strategy depends on <code>distage-core-proxy-cglib</code> module which is a default dependency of <code>distage-core</code>.</p>
 <p>If you want to disable it, use <code>NoProxies</code> bootstrap configuration:</p>
 <pre class="prettyprint"><code class="language-scala">Injector.NoProxies()
-// res10: Injector = izumi.distage.InjectorDefaultImpl@58fb4f39
+// res10: Injector = izumi.distage.InjectorDefaultImpl@406cdda2
 </code></pre>
 <p>Proxies are not supported on Scala.js.</p>
 <h4><a href="#manual-resolution-with-by-name-parameters" name="manual-resolution-with-by-name-parameters" class="anchor"><span class="anchor-link"></span></a>Manual Resolution with by-name parameters</h4>
@@ -353,7 +353,7 @@ val module = new ModuleDef {
 val locator = Injector.NoProxies()
   .produce(module, Roots.Everything)
   .unsafeGet()
-// locator: izumi.fundamentals.platform.functional.package.Identity[izumi.distage.model.Locator] = izumi.distage.LocatorDefaultImpl@54996fe5
+// locator: izumi.fundamentals.platform.functional.package.Identity[izumi.distage.model.Locator] = izumi.distage.LocatorDefaultImpl@7dd5d2bf
 
 locator.get[A].b eq locator.get[B]
 // res12: Boolean = true
@@ -401,7 +401,7 @@ val appModule = new ModuleDef {
 val resources = Injector(bootstrapModule)
   .produce(appModule, Roots.Everything)
   .use(_.get[Set[PrintResource]])
-// resources: izumi.fundamentals.platform.functional.package.Identity[Set[PrintResource]] = ListSet(repl.MdocSession$App15$A@45070ccc, repl.MdocSession$App15$B@3f66d689, repl.MdocSession$App15$C@e2fb721)
+// resources: izumi.fundamentals.platform.functional.package.Identity[Set[PrintResource]] = ListSet(repl.MdocSession$App15$A@1f2d4e09, repl.MdocSession$App15$B@6b05c4b, repl.MdocSession$App15$C@7d96ca98)
 
 resources.foreach(_.start())
 // A started
@@ -454,7 +454,7 @@ val roots = Set[DIKey](DIKey[Set[Elem]])
 
 val objects = Injector().produce(PlannerInput(module, Activation.empty, roots)).unsafeGet()
 // Strong constructed
-// objects: izumi.fundamentals.platform.functional.package.Identity[Locator] = izumi.distage.LocatorDefaultImpl@1529e20d
+// objects: izumi.fundamentals.platform.functional.package.Identity[Locator] = izumi.distage.LocatorDefaultImpl@66ade5b0
 
 // Strong is around
 
@@ -480,17 +480,17 @@ objects.get[Set[Elem]]
 val objects = Injector().produce(PlannerInput(module, Activation.empty, roots)).unsafeGet()
 // Weak constructed
 // Strong constructed
-// objects: izumi.fundamentals.platform.functional.package.Identity[Locator] = izumi.distage.LocatorDefaultImpl@68b5fd08
+// objects: izumi.fundamentals.platform.functional.package.Identity[Locator] = izumi.distage.LocatorDefaultImpl@1305b26a
 
 // Weak is around
 
 objects.find[Weak]
-// res23: Option[Weak] = Some(repl.MdocSession$App22$Weak@616ebc09)
+// res23: Option[Weak] = Some(repl.MdocSession$App22$Weak@1753f645)
 
 // both Strong and Weak are in the Set
 
 objects.get[Set[Elem]]
-// res24: Set[Elem] = Set(repl.MdocSession$App22$Weak@616ebc09, repl.MdocSession$App22$Strong@120b99ba)
+// res24: Set[Elem] = Set(repl.MdocSession$App22$Weak@1753f645, repl.MdocSession$App22$Strong@5c5a2c3d)
 </code></pre>
 <h3><a href="#inner-classes-and-path-dependent-types" name="inner-classes-and-path-dependent-types" class="anchor"><span class="anchor-link"></span></a>Inner Classes and Path-Dependent Types</h3>
 <p>Path-dependent types with a value prefix will be instantiated normally:</p>
@@ -500,7 +500,7 @@ class Path {
   class A
 }
 val path = new Path
-// path: Path = repl.MdocSession$App25$Path@48e8387c
+// path: Path = repl.MdocSession$App25$Path@55d3c263
 
 def module = new ModuleDef {
   make[path.A]
@@ -509,7 +509,7 @@ def module = new ModuleDef {
 Injector()
   .produce(module, Roots.Everything)
   .use(_.get[path.A])
-// res26: izumi.fundamentals.platform.functional.package.Identity[path.A] = repl.MdocSession$App25$Path$A@f72d1d4
+// res26: izumi.fundamentals.platform.functional.package.Identity[path.A] = repl.MdocSession$App25$Path$A@6bfbbc51
 </code></pre>
 <p>Since version <code>0.10</code>, support for path-dependent types with a non-value (type) prefix hasn&rsquo;t reimplemented after a rewrite of the internals, see issue: <a href="https://github.com/7mind/izumi/issues/764">https://github.com/7mind/izumi/issues/764</a></p>
 <p>However, there&rsquo;s a gotcha with value prefixes, when seen by distage they&rsquo;re based on the <strong>literal variable name</strong> of the prefix, not the full type information available to the compiler, therefore the following usage will fail:</p>
@@ -518,9 +518,9 @@ Injector()
 }
 
 val path1 = new Path
-// path1: Path = repl.MdocSession$App25$Path@1be8bac7
+// path1: Path = repl.MdocSession$App25$Path@63129eb5
 val path2 = new Path
-// path2: Path = repl.MdocSession$App25$Path@55e02649
+// path2: Path = repl.MdocSession$App25$Path@6ea47d2e
 </code></pre>
 <pre class="prettyprint"><code class="language-scala">Injector()
   .produceRun(pathModule(path1) ++ pathModule(path2)) {
@@ -573,8 +573,8 @@ val path2 = new Path
 // 	at repl.MdocSession$App25$$anonfun$65.apply$mcV$sp(advanced-features.md:370)
 // 	at repl.MdocSession$App25$$anonfun$65.apply(advanced-features.md:370)
 // 	at repl.MdocSession$App25$$anonfun$65.apply(advanced-features.md:370)
-// 	at mdoc.internal.document.DocumentBuilder$$doc$.crash(DocumentBuilder.scala:69)
-// 	at repl.MdocSession$App25.&lt;init&gt;(advanced-features.md:370)
+// 	at mdoc.internal.document.DocumentBuilder$$doc$.crash(DocumentBuilder.scala:75)
+// 	at repl.MdocSession$App25.&lt;init&gt;(advanced-features.md:368)
 // 	at repl.MdocSession$App22$.&lt;clinit&gt;(advanced-features.md:324)
 // 	at repl.MdocSession$App18$.&lt;clinit&gt;(advanced-features.md:277)
 // 	at repl.MdocSession$App15.&lt;init&gt;(advanced-features.md:230)
@@ -584,15 +584,15 @@ val path2 = new Path
 // 	at repl.MdocSession$App0.&lt;init&gt;(advanced-features.md:51)
 // 	at repl.MdocSession$App.&lt;init&gt;(advanced-features.md:5)
 // 	at repl.MdocSession$.app(advanced-features.md:3)
-// 	at mdoc.internal.document.DocumentBuilder$$doc$.$anonfun$build$2(DocumentBuilder.scala:82)
+// 	at mdoc.internal.document.DocumentBuilder$$doc$.$anonfun$build$2(DocumentBuilder.scala:89)
 // 	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.scala:18)
 // 	at scala.util.DynamicVariable.withValue(DynamicVariable.scala:59)
 // 	at scala.Console$.withErr(Console.scala:193)
-// 	at mdoc.internal.document.DocumentBuilder$$doc$.$anonfun$build$1(DocumentBuilder.scala:82)
+// 	at mdoc.internal.document.DocumentBuilder$$doc$.$anonfun$build$1(DocumentBuilder.scala:89)
 // 	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.scala:18)
 // 	at scala.util.DynamicVariable.withValue(DynamicVariable.scala:59)
 // 	at scala.Console$.withOut(Console.scala:164)
-// 	at mdoc.internal.document.DocumentBuilder$$doc$.build(DocumentBuilder.scala:81)
+// 	at mdoc.internal.document.DocumentBuilder$$doc$.build(DocumentBuilder.scala:88)
 // 	at mdoc.internal.markdown.MarkdownBuilder$.buildDocument(MarkdownBuilder.scala:44)
 // 	at mdoc.internal.markdown.Processor.processScalaInputs(Processor.scala:186)
 // 	at mdoc.internal.markdown.Processor.processScalaInputs(Processor.scala:153)
@@ -668,8 +668,8 @@ val path2 = new Path
 // 	at repl.MdocSession$App25$$anonfun$65.apply$mcV$sp(advanced-features.md:370)
 // 	at repl.MdocSession$App25$$anonfun$65.apply(advanced-features.md:370)
 // 	at repl.MdocSession$App25$$anonfun$65.apply(advanced-features.md:370)
-// 	at mdoc.internal.document.DocumentBuilder$$doc$.crash(DocumentBuilder.scala:69)
-// 	at repl.MdocSession$App25.&lt;init&gt;(advanced-features.md:370)
+// 	at mdoc.internal.document.DocumentBuilder$$doc$.crash(DocumentBuilder.scala:75)
+// 	at repl.MdocSession$App25.&lt;init&gt;(advanced-features.md:368)
 // 	at repl.MdocSession$App22$.&lt;clinit&gt;(advanced-features.md:324)
 // 	at repl.MdocSession$App18$.&lt;clinit&gt;(advanced-features.md:277)
 // 	at repl.MdocSession$App15.&lt;init&gt;(advanced-features.md:230)
@@ -679,15 +679,15 @@ val path2 = new Path
 // 	at repl.MdocSession$App0.&lt;init&gt;(advanced-features.md:51)
 // 	at repl.MdocSession$App.&lt;init&gt;(advanced-features.md:5)
 // 	at repl.MdocSession$.app(advanced-features.md:3)
-// 	at mdoc.internal.document.DocumentBuilder$$doc$.$anonfun$build$2(DocumentBuilder.scala:82)
+// 	at mdoc.internal.document.DocumentBuilder$$doc$.$anonfun$build$2(DocumentBuilder.scala:89)
 // 	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.scala:18)
 // 	at scala.util.DynamicVariable.withValue(DynamicVariable.scala:59)
 // 	at scala.Console$.withErr(Console.scala:193)
-// 	at mdoc.internal.document.DocumentBuilder$$doc$.$anonfun$build$1(DocumentBuilder.scala:82)
+// 	at mdoc.internal.document.DocumentBuilder$$doc$.$anonfun$build$1(DocumentBuilder.scala:89)
 // 	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.scala:18)
 // 	at scala.util.DynamicVariable.withValue(DynamicVariable.scala:59)
 // 	at scala.Console$.withOut(Console.scala:164)
-// 	at mdoc.internal.document.DocumentBuilder$$doc$.build(DocumentBuilder.scala:81)
+// 	at mdoc.internal.document.DocumentBuilder$$doc$.build(DocumentBuilder.scala:88)
 // 	at mdoc.internal.markdown.MarkdownBuilder$.buildDocument(MarkdownBuilder.scala:44)
 // 	at mdoc.internal.markdown.Processor.processScalaInputs(Processor.scala:186)
 // 	at mdoc.internal.markdown.Processor.processScalaInputs(Processor.scala:153)
@@ -794,8 +794,8 @@ val path2 = new Path
 // 		at repl.MdocSession$App25$$anonfun$65.apply$mcV$sp(advanced-features.md:370)
 // 		at repl.MdocSession$App25$$anonfun$65.apply(advanced-features.md:370)
 // 		at repl.MdocSession$App25$$anonfun$65.apply(advanced-features.md:370)
-// 		at mdoc.internal.document.DocumentBuilder$$doc$.crash(DocumentBuilder.scala:69)
-// 		at repl.MdocSession$App25.&lt;init&gt;(advanced-features.md:370)
+// 		at mdoc.internal.document.DocumentBuilder$$doc$.crash(DocumentBuilder.scala:75)
+// 		at repl.MdocSession$App25.&lt;init&gt;(advanced-features.md:368)
 // 		at repl.MdocSession$App22$.&lt;clinit&gt;(advanced-features.md:324)
 // 		at repl.MdocSession$App18$.&lt;clinit&gt;(advanced-features.md:277)
 // 		at repl.MdocSession$App15.&lt;init&gt;(advanced-features.md:230)
@@ -805,15 +805,15 @@ val path2 = new Path
 // 		at repl.MdocSession$App0.&lt;init&gt;(advanced-features.md:51)
 // 		at repl.MdocSession$App.&lt;init&gt;(advanced-features.md:5)
 // 		at repl.MdocSession$.app(advanced-features.md:3)
-// 		at mdoc.internal.document.DocumentBuilder$$doc$.$anonfun$build$2(DocumentBuilder.scala:82)
+// 		at mdoc.internal.document.DocumentBuilder$$doc$.$anonfun$build$2(DocumentBuilder.scala:89)
 // 		at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.scala:18)
 // 		at scala.util.DynamicVariable.withValue(DynamicVariable.scala:59)
 // 		at scala.Console$.withErr(Console.scala:193)
-// 		at mdoc.internal.document.DocumentBuilder$$doc$.$anonfun$build$1(DocumentBuilder.scala:82)
+// 		at mdoc.internal.document.DocumentBuilder$$doc$.$anonfun$build$1(DocumentBuilder.scala:89)
 // 		at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.scala:18)
 // 		at scala.util.DynamicVariable.withValue(DynamicVariable.scala:59)
 // 		at scala.Console$.withOut(Console.scala:164)
-// 		at mdoc.internal.document.DocumentBuilder$$doc$.build(DocumentBuilder.scala:81)
+// 		at mdoc.internal.document.DocumentBuilder$$doc$.build(DocumentBuilder.scala:88)
 // 		at mdoc.internal.markdown.MarkdownBuilder$.buildDocument(MarkdownBuilder.scala:44)
 // 		at mdoc.internal.markdown.Processor.processScalaInputs(Processor.scala:186)
 // 		at mdoc.internal.markdown.Processor.processScalaInputs(Processor.scala:153)
@@ -888,8 +888,8 @@ val path2 = new Path
 // 		at repl.MdocSession$App25$$anonfun$65.apply$mcV$sp(advanced-features.md:370)
 // 		at repl.MdocSession$App25$$anonfun$65.apply(advanced-features.md:370)
 // 		at repl.MdocSession$App25$$anonfun$65.apply(advanced-features.md:370)
-// 		at mdoc.internal.document.DocumentBuilder$$doc$.crash(DocumentBuilder.scala:69)
-// 		at repl.MdocSession$App25.&lt;init&gt;(advanced-features.md:370)
+// 		at mdoc.internal.document.DocumentBuilder$$doc$.crash(DocumentBuilder.scala:75)
+// 		at repl.MdocSession$App25.&lt;init&gt;(advanced-features.md:368)
 // 		at repl.MdocSession$App22$.&lt;clinit&gt;(advanced-features.md:324)
 // 		at repl.MdocSession$App18$.&lt;clinit&gt;(advanced-features.md:277)
 // 		at repl.MdocSession$App15.&lt;init&gt;(advanced-features.md:230)
@@ -899,15 +899,15 @@ val path2 = new Path
 // 		at repl.MdocSession$App0.&lt;init&gt;(advanced-features.md:51)
 // 		at repl.MdocSession$App.&lt;init&gt;(advanced-features.md:5)
 // 		at repl.MdocSession$.app(advanced-features.md:3)
-// 		at mdoc.internal.document.DocumentBuilder$$doc$.$anonfun$build$2(DocumentBuilder.scala:82)
+// 		at mdoc.internal.document.DocumentBuilder$$doc$.$anonfun$build$2(DocumentBuilder.scala:89)
 // 		at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.scala:18)
 // 		at scala.util.DynamicVariable.withValue(DynamicVariable.scala:59)
 // 		at scala.Console$.withErr(Console.scala:193)
-// 		at mdoc.internal.document.DocumentBuilder$$doc$.$anonfun$build$1(DocumentBuilder.scala:82)
+// 		at mdoc.internal.document.DocumentBuilder$$doc$.$anonfun$build$1(DocumentBuilder.scala:89)
 // 		at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.scala:18)
 // 		at scala.util.DynamicVariable.withValue(DynamicVariable.scala:59)
 // 		at scala.Console$.withOut(Console.scala:164)
-// 		at mdoc.internal.document.DocumentBuilder$$doc$.build(DocumentBuilder.scala:81)
+// 		at mdoc.internal.document.DocumentBuilder$$doc$.build(DocumentBuilder.scala:88)
 // 		at mdoc.internal.markdown.MarkdownBuilder$.buildDocument(MarkdownBuilder.scala:44)
 // 		at mdoc.internal.markdown.Processor.processScalaInputs(Processor.scala:186)
 // 		at mdoc.internal.markdown.Processor.processScalaInputs(Processor.scala:153)
@@ -951,16 +951,16 @@ def pathModule[A: Tag: ClassConstructor](p: Path.Aux[A]) = new ModuleDef {
 }
 
 val path1 = new Path
-// path1: Path = repl.MdocSession$App27$Path@4bdb30f2
+// path1: Path = repl.MdocSession$App27$Path@1f6a4746
 val path2 = new Path
-// path2: Path = repl.MdocSession$App27$Path@4bb7f5d7
+// path2: Path = repl.MdocSession$App27$Path@51758653
 
 Injector()
   .produceRun(pathModule(path1) ++ pathModule(path2)) {
     (p1a: path1.A, p2a: path2.A) =&gt;
       println((p1a, p2a))
   }
-// (repl.MdocSession$App27$Path$A@3b5d3b2e,repl.MdocSession$App27$Path$A@28614eb7)
+// (repl.MdocSession$App27$Path$A@2deae7ae,repl.MdocSession$App27$Path$A@7d360225)
 </code></pre>
 <p>Now the example works, because the <code>A</code> inside <code>pathModule</code> is <code>path1.A</code> &amp; <code>path2.A</code> respectively, the same as it is later in <code>produceRun</code></p>
 <h3><a href="#depending-on-locator" name="depending-on-locator" class="anchor"><span class="anchor-link"></span></a>Depending on Locator</h3>
@@ -982,19 +982,19 @@ def module = new ModuleDef {
 }
 
 val objects = Injector().produce(module, Roots.Everything).unsafeGet()
-// objects: izumi.fundamentals.platform.functional.package.Identity[izumi.distage.model.Locator] = izumi.distage.LocatorDefaultImpl@4bb6cf88
+// objects: izumi.fundamentals.platform.functional.package.Identity[izumi.distage.model.Locator] = izumi.distage.LocatorDefaultImpl@534643e4
 
 // A took C from the object graph
 
 objects.get[A].c
-// res30: C = repl.MdocSession$App29$C@4594730c
+// res30: C = repl.MdocSession$App29$C@3c73d83
 
 // this C is the same C as in this `objects` value
 
 val thisC = objects.get[C]
-// thisC: C = repl.MdocSession$App29$C@4594730c
+// thisC: C = repl.MdocSession$App29$C@3c73d83
 val thatC = objects.get[A].c
-// thatC: C = repl.MdocSession$App29$C@4594730c
+// thatC: C = repl.MdocSession$App29$C@3c73d83
 
 assert(thisC == thatC)
 </code></pre>
@@ -1006,8 +1006,8 @@ assert(thisC == thatC)
 val plan: OrderedPlan = objects.plan
 // plan: OrderedPlan = 
 // {type.LocatorRef} (advanced-features.md:440) := import {type.izumi.distage.model.recursive.LocatorRef} // required for {type.MdocSession::App29::A}
-// {type.BootstrapModule} (InjectorDefaultImpl.scala:49) := value izumi.distage.model.definition.BootstrapContextModule$$anon$1#1978346684
-// {type.InjectorFactory} (InjectorDefaultImpl.scala:48) := value distage.Injector$#2124378239
+// {type.BootstrapModule} (InjectorDefaultImpl.scala:49) := value izumi.distage.model.definition.BootstrapContextModule$$anon$1#-1252719504
+// {type.InjectorFactory} (InjectorDefaultImpl.scala:48) := value distage.Injector$#1890829638
 // {type.PlannerInput} (InjectorDefaultImpl.scala:47) := value izumi.distage.model.PlannerInput#1061878501
 // {type.Activation} (InjectorDefaultImpl.scala:50) := value izumi.distage.model.definition.Activation#-1609326920
 // {type.MdocSession::App29::C} (advanced-features.md:442) := call(π:Class(): MdocSession::App29::C) {}
@@ -1026,16 +1026,6 @@ val plan: OrderedPlan = objects.plan
 
 val bindings: ModuleBase = plan.definition
 // bindings: ModuleBase = 
-// make[{type.repl.MdocSession::repl.MdocSession.App29::repl.MdocSession.App29.A}].from(call(π:Class(izumi.distage.model.recursive.LocatorRef): repl.MdocSession::repl.MdocSession.App29::repl.MdocSession.App29.A)) ((advanced-features.md:440))
-// make[{type.izumi.distage.model.recursive.Bootloader}].from(call(π:Class(izumi.distage.model.definition.BootstrapModule, izumi.distage.model.definition.Activation, izumi.distage.model.PlannerInput, izumi.distage.InjectorFactory): izumi.distage.model.recursive.Bootloader)) ((InjectorDefaultImpl.scala:51))
-// make[{type.repl.MdocSession::repl.MdocSession.App29::repl.MdocSession.App29.C}].from(call(π:Class(): repl.MdocSession::repl.MdocSession.App29::repl.MdocSession.App29.C)) ((advanced-features.md:442))
-// make[{type.izumi.distage.model.PlannerInput}].from(value(PlannerInput(
-// make[{type.repl.MdocSession::repl.MdocSession.App29::repl.MdocSession.App29.A}].from(call(π:Class(izumi.distage.model.recursive.LocatorRef): repl.MdocSession::repl.MdocSession.App29::repl.MdocSession.App29.A)) ((advanced-features.md:440))
-// make[{type.repl.MdocSession::repl.MdocSession.App29::repl.MdocSession.App29.B}].from(call(π:Class(): repl.MdocSession::repl.MdocSession.App29::repl.MdocSession.App29.B)) ((advanced-features.md:441))
-// make[{type.repl.MdocSession::repl.MdocSession.App29::repl.MdocSession.App29.C}].from(call(π:Class(): repl.MdocSession::repl.MdocSession.App29::repl.MdocSession.App29.C)) ((advanced-features.md:442)),Activation(Map()),Everything): izumi.distage.model.PlannerInput)) ((InjectorDefaultImpl.scala:47))
-// make[{type.izumi.distage.model.definition.Activation}].from(value(Activation(Map()): izumi.distage.model.definition.Activation)) ((InjectorDefaultImpl.scala:50))
-// make[{type.repl.MdocSession::repl.MdocSession.App29::repl.MdocSession.App29.B}].from(call(π:Class(): repl.MdocSession::repl.MdocSession.App29::repl.MdocSession.App29.B)) ((advanced-features.md:441))
-// make[{type.izumi.distage.InjectorFactory}].from(value(distage.Injector$@7e9f707f: izumi.distage.InjectorFactory)) ((InjectorDefaultImpl.scala:48))
 // make[{type.izumi.distage.model.definition.BootstrapModule}].from(value(
 // make[{type.izumi.distage.model.provisioning.strategies.ResourceStrategy}].from(call(π:Class(): izumi.distage.provisioning.strategies.ResourceStrategyDefaultImpl)) ((BootstrapLocator.scala:138))
 // many[{type.scala.collection.immutable.Set[=PlanningHook]}] ((BootstrapLocator.scala:143))
@@ -1047,7 +1037,7 @@ val bindings: ModuleBase = plan.definition
 // make[{type.izumi.distage.planning.BindingTranslator}].from(call(π:Class(): izumi.distage.planning.BindingTranslator::izumi.distage.planning.BindingTranslator.Impl)) ((BootstrapLocator.scala:148))
 // make[{type.izumi.distage.model.planning.ForwardingRefResolver}].from(call(π:Class(izumi.distage.model.planning.PlanAnalyzer, scala.Boolean): izumi.distage.planning.ForwardingRefResolverDefaultImpl)) ((BootstrapLocator.scala:130))
 // make[{type.izumi.distage.model.planning.PlanningObserver}].from(call(π:Class(scala.collection.immutable.Set[=PlanningObserver]): izumi.distage.planning.PlanningObserverAggregate)) ((BootstrapLocator.scala:145))
-// make[{type.izumi.distage.model.reflection.MirrorProvider}].from(value(izumi.distage.model.reflection.MirrorProvider$Impl$@4fdea7a4: izumi.distage.model.reflection.MirrorProvider::izumi.distage.model.reflection.MirrorProvider.Impl)) ((BootstrapLocator.scala:126))
+// make[{type.izumi.distage.model.reflection.MirrorProvider}].from(value(izumi.distage.model.reflection.MirrorProvider$Impl$@56a2adb8: izumi.distage.model.reflection.MirrorProvider::izumi.distage.model.reflection.MirrorProvider.Impl)) ((BootstrapLocator.scala:126))
 // make[{type.izumi.distage.model.provisioning.strategies.InstanceStrategy}].from(call(π:Class(): izumi.distage.provisioning.strategies.InstanceStrategyDefaultImpl)) ((BootstrapLocator.scala:136))
 // make[{type.izumi.distage.model.provisioning.strategies.ProxyStrategy}].from(call(π:Class(): izumi.distage.provisioning.strategies.ProxyStrategyFailingImpl)).tagged(Set(AxisTag(cycles:disable))) ((BootstrapLocator.scala:156))
 // make[{type.izumi.distage.model.provisioning.strategies.EffectStrategy}].from(call(π:Class(): izumi.distage.provisioning.strategies.EffectStrategyDefaultImpl)) ((BootstrapLocator.scala:137))
@@ -1064,6 +1054,16 @@ val bindings: ModuleBase = plan.definition
 // make[{type.izumi.distage.model.provisioning.strategies.SetStrategy}].from(call(π:Class(): izumi.distage.provisioning.strategies.SetStrategyDefaultImpl)) ((BootstrapLocator.scala:133))
 // make[{type.izumi.distage.model.planning.PlanningHook}].from(call(π:Class(scala.collection.immutable.Set[=PlanningHook]): izumi.distage.planning.PlanningHookAggregate)) ((BootstrapLocator.scala:146))
 // make[{type.izumi.distage.model.provisioning.strategies.ProviderStrategy}].from(call(π:Class(): izumi.distage.provisioning.strategies.ProviderStrategyDefaultImpl)) ((BootstrapLocator.scala:134)): izumi.distage.model.definition.BootstrapModule)) ((InjectorDefaultImpl.scala:49))
+// make[{type.repl.MdocSession::repl.MdocSession.App29::repl.MdocSession.App29.A}].from(call(π:Class(izumi.distage.model.recursive.LocatorRef): repl.MdocSession::repl.MdocSession.App29::repl.MdocSession.App29.A)) ((advanced-features.md:440))
+// make[{type.izumi.distage.model.recursive.Bootloader}].from(call(π:Class(izumi.distage.model.definition.BootstrapModule, izumi.distage.model.definition.Activation, izumi.distage.model.PlannerInput, izumi.distage.InjectorFactory): izumi.distage.model.recursive.Bootloader)) ((InjectorDefaultImpl.scala:51))
+// make[{type.repl.MdocSession::repl.MdocSession.App29::repl.MdocSession.App29.C}].from(call(π:Class(): repl.MdocSession::repl.MdocSession.App29::repl.MdocSession.App29.C)) ((advanced-features.md:442))
+// make[{type.izumi.distage.model.PlannerInput}].from(value(PlannerInput(
+// make[{type.repl.MdocSession::repl.MdocSession.App29::repl.MdocSession.App29.A}].from(call(π:Class(izumi.distage.model.recursive.LocatorRef): repl.MdocSession::repl.MdocSession.App29::repl.MdocSession.App29.A)) ((advanced-features.md:440))
+// make[{type.repl.MdocSession::repl.MdocSession.App29::repl.MdocSession.App29.B}].from(call(π:Class(): repl.MdocSession::repl.MdocSession.App29::repl.MdocSession.App29.B)) ((advanced-features.md:441))
+// make[{type.repl.MdocSession::repl.MdocSession.App29::repl.MdocSession.App29.C}].from(call(π:Class(): repl.MdocSession::repl.MdocSession.App29::repl.MdocSession.App29.C)) ((advanced-features.md:442)),Activation(Map()),Everything): izumi.distage.model.PlannerInput)) ((InjectorDefaultImpl.scala:47))
+// make[{type.izumi.distage.model.definition.Activation}].from(value(Activation(Map()): izumi.distage.model.definition.Activation)) ((InjectorDefaultImpl.scala:50))
+// make[{type.repl.MdocSession::repl.MdocSession.App29::repl.MdocSession.App29.B}].from(call(π:Class(): repl.MdocSession::repl.MdocSession.App29::repl.MdocSession.App29.B)) ((advanced-features.md:441))
+// make[{type.izumi.distage.InjectorFactory}].from(value(distage.Injector$@70b3c546: izumi.distage.InjectorFactory)) ((InjectorDefaultImpl.scala:48))
 </code></pre>
 <p>The plan and bindings in Locator are saved in the state they were AFTER <a href="advanced-features.html#garbage-collection">Garbage Collection</a> has been performed. Objects can request the original input via a <code>PlannerInput</code> parameter:</p>
 <pre class="prettyprint"><code class="language-scala">import distage.{DIKey, Roots, ModuleDef, PlannerInput, Injector, Activation}
@@ -1081,7 +1081,7 @@ val input = PlannerInput(module, Activation.empty, Roots(root = DIKey[InjectionI
 // make[{type.repl.MdocSession::repl.MdocSession.App32::repl.MdocSession.App32.InjectionInfo}].from(call(π:Class(izumi.distage.model.PlannerInput): repl.MdocSession::repl.MdocSession.App32::repl.MdocSession.App32.InjectionInfo)) ((advanced-features.md:486)),Activation(Map()),Of(NonEmptySet({type.repl.MdocSession::repl.MdocSession.App32::repl.MdocSession.App32.InjectionInfo})))
 
 val injectionInfo = Injector().produce(input).unsafeGet().get[InjectionInfo]
-// injectionInfo: InjectionInfo = repl.MdocSession$App32$InjectionInfo@4aba6c8a
+// injectionInfo: InjectionInfo = repl.MdocSession$App32$InjectionInfo@75bc15c8
 
 // the PlannerInput in `InjectionInfo` is the same as `input`
 
