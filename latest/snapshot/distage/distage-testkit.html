@@ -146,7 +146,7 @@ data-md-source="github">
     <li><a href="../distage/reference.html" class="page">Syntax Summary</a></li>
   </ul></li>
   <li><a href="../logstage/index.html" class="page">LogStage</a></li>
-  <li><a href="../bio/index.html" class="page">BIO</a></li>
+  <li><a href="../bio/index.html" class="page">BIO Hierarchy</a></li>
   <li><a href="../idealingua/index.html" class="page">IdeaLingua RPC/DML</a>
   <ul>
     <li><a href="../idealingua/language-reference.html" class="page">Idealingua Language Reference</a></li>
@@ -235,7 +235,7 @@ data-md-source="github">
   <ul>
     <li><a href="../distage/distage-testkit.html#memoization-environments" class="header">Memoization Environments</a></li>
     <li><a href="../distage/distage-testkit.html#examples" class="header">Examples</a></li>
-    <li><a href="../distage/distage-testkit.html#psuedocode" class="header">Psuedocode</a></li>
+    <li><a href="../distage/distage-testkit.html#pseudocode" class="header">Pseudocode</a></li>
   </ul></li>
   <li><a href="../distage/distage-testkit.html#forced-roots" class="header">Forced Roots</a></li>
   <li><a href="../distage/distage-testkit.html#test-selection" class="header">Test Selection</a>
@@ -730,7 +730,7 @@ bonusService = repl.MdocSession$App$DummyBonusService$Impl@2843b83b
 </code></pre>
 <pre>
 </pre>
-<h4><a href="#psuedocode" name="psuedocode" class="anchor"><span class="anchor-link"></span></a>Psuedocode</h4>
+<h4><a href="#pseudocode" name="pseudocode" class="anchor"><span class="anchor-link"></span></a>Pseudocode</h4>
 <p>Suppose that the lookup of an instance for a component uses a hypothetical function <code>lookup(graph,
 type and tag)</code>. This function is memoized using storage specific to the current memoization environment. This memoization environment is uniquely defined by the test config options above. This would have pseudocode like:</p>
 <pre><code>rootComponents = planRoots(memoizationRoots, activation, forcedRoots, ...)
@@ -765,13 +765,13 @@ for each test case
   <li><a href="https://en.wikipedia.org/wiki/N-version_programming">N-Version Programming</a></li>
 </ul>
 <h2><a href="#extended-example" name="extended-example" class="anchor"><span class="anchor-link"></span></a>Extended Example</h2>
-<p>This is an excerpt from <a href="https://github.com/7mind/distage-example">distage-example</a>. Techniques in that example to look for:</p>
+<p>This is an excerpt from <a href="https://github.com/7mind/distage-example">distage-example</a>, specifically the <a href="https://github.com/7mind/distage-example/blob/develop/src/test/scala/leaderboard/tests.scala">tests</a> source. Techniques in that example to look for:</p>
 <ul>
   <li>Placing the <code>Profiles</code> component in the <code>memoizationRoots</code>. The axis <code>Repo.Prod</code> uses a PostgreSQL  docker container. This is shared across test cases since the <code>Profiles[IO]</code> depends on the  PostgreSQL connection which then depends on the container instance.</li>
-  <li>Use of <code>Scene.Managed</code> to use <code>Axis.Prod</code> components in a managed environment.</li>
+  <li>Use of <code>Scene.Managed</code> to use <code>Repo.Prod</code> components in a managed environment.</li>
 </ul>
 <pre class="prettyprint"><code class="language-scala">import distage.{Activation, DIKey, ModuleDef}
-import distage.StandardAxis.Repo
+import distage.StandardAxis.{Scene, Repo}
 import distage.plugins.PluginConfig
 import izumi.distage.testkit.TestConfig
 import izumi.distage.testkit.scalatest.{AssertIO, DistageBIOEnvSpecScalatest}
@@ -781,34 +781,34 @@ import leaderboard.zioenv.{ladder, rnd}
 import zio.{ZIO, IO}
 
 abstract class LeaderboardTest extends DistageBIOEnvSpecScalatest[ZIO] with AssertIO {
-  override def config = super.config.copy(
+  override def config = TestConfig(
     pluginConfig = PluginConfig.cached(packagesEnabled = Seq(&quot;leaderboard.plugins&quot;)),
     moduleOverrides = new ModuleDef {
       make[Rnd[IO]].from[Rnd.Impl[IO]]
-      // For testing, setup a docker container with postgres,
-      // instead of trying to connect to an external database
-      include(PostgresDockerModule)
     },
-    // instantiate Ladder &amp; Profiles only once per test-run and
+    // For testing, setup a docker container with postgres,
+    // instead of trying to connect to an external database
+    activation = Activation(Scene -&gt; Scene.Managed),
+    // Instantiate Ladder &amp; Profiles only once per test-run and
     // share them and all their dependencies across all tests.
-    // this includes the Postgres Docker container above and
-    // table DDLs
+    // this includes the Postgres Docker container above and table DDLs
     memoizationRoots = Set(
       DIKey[Ladder[IO]],
       DIKey[Profiles[IO]],
     ),
+    configBaseName = &quot;leaderboard-test&quot;,
   )
 }
 
 trait DummyTest extends LeaderboardTest {
   override final def config = super.config.copy(
-    activation = Activation(Repo -&gt; Repo.Dummy),
+    activation = super.config.activation ++ Activation(Repo -&gt; Repo.Dummy)
   )
 }
 
 trait ProdTest extends LeaderboardTest {
   override final def config = super.config.copy(
-    activation = Activation(Repo -&gt; Repo.Prod),
+    activation = super.config.activation ++ Activation(Repo -&gt; Repo.Prod)
   )
 }
 
