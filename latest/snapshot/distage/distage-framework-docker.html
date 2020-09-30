@@ -330,7 +330,6 @@ import com.typesafe.config.ConfigFactory
 import distage.Injector
 import izumi.distage.config.AppConfigModule
 import izumi.distage.docker.modules.DockerSupportModule
-import izumi.distage.effect.modules.CatsDIEffectModule
 import izumi.logstage.api.routing.StaticLogRouter
 import izumi.logstage.distage.LogIOModule
 
@@ -340,8 +339,7 @@ val distageFrameworkModules = new ModuleDef {
 
   // standard distage framework modules
   include(AppConfigModule(ConfigFactory.defaultApplication))
-  include(CatsDIEffectModule)
-  include(new LogIOModule[IO](StaticLogRouter.instance, false))
+  include(LogIOModule[IO](StaticLogRouter.instance, false))
 }
 </code></pre>
 <p>The required framework modules plus <code>PostgresDockerModule</code> is sufficient to depend on Docker containers:</p>
@@ -351,14 +349,17 @@ val distageFrameworkModules = new ModuleDef {
     include(distageFrameworkModules)
   }
 
-  Injector().produceGetF[IO, PostgresDocker.Container](applicationModules).use { container =&gt;
-    val port = container.availablePorts.first(PostgresDocker.primaryPort)
-    IO(println(s&quot;postgres is available on port ${port}&quot;))
-  }
+  Injector[IO]()
+    .produceGet[PostgresDocker.Container](applicationModules)
+    .use {
+      container =&gt;
+        val port = container.availablePorts.first(PostgresDocker.primaryPort)
+        IO(println(s&quot;postgres is available on port ${port}&quot;))
+    }
 }
 
 minimalExample.unsafeRunSync()
-// postgres is available on port AvailablePort(172.17.0.2,5432)
+// postgres is available on port AvailablePort(127.0.0.1,34251)
 </code></pre>
 <p>If the <code>DockerSupportModule</code> is not included in an application then a get of a Docker container dependent resource will fail with a <code>izumi.distage.model.exceptions.ProvisioningException</code>.</p>
 <h3><a href="#config-api" name="config-api" class="anchor"><span class="anchor-link"></span></a>Config API</h3>
@@ -525,8 +526,8 @@ class PostgresExampleAppIntegTest extends DistageSpecScalatest[IO] with AssertCI
     make[PostgresExampleApp]
   }
 
-  Injector()
-    .produceGetF[IO, PostgresExampleApp](applicationModules)
+  Injector[IO]()
+    .produceGet[PostgresExampleApp](applicationModules)
     .use(app =&gt; app.run)
 }
 
