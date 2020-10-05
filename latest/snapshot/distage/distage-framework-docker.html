@@ -376,7 +376,7 @@ minimalExample.unsafeRunSync()
 }
 </code></pre>
 <p>Suppose <code>HostPostgresData</code> is a component provided by the application modules. This path can be added to the PostgreSQL container&rsquo;s mounts by adding to the additional dependencies of the provider magnet:</p>
-<pre class="prettyprint"><code class="language-scala">case class HostPostgresData(path: String)
+<pre class="prettyprint"><code class="language-scala">final case class HostPostgresData(path: String)
 
 class PostgresWithMountsDockerModule[F[_]: TagK] extends ModuleDef {
   make[PostgresDocker.Container].fromResource {
@@ -392,7 +392,7 @@ class PostgresWithMountsDockerModule[F[_]: TagK] extends ModuleDef {
 <h4><a href="#dependondocker" name="dependondocker" class="anchor"><span class="anchor-link"></span></a><code>dependOnDocker</code></h4>
 <p><a href="/latest/snapshot/api/izumi/distage/docker/DockerContainer$$DockerProviderExtensions.html#dependOnDocker"><code>dependOnDocker</code></a> adds a dependency on a given Docker container. <code>distage</code> ensures the requested container is available before the dependent is provided.</p>
 <p>For example, suppose a system under test requires both PostgreSQL and Elasticsearch. One option is to use <code>dependOnDocker</code> to declare the Elasticsearch container depends on the PostgreSQL container:</p>
-<pre class="prettyprint"><code class="language-scala"><br/>object ElasticSearchDocker extends ContainerDef {
+<pre class="prettyprint"><code class="language-scala">object ElasticSearchDocker extends ContainerDef {
   val ports = Seq(9200, 9300)
 
   override def config: Config = {
@@ -425,7 +425,8 @@ class ElasticSearchPlusPostgresModule[F[_]: TagK] extends ModuleDef {
 <h3><a href="#usage-in-integration-tests" name="usage-in-integration-tests" class="anchor"><span class="anchor-link"></span></a>Usage in Integration Tests</h3>
 <p>A common use case is using Docker containers to provide service implementations for integration test, such as using a PostgreSQL container for verifying an application that uses a PostgreSQL database. <code>distage</code> container resources are easy to integrate as providers.</p>
 <p>Consider the example application below. This application is written to depend on a <a href="https://tpolecat.github.io/doobie/">doobie</a> <code>Transactor</code>, which is constructed from a <code>PostgresServerConfig</code>.</p>
-<pre class="prettyprint"><code class="language-scala">import doobie.Transactor
+<pre class="prettyprint"><code class="language-scala">import cats.effect.ContextShift
+import doobie.Transactor
 import doobie.syntax.connectionio._
 import doobie.syntax.string._
 
@@ -443,7 +444,7 @@ class PostgresExampleApp(xa: Transactor[IO]) {
 }
 
 // the postgres configuration used to construct the Transactor
-case class PostgresServerConfig(
+final case class PostgresServerConfig(
   host: String,
   port: Int,
   database: String,
@@ -452,21 +453,18 @@ case class PostgresServerConfig(
 )
 
 class TransactorFromConfigModule extends ModuleDef {
-  make[Transactor[IO]].from { config: PostgresServerConfig =&gt;
-    import scala.concurrent.ExecutionContext.global
+  make[Transactor[IO]].from {
+    (config: PostgresServerConfig, contextShift: ContextShift[IO]) =&gt;
+      implicit val CS = contextShift
 
-    implicit val contextShift = IO.contextShift(global)
-    implicit val timer = IO.timer(global)
-
-    Transactor.fromDriverManager[IO](
-      &quot;org.postgresql.Driver&quot;,
-      s&quot;jdbc:postgresql://${config.host}:${config.port}/${config.database}&quot;,
-      config.username,
-      config.password,
-    )
+      Transactor.fromDriverManager[IO](
+        driver = &quot;org.postgresql.Driver&quot;,
+        url    = s&quot;jdbc:postgresql://${config.host}:${config.port}/${config.database}&quot;,
+        user   = config.username,
+        pass   = config.password,
+      )
   }
 }
-
 </code></pre>
 <p>Note that the above code is agnostic of environment. Provided a <code>PostgresServerConfig</code>, the <code>Transactor</code> needed by <code>PostgresExampleApp</code> can be constructed.</p>
 <p>An integration test would use a module that provides the <code>PostgresServerConfig</code> from a <code>PostgresDocker.Container</code>:</p>
