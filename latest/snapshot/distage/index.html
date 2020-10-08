@@ -137,7 +137,7 @@ data-md-source="github">
 <ul>
   <li><a href="../distage/index.html" class="active page">distage: Staged Dependency Injection</a>
   <ul>
-    <li><a href="../distage/basics.html" class="page">Basics</a></li>
+    <li><a href="../distage/basics.html" class="page">Introduction</a></li>
     <li><a href="../distage/advanced-features.html" class="page">Advanced Features</a></li>
     <li><a href="../distage/debugging.html" class="page">Debugging</a></li>
     <li><a href="../distage/distage-framework.html" class="page">distage-framework</a></li>
@@ -163,6 +163,7 @@ data-md-source="github">
 <ul>
   <li><a href="../distage/index.html#distage-staged-dependency-injection" class="header">distage: Staged Dependency Injection</a>
   <ul>
+    <li><a href="../distage/index.html#real-world-example" class="header">Real-world example</a></li>
     <li><a href="../distage/index.html#why-distage-" class="header">Why distage?</a></li>
     <li><a href="../distage/index.html#faq" class="header">FAQ</a></li>
     <li><a href="../distage/index.html#documentation" class="header">Documentation</a></li>
@@ -190,6 +191,7 @@ data-md-source="github">
 <ul>
   <li><a href="../distage/index.html#distage-staged-dependency-injection" class="header">distage: Staged Dependency Injection</a>
   <ul>
+    <li><a href="../distage/index.html#real-world-example" class="header">Real-world example</a></li>
     <li><a href="../distage/index.html#why-distage-" class="header">Why distage?</a></li>
     <li><a href="../distage/index.html#faq" class="header">FAQ</a></li>
     <li><a href="../distage/index.html#documentation" class="header">Documentation</a></li>
@@ -205,11 +207,20 @@ data-md-source="github">
 <article class="md-content__inner md-typeset">
 <div class="md-content__searchable">
 <h1><a href="#distage-staged-dependency-injection" name="distage-staged-dependency-injection" class="anchor"><span class="anchor-link"></span></a>distage: Staged Dependency Injection</h1>
-<p><code>distage</code> is a pragmatic module system for FP Scala &amp; Scala.js. It combines simplicity and expressiveness of pure FP with the flexibility and extreme late-binding, traditionally associated with object-oriented dependency injection frameworks, such as Guice.</p>
-<p><code>distage</code> is suitable for wiring <a href="basics.html#tagless-final-style">Tagless Final Style</a>, <a href="basics.html#zio-has-bindings">ZIO Environment style and ZLayer-based applications</a>, and imperative Scala style applications.</p>
+<p><code>distage</code> is a pragmatic module system for pure-FP Scala &amp; Scala.js. It combines simplicity and expressiveness of pure FP with the flexibility and extreme late-binding, traditionally associated with object-oriented dependency injection frameworks, such as Guice.</p>
+<p><code>distage</code> is suitable for wiring <a href="basics.html#tagless-final-style">Tagless Final Style</a>, <a href="basics.html#zio-has-bindings">ZIO ZLayer-based applications</a>, and ordinary FP, actor-based or imperative Scala applications.</p>
+<h4><a href="#real-world-example" name="real-world-example" class="anchor"><span class="anchor-link"></span></a>Real-world example</h4>
+<p>Check out <a href="https://github.com/7mind/distage-example"><code>distage-example</code> project</a> for a complete example built using <code>distage</code>, tagless final, <code>http4s</code>, <code>doobie</code> and <code>zio</code> libraries.</p>
+<p>It shows how to write an idiomatic <code>distage</code>-style from scratch and how to:</p>
+<ul>
+  <li>write tests using <a href="distage-testkit.html"><code>distage-testkit</code></a></li>
+  <li>setup portable, zero-setup test environments using <a href="distage-framework-docker.html"><code>distage-framework-docker</code></a></li>
+  <li>create <a href="distage-framework.html#roles">role-based applications</a></li>
+  <li>enable <a href="distage-framework.html">compile-time checks</a> for fast-feedback on wiring errors</li>
+</ul>
 <h2><a href="#why-distage-" name="why-distage-" class="anchor"><span class="anchor-link"></span></a>Why distage?</h2>
 <ol>
-  <li><strong>Faster applications and tests</strong>: <code>distage</code> guarantees that no unnecessary instantiations will happen during your tests or application startup.</li>
+  <li><strong>Faster applications and tests</strong>: <code>distage</code> guarantees that no unnecessary instantiations will happen during your tests or application startup. <code>distage</code> itself is very fast, in part due to not relying on any sort of runtime reflection.</li>
   <li><strong>Quick failure detection</strong>: <code>distage</code> performs all the integration checks for your application and tests even before any instantiations happened.</li>
   <li><strong>Simple tests</strong>: <code>distage</code> eliminates all the hard work of setting up your test environments, especially configurable ones.</li>
   <li><strong>Better integration tests</strong>: <a href="distage-testkit.html">distage-testkit</a> allows you to reuse expensive resources (like database connections and docker containers) across multiple integration tests, gaining performance and without sacrificing correctness.</li>
@@ -217,7 +228,7 @@ data-md-source="github">
   <li><strong>Fast compile times and low mental overhead</strong>: Unlike fully compile-time DIs, <code>distage</code> does not impose a compile time penalty. <code>distage</code> extensions are simple to write and do not require type-level programming.</li>
   <li><strong>Simple debugging</strong>: <code>distage</code> provides you important insights about your application and allows you to introspect and modify it on the fly, before any instantiations happen.</li>
   <li><strong>High Correctness</strong>: <code>distage</code> supports resources and lifecycle natively and guarantees proper cleanups even when something went wrong.</li>
-  <li><strong>No reflection</strong>: <code>distage</code> generates constructors and <a href="https://blog.7mind.io/lightweight-reflection.html">type information</a> at compile-time and does not use Scala reflection. As such, it&rsquo;s compatible with Graal Native Image and Scala.js.</li>
+  <li><strong>No reflection</strong>: <code>distage</code> generates constructors and <a href="https://blog.7mind.io/lightweight-reflection.html">type information</a> at compile-time and does not use Scala reflection. As such, it&rsquo;s compatible with GraalVM Native Image and Scala.js.</li>
   <li><strong>Non-invasive</strong>: <code>distage</code> is designed to not impact the way your Scala code is written, it just removes all the initialization boilerplate. You don&rsquo;t need to learn magic tricks to write components in a distage application.</li>
 </ol>
 <p><code>distage</code> is recommended by industry leaders:</p>
@@ -234,8 +245,8 @@ data-md-source="github">
 <p><strong>A</strong>: Use <a href="basics.html#activation-axis">Activation Axis</a></p>
 <h2><a href="#documentation" name="documentation" class="anchor"><span class="anchor-link"></span></a>Documentation</h2>
 <ul>
-  <li><a href="basics.html">Basics</a></li>
-  <li><a href="advanced-features.html">Advanced features</a></li>
+  <li><a href="basics.html">Introduction</a></li>
+  <li><a href="advanced-features.html">Advanced Features</a></li>
   <li><a href="debugging.html">Debugging</a></li>
   <li><a href="distage-framework.html">distage-framework</a></li>
   <li><a href="distage-framework-docker.html">distage-framework-docker</a></li>
@@ -297,13 +308,13 @@ Izumi Project
 </span>
 </div>
 </a>
-<a href="../distage/basics.html" title="Basics" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+<a href="../distage/basics.html" title="Introduction" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
 <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
 <span class="md-flex__ellipsis">
 <span class="md-footer-nav__direction">
 Next
 </span>
-Basics
+Introduction
 </span>
 </div>
 <div class="md-flex__cell md-flex__cell--shrink">

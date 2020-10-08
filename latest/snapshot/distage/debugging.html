@@ -137,7 +137,7 @@ data-md-source="github">
 <ul>
   <li><a href="../distage/index.html" class="page">distage: Staged Dependency Injection</a>
   <ul>
-    <li><a href="../distage/basics.html" class="page">Basics</a></li>
+    <li><a href="../distage/basics.html" class="page">Introduction</a></li>
     <li><a href="../distage/advanced-features.html" class="page">Advanced Features</a></li>
     <li><a href="../distage/debugging.html" class="active page">Debugging</a></li>
     <li><a href="../distage/distage-framework.html" class="page">distage-framework</a></li>
@@ -212,97 +212,31 @@ data-md-source="github">
 </div>
 <h3><a href="#testing-plans" name="testing-plans" class="anchor"><span class="anchor-link"></span></a>Testing Plans</h3>
 <p>Use <code>OrderedPlan#assertValid</code> method to test whether the plan will execute correctly when passed to <code>Injector#produce</code>.</p>
-<pre class="prettyprint"><code class="language-scala">import distage.{DIKey, Roots, ModuleDef, Injector, Activation}
+<pre class="prettyprint"><code class="language-scala">import distage.{DIKey, Roots, ModuleDef, Injector}
 
 class A(b: B)
 class B
 
-val badModule = new ModuleDef {
+def badModule = new ModuleDef {
   make[A]
-  make[Int].fromEffect(zio.Task { ??? })
+  make[B].fromEffect(zio.Task { ??? })
 }
-// badModule: AnyRef with ModuleDef = 
-// make[{type.scala.Int}].from(effect[λ %0 → zio.ZIO[-Any,+Throwable,+0]](value(zio.ZIO$EffectPartial@5ec96365: zio.ZIO[-Any,+Throwable,+Nothing]))) ((debugging.md:22))
-// make[{type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.A}].from(call(π:Class(repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B): repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.A)) ((debugging.md:21))
 
-val badPlan = Injector[cats.effect.IO]().plan(badModule, Activation.empty, Roots.Everything)
+val badPlan = Injector[cats.effect.IO]().plan(badModule, Roots.target[A])
 // badPlan: izumi.distage.model.plan.OrderedPlan = 
-// {type.MdocSession::App0::B} (&lt;unknown&gt;) := import {type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B}  // no dependees
-// {type.DIEffectAsync[=λ %1:0 → 1:0]} (IdentitySupportModule.scala:17) := value izumi.distage.model.effect.DIEffectAsync$$anon$1#47779705
-// {effect.{type.Int}} (debugging.md:22) := value zio.ZIO$EffectPartial#1590256485
-// {type.DIEffect[=λ %1:0 → 1:0]} (IdentitySupportModule.scala:15) := value izumi.distage.model.effect.DIEffect$$anon$1#154064065
-// {type.DIEffectRunner[=λ %1:0 → 1:0]} (IdentitySupportModule.scala:16) := value izumi.distage.model.effect.DIEffectRunner$IdentityImpl$#222952514
-// {type.InjectorFactory} (InjectorDefaultImpl.scala:49) := value distage.Injector$#1597525780
-// {type.DIApplicative[=λ %1:0 → 1:0]} (IdentitySupportModule.scala:14) := value izumi.distage.model.effect.DIApplicative$$anon$4#623500643
-// {type.PublicIOApp} (CatsIOSupportModule.scala:23) := call(π:Trait(): PublicIOApp) {}
-// {type.PlannerInput} (InjectorDefaultImpl.scala:47) := value izumi.distage.model.PlannerInput#-386021731
-// {type.Activation} (InjectorDefaultImpl.scala:48) := value izumi.distage.model.definition.Activation#-1609326920
-// {id.Module@defaultModule} (InjectorDefaultImpl.scala:51) := value izumi.distage.model.definition.Module$$anon$1#-1656855190
-// {type.BootstrapModule} (InjectorDefaultImpl.scala:50) := value izumi.distage.model.definition.BootstrapContextModule$$anon$1#-1871065210
-// {type.Bootloader} (InjectorDefaultImpl.scala:52) := call(π:Class(BootstrapModule, Activation, PlannerInput, InjectorFactory, Module): Bootloader) {
-//   arg bootstrapModule: BootstrapModule = lookup({type.BootstrapModule})
-//   arg activation: Activation = lookup({type.Activation})
-//   arg input: PlannerInput = lookup({type.PlannerInput})
-//   arg injectorFactory: InjectorFactory = lookup({type.InjectorFactory})
-//   arg defaultModule: Module = lookup({id.Module@defaultModule})
-// }
-// {type.Timer[=λ %1:0 → IO[+1:0]]} (CatsIOSupportModule.scala:22) := call(ƒ:izumi.distage.modules.support.CatsIOSupportModule$$Lambda$20260/698999729@4ae33b43(PublicIOApp): Timer[=λ %1:0 → IO[+1:0]]) {
-//   arg x$4: PublicIOApp = lookup({type.PublicIOApp})
-// }
-// {type.ContextShift[=λ %1:0 → IO[+1:0]]} (CatsIOSupportModule.scala:21) := call(ƒ:izumi.distage.modules.support.CatsIOSupportModule$$Lambda$20258/1238745631@6885919d(PublicIOApp): ContextShift[=λ %1:0 → IO[+1:0]]) {
-//   arg x$3: PublicIOApp = lookup({type.PublicIOApp})
-// }
-// {type.Int} (debugging.md:22) := effect[λ %0 → zio.ZIO[-Any,+Throwable,+0]]{effect.{type.Int}}
+// {effect.{type.MdocSession::App0::B}} (debugging.md:22) := value zio.ZIO$EffectPartial#1567955907
+// {type.MdocSession::App0::B} (debugging.md:22) := effect[λ %0 → zio.ZIO[-Any,+Throwable,+0]]{effect.{type.MdocSession::App0::B}}
 // {type.MdocSession::App0::A} (debugging.md:21) := call(π:Class(MdocSession::App0::B): MdocSession::App0::A) {
 //   arg b: MdocSession::App0::B = lookup({type.MdocSession::App0::B})
 // }
-// {type.ConcurrentEffect[=λ %1:0 → IO[+1:0]]} (CatsIOSupportModule.scala:18) := call(ƒ:izumi.distage.modules.support.CatsIOSupportModule$$Lambda$20254/220714157@275e526c(ContextShift[=λ %1:0 → IO[+1:0]]): ConcurrentEffect[=λ %1:0 → IO[+1:0]]) {
-//   arg x$1: ContextShift[=λ %1:0 → IO[+1:0]] = lookup({type.ContextShift[=λ %1:0 → IO[+1:0]]})
-// }
-// {type.Parallel[=λ %1:0 → IO[+1:0]]} (CatsIOSupportModule.scala:19) := call(ƒ:izumi.distage.modules.support.CatsIOSupportModule$$Lambda$20256/119449029@3a137390(ContextShift[=λ %1:0 → IO[+1:0]]): (Parallel[=λ %1:0 → IO[+1:0]] &amp; {type F = λ %0 → IOParallelNewtype::Par::Type[+0]})) {
-//   arg x$2: ContextShift[=λ %1:0 → IO[+1:0]] = lookup({type.ContextShift[=λ %1:0 → IO[+1:0]]})
-// }
-// {type.Invariant[=λ %0 → IO[+0]]} (CatsEffectInstancesModule.scala:14) := ref {type.ConcurrentEffect[=λ %0 → IO[+0]]}
-// {type.Apply[=λ %0 → IO[+0]]} (CatsEffectInstancesModule.scala:19) := ref {type.ConcurrentEffect[=λ %0 → IO[+0]]}
-// {type.FlatMap[=λ %0 → IO[+0]]} (CatsEffectInstancesModule.scala:21) := ref {type.ConcurrentEffect[=λ %0 → IO[+0]]}
-// {type.Semigroupal[=λ %0 → IO[+0]]} (CatsEffectInstancesModule.scala:15) := ref {type.ConcurrentEffect[=λ %0 → IO[+0]]}
-// {type.Applicative[=λ %0 → IO[+0]]} (CatsEffectInstancesModule.scala:20) := ref {type.ConcurrentEffect[=λ %0 → IO[+0]]}
-// {type.Async[=λ %0 → IO[+0]]} (CatsEffectInstancesModule.scala:28) := ref {type.ConcurrentEffect[=λ %0 → IO[+0]]}
-// {type.Effect[=λ %0 → IO[+0]]} (CatsEffectInstancesModule.scala:30) := ref {type.ConcurrentEffect[=λ %0 → IO[+0]]}
-// {type.Sync[=λ %0 → IO[+0]]} (CatsEffectInstancesModule.scala:27) := ref {type.ConcurrentEffect[=λ %0 → IO[+0]]}
-// {type.Bracket[=λ %0 → IO[+0],=Throwable]} (CatsEffectInstancesModule.scala:26) := ref {type.ConcurrentEffect[=λ %0 → IO[+0]]}
-// {type.Concurrent[=λ %0 → IO[+0]]} (CatsEffectInstancesModule.scala:31) := ref {type.ConcurrentEffect[=λ %0 → IO[+0]]}
-// {type.ApplicativeError[=λ %0 → IO[+0],=Throwable]} (CatsEffectInstancesModule.scala:23) := ref {type.ConcurrentEffect[=λ %0 → IO[+0]]}
-// {type.Monad[=λ %0 → IO[+0]]} (CatsEffectInstancesModule.scala:22) := ref {type.ConcurrentEffect[=λ %0 → IO[+0]]}
-// {type.MonadError[=λ %0 → IO[+0],=Throwable]} (CatsEffectInstancesModule.scala:24) := ref {type.ConcurrentEffect[=λ %0 → IO[+0]]}
-// {type.LiftIO[=λ %0 → IO[+0]]} (CatsEffectInstancesModule.scala:29) := ref {type.ConcurrentEffect[=λ %0 → IO[+0]]}
-// {type.InvariantSemigroupal[=λ %0 → IO[+0]]} (CatsEffectInstancesModule.scala:16) := ref {type.ConcurrentEffect[=λ %0 → IO[+0]]}
-// {type.Functor[=λ %0 → IO[+0]]} (CatsEffectInstancesModule.scala:18) := ref {type.ConcurrentEffect[=λ %0 → IO[+0]]}
-// {type.SyncSafe[=λ %0 → IO[+0]]} (AnyCatsEffectSupportModule.scala:38) := call(ƒ:izumi.distage.modules.support.AnyCatsEffectSupportModule$$Lambda$20252/1078294885@4bc82e52(Sync[=λ %0 → IO[+0]]): SyncSafe[=λ %0 → IO[+0]]) {
-//   arg F: Sync[=λ %0 → IO[+0]] = lookup({type.Sync[=λ %0 → IO[+0]]})
-// }
-// {type.DIApplicative[=λ %0 → IO[+0]]} (AnyCatsEffectSupportModule.scala:35) := call(ƒ:izumi.distage.modules.support.AnyCatsEffectSupportModule$$Lambda$20250/1896205799@a440045(Applicative[=λ %0 → IO[+0]]): DIApplicative[=λ %0 → IO[+0]]) {
-//   arg F: Applicative[=λ %0 → IO[+0]] = lookup({type.Applicative[=λ %0 → IO[+0]]})
-// }
-// {type.DIEffectAsync[=λ %0 → IO[+0]]} (AnyCatsEffectSupportModule.scala:28) := call(ƒ:izumi.distage.modules.support.AnyCatsEffectSupportModule$$Lambda$20248/629382089@28d22b1e(Concurrent[=λ %0 → IO[+0]], Timer[=λ %0 → IO[+0]], Parallel[=λ %0 → IO[+0]]): DIEffectAsync[=λ %0 → IO[+0]]) {
-//   arg C0: Concurrent[=λ %0 → IO[+0]] = lookup({type.Concurrent[=λ %0 → IO[+0]]})
-//   arg T0: Timer[=λ %0 → IO[+0]] = lookup({type.Timer[=λ %0 → IO[+0]]})
-//   arg P0: Parallel[=λ %0 → IO[+0]] = lookup({type.Parallel[=λ %0 → IO[+0]]})
-// }
-// {type.DIEffect[=λ %0 → IO[+0]]} (AnyCatsEffectSupportModule.scala:25) := call(ƒ:izumi.distage.modules.support.AnyCatsEffectSupportModule$$Lambda$20246/1940192851@43b7ec5c(Sync[=λ %0 → IO[+0]]): DIEffect[=λ %0 → IO[+0]]) {
-//   arg F: Sync[=λ %0 → IO[+0]] = lookup({type.Sync[=λ %0 → IO[+0]]})
-// }
-// {type.DIEffectRunner[=λ %0 → IO[+0]]} (AnyCatsEffectSupportModule.scala:22) := call(ƒ:izumi.distage.modules.support.AnyCatsEffectSupportModule$$Lambda$20244/1087284444@251c8a3d(Effect[=λ %0 → IO[+0]]): DIEffectRunner[=λ %0 → IO[+0]]) {
-//   arg F: Effect[=λ %0 → IO[+0]] = lookup({type.Effect[=λ %0 → IO[+0]]})
-// }
 </code></pre>
-<pre class="prettyprint"><code class="language-scala">badPlan.assertValid[cats.effect.IO]().unsafeRunSync()
+<pre class="prettyprint"><code class="language-scala">// the effect types are mismatched - `badModule` uses `zio.Task`, but we expect `cats.effect.IO`
+
+badPlan.assertValid[cats.effect.IO]().unsafeRunSync()
 // izumi.distage.model.exceptions.InvalidPlanException: 
-// - Instance is not available in the object graph: {type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B}.
-// Required by refs:ø
 // - Incompatible effect types when trying to execute operation:
 // 
-//   - {type.scala.Int} (debugging.md:22) := effect[λ %0 → zio.ZIO[-Any,+Throwable,+0]]{effect.{type.scala.Int}/zio.ZIO[-Any,+Throwable,+Nothing]}
+//   - {type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B} (debugging.md:22) := effect[λ %0 → zio.ZIO[-Any,+Throwable,+0]]{effect.{type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B}/zio.ZIO[-Any,+Throwable,+Nothing]}
 // 
 // Can&#39;t execute an effect in `λ %0 → zio.ZIO[-Any,+Throwable,+0]` which is neither equivalent to `izumi.fundamentals.platform.Identity`, nor a subtype of the Injector&#39;s effect type: `λ %0 → cats.effect.IO[+0]`
 // 
@@ -323,186 +257,65 @@ val badPlan = Injector[cats.effect.IO]().plan(badModule, Activation.empty, Roots
 // 	at cats.effect.internals.IORunLoop$.step(IORunLoop.scala:235)
 // 	at cats.effect.IO.unsafeRunTimed(IO.scala:338)
 // 	at cats.effect.IO.unsafeRunSync(IO.scala:256)
-// 	at repl.MdocSession$App0$$anonfun$5.apply$mcV$sp(debugging.md:33)
-// 	at repl.MdocSession$App0$$anonfun$5.apply(debugging.md:33)
-// 	at repl.MdocSession$App0$$anonfun$5.apply(debugging.md:33)
+// 	at repl.MdocSession$App0$$anonfun$4.apply$mcV$sp(debugging.md:33)
+// 	at repl.MdocSession$App0$$anonfun$4.apply(debugging.md:33)
+// 	at repl.MdocSession$App0$$anonfun$4.apply(debugging.md:33)
 </code></pre>
-<pre class="prettyprint"><code class="language-scala">val goodModule = new ModuleDef {
+<pre class="prettyprint"><code class="language-scala">def goodModule = new ModuleDef {
   make[A]
   make[B].fromEffect(cats.effect.IO(new B))
 }
-// goodModule: AnyRef with ModuleDef = 
-// make[{type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.A}].from(call(π:Class(repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B): repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.A)) ((debugging.md:41))
-// make[{type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B}].from(effect[λ %0 → cats.effect.IO[+0]](value(IO$1466110741: cats.effect.IO[+MdocSession::App0::B]))) ((debugging.md:42))
 
-val plan = Injector[cats.effect.IO]().plan(goodModule, Activation.empty, Roots.Everything)
+val plan = Injector[cats.effect.IO]().plan(goodModule, Roots.target[A])
 // plan: izumi.distage.model.plan.OrderedPlan = 
-// {type.DIEffectAsync[=λ %1:0 → 1:0]} (IdentitySupportModule.scala:17) := value izumi.distage.model.effect.DIEffectAsync$$anon$1#47779705
-// {type.DIEffect[=λ %1:0 → 1:0]} (IdentitySupportModule.scala:15) := value izumi.distage.model.effect.DIEffect$$anon$1#154064065
-// {effect.{type.MdocSession::App0::B}} (debugging.md:42) := value cats.effect.IO$Delay#534142085
-// {type.DIEffectRunner[=λ %1:0 → 1:0]} (IdentitySupportModule.scala:16) := value izumi.distage.model.effect.DIEffectRunner$IdentityImpl$#222952514
-// {type.InjectorFactory} (InjectorDefaultImpl.scala:49) := value distage.Injector$#1597525780
-// {type.DIApplicative[=λ %1:0 → 1:0]} (IdentitySupportModule.scala:14) := value izumi.distage.model.effect.DIApplicative$$anon$4#623500643
-// {type.PublicIOApp} (CatsIOSupportModule.scala:23) := call(π:Trait(): PublicIOApp) {}
-// {type.PlannerInput} (InjectorDefaultImpl.scala:47) := value izumi.distage.model.PlannerInput#1253107641
-// {type.Activation} (InjectorDefaultImpl.scala:48) := value izumi.distage.model.definition.Activation#-1609326920
-// {id.Module@defaultModule} (InjectorDefaultImpl.scala:51) := value izumi.distage.model.definition.Module$$anon$1#-1656855190
-// {type.BootstrapModule} (InjectorDefaultImpl.scala:50) := value izumi.distage.model.definition.BootstrapContextModule$$anon$1#-1871065210
-// {type.Bootloader} (InjectorDefaultImpl.scala:52) := call(π:Class(BootstrapModule, Activation, PlannerInput, InjectorFactory, Module): Bootloader) {
-//   arg bootstrapModule: BootstrapModule = lookup({type.BootstrapModule})
-//   arg activation: Activation = lookup({type.Activation})
-//   arg input: PlannerInput = lookup({type.PlannerInput})
-//   arg injectorFactory: InjectorFactory = lookup({type.InjectorFactory})
-//   arg defaultModule: Module = lookup({id.Module@defaultModule})
-// }
+// {effect.{type.MdocSession::App0::B}} (debugging.md:42) := value cats.effect.IO$Delay#456965287
 // {type.MdocSession::App0::B} (debugging.md:42) := effect[λ %0 → cats.effect.IO[+0]]{effect.{type.MdocSession::App0::B}}
-// {type.Timer[=λ %1:0 → IO[+1:0]]} (CatsIOSupportModule.scala:22) := call(ƒ:izumi.distage.modules.support.CatsIOSupportModule$$Lambda$20260/698999729@4ae33b43(PublicIOApp): Timer[=λ %1:0 → IO[+1:0]]) {
-//   arg x$4: PublicIOApp = lookup({type.PublicIOApp})
-// }
-// {type.ContextShift[=λ %1:0 → IO[+1:0]]} (CatsIOSupportModule.scala:21) := call(ƒ:izumi.distage.modules.support.CatsIOSupportModule$$Lambda$20258/1238745631@6885919d(PublicIOApp): ContextShift[=λ %1:0 → IO[+1:0]]) {
-//   arg x$3: PublicIOApp = lookup({type.PublicIOApp})
-// }
-// {type.ConcurrentEffect[=λ %1:0 → IO[+1:0]]} (CatsIOSupportModule.scala:18) := call(ƒ:izumi.distage.modules.support.CatsIOSupportModule$$Lambda$20254/220714157@275e526c(ContextShift[=λ %1:0 → IO[+1:0]]): ConcurrentEffect[=λ %1:0 → IO[+1:0]]) {
-//   arg x$1: ContextShift[=λ %1:0 → IO[+1:0]] = lookup({type.ContextShift[=λ %1:0 → IO[+1:0]]})
-// }
-// {type.Parallel[=λ %1:0 → IO[+1:0]]} (CatsIOSupportModule.scala:19) := call(ƒ:izumi.distage.modules.support.CatsIOSupportModule$$Lambda$20256/119449029@3a137390(ContextShift[=λ %1:0 → IO[+1:0]]): (Parallel[=λ %1:0 → IO[+1:0]] &amp; {type F = λ %0 → IOParallelNewtype::Par::Type[+0]})) {
-//   arg x$2: ContextShift[=λ %1:0 → IO[+1:0]] = lookup({type.ContextShift[=λ %1:0 → IO[+1:0]]})
-// }
 // {type.MdocSession::App0::A} (debugging.md:41) := call(π:Class(MdocSession::App0::B): MdocSession::App0::A) {
 //   arg b: MdocSession::App0::B = lookup({type.MdocSession::App0::B})
 // }
-// {type.Invariant[=λ %0 → IO[+0]]} (CatsEffectInstancesModule.scala:14) := ref {type.ConcurrentEffect[=λ %0 → IO[+0]]}
-// {type.Apply[=λ %0 → IO[+0]]} (CatsEffectInstancesModule.scala:19) := ref {type.ConcurrentEffect[=λ %0 → IO[+0]]}
-// {type.FlatMap[=λ %0 → IO[+0]]} (CatsEffectInstancesModule.scala:21) := ref {type.ConcurrentEffect[=λ %0 → IO[+0]]}
-// {type.Semigroupal[=λ %0 → IO[+0]]} (CatsEffectInstancesModule.scala:15) := ref {type.ConcurrentEffect[=λ %0 → IO[+0]]}
-// {type.Applicative[=λ %0 → IO[+0]]} (CatsEffectInstancesModule.scala:20) := ref {type.ConcurrentEffect[=λ %0 → IO[+0]]}
-// {type.Async[=λ %0 → IO[+0]]} (CatsEffectInstancesModule.scala:28) := ref {type.ConcurrentEffect[=λ %0 → IO[+0]]}
-// {type.Effect[=λ %0 → IO[+0]]} (CatsEffectInstancesModule.scala:30) := ref {type.ConcurrentEffect[=λ %0 → IO[+0]]}
-// {type.Sync[=λ %0 → IO[+0]]} (CatsEffectInstancesModule.scala:27) := ref {type.ConcurrentEffect[=λ %0 → IO[+0]]}
-// {type.Bracket[=λ %0 → IO[+0],=Throwable]} (CatsEffectInstancesModule.scala:26) := ref {type.ConcurrentEffect[=λ %0 → IO[+0]]}
-// {type.Concurrent[=λ %0 → IO[+0]]} (CatsEffectInstancesModule.scala:31) := ref {type.ConcurrentEffect[=λ %0 → IO[+0]]}
-// {type.ApplicativeError[=λ %0 → IO[+0],=Throwable]} (CatsEffectInstancesModule.scala:23) := ref {type.ConcurrentEffect[=λ %0 → IO[+0]]}
-// {type.Monad[=λ %0 → IO[+0]]} (CatsEffectInstancesModule.scala:22) := ref {type.ConcurrentEffect[=λ %0 → IO[+0]]}
-// {type.MonadError[=λ %0 → IO[+0],=Throwable]} (CatsEffectInstancesModule.scala:24) := ref {type.ConcurrentEffect[=λ %0 → IO[+0]]}
-// {type.LiftIO[=λ %0 → IO[+0]]} (CatsEffectInstancesModule.scala:29) := ref {type.ConcurrentEffect[=λ %0 → IO[+0]]}
-// {type.InvariantSemigroupal[=λ %0 → IO[+0]]} (CatsEffectInstancesModule.scala:16) := ref {type.ConcurrentEffect[=λ %0 → IO[+0]]}
-// {type.Functor[=λ %0 → IO[+0]]} (CatsEffectInstancesModule.scala:18) := ref {type.ConcurrentEffect[=λ %0 → IO[+0]]}
-// {type.SyncSafe[=λ %0 → IO[+0]]} (AnyCatsEffectSupportModule.scala:38) := call(ƒ:izumi.distage.modules.support.AnyCatsEffectSupportModule$$Lambda$20252/1078294885@4bc82e52(Sync[=λ %0 → IO[+0]]): SyncSafe[=λ %0 → IO[+0]]) {
-//   arg F: Sync[=λ %0 → IO[+0]] = lookup({type.Sync[=λ %0 → IO[+0]]})
-// }
-// {type.DIApplicative[=λ %0 → IO[+0]]} (AnyCatsEffectSupportModule.scala:35) := call(ƒ:izumi.distage.modules.support.AnyCatsEffectSupportModule$$Lambda$20250/1896205799@a440045(Applicative[=λ %0 → IO[+0]]): DIApplicative[=λ %0 → IO[+0]]) {
-//   arg F: Applicative[=λ %0 → IO[+0]] = lookup({type.Applicative[=λ %0 → IO[+0]]})
-// }
-// {type.DIEffectAsync[=λ %0 → IO[+0]]} (AnyCatsEffectSupportModule.scala:28) := call(ƒ:izumi.distage.modules.support.AnyCatsEffectSupportModule$$Lambda$20248/629382089@28d22b1e(Concurrent[=λ %0 → IO[+0]], Timer[=λ %0 → IO[+0]], Parallel[=λ %0 → IO[+0]]): DIEffectAsync[=λ %0 → IO[+0]]) {
-//   arg C0: Concurrent[=λ %0 → IO[+0]] = lookup({type.Concurrent[=λ %0 → IO[+0]]})
-//   arg T0: Timer[=λ %0 → IO[+0]] = lookup({type.Timer[=λ %0 → IO[+0]]})
-//   arg P0: Parallel[=λ %0 → IO[+0]] = lookup({type.Parallel[=λ %0 → IO[+0]]})
-// }
-// {type.DIEffect[=λ %0 → IO[+0]]} (AnyCatsEffectSupportModule.scala:25) := call(ƒ:izumi.distage.modules.support.AnyCatsEffectSupportModule$$Lambda$20246/1940192851@43b7ec5c(Sync[=λ %0 → IO[+0]]): DIEffect[=λ %0 → IO[+0]]) {
-//   arg F: Sync[=λ %0 → IO[+0]] = lookup({type.Sync[=λ %0 → IO[+0]]})
-// }
-// {type.DIEffectRunner[=λ %0 → IO[+0]]} (AnyCatsEffectSupportModule.scala:22) := call(ƒ:izumi.distage.modules.support.AnyCatsEffectSupportModule$$Lambda$20244/1087284444@251c8a3d(Effect[=λ %0 → IO[+0]]): DIEffectRunner[=λ %0 → IO[+0]]) {
-//   arg F: Effect[=λ %0 → IO[+0]] = lookup({type.Effect[=λ %0 → IO[+0]]})
-// }
+</code></pre>
+<pre class="prettyprint"><code class="language-scala">// the effect types in `goodModule` and here match now
 
 plan.assertValid[cats.effect.IO]().unsafeRunSync()
 </code></pre>
 <h3><a href="#pretty-printing-plans" name="pretty-printing-plans" class="anchor"><span class="anchor-link"></span></a>Pretty-printing plans</h3>
 <p>You can print the output of <code>plan.render()</code> to get detailed info on what will happen during instantiation. The printout includes source and line numbers so your IDE can show you where the binding was defined!</p>
 <pre class="prettyprint"><code class="language-scala">println(plan.render())
-// {type.DIEffectAsync[=λ %1:0 → 1:0]} (IdentitySupportModule.scala:17) := value izumi.distage.model.effect.DIEffectAsync$$anon$1#47779705
-// {type.DIEffect[=λ %1:0 → 1:0]} (IdentitySupportModule.scala:15) := value izumi.distage.model.effect.DIEffect$$anon$1#154064065
-// {effect.{type.MdocSession::App0::B}} (debugging.md:42) := value cats.effect.IO$Delay#534142085
-// {type.DIEffectRunner[=λ %1:0 → 1:0]} (IdentitySupportModule.scala:16) := value izumi.distage.model.effect.DIEffectRunner$IdentityImpl$#222952514
-// {type.InjectorFactory} (InjectorDefaultImpl.scala:49) := value distage.Injector$#1597525780
-// {type.DIApplicative[=λ %1:0 → 1:0]} (IdentitySupportModule.scala:14) := value izumi.distage.model.effect.DIApplicative$$anon$4#623500643
-// {type.PublicIOApp} (CatsIOSupportModule.scala:23) := call(π:Trait(): PublicIOApp) {}
-// {type.PlannerInput} (InjectorDefaultImpl.scala:47) := value izumi.distage.model.PlannerInput#1253107641
-// {type.Activation} (InjectorDefaultImpl.scala:48) := value izumi.distage.model.definition.Activation#-1609326920
-// {id.Module@defaultModule} (InjectorDefaultImpl.scala:51) := value izumi.distage.model.definition.Module$$anon$1#-1656855190
-// {type.BootstrapModule} (InjectorDefaultImpl.scala:50) := value izumi.distage.model.definition.BootstrapContextModule$$anon$1#-1871065210
-// {type.Bootloader} (InjectorDefaultImpl.scala:52) := call(π:Class(BootstrapModule, Activation, PlannerInput, InjectorFactory, Module): Bootloader) {
-//   arg bootstrapModule: BootstrapModule = lookup({type.BootstrapModule})
-//   arg activation: Activation = lookup({type.Activation})
-//   arg input: PlannerInput = lookup({type.PlannerInput})
-//   arg injectorFactory: InjectorFactory = lookup({type.InjectorFactory})
-//   arg defaultModule: Module = lookup({id.Module@defaultModule})
-// }
+// {effect.{type.MdocSession::App0::B}} (debugging.md:42) := value cats.effect.IO$Delay#456965287
 // {type.MdocSession::App0::B} (debugging.md:42) := effect[λ %0 → cats.effect.IO[+0]]{effect.{type.MdocSession::App0::B}}
-// {type.Timer[=λ %1:0 → IO[+1:0]]} (CatsIOSupportModule.scala:22) := call(ƒ:izumi.distage.modules.support.CatsIOSupportModule$$Lambda$20260/698999729@4ae33b43(PublicIOApp): Timer[=λ %1:0 → IO[+1:0]]) {
-//   arg x$4: PublicIOApp = lookup({type.PublicIOApp})
-// }
-// {type.ContextShift[=λ %1:0 → IO[+1:0]]} (CatsIOSupportModule.scala:21) := call(ƒ:izumi.distage.modules.support.CatsIOSupportModule$$Lambda$20258/1238745631@6885919d(PublicIOApp): ContextShift[=λ %1:0 → IO[+1:0]]) {
-//   arg x$3: PublicIOApp = lookup({type.PublicIOApp})
-// }
-// {type.ConcurrentEffect[=λ %1:0 → IO[+1:0]]} (CatsIOSupportModule.scala:18) := call(ƒ:izumi.distage.modules.support.CatsIOSupportModule$$Lambda$20254/220714157@275e526c(ContextShift[=λ %1:0 → IO[+1:0]]): ConcurrentEffect[=λ %1:0 → IO[+1:0]]) {
-//   arg x$1: ContextShift[=λ %1:0 → IO[+1:0]] = lookup({type.ContextShift[=λ %1:0 → IO[+1:0]]})
-// }
-// {type.Parallel[=λ %1:0 → IO[+1:0]]} (CatsIOSupportModule.scala:19) := call(ƒ:izumi.distage.modules.support.CatsIOSupportModule$$Lambda$20256/119449029@3a137390(ContextShift[=λ %1:0 → IO[+1:0]]): (Parallel[=λ %1:0 → IO[+1:0]] &amp; {type F = λ %0 → IOParallelNewtype::Par::Type[+0]})) {
-//   arg x$2: ContextShift[=λ %1:0 → IO[+1:0]] = lookup({type.ContextShift[=λ %1:0 → IO[+1:0]]})
-// }
 // {type.MdocSession::App0::A} (debugging.md:41) := call(π:Class(MdocSession::App0::B): MdocSession::App0::A) {
 //   arg b: MdocSession::App0::B = lookup({type.MdocSession::App0::B})
-// }
-// {type.Invariant[=λ %0 → IO[+0]]} (CatsEffectInstancesModule.scala:14) := ref {type.ConcurrentEffect[=λ %0 → IO[+0]]}
-// {type.Apply[=λ %0 → IO[+0]]} (CatsEffectInstancesModule.scala:19) := ref {type.ConcurrentEffect[=λ %0 → IO[+0]]}
-// {type.FlatMap[=λ %0 → IO[+0]]} (CatsEffectInstancesModule.scala:21) := ref {type.ConcurrentEffect[=λ %0 → IO[+0]]}
-// {type.Semigroupal[=λ %0 → IO[+0]]} (CatsEffectInstancesModule.scala:15) := ref {type.ConcurrentEffect[=λ %0 → IO[+0]]}
-// {type.Applicative[=λ %0 → IO[+0]]} (CatsEffectInstancesModule.scala:20) := ref {type.ConcurrentEffect[=λ %0 → IO[+0]]}
-// {type.Async[=λ %0 → IO[+0]]} (CatsEffectInstancesModule.scala:28) := ref {type.ConcurrentEffect[=λ %0 → IO[+0]]}
-// {type.Effect[=λ %0 → IO[+0]]} (CatsEffectInstancesModule.scala:30) := ref {type.ConcurrentEffect[=λ %0 → IO[+0]]}
-// {type.Sync[=λ %0 → IO[+0]]} (CatsEffectInstancesModule.scala:27) := ref {type.ConcurrentEffect[=λ %0 → IO[+0]]}
-// {type.Bracket[=λ %0 → IO[+0],=Throwable]} (CatsEffectInstancesModule.scala:26) := ref {type.ConcurrentEffect[=λ %0 → IO[+0]]}
-// {type.Concurrent[=λ %0 → IO[+0]]} (CatsEffectInstancesModule.scala:31) := ref {type.ConcurrentEffect[=λ %0 → IO[+0]]}
-// {type.ApplicativeError[=λ %0 → IO[+0],=Throwable]} (CatsEffectInstancesModule.scala:23) := ref {type.ConcurrentEffect[=λ %0 → IO[+0]]}
-// {type.Monad[=λ %0 → IO[+0]]} (CatsEffectInstancesModule.scala:22) := ref {type.ConcurrentEffect[=λ %0 → IO[+0]]}
-// {type.MonadError[=λ %0 → IO[+0],=Throwable]} (CatsEffectInstancesModule.scala:24) := ref {type.ConcurrentEffect[=λ %0 → IO[+0]]}
-// {type.LiftIO[=λ %0 → IO[+0]]} (CatsEffectInstancesModule.scala:29) := ref {type.ConcurrentEffect[=λ %0 → IO[+0]]}
-// {type.InvariantSemigroupal[=λ %0 → IO[+0]]} (CatsEffectInstancesModule.scala:16) := ref {type.ConcurrentEffect[=λ %0 → IO[+0]]}
-// {type.Functor[=λ %0 → IO[+0]]} (CatsEffectInstancesModule.scala:18) := ref {type.ConcurrentEffect[=λ %0 → IO[+0]]}
-// {type.SyncSafe[=λ %0 → IO[+0]]} (AnyCatsEffectSupportModule.scala:38) := call(ƒ:izumi.distage.modules.support.AnyCatsEffectSupportModule$$Lambda$20252/1078294885@4bc82e52(Sync[=λ %0 → IO[+0]]): SyncSafe[=λ %0 → IO[+0]]) {
-//   arg F: Sync[=λ %0 → IO[+0]] = lookup({type.Sync[=λ %0 → IO[+0]]})
-// }
-// {type.DIApplicative[=λ %0 → IO[+0]]} (AnyCatsEffectSupportModule.scala:35) := call(ƒ:izumi.distage.modules.support.AnyCatsEffectSupportModule$$Lambda$20250/1896205799@a440045(Applicative[=λ %0 → IO[+0]]): DIApplicative[=λ %0 → IO[+0]]) {
-//   arg F: Applicative[=λ %0 → IO[+0]] = lookup({type.Applicative[=λ %0 → IO[+0]]})
-// }
-// {type.DIEffectAsync[=λ %0 → IO[+0]]} (AnyCatsEffectSupportModule.scala:28) := call(ƒ:izumi.distage.modules.support.AnyCatsEffectSupportModule$$Lambda$20248/629382089@28d22b1e(Concurrent[=λ %0 → IO[+0]], Timer[=λ %0 → IO[+0]], Parallel[=λ %0 → IO[+0]]): DIEffectAsync[=λ %0 → IO[+0]]) {
-//   arg C0: Concurrent[=λ %0 → IO[+0]] = lookup({type.Concurrent[=λ %0 → IO[+0]]})
-//   arg T0: Timer[=λ %0 → IO[+0]] = lookup({type.Timer[=λ %0 → IO[+0]]})
-//   arg P0: Parallel[=λ %0 → IO[+0]] = lookup({type.Parallel[=λ %0 → IO[+0]]})
-// }
-// {type.DIEffect[=λ %0 → IO[+0]]} (AnyCatsEffectSupportModule.scala:25) := call(ƒ:izumi.distage.modules.support.AnyCatsEffectSupportModule$$Lambda$20246/1940192851@43b7ec5c(Sync[=λ %0 → IO[+0]]): DIEffect[=λ %0 → IO[+0]]) {
-//   arg F: Sync[=λ %0 → IO[+0]] = lookup({type.Sync[=λ %0 → IO[+0]]})
-// }
-// {type.DIEffectRunner[=λ %0 → IO[+0]]} (AnyCatsEffectSupportModule.scala:22) := call(ƒ:izumi.distage.modules.support.AnyCatsEffectSupportModule$$Lambda$20244/1087284444@251c8a3d(Effect[=λ %0 → IO[+0]]): DIEffectRunner[=λ %0 → IO[+0]]) {
-//   arg F: Effect[=λ %0 → IO[+0]] = lookup({type.Effect[=λ %0 → IO[+0]]})
 // }
 </code></pre>
 <p><img src="media/print-test-plan.png" alt="print-test-plan" /></p>
 <p>You can also query a plan to see the dependencies and reverse dependencies of a specific class and their order of instantiation:</p>
 <pre class="prettyprint"><code class="language-scala">// Print dependencies
 println(plan.topology.dependencies.tree(DIKey[A]))
-// DepNode({type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.A},DependencyGraph(HashMap({type.izumi.distage.model.recursive.Bootloader} -&gt; HashSet({type.izumi.distage.InjectorFactory}, {type.izumi.distage.model.PlannerInput}, {type.izumi.distage.model.definition.Activation}, {type.izumi.distage.model.definition.Module@defaultModule}, {type.izumi.distage.model.definition.BootstrapModule}), {type.cats.Invariant[=λ %0 → IO[+0]]} -&gt; Set({type.cats.effect.ConcurrentEffect[=λ %0 → IO[+0]]}), {type.cats.effect.ConcurrentEffect[=λ %1:0 → IO[+1:0]]} -&gt; Set({type.cats.effect.ContextShift[=λ %1:0 → IO[+1:0]]}), {type.izumi.distage.model.effect.DIEffectAsync[=λ %1:0 → 1:0]} -&gt; Set(), {type.cats.Apply[=λ %0 → IO[+0]]} -&gt; Set({type.cats.effect.ConcurrentEffect[=λ %0 → IO[+0]]}), {type.cats.Applicative[=λ %0 → IO[+0]]} -&gt; Set({type.cats.effect.ConcurrentEffect[=λ %0 → IO[+0]]}), {type.izumi.distage.model.effect.DIEffectAsync[=λ %0 → IO[+0]]} -&gt; Set({type.cats.effect.Concurrent[=λ %0 → IO[+0]]}, {type.cats.effect.Timer[=λ %0 → IO[+0]]}, {type.cats.Parallel[=λ %0 → IO[+0]]}), {type.izumi.distage.modules.support.PublicIOApp} -&gt; Set(), {type.cats.effect.Sync[=λ %0 → IO[+0]]} -&gt; Set({type.cats.effect.ConcurrentEffect[=λ %0 → IO[+0]]}), {type.izumi.distage.model.PlannerInput} -&gt; Set(), {type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B} -&gt; Set({effect.{type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B}/cats.effect.IO[+MdocSession::App0::B]}), {type.izumi.distage.model.effect.DIEffect[=λ %0 → IO[+0]]} -&gt; Set({type.cats.effect.Sync[=λ %0 → IO[+0]]}), {type.izumi.distage.model.effect.DIEffectRunner[=λ %0 → IO[+0]]} -&gt; Set({type.cats.effect.Effect[=λ %0 → IO[+0]]}), {type.izumi.distage.model.definition.Module@defaultModule} -&gt; Set(), {type.cats.effect.Concurrent[=λ %0 → IO[+0]]} -&gt; Set({type.cats.effect.ConcurrentEffect[=λ %0 → IO[+0]]}), {type.cats.ApplicativeError[=λ %0 → IO[+0],=Throwable]} -&gt; Set({type.cats.effect.ConcurrentEffect[=λ %0 → IO[+0]]}), {type.izumi.distage.model.definition.BootstrapModule} -&gt; Set(), {type.cats.Monad[=λ %0 → IO[+0]]} -&gt; Set({type.cats.effect.ConcurrentEffect[=λ %0 → IO[+0]]}), {type.cats.MonadError[=λ %0 → IO[+0],=Throwable]} -&gt; Set({type.cats.effect.ConcurrentEffect[=λ %0 → IO[+0]]}), {type.cats.effect.Timer[=λ %1:0 → IO[+1:0]]} -&gt; Set({type.izumi.distage.modules.support.PublicIOApp}), {type.cats.FlatMap[=λ %0 → IO[+0]]} -&gt; Set({type.cats.effect.ConcurrentEffect[=λ %0 → IO[+0]]}), {type.cats.InvariantSemigroupal[=λ %0 → IO[+0]]} -&gt; Set({type.cats.effect.ConcurrentEffect[=λ %0 → IO[+0]]}), {type.cats.effect.ContextShift[=λ %1:0 → IO[+1:0]]} -&gt; Set({type.izumi.distage.modules.support.PublicIOApp}), {type.izumi.functional.mono.SyncSafe[=λ %0 → IO[+0]]} -&gt; Set({type.cats.effect.Sync[=λ %0 → IO[+0]]}), {type.cats.Functor[=λ %0 → IO[+0]]} -&gt; Set({type.cats.effect.ConcurrentEffect[=λ %0 → IO[+0]]}), {type.izumi.distage.model.effect.DIEffect[=λ %1:0 → 1:0]} -&gt; Set(), {type.cats.effect.LiftIO[=λ %0 → IO[+0]]} -&gt; Set({type.cats.effect.ConcurrentEffect[=λ %0 → IO[+0]]}), {type.izumi.distage.model.effect.DIApplicative[=λ %0 → IO[+0]]} -&gt; Set({type.cats.Applicative[=λ %0 → IO[+0]]}), {effect.{type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B}/cats.effect.IO[+MdocSession::App0::B]} -&gt; Set(), {type.cats.Semigroupal[=λ %0 → IO[+0]]} -&gt; Set({type.cats.effect.ConcurrentEffect[=λ %0 → IO[+0]]}), {type.izumi.distage.model.effect.DIEffectRunner[=λ %1:0 → 1:0]} -&gt; Set(), {type.cats.effect.Async[=λ %0 → IO[+0]]} -&gt; Set({type.cats.effect.ConcurrentEffect[=λ %0 → IO[+0]]}), {type.izumi.distage.InjectorFactory} -&gt; Set(), {type.cats.Parallel[=λ %1:0 → IO[+1:0]]} -&gt; Set({type.cats.effect.ContextShift[=λ %1:0 → IO[+1:0]]}), {type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.A} -&gt; Set({type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B}), {type.izumi.distage.model.effect.DIApplicative[=λ %1:0 → 1:0]} -&gt; Set(), {type.cats.effect.Effect[=λ %0 → IO[+0]]} -&gt; Set({type.cats.effect.ConcurrentEffect[=λ %0 → IO[+0]]}), {type.cats.effect.Bracket[=λ %0 → IO[+0],=Throwable]} -&gt; Set({type.cats.effect.ConcurrentEffect[=λ %0 → IO[+0]]}), {type.izumi.distage.model.definition.Activation} -&gt; Set()),Depends),0,None,Set())
+// DepNode({type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.A},DependencyGraph(Map({effect.{type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B}/cats.effect.IO[+MdocSession::App0::B]} -&gt; Set(), {type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B} -&gt; Set({effect.{type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B}/cats.effect.IO[+MdocSession::App0::B]}), {type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.A} -&gt; Set({type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B})),Depends),0,None,Set())
 
 // Print reverse dependencies
 println(plan.topology.dependees.tree(DIKey[B]))
-// DepNode({type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B},DependencyGraph(HashMap({type.izumi.distage.model.recursive.Bootloader} -&gt; Set(), {type.cats.Invariant[=λ %0 → IO[+0]]} -&gt; Set(), {type.cats.effect.ConcurrentEffect[=λ %0 → IO[+0]]} -&gt; HashSet({type.cats.Invariant[=λ %0 → IO[+0]]}, {type.cats.Apply[=λ %0 → IO[+0]]}, {type.cats.FlatMap[=λ %0 → IO[+0]]}, {type.cats.Semigroupal[=λ %0 → IO[+0]]}, {type.cats.Applicative[=λ %0 → IO[+0]]}, {type.cats.effect.Async[=λ %0 → IO[+0]]}, {type.cats.effect.Effect[=λ %0 → IO[+0]]}, {type.cats.effect.Sync[=λ %0 → IO[+0]]}, {type.cats.effect.Bracket[=λ %0 → IO[+0],=Throwable]}, {type.cats.effect.Concurrent[=λ %0 → IO[+0]]}, {type.cats.ApplicativeError[=λ %0 → IO[+0],=Throwable]}, {type.cats.Monad[=λ %0 → IO[+0]]}, {type.cats.MonadError[=λ %0 → IO[+0],=Throwable]}, {type.cats.effect.LiftIO[=λ %0 → IO[+0]]}, {type.cats.InvariantSemigroupal[=λ %0 → IO[+0]]}, {type.cats.Functor[=λ %0 → IO[+0]]}), {type.izumi.distage.model.effect.DIEffectAsync[=λ %1:0 → 1:0]} -&gt; Set(), {type.cats.Apply[=λ %0 → IO[+0]]} -&gt; Set(), {type.cats.Applicative[=λ %0 → IO[+0]]} -&gt; Set({type.izumi.distage.model.effect.DIApplicative[=λ %0 → IO[+0]]}), {type.izumi.distage.model.effect.DIEffectAsync[=λ %0 → IO[+0]]} -&gt; Set(), {type.izumi.distage.modules.support.PublicIOApp} -&gt; Set({type.cats.effect.ContextShift[=λ %1:0 → IO[+1:0]]}, {type.cats.effect.Timer[=λ %1:0 → IO[+1:0]]}), {type.cats.effect.Sync[=λ %0 → IO[+0]]} -&gt; Set({type.izumi.functional.mono.SyncSafe[=λ %0 → IO[+0]]}, {type.izumi.distage.model.effect.DIEffect[=λ %0 → IO[+0]]}), {type.izumi.distage.model.PlannerInput} -&gt; Set({type.izumi.distage.model.recursive.Bootloader}), {type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B} -&gt; Set({type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.A}), {type.izumi.distage.model.effect.DIEffect[=λ %0 → IO[+0]]} -&gt; Set(), {type.izumi.distage.model.effect.DIEffectRunner[=λ %0 → IO[+0]]} -&gt; Set(), {type.izumi.distage.model.definition.Module@defaultModule} -&gt; Set({type.izumi.distage.model.recursive.Bootloader}), {type.cats.effect.Concurrent[=λ %0 → IO[+0]]} -&gt; Set({type.izumi.distage.model.effect.DIEffectAsync[=λ %0 → IO[+0]]}), {type.cats.ApplicativeError[=λ %0 → IO[+0],=Throwable]} -&gt; Set(), {type.izumi.distage.model.definition.BootstrapModule} -&gt; Set({type.izumi.distage.model.recursive.Bootloader}), {type.cats.Monad[=λ %0 → IO[+0]]} -&gt; Set(), {type.cats.MonadError[=λ %0 → IO[+0],=Throwable]} -&gt; Set(), {type.cats.effect.Timer[=λ %0 → IO[+0]]} -&gt; Set({type.izumi.distage.model.effect.DIEffectAsync[=λ %0 → IO[+0]]}), {type.cats.FlatMap[=λ %0 → IO[+0]]} -&gt; Set(), {type.cats.InvariantSemigroupal[=λ %0 → IO[+0]]} -&gt; Set(), {type.cats.effect.ContextShift[=λ %1:0 → IO[+1:0]]} -&gt; Set({type.cats.effect.ConcurrentEffect[=λ %1:0 → IO[+1:0]]}, {type.cats.Parallel[=λ %1:0 → IO[+1:0]]}), {type.izumi.functional.mono.SyncSafe[=λ %0 → IO[+0]]} -&gt; Set(), {type.cats.Functor[=λ %0 → IO[+0]]} -&gt; Set(), {type.izumi.distage.model.effect.DIEffect[=λ %1:0 → 1:0]} -&gt; Set(), {type.cats.effect.LiftIO[=λ %0 → IO[+0]]} -&gt; Set(), {type.izumi.distage.model.effect.DIApplicative[=λ %0 → IO[+0]]} -&gt; Set(), {effect.{type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B}/cats.effect.IO[+MdocSession::App0::B]} -&gt; Set({type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B}), {type.cats.Semigroupal[=λ %0 → IO[+0]]} -&gt; Set(), {type.izumi.distage.model.effect.DIEffectRunner[=λ %1:0 → 1:0]} -&gt; Set(), {type.cats.effect.Async[=λ %0 → IO[+0]]} -&gt; Set(), {type.izumi.distage.InjectorFactory} -&gt; Set({type.izumi.distage.model.recursive.Bootloader}), {type.cats.Parallel[=λ %0 → IO[+0]]} -&gt; Set({type.izumi.distage.model.effect.DIEffectAsync[=λ %0 → IO[+0]]}), {type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.A} -&gt; Set(), {type.izumi.distage.model.effect.DIApplicative[=λ %1:0 → 1:0]} -&gt; Set(), {type.cats.effect.Effect[=λ %0 → IO[+0]]} -&gt; Set({type.izumi.distage.model.effect.DIEffectRunner[=λ %0 → IO[+0]]}), {type.cats.effect.Bracket[=λ %0 → IO[+0],=Throwable]} -&gt; Set(), {type.izumi.distage.model.definition.Activation} -&gt; Set({type.izumi.distage.model.recursive.Bootloader})),Required),0,None,Set())
+// DepNode({type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B},DependencyGraph(Map({effect.{type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B}/cats.effect.IO[+MdocSession::App0::B]} -&gt; Set({type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B}), {type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B} -&gt; Set({type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.A}), {type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.A} -&gt; Set()),Required),0,None,Set())
 </code></pre>
 <p>The printer highlights circular dependencies:</p>
 <p><img src="media/print-dependencies.png" alt="print-dependencies" /></p>
 <p>To debug macros used by <code>distage</code> you may use the following Java Properties:</p>
-<pre class="prettyprint"><code class="language-bash">sbt -Dizumi.debug.macro.rtti=true compile # fundamentals-reflection &amp; LightTypeTag macros
-sbt -Dizumi.debug.macro.distage.constructors=true compile # izumi.distage.constructors.* macros
-sbt -Dizumi.debug.macro.distage.functoid=true compile # Functoid macro
+<pre class="prettyprint"><code class="language-bash"># izumi-reflect macros
+-Dizumi.debug.macro.rtti=true
+
+# izumi.distage.constructors.* macros
+-Dizumi.debug.macro.distage.constructors=true
+
+# Functoid macro
+-Dizumi.debug.macro.distage.functoid=true
 </code></pre>
 <h3><a href="#graphviz-rendering" name="graphviz-rendering" class="anchor"><span class="anchor-link"></span></a>Graphviz rendering</h3>
-<p>Add <code>GraphDumpBootstrapModule</code> to your <code>Injector</code>&rsquo;s configuration to enable dumping of graphviz files with a graphical representation of the <code>Plan</code>.</p>
-<pre class="prettyprint"><code class="language-scala">import distage.GraphDumpBootstrapModule
+<p>Add <code>GraphDumpBootstrapModule</code> to your <code>Injector</code>&rsquo;s configuration to enable writing GraphViz files with a graphical representation of the <code>OrderedPlan</code>. Data will be saved to <code>./target/plan-last-full.gv</code> and <code>./target/plan-last-nogc.gv</code> in the current working directory.</p>
+<pre class="prettyprint"><code class="language-scala">import distage.{GraphDumpBootstrapModule, Injector}
 
-val injector = Injector(GraphDumpBootstrapModule())
-// injector: Injector[izumi.fundamentals.platform.functional.package.Identity[A]] = izumi.distage.InjectorDefaultImpl@7399c158
+Injector(GraphDumpBootstrapModule)
+// res6: Injector[izumi.fundamentals.platform.functional.package.Identity[A]] = izumi.distage.InjectorDefaultImpl@561ad4c9
 </code></pre>
-<p>Data will be saved dumped to <code>./target/plan-last-full.gv</code> and <code>./target/plan-last-nogc.gv</code> in current working directory. </p>
 <p>You&rsquo;ll need a <code>GraphViz</code> installation to render these files into a viewable PNG images:</p>
 <pre class="prettyprint"><code class="language-bash">dot -Tpng target/plan-last-nogc.gv -o out.png
 </code></pre>
