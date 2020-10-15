@@ -590,14 +590,15 @@ final class DummyBonusServiceTest extends BonusServiceTest with DummyTest
   <li><code>assertIO[F[_]: Sync](???: Boolean): F[Assertion]</code></li>
 </ul>
 <h3><a href="#execution-order" name="execution-order" class="anchor"><span class="anchor-link"></span></a>Execution Order</h3>
-<p>By default, tests are executed in parallel. This includes tests using <code>Identity</code>, monix, ZIO, and monads in the cats effect hierarchy. <code>Identity</code> is treated as the effect type for imperative code. This behavior and the behavior of cats effect monads is provided by low priority implicits of <code>DIEffect</code>, <code>DIEffectAsync</code>, and <code>DIEffectRunner</code>. These components can be provided by the application if different behavior or other effects types are required.</p>
+<p>By default, tests are executed in parallel. This includes tests using <code>ZIO</code>, <code>monix</code>, <code>cats.effect.IO</code>, and any effect type with <code>cats-effect</code> or <a href="../bio/index.html">BIO</a> typeclass instances. <code>Identity</code> is treated as an effect type for imperative code.</p>
+<p>Interoperability with all existing Scala effect types is provided by implicit instances of <a href="/latest/snapshot/api/izumi/distage/model/effect/QuasiIO.html"><code>QuasiIO</code></a>, <a href="/latest/snapshot/api/izumi/distage/model/effect/QuasiAsync.html"><code>QuasiAsync</code></a>, and <a href="/latest/snapshot/api/izumi/distage/model/effect/QuasiIORunner.html"><code>QuasiIORunner</code></a>. These components will be provided to the application automatically via <a href="/latest/snapshot/api/izumi/distage/modules/DefaultModule.html"><code>DefaultModule</code></a>, but may be overridden by user bindings if different behavior or support for custom effect types is required.</p>
 <p>The execution of tests is grouped into:</p>
 <ul>
   <li><a href="#resource-reuse-memoization">memoization environments</a>.</li>
   <li>test suite</li>
   <li>test cases</li>
 </ul>
-<p>The default is to run all of these in parallel. The <a href="/latest/snapshot/api/izumi/distage/testkit/TestConfig.html"><code>TestConfig</code></a> has options to change the behavior for each of these groups. The default is <a href="/latest/snapshot/api/izumi/distage/testkit/TestConfig$$ParallelLevel$$Unlimited$.html"><code>Unlimited</code></a> which does not constrain the number of parallel tests. <code>Fixed(n: Int)</code> limits the execution to at most <code>n</code> test cases. While <code>Sequential</code> executes the test cases one at a time.</p>
+<p>The default is to run all of these in parallel. The <a href="/latest/snapshot/api/izumi/distage/testkit/TestConfig.html"><code>TestConfig</code></a> has options to change the behavior for each of these groups. The default is <a href="/latest/snapshot/api/izumi/distage/testkit/TestConfig$$ParallelLevel$$Unlimited$.html"><code>ParallelLevel.Unlimited</code></a> which does not constrain the number of parallel tests. <code>ParallelLevel.Fixed(n: Int)</code> limits the execution to at most <code>n</code> test cases. While <code>ParallelLevel.Sequential</code> executes the test cases one at a time.</p>
 <ul>
   <li><code>parallelEnvs</code> - Parallel level for distinct memoization environments.</li>
   <li><code>parallelSuites</code> - Parallel level for test suites.</li>
