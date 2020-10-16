@@ -137,9 +137,9 @@ data-md-source="github">
 <ul>
   <li><a href="../distage/index.html" class="page">distage: Staged Dependency Injection</a>
   <ul>
-    <li><a href="../distage/basics.html" class="page">Introduction</a></li>
-    <li><a href="../distage/advanced-features.html" class="page">Advanced Features</a></li>
+    <li><a href="../distage/basics.html" class="page">Overview</a></li>
     <li><a href="../distage/debugging.html" class="page">Debugging</a></li>
+    <li><a href="../distage/advanced-features.html" class="page">Advanced Features</a></li>
     <li><a href="../distage/distage-framework.html" class="page">distage-framework</a></li>
     <li><a href="../distage/distage-framework-docker.html" class="page">distage-framework-docker</a></li>
     <li><a href="../distage/distage-testkit.html" class="active page">distage-testkit</a></li>
@@ -220,7 +220,7 @@ data-md-source="github">
   <li><a href="../distage/distage-testkit.html#quick-start" class="header">Quick Start</a></li>
   <li><a href="../distage/distage-testkit.html#api-overview" class="header">API Overview</a>
   <ul>
-    <li><a href="../distage/distage-testkit.html#distagespecscalatest-base-classes" class="header"><code>DistageSpecScalatest</code> Base Classes</a></li>
+    <li><a href="../distage/distage-testkit.html#spec-base-classes" class="header"><code>Spec</code> Base Classes</a></li>
     <li><a href="../distage/distage-testkit.html#test-cases" class="header">Test Cases</a></li>
     <li><a href="../distage/distage-testkit.html#assertions" class="header">Assertions</a></li>
     <li><a href="../distage/distage-testkit.html#assertions-with-effects" class="header">Assertions with Effects</a></li>
@@ -247,26 +247,26 @@ data-md-source="github">
 </ul>
 </div>
 <h3><a href="#quick-start" name="quick-start" class="anchor"><span class="anchor-link"></span></a>Quick Start</h3>
-<p>The <code>distage-testkit</code> simplifies pragmatic pure functional programming testing. <code>DistageSpecScalatest</code> are <a href="https://www.scalatest.org/">ScalaTest</a> base classes for the effect types of <code>Identity</code>, <code>F[_]</code>, <code>F[+_, +_]</code> and <code>F[-_, +_, +_]</code>. They provide an interface similar to ScalaTest&rsquo;s <a href="http://doc.scalatest.org/3.1.0/org/scalatest/wordspec/AnyWordSpec.html"><code>WordSpec</code></a>, however <code>distage-testkit</code> has additional capabilities such as: first class support for effect types; dependency injection; and parallel execution.</p>
+<p><code>distage-testkit</code> simplifies pragmatic purely-functional program testing providing <code>Spec*</code> <a href="https://www.scalatest.org/">ScalaTest</a> base classes for any existing Scala effect type with kind <code>F[_]</code>, <code>F[+_, +_]</code>, <code>F[-_, +_, +_]</code> or <code>Identity</code>. <code>Spec</code>s provide an interface similar to ScalaTest&rsquo;s <a href="http://doc.scalatest.org/3.1.0/org/scalatest/wordspec/AnyWordSpec.html"><code>WordSpec</code></a>, however <code>distage-testkit</code> adds additional capabilities such as: first class support for effect types; dependency injection; and parallel execution.</p>
 <p>Usage of <code>distage-testkit</code> generally follows these steps:</p>
 <ol>
   <li>Extend a base class corresponding to the effect type:
     <ul>
-      <li>No effect type - <a href="/latest/snapshot/api/izumi/distage/testkit/scalatest/DistageSpecScalatest.html"><code>DistageSpecScalatest[Identity]</code></a></li>
-      <li><code>F[_]</code> - <a href="/latest/snapshot/api/izumi/distage/testkit/scalatest/DistageSpecScalatest.html"><code>DistageSpecScalatest[F]</code></a></li>
-      <li><code>F[+_, +_]</code> - <a href="/latest/snapshot/api/izumi/distage/testkit/scalatest/DistageBIOSpecScalatest.html"><code>DistageBIOSpecScalatest[F]</code></a></li>
-      <li><code>F[-_, +_, +_]</code> - <a href="/latest/snapshot/api/izumi/distage/testkit/scalatest/DistageBIOEnvSpecScalatest.html"><code>DistageBIOEnvSpecScalatest[F]</code></a></li>
+      <li>No effect type - <a href="/latest/snapshot/api/izumi/distage/testkit/scalatest/SpecIdentity.html"><code>SpecIdentity</code></a></li>
+      <li><code>F[_]</code> - <a href="/latest/snapshot/api/izumi/distage/testkit/scalatest/Spec1.html"><code>Spec1[F]</code></a>, for monofunctors (<code>cats.effect.IO</code>, <code>monix</code>)</li>
+      <li><code>F[+_, +_]</code> - <a href="/latest/snapshot/api/izumi/distage/testkit/scalatest/Spec2.html"><code>Spec2[F]</code></a>, for bifunctors (<code>ZIO</code>, <code>monix-bio</code>)</li>
+      <li><code>F[-_, +_, +_]</code> - <a href="/latest/snapshot/api/izumi/distage/testkit/scalatest/Spec3.html"><code>Spec3[F]</code></a> for trifunctors (<code>ZIO</code>)</li>
     </ul>
   </li>
   <li>Override <code>def config: TestConfig</code> to customize the <a href="/latest/snapshot/api/izumi/distage/testkit/TestConfig.html"><code>TestConfig</code></a></li>
-  <li>Establish test case contexts using <a href="https://www.scalatest.org/scaladoc/3.2.0/org/scalatest/verbs/ShouldVerb.html"><code>should</code></a>,  <a href="https://www.scalatest.org/scaladoc/3.2.0/org/scalatest/verbs/MustVerb.html"><code>must</code></a>,  and <a href="https://www.scalatest.org/scaladoc/3.2.0/org/scalatest/verbs/CanVerb.html"><code>can</code></a>.</li>
-  <li>Introduce test cases using one of the <code>in</code> methods. These test cases can have a variety of forms, from  pure functions returning an  <a href="https://www.scalatest.org/scaladoc/3.2.0/org/scalatest/Assertions.html">assertion</a>, to effectful  functions with dependencies:
+  <li>Establish test case contexts using <a href="https://www.scalatest.org/scaladoc/3.2.0/org/scalatest/verbs/ShouldVerb.html"><code>should</code></a>,  <a href="https://www.scalatest.org/scaladoc/3.2.0/org/scalatest/verbs/MustVerb.html"><code>must</code></a>,  or <a href="https://www.scalatest.org/scaladoc/3.2.0/org/scalatest/verbs/CanVerb.html"><code>can</code></a>.</li>
+  <li>Introduce test cases using one of the <code>in</code> methods.  These test cases can have a variety of forms, from plain functions returning an  <a href="https://www.scalatest.org/scaladoc/3.2.0/org/scalatest/Assertions.html">assertion</a>, to effectful  functions with dependencies:
     <ul>
       <li>No effect type / <code>Identity</code> - <a href="/latest/snapshot/api/izumi/distage/testkit/services/scalatest/dstest/DistageAbstractScalatestSpec$$LowPriorityIdentityOverloads.html"><code>in</code></a></li>
       <li><a href="/latest/snapshot/api/izumi/distage/testkit/services/scalatest/dstest/DistageAbstractScalatestSpec$$DSWordSpecStringWrapper.html"><code>in</code> for <code>F[_]</code></a></li>
       <li><a href="/latest/snapshot/api/izumi/distage/testkit/services/scalatest/dstest/DistageAbstractScalatestSpec$$DSWordSpecStringWrapper2.html"><code>in</code> for <code>F[+_, +_]</code></a></li>
       <li><a href="/latest/snapshot/api/izumi/distage/testkit/services/scalatest/dstest/DistageAbstractScalatestSpec$$DSWordSpecStringWrapper3.html"><code>in</code> for <code>F[-_, +_, +_]</code></a></li>
-      <li>Magnet for test cases dependent on injectables: <a href="/latest/snapshot/api/izumi/distage/model/providers/Functoid.html"><code>Functoid</code></a></li>
+      <li>Test cases dependent on injectables: <a href="/latest/snapshot/api/izumi/distage/model/providers/Functoid.html"><code>Functoid</code></a></li>
     </ul>
   </li>
 </ol>
@@ -316,41 +316,45 @@ object Score {
 }
 </code></pre>
 <p>This represents a game score system where the player can collect Stars or Mangoes with differently configured and calculated point values.</p>
-<h4><a href="#distagespecscalatest-base-classes" name="distagespecscalatest-base-classes" class="anchor"><span class="anchor-link"></span></a><code>DistageSpecScalatest</code> Base Classes</h4>
+<h4><a href="#spec-base-classes" name="spec-base-classes" class="anchor"><span class="anchor-link"></span></a><code>Spec</code> Base Classes</h4>
 <p>There are test suite base classes for functor, bifunctor and trifunctor effect types. We will be choosing the one that matches our application&rsquo;s effect type from the following:</p>
 <ul>
-  <li>No effect type, imperative usage - <a href="/latest/snapshot/api/izumi/distage/testkit/scalatest/DistageSpecScalatest.html"><code>DistageSpecScalatest[Identity]</code></a></li>
-  <li><code>F[_]</code> - <a href="/latest/snapshot/api/izumi/distage/testkit/scalatest/DistageSpecScalatest.html"><code>DistageSpecScalatest[F]</code></a></li>
-  <li><code>F[+_, +_]</code> - <a href="/latest/snapshot/api/izumi/distage/testkit/scalatest/DistageBIOSpecScalatest.html"><code>DistageBIOSpecScalatest[F]</code></a></li>
-  <li><code>F[-_, +_, +_]</code> - <a href="/latest/snapshot/api/izumi/distage/testkit/scalatest/DistageBIOEnvSpecScalatest.html"><code>DistageBIOEnvSpecScalatest[F]</code></a></li>
+  <li>No effect type, imperative usage - <a href="/latest/snapshot/api/izumi/distage/testkit/scalatest/SpecIdentity.html"><code>SpecIdentity</code></a></li>
+  <li><code>F[_]</code> - <a href="/latest/snapshot/api/izumi/distage/testkit/scalatest/Spec1.html"><code>Spec1[F]</code></a></li>
+  <li><code>F[+_, +_]</code> - <a href="/latest/snapshot/api/izumi/distage/testkit/scalatest/Spec2.html"><code>Spec2[F]</code></a></li>
+  <li><code>F[-_, +_, +_]</code> - <a href="/latest/snapshot/api/izumi/distage/testkit/scalatest/Spec3.html"><code>Spec3[F]</code></a></li>
 </ul>
-<p>The effect monad is expected to support sync and async effects. <code>distage-testkit</code> provides this support for <code>Identity</code>, monix, ZIO, and monads in the cats effect heirarchy. For our demonstration application the tests use the <code>ZIO[-R, +E, +A]</code> effect type. This means we&rsquo;ll be using <code>DistageBIOEnvSpecScalatest</code> for the test suite base class.</p>
-<p>The default config (<code>super.config</code>) has <code>pluginConfig</code>, which will scan the package the test is in for according modules. See the <a href="distage-framework.html#plugins"><code>distage-extension-plugins</code></a> documentation for more information. For our demonstration the module will be provided using <code>moduleOverrides</code> like so:</p>
+<p>The effect monad is expected to support sync and async effects. <code>distage-testkit</code> provides this support for <code>Identity</code>, <code>monix</code>, <code>monix-bio</code>, <code>ZIO</code>, and monads wth instances of <code>cats-effect</code> or <a href="../bio/index.html">BIO</a> typeclasses. For our demonstration application, the tests will use the <code>ZIO[-R, +E, +A]</code> effect type. This means we&rsquo;ll be using <code>Spec3[ZIO]</code> for the test suite base class.</p>
+<p>The default config (<code>super.config</code>) has <code>pluginConfig</code>, which by default will scan the package the test is defined in for defined Plugin modules. See the <a href="distage-framework.html#plugins"><code>distage-extension-plugins</code></a> documentation for more information. For our demonstration the module will be provided using explicit <code>moduleOverrides</code> instead of classpath scanning, like so:</p>
 <pre class="prettyprint"><code class="language-scala">package app
 
 import com.typesafe.config.ConfigFactory
 import distage.config.AppConfigModule
 import distage.ModuleDef
-import izumi.distage.testkit.scalatest.{AssertIO, DistageBIOEnvSpecScalatest}
+import izumi.distage.testkit.scalatest.{AssertZIO, Spec3}
 
-abstract class Test extends DistageBIOEnvSpecScalatest[ZIO] with AssertIO {
-  val defaultConfig = Config(starValue = 10,
-                             mangoValue = 256,
-                             defaultBonus = 10)
+abstract class Test extends Spec3[ZIO] with AssertZIO {
+  val defaultConfig = Config(
+    starValue = 10,
+    mangoValue = 256,
+    defaultBonus = 10,
+  )
 
   override def config = super
     .config.copy(
       moduleOverrides = new ModuleDef {
-        include(AppConfigModule(ConfigFactory.defaultApplication))
+        include(AppConfigModule(ConfigFactory.defaultApplication()))
+        
         make[Config].from(defaultConfig)
         make[Console.Service].fromHas(Console.live)
       },
-      debugOutput = true
+      debugOutput = true,
     )
 }
 </code></pre>
 <h4><a href="#test-cases" name="test-cases" class="anchor"><span class="anchor-link"></span></a>Test Cases</h4>
-<p>In <code>WordSpec</code>, a test case is a sentence (a <code>String</code>) followed by <code>in</code> then the body. In <code>distage-testkit</code> the body of the test case is not limited to a function returning an <a href="https://www.scalatest.org/scaladoc/3.2.0/org/scalatest/Assertions.html">assertion</a>. <a href="/latest/snapshot/api/izumi/distage/model/providers/Functoid.html">Functions that take arguments</a> and functions using effect types are also supported. Function arguments and effect environments will be provided according to the <code>distage</code> object graph.</p>
+<p>In <code>WordSpec</code>, a test case is a sentence (a <code>String</code>) followed by <code>in</code> then the body. In <code>distage-testkit</code> the body of the test case is not limited to a function returning an <a href="https://www.scalatest.org/scaladoc/3.2.0/org/scalatest/Assertions.html">assertion</a>.</p>
+<p><a href="/latest/snapshot/api/izumi/distage/model/providers/Functoid.html">Functions that take arguments</a> and functions using effect types are also supported. Function arguments and effect environments will be provided according to the <code>distage</code> object graph created from the modules defined in <a href="izumi.distage.testkit.TestConfig"><code>def config: TestConfig</code></a>.</p>
 <h4><a href="#assertions" name="assertions" class="anchor"><span class="anchor-link"></span></a>Assertions</h4>
 <p>All of the base classes support test cases that are:</p>
 <ul>
@@ -386,15 +390,14 @@ class ScoreSimpleTest extends Test {
   }
 }
 </code></pre>
-<pre>
-</pre>
+<p>MdocSession$App$$anon$2: - Score should increase by config star value  - Score should increase by config start value from DI - Score should increase by config start value from DI</p>
 <h4><a href="#assertions-with-effects" name="assertions-with-effects" class="anchor"><span class="anchor-link"></span></a>Assertions with Effects</h4>
 <p>All of the base classes support test cases that are effects with assertions. Functions returning effects will have arguments provided from the object graph. These test cases are supported by <a href="/latest/snapshot/api/izumi/distage/testkit/services/scalatest/dstest/DistageAbstractScalatestSpec$$DSWordSpecStringWrapper.html"><code>in</code> from DSWordSpecStringWrapper</a>.</p>
 <p>The different effect types fix the <code>F[_]</code> argument for this syntax:</p>
 <ul>
-  <li><code>DistageSpecScalatest</code>: <code>F[_]</code></li>
-  <li><code>DistageBIOSpecScalatest</code>: <code>F[Throwable, _]</code></li>
-  <li><code>DistageBIOEnvSpecScalatest</code>: <code>F[Any, Throwable, _]</code></li>
+  <li><code>Spec1</code>: <code>F[_]</code></li>
+  <li><code>Spec2</code>: <code>F[Throwable, _]</code></li>
+  <li><code>Spec3</code>: <code>F[Any, Throwable, _]</code></li>
 </ul>
 <p>With our demonstration application we&rsquo;ll use this to verify the <code>Score.echoConfig</code> method. The <code>Config</code> required is from the <code>distage</code> object graph defined in <code>moduleOverrides</code>. By using a function from <code>Config</code>, the required argument will be injected by <code>distage-testkit</code>.</p>
 <pre class="prettyprint"><code class="language-scala">package app
@@ -448,7 +451,7 @@ abstract class BonusServiceTest extends Test {
   }
 }
 </code></pre>
-<p>While this compiles this test cannot be run without the object graph containing a <code>BonusService</code> resource. For <code>ZIO[-R, +E, +A]</code>, the <code>Has</code> bindings are injected from <code>ZLayer</code>, <code>ZManaged</code> <code>ZIO</code> or any <code>F[_, _, _]: BIOLocal</code>. See <a href="basics.html#zio-has-bindings">here for details on ZIO Has injection </a>.</p>
+<p>While this compiles this test cannot be run without the object graph containing a <code>BonusService</code> resource. For <code>ZIO[-R, +E, +A]</code>, the <code>Has</code> bindings are injected from <code>ZLayer</code>, <code>ZManaged</code> <code>ZIO</code> or any <code>F[-_, +_, +_]: Local3</code> (from <a href="../bio/index.html">BIO</a> typeclasses). See <a href="basics.html#zio-has-bindings">here for details on ZIO Has injection </a>.</p>
 <p>Our demonstration application has a dummy and production implementation of the <code>BonusService</code>. For each implementation, a <code>ZManaged</code> is provided. With the <code>ZManaged</code> resources added to the object graph test cases can inject <code>Has[BonusService]</code>.</p>
 <pre class="prettyprint"><code class="language-scala">package app
 
@@ -560,7 +563,7 @@ final class DummyBonusServiceTest extends BonusServiceTest with DummyTest
   <li><a href="#execution-order">Execution Order</a></li>
 </ul>
 <h3><a href="#syntax-summary" name="syntax-summary" class="anchor"><span class="anchor-link"></span></a>Syntax Summary</h3>
-<p>For <code>F[_]</code> including <code>Identity</code>:</p>
+<p>For <code>F[_]</code>, including <code>Identity</code>:</p>
 <ul>
   <li><code>in { assert(???) }</code>: The test case is a function returning an  <a href="https://www.scalatest.org/scaladoc/3.2.0/org/scalatest/Assertions.html">assertion</a>.</li>
   <li><code>in { (a: A, b: B) =&gt; assert(???) }</code>: The test case is a function returning an assertion. The <code>a</code> and  <code>b</code> will be injected from the object graph.</li>
@@ -573,21 +576,25 @@ final class DummyBonusServiceTest extends BonusServiceTest with DummyTest
   <li><code>in { ???: F[zio.Has[C] with zio.Has[D], _, Assertion] }</code>: The test case is an effect  requiring an environment. The test case will fail if the effect fails or produces a failure  assertion. The environment will be injected from the object graph.</li>
   <li><code>in { (a: A, b: B) =&gt; ???: F[zio.Has[C] with zio.Has[D], _, Assertion] }</code>: The test case is a  function producing an effect requiring an environment. All of <code>a: A</code>, <code>b: B</code>, <code>Has[C]</code> and <code>Has[D]</code>  will be injected from the object graph.</li>
 </ul>
-<p>Provided by trait <a href="/latest/snapshot/api/izumi/distage/testkit/scalatest/AssertIO.html">AssertIO</a>:</p>
+<p>Provided by trait <a href="/latest/snapshot/api/izumi/distage/testkit/scalatest/AssertZIO.html">AssertZIO</a>:</p>
 <ul>
-  <li><code>assertIO(???: Boolean): zio.UIO[Assertion]</code></li>
+  <li><code>assertIO(_: Boolean): zio.ZIO[Any, Nothing, Assertion]</code></li>
+</ul>
+<p>Provided by trait <a href="/latest/snapshot/api/izumi/distage/testkit/scalatest/AssertMonix.html">AssertMonix</a>:</p>
+<ul>
+  <li><code>assertIO(_: Boolean): monix.eval.Task[Assertion]</code></li>
 </ul>
 <p>Provided by trait <a href="/latest/snapshot/api/izumi/distage/testkit/scalatest/AssertCIO.html">AssertCIO</a>:</p>
 <ul>
-  <li><code>assertIO(???: Boolean): cats.effect.IO[Assertion]</code></li>
+  <li><code>assertIO(_: Boolean): cats.effect.IO[Assertion]</code></li>
 </ul>
-<p>Provided by trait <a href="/latest/snapshot/api/izumi/distage/testkit/scalatest/AssertBIO.html">AssertBIO</a>:</p>
+<p>Provided by trait <a href="/latest/snapshot/api/izumi/distage/testkit/scalatest/AssertIO2.html">AssertIO2</a>:</p>
 <ul>
-  <li><code>assertBIO[F[+_, +_]: BIO](???: Boolean): F[Nothing, Assertion]</code></li>
+  <li><code>assertBIO[F[+_, +_]: IO2](_: Boolean): F[Nothing, Assertion]</code></li>
 </ul>
-<p>Provided by trait <a href="/latest/snapshot/api/izumi/distage/testkit/scalatest/AssertSync.html">AssertBIO</a>:</p>
+<p>Provided by trait <a href="/latest/snapshot/api/izumi/distage/testkit/scalatest/AssertSync.html">AssertSync</a>:</p>
 <ul>
-  <li><code>assertIO[F[_]: Sync](???: Boolean): F[Assertion]</code></li>
+  <li><code>assertIO[F[_]: Sync](_: Boolean): F[Assertion]</code></li>
 </ul>
 <h3><a href="#execution-order" name="execution-order" class="anchor"><span class="anchor-link"></span></a>Execution Order</h3>
 <p>By default, tests are executed in parallel. This includes tests using <code>ZIO</code>, <code>monix</code>, <code>cats.effect.IO</code>, and any effect type with <code>cats-effect</code> or <a href="../bio/index.html">BIO</a> typeclass instances. <code>Identity</code> is treated as an effect type for imperative code.</p>
@@ -787,13 +794,13 @@ for each test case
 import distage.StandardAxis.{Scene, Repo}
 import distage.plugins.PluginConfig
 import izumi.distage.testkit.TestConfig
-import izumi.distage.testkit.scalatest.{AssertIO, DistageBIOEnvSpecScalatest}
+import izumi.distage.testkit.scalatest.{AssertZIO, Spec3}
 import leaderboard.model.{Score, UserId}
 import leaderboard.repo.{Ladder, Profiles}
 import leaderboard.zioenv.{ladder, rnd}
 import zio.{ZIO, IO}
 
-abstract class LeaderboardTest extends DistageBIOEnvSpecScalatest[ZIO] with AssertIO {
+abstract class LeaderboardTest extends Spec3[ZIO] with AssertZIO {
   override def config = TestConfig(
     pluginConfig = PluginConfig.cached(packagesEnabled = Seq(&quot;leaderboard.plugins&quot;)),
     moduleOverrides = new ModuleDef {
