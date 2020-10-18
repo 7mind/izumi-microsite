@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="x-ua-compatible" content="ie=edge">
 <meta name="description" content="microsite">
-<meta name="generator" content="Paradox, paradox-material-theme=0.10.19, mkdocs-material=3.0.3">
+<meta name="generator" content="Paradox, paradox-material-theme=1.0.0-M1, mkdocs-material=3.0.3">
 
 <meta name="lang:clipboard.copy" content="Copy to clipboard">
 <meta name="lang:clipboard.copied" content="Copied to clipboard">
@@ -137,16 +137,16 @@ data-md-source="github">
 <ul>
   <li><a href="../distage/index.html" class="page">distage: Staged Dependency Injection</a>
   <ul>
-    <li><a href="../distage/basics.html" class="page">Basics</a></li>
-    <li><a href="../distage/advanced-features.html" class="page">Advanced Features</a></li>
+    <li><a href="../distage/basics.html" class="page">Overview</a></li>
     <li><a href="../distage/debugging.html" class="page">Debugging</a></li>
+    <li><a href="../distage/advanced-features.html" class="page">Advanced Features</a></li>
     <li><a href="../distage/distage-framework.html" class="active page">distage-framework</a></li>
     <li><a href="../distage/distage-framework-docker.html" class="page">distage-framework-docker</a></li>
     <li><a href="../distage/distage-testkit.html" class="page">distage-testkit</a></li>
     <li><a href="../distage/reference.html" class="page">Syntax Summary</a></li>
   </ul></li>
   <li><a href="../logstage/index.html" class="page">LogStage</a></li>
-  <li><a href="../bio/index.html" class="page">BIO</a></li>
+  <li><a href="../bio/index.html" class="page">BIO Hierarchy</a></li>
   <li><a href="../idealingua/index.html" class="page">IdeaLingua RPC/DML</a>
   <ul>
     <li><a href="../idealingua/language-reference.html" class="page">Idealingua Language Reference</a></li>
@@ -175,7 +175,7 @@ data-md-source="github">
 <ul style="display: none">
 <li class="md-nav__item md-version" id="project.version">
 <label class="md-nav__link" for="__version">
-<i class="md-icon" title="Version">label_outline</i> 0.10.19
+<i class="md-icon" title="Version">label_outline</i> 1.0.0-M1
 </label>
 </li>
 </ul>
@@ -215,27 +215,50 @@ data-md-source="github">
 </div>
 <h3><a href="#roles" name="roles" class="anchor"><span class="anchor-link"></span></a>Roles</h3>
 <p>A &ldquo;Role&rdquo; is an entrypoint for a specific application hosted in a larger software suite. Bundling multiple roles in a single <code>.jar</code> file can simplify deployment and operations.</p>
-<p><code>distage-framework</code> module contains the distage Role API:</p>
-<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;io.7mind.izumi&quot; %% &quot;distage-framework&quot; % &quot;0.10.19&quot;
+<p>Add <code>distage-framework</code> library for Roles API:</p><dl class="dependency"><dt>sbt</dt><dd><pre class="prettyprint"><code class="language-scala">libraryDependencies += "io.7mind.izumi" %% "distage-framework" % "1.0.0-M1"</code></pre></dd><dt>Maven</dt><dd><pre class="prettyprint"><code class="language-xml">&lt;dependency&gt;
+  &lt;groupId&gt;io.7mind.izumi&lt;/groupId&gt;
+  &lt;artifactId&gt;distage-framework_2.13&lt;/artifactId&gt;
+  &lt;version&gt;1.0.0-M1&lt;/version&gt;
+&lt;/dependency&gt;</code></pre></dd><dt>Gradle</dt><dd><pre class="prettyprint"><code class="language-gradle">dependencies {
+  compile group: 'io.7mind.izumi', name: 'distage-framework_2.13', version: '1.0.0-M1'
+}</code></pre></dd></dl>
+<p>With default <a href="/api/izumi/distage/roles/RoleAppMain.html">RoleAppMain</a>, roles to launch are specified on the command-line:</p>
+<pre><code>./launcher :rolename1 :rolename2`
 </code></pre>
-<p>With default <a href="/api/izumi/distage/roles/RoleAppLauncherImpl.html">RoleAppLauncherImpl</a>, roles to launch are specified on the command-line: <code>./launcher role1 role2 role3</code>. Only the components required by the specified roles will be created, everything else will be pruned. (see: <a href="advanced-features.html#garbage-collection">GC</a>)</p>
-<p>Two roles are bundled by default: <a href="/api/izumi/distage/roles/examples/Help.html">Help</a> and <a href="/api/izumi/distage/roles/examples/ConfigWriter.html">ConfigWriter</a>.</p>
-<p>Further reading: <a href="https://github.com/7mind/slides/blob/master/02-roles/roles.pdf">Roles: a viable alternative to Microservices</a></p>
+<p>Only the components required by the specified roles will be created, everything else will be pruned. (see: <a href="advanced-features.html#dependency-pruning">Dependency Pruning</a>)</p>
+<p><a href="/api/izumi/distage/roles/bundled/BundledRolesModule.html">BundledRolesModule</a> contains two example roles: </p>
+<ul>
+  <li><a href="/api/izumi/distage/roles/bundled/Help.html">Help</a> - prints help message when launched <code>./launcher :help</code></li>
+  <li><a href="/api/izumi/distage/roles/bundled/ConfigWriter.html">ConfigWriter</a> - writes reference config into files, split by roles (includes only parts of the config used by the application)</li>
+</ul>
+<p>Further reading: - <a href="https://github.com/7mind/slides/blob/master/02-roles/roles.pdf">Roles: a viable alternative to Microservices and Monoliths</a></p>
 <h3><a href="#typesafe-config" name="typesafe-config" class="anchor"><span class="anchor-link"></span></a>Typesafe Config</h3>
-<p><code>distage-extension-config</code> library allows summoning case classes and sealed traits from <code>typesafe-config</code> configuration</p>
-<p>To use it, add <code>distage-extension-config</code> library:</p>
-<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;io.7mind.izumi&quot; %% &quot;distage-extension-config&quot; % &quot;0.10.19&quot;
-</code></pre>
-<p>Use helper functions in <code>ConfigModuleDef</code> to parse the Typesafe Config instance bound to <code>AppConfig</code> into case classes:</p>
-<pre class="prettyprint"><code class="language-scala">import distage.{DIKey, Roots, ModuleDef, Id, Injector}
+<p><code>distage-extension-config</code> library allows parsing case classes and sealed traits from <code>typesafe-config</code> configuration files.</p>
+<p>To use it, add the <code>distage-extension-config</code> library:</p><dl class="dependency"><dt>sbt</dt><dd><pre class="prettyprint"><code class="language-scala">libraryDependencies += "io.7mind.izumi" %% "distage-extension-config" % "1.0.0-M1"</code></pre></dd><dt>Maven</dt><dd><pre class="prettyprint"><code class="language-xml">&lt;dependency&gt;
+  &lt;groupId&gt;io.7mind.izumi&lt;/groupId&gt;
+  &lt;artifactId&gt;distage-extension-config_2.13&lt;/artifactId&gt;
+  &lt;version&gt;1.0.0-M1&lt;/version&gt;
+&lt;/dependency&gt;</code></pre></dd><dt>Gradle</dt><dd><pre class="prettyprint"><code class="language-gradle">dependencies {
+  compile group: 'io.7mind.izumi', name: 'distage-extension-config_2.13', version: '1.0.0-M1'
+}</code></pre></dd></dl>
+<p>Use helper functions in <code>ConfigModuleDef</code>, <code>makeConfig</code> and <code>make[_].fromConfig</code> to parse the bound <code>AppConfig</code> instance into case classes, sealed traits or literals:</p>
+<pre class="prettyprint"><code class="language-scala">import distage.{Id, Injector}
 import distage.config.{AppConfig, ConfigModuleDef}
 import com.typesafe.config.ConfigFactory
 
-final case class Conf(name: String, age: Int)
+final case class Conf(
+  name: String,
+  age: Int,
+)
 
-final case class OtherConf(other: Boolean)
+final case class OtherConf(
+  other: Boolean
+)
 
-final class ConfigPrinter(conf: Conf, otherConf: OtherConf @Id(&quot;other&quot;)) {
+final class ConfigPrinter(
+  conf: Conf,
+  otherConf: OtherConf @Id(&quot;other&quot;),
+) {
   def print() = {
     println(s&quot;name: ${conf.name}, age: ${conf.age}, other: ${otherConf.other}&quot;)
   }
@@ -247,60 +270,71 @@ val module = new ConfigModuleDef {
   // declare paths to parse
   makeConfig[Conf](&quot;conf&quot;)
   makeConfig[OtherConf](&quot;conf&quot;).named(&quot;other&quot;)
- 
+
   // add config instance
-  make[AppConfig].from(AppConfig(ConfigFactory.parseString(
-    &quot;&quot;&quot;conf {
-      |  name = &quot;John&quot;
-      |  age = 33
-      |  other = true
-      |}&quot;&quot;&quot;.stripMargin
-  )))
+  make[AppConfig].from(AppConfig(
+    ConfigFactory.parseString(
+      &quot;&quot;&quot;conf {
+        |  name = &quot;John&quot;
+        |  age = 33
+        |  other = true
+        |}&quot;&quot;&quot;.stripMargin
+    )
+  ))
 }
 // module: AnyRef with ConfigModuleDef = 
-// make[{type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.ConfigPrinter}].from(call(Class(repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.Conf, repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.OtherConf): repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.ConfigPrinter)) ((distage-framework.md:34))
-// make[{type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.Conf}].from(call(izumi.distage.config.ConfigModuleDef$$$Lambda$20586/1395765466@3b738a5f(izumi.distage.config.model.AppConfig): repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.Conf)).tagged(Set(ConfTag(conf))) ((distage-framework.md:37))
-// make[{type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.OtherConf@other}].from(call(izumi.distage.config.ConfigModuleDef$$$Lambda$20586/1395765466@3e828a71(izumi.distage.config.model.AppConfig): repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.OtherConf)).tagged(Set(ConfTag(conf))) ((distage-framework.md:38))
-// make[{type.izumi.distage.config.model.AppConfig}].from(call(izumi.distage.model.definition.dsl.ModuleDefDSL$MakeDSLBase$$Lambda$20054/1288318063@7a8c1116(): izumi.distage.config.model.AppConfig)) ((distage-framework.md:41))
+// make[{type.izumi.distage.config.model.AppConfig}].from(call(ƒ:&lt;function0&gt;(): izumi.distage.config.model.AppConfig)) ((distage-framework.md:49))
+// make[{type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.Conf}].from(call(ƒ:izumi.distage.config.codec.DIConfigReader$$Lambda$21868/1874416091@418b9360(izumi.distage.config.model.AppConfig): repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.Conf)).tagged(Set(ConfTag(conf))) ((distage-framework.md:45))
+// make[{type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.OtherConf@other}].from(call(ƒ:izumi.distage.config.codec.DIConfigReader$$Lambda$21868/1874416091@1bf16d9d(izumi.distage.config.model.AppConfig): repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.OtherConf)).tagged(Set(ConfTag(conf))) ((distage-framework.md:46))
+// make[{type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.ConfigPrinter}].from(call(π:Class(repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.Conf, repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.OtherConf): repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.ConfigPrinter)) ((distage-framework.md:42))
 
 Injector().produceRun(module) {
   configPrinter: ConfigPrinter =&gt;
     configPrinter.print()
-} 
+}
 // name: John, age: 33, other: true
+// res1: izumi.fundamentals.platform.functional.package.Identity[Unit] = ()
 </code></pre>
-<p>Automatic derivation of config codecs is based on <a href="https://github.com/pureconfig/pureconfig">pureconfig-magnolia</a>. Pureconfig codecs for a type will be used if they exist.</p>
-<p>You don&rsquo;t have to explicitly <code>make[AppConfig]</code> in <a href="distage-testkit.html">distage-testkit</a>&rsquo;s tests and in <a href="distage-framework.html">distage-framework</a>&rsquo;s Roles, unless you want to override default behavior. By default, tests and roles will try to read the configurations from resources with the following names, in order:</p>
-<pre><code>- $roleName.conf
-- $roleName-reference.conf
-- $roleName-reference-dev.conf
-- application.conf
-- application-reference.conf
-- application-reference-dev.conf
-- common.conf
-- common-reference.conf
-- common-reference-dev.conf
-</code></pre>
-<p>Where <code>distage-testkit</code> uses <a href="/api/izumi/distage/testkit/TestConfig.html#testBaseName"><code>TestConfig#testBaseName</code></a> instead of <code>roleName</code>.</p>
-<p>When explicit configs are passed to the role launcher on the command-line using the <code>-c</code> option, they have higher priority than all the reference configs. Role-specific configs on the command-line (<code>-c</code> option after <code>:role</code> argument) override global command-line configs (<code>-c</code> option given before the first <code>:role</code> argument).</p>
+<p>Automatic derivation of config codecs is based on <a href="https://github.com/pureconfig/pureconfig">pureconfig-magnolia</a>.</p>
+<p>When a given type already has custom <code>pureconfig.ConfigReader</code> instances in implicit scope, they will be used, otherwise they will be derived automatically.</p>
+<p>You don&rsquo;t have to explicitly <code>make[AppConfig]</code> in <a href="distage-testkit.html">distage-testkit</a>&rsquo;s tests and in <a href="distage-framework.html">distage-framework</a>&rsquo;s Roles, unless you want to override default behavior.</p>
+<p>By default, tests and roles will try to read the configurations from resources with the following names, in order:</p>
+<ul>
+  <li><code>${roleName}.conf</code></li>
+  <li><code>${roleName}-reference.conf</code></li>
+  <li><code>${roleName}-reference-dev.conf</code></li>
+  <li><code>application.conf</code></li>
+  <li><code>application-reference.conf</code></li>
+  <li><code>application-reference-dev.conf</code></li>
+  <li><code>common.conf</code></li>
+  <li><code>common-reference.conf</code></li>
+  <li><code>common-reference-dev.conf</code></li>
+</ul>
+<p>Where <code>distage-testkit</code> uses <a href="/api/izumi/distage/testkit/TestConfig.html#configBaseName"><code>TestConfig#configBaseName</code></a> instead of <code>roleName</code>.</p>
+<p>Explicit config files passed to the role launcher <code>-c file.conf</code> the command-line flag have a higher priority than resource configs.</p>
+<p>Role-specific configs on the command-line, passed via <code>-c file.conf</code> option <em>after</em> a <code>:roleName</code> argument, in turn have a higher priority than the explicit config files passed <em>before</em> the first <code>:role</code> argument.</p>
 <p>Example:</p>
 <pre><code>  ./launcher -c global.conf :role1 -c role1.conf :role2 -c role2.conf
 </code></pre>
-<p>Here configs will be loaded in the following order, with higher priority earlier:</p>
+<p>Here configs will be loaded in the following order, with higher priority earlier and earlier configs overriding the values in later configs:</p>
 <ul>
   <li>explicits: <code>role1.conf</code>, <code>role2.conf</code>, <code>global.conf</code>,</li>
   <li>resources: <code>role1[-reference,-dev].conf</code>, <code>role2[-reference,-dev].conf</code>, ,<code>application[-reference,-dev].conf</code>, <code>common[-reference,-dev].conf</code></li>
 </ul>
 <h3><a href="#plugins" name="plugins" class="anchor"><span class="anchor-link"></span></a>Plugins</h3>
 <p><code>distage-extension-plugins</code> module adds classpath discovery for modules that inherit a marker trait <code>PluginBase</code>. Plugins enable extreme late-binding; e.g. they allow a program to extend itself at launch time with new <code>Plugin</code> classes on the classpath. Plugins are compatible with <a href="distage-framework.html#compile-time-checks">compile-time checks</a> as long as they&rsquo;re defined in a separate module.</p>
-<p>To use plugins, first add the <code>distage-extension-plugins</code> library:</p>
-<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;io.7mind.izumi&quot; %% &quot;distage-extension-plugins&quot; % &quot;0.10.19&quot;
-</code></pre>
+<p>To use plugins, first add the <code>distage-extension-plugins</code> library:</p><dl class="dependency"><dt>sbt</dt><dd><pre class="prettyprint"><code class="language-scala">libraryDependencies += "io.7mind.izumi" %% "distage-extension-plugins" % "1.0.0-M1"</code></pre></dd><dt>Maven</dt><dd><pre class="prettyprint"><code class="language-xml">&lt;dependency&gt;
+  &lt;groupId&gt;io.7mind.izumi&lt;/groupId&gt;
+  &lt;artifactId&gt;distage-extension-plugins_2.13&lt;/artifactId&gt;
+  &lt;version&gt;1.0.0-M1&lt;/version&gt;
+&lt;/dependency&gt;</code></pre></dd><dt>Gradle</dt><dd><pre class="prettyprint"><code class="language-gradle">dependencies {
+  compile group: 'io.7mind.izumi', name: 'distage-extension-plugins_2.13', version: '1.0.0-M1'
+}</code></pre></dd></dl>
 <p>Create a module extending the <code>PluginDef</code> trait instead of <code>ModuleDef</code>:</p>
-<pre class="prettyprint"><code class="language-scala">// package com.example.petstore
+<pre class="prettyprint"><code class="language-scala">package com.example.petstore
 
-import distage._
-import distage.plugins._
+import distage.Injector
+import distage.plugins.{PluginConfig, PluginDef, PluginLoader}
 
 object PetStorePlugin extends PluginDef {
   make[PetRepository]
@@ -308,26 +342,27 @@ object PetStorePlugin extends PluginDef {
   make[PetStoreController]
 }
 </code></pre>
-<p>Collect all <code>PluginDefs</code> in a package:</p>
+<p>Collect all the <code>PluginDef</code> classes and objects in a package:</p>
 <pre class="prettyprint"><code class="language-scala">val pluginConfig = PluginConfig.cached(
-  packagesEnabled = Seq(&quot;com.example.petstore&quot;) // packages to scan
+  // packages to scan
+  packagesEnabled = Seq(&quot;com.example.petstore&quot;)
 )
 // pluginConfig: PluginConfig = PluginConfig(List(com.example.petstore),List(),true,false,List(),List())
 
 val appModules = PluginLoader().load(pluginConfig)
-// appModules: Seq[PluginBase] = List(
-// make[{type.com.example.petstore.PetRepository}].from(call(Class(): com.example.petstore.PetRepository)) ((PetStorePlugin.scala:6))
-// make[{type.com.example.petstore.PetStoreService}].from(call(Class(): com.example.petstore.PetStoreService)) ((PetStorePlugin.scala:7))
-// make[{type.com.example.petstore.PetStoreController}].from(call(Class(): com.example.petstore.PetStoreController)) ((PetStorePlugin.scala:8)))
+// appModules: izumi.distage.plugins.load.LoadedPlugins = LoadedPlugins(List(
+// make[{type.com.example.petstore.PetStoreController}].from(call(π:Class(): com.example.petstore.PetStoreController)) ((PetStorePlugin.scala:8))
+// make[{type.com.example.petstore.PetStoreService}].from(call(π:Class(): com.example.petstore.PetStoreService)) ((PetStorePlugin.scala:7))
+// make[{type.com.example.petstore.PetRepository}].from(call(π:Class(): com.example.petstore.PetRepository)) ((PetStorePlugin.scala:6))),List(),List())
 </code></pre>
-<p>Execute collected modules as usual:</p>
+<p>Wire the collected modules as usual:</p>
 <pre class="prettyprint"><code class="language-scala">// combine all modules into one
 
-val appModule = appModules.merge
-// appModule: PluginBase = 
-// make[{type.com.example.petstore.PetRepository}].from(call(Class(): com.example.petstore.PetRepository)) ((PetStorePlugin.scala:6))
-// make[{type.com.example.petstore.PetStoreService}].from(call(Class(): com.example.petstore.PetStoreService)) ((PetStorePlugin.scala:7))
-// make[{type.com.example.petstore.PetStoreController}].from(call(Class(): com.example.petstore.PetStoreController)) ((PetStorePlugin.scala:8))
+val appModule = appModules.result.merge
+// appModule: izumi.distage.plugins.PluginBase = 
+// make[{type.com.example.petstore.PetRepository}].from(call(π:Class(): com.example.petstore.PetRepository)) ((PetStorePlugin.scala:6))
+// make[{type.com.example.petstore.PetStoreService}].from(call(π:Class(): com.example.petstore.PetStoreService)) ((PetStorePlugin.scala:7))
+// make[{type.com.example.petstore.PetStoreController}].from(call(π:Class(): com.example.petstore.PetStoreController)) ((PetStorePlugin.scala:8))
 
 // launch
 
@@ -335,76 +370,27 @@ Injector()
   .produceGet[PetStoreController](appModule)
   .use(_.run())
 // PetStoreController: running!
-// res4: izumi.fundamentals.platform.functional.package.Identity[Unit] = ()
+// res5: izumi.fundamentals.platform.functional.package.Identity[Unit] = ()
 </code></pre>
 <h3><a href="#compile-time-checks" name="compile-time-checks" class="anchor"><span class="anchor-link"></span></a>Compile-time checks</h3>
-<p>An experimental compile-time verification API is available in the <code>distage-framework</code> module.</p>
-<p>To use it add <code>distage-framework</code> library:</p>
-<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;io.7mind.izumi&quot; %% &quot;distage-framework&quot; % &quot;0.10.19&quot;
-</code></pre>
-<p>Only plugins defined in a different module can be checked at compile-time, <code>test</code> scope counts as a different module.</p>
-<p>Example:</p>
-<p>In main scope:</p>
-<pre class="prettyprint"><code class="language-scala">// package com.example
-
-import distage.DIKey
-import distage.StandardAxis.Env
-import distage.config.ConfigModuleDef
-import distage.plugins.PluginDef
-import izumi.distage.staticinjector.plugins.ModuleRequirements
-
-final case class HostPort(host: String, port: Int)
-
-final case class Config(hostPort: HostPort)
-
-final class Service(conf: Config, otherService: OtherService)
-final class OtherService
-
-// error: OtherService is not bound here, even though Service depends on it
-final class AppPlugin extends PluginDef with ConfigModuleDef {
-  tag(Env.Prod)
-  
-  make[Service]
-  makeConfig[Config](&quot;config&quot;)
-}
-
-// Declare OtherService as an external dependency
-final class AppRequirements extends ModuleRequirements(
-  // If we remove this line, compilation will rightfully break
-  Set(DIKey[OtherService])
-)
-</code></pre>
-<p>In config:</p>
-<pre class="prettyprint"><code class="language-scala">// src/main/resources/application.conf
-config {
-  host = localhost
-  port = 8080
-}
-</code></pre>
-<p>In test scope:</p>
-<pre class="prettyprint"><code class="language-scala">// package com.example.test
-
-import com.example._
-import org.scalatest.wordspec.AnyWordSpec
-import izumi.distage.staticinjector.plugins.StaticPluginChecker
-
-final class AppPluginTest extends AnyWordSpec {
-  &quot;App plugin will work (if OtherService is provided later)&quot; in {
-    StaticPluginChecker.checkWithConfig[AppPlugin, AppRequirements](&quot;env:prod&quot;, &quot;.*.application.conf&quot;)   
-  }
-}
-</code></pre>
-<p><code>checkWithConfig</code> will run at compile-time whenever <code>AppPluginTest</code> is recompiled.</p>
-<p>Note: Since version <code>0.10.0</code>, configuration files are no longer checked for correctness by the compile-time checker, see: <a href="https://github.com/7mind/izumi/issues/763">https://github.com/7mind/izumi/issues/763</a></p>
+<p>WIP on current <code>1.0.0-M1</code>. Version<code>1.0.0</code> will have finalized API.</p>
+<ul>
+  <li><a href="https://github.com/7mind/izumi/pull/1285">https://github.com/7mind/izumi/pull/1285</a></li>
+  <li>(<a href="https://github.com/7mind/izumi/issues/1226">https://github.com/7mind/izumi/issues/1226</a>)</li>
+  <li>
+  <p><a href="/api/izumi/distage/framework/PlanCheck.html">izumi.distage.framework.PlanCheck</a></p></li>
+  <li><a href="/api/izumi/distage/framework/PlanCheckMacro.html">izumi.distage.framework.PlanCheckMacro</a></li>
+  <li><a href="/api/izumi/distage/planning/solver/PlanVerifier.html">izumi.distage.planning.solver.PlanVerifier</a></li>
+</ul>
 </div>
 <div>
-<a href="https://github.com/7mind/izumi/tree/v0.10.19/doc/microsite/target/mdoc/distage/distage-framework.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/7mind/izumi/tree/v1.0.0-M1/doc/microsite/target/mdoc/distage/distage-framework.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>
 <div class="print-only">
 <span class="md-source-file md-version">
-0.10.19
+1.0.0-M1
 </span>
 </div>
 </article>
@@ -414,7 +400,7 @@ Edit this page
 <footer class="md-footer">
 <div class="md-footer-nav">
 <nav class="md-footer-nav__inner md-grid">
-<a href="../distage/debugging.html" title="Debugging" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+<a href="../distage/advanced-features.html" title="Advanced Features" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
 <div class="md-flex__cell md-flex__cell--shrink">
 <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
 </div>
@@ -423,7 +409,7 @@ Edit this page
 <span class="md-footer-nav__direction">
 Previous
 </span>
-Debugging
+Advanced Features
 </span>
 </div>
 </a>

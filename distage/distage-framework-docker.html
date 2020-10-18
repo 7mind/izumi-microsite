@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="x-ua-compatible" content="ie=edge">
 <meta name="description" content="microsite">
-<meta name="generator" content="Paradox, paradox-material-theme=0.10.19, mkdocs-material=3.0.3">
+<meta name="generator" content="Paradox, paradox-material-theme=1.0.0-M1, mkdocs-material=3.0.3">
 
 <meta name="lang:clipboard.copy" content="Copy to clipboard">
 <meta name="lang:clipboard.copied" content="Copied to clipboard">
@@ -137,16 +137,16 @@ data-md-source="github">
 <ul>
   <li><a href="../distage/index.html" class="page">distage: Staged Dependency Injection</a>
   <ul>
-    <li><a href="../distage/basics.html" class="page">Basics</a></li>
-    <li><a href="../distage/advanced-features.html" class="page">Advanced Features</a></li>
+    <li><a href="../distage/basics.html" class="page">Overview</a></li>
     <li><a href="../distage/debugging.html" class="page">Debugging</a></li>
+    <li><a href="../distage/advanced-features.html" class="page">Advanced Features</a></li>
     <li><a href="../distage/distage-framework.html" class="page">distage-framework</a></li>
     <li><a href="../distage/distage-framework-docker.html" class="active page">distage-framework-docker</a></li>
     <li><a href="../distage/distage-testkit.html" class="page">distage-testkit</a></li>
     <li><a href="../distage/reference.html" class="page">Syntax Summary</a></li>
   </ul></li>
   <li><a href="../logstage/index.html" class="page">LogStage</a></li>
-  <li><a href="../bio/index.html" class="page">BIO</a></li>
+  <li><a href="../bio/index.html" class="page">BIO Hierarchy</a></li>
   <li><a href="../idealingua/index.html" class="page">IdeaLingua RPC/DML</a>
   <ul>
     <li><a href="../idealingua/language-reference.html" class="page">Idealingua Language Reference</a></li>
@@ -186,7 +186,7 @@ data-md-source="github">
 <ul style="display: none">
 <li class="md-nav__item md-version" id="project.version">
 <label class="md-nav__link" for="__version">
-<i class="md-icon" title="Version">label_outline</i> 0.10.19
+<i class="md-icon" title="Version">label_outline</i> 1.0.0-M1
 </label>
 </li>
 </ul>
@@ -233,15 +233,14 @@ data-md-source="github">
   <li><a href="../distage/distage-framework-docker.html#dependencies" class="header">Dependencies</a></li>
   <li><a href="../distage/distage-framework-docker.html#overview" class="header">Overview</a>
   <ul>
-    <li><a href="../distage/distage-framework-docker.html#setup" class="header">Setup</a></li>
     <li><a href="../distage/distage-framework-docker.html#1-create-a-containerdef" class="header">1. Create a <code>ContainerDef</code></a></li>
     <li><a href="../distage/distage-framework-docker.html#2-declare-container-components" class="header">2. Declare Container Components</a></li>
     <li><a href="../distage/distage-framework-docker.html#3-include-the-dockersupportmodule" class="header">3. Include the <code>DockerSupportModule</code></a></li>
   </ul></li>
   <li><a href="../distage/distage-framework-docker.html#config-api" class="header">Config API</a>
   <ul>
-    <li><a href="../distage/distage-framework-docker.html#modifyconfig" class="header"><code>modifyConfig</code></a></li>
-    <li><a href="../distage/distage-framework-docker.html#dependondocker" class="header"><code>dependOnDocker</code></a></li>
+    <li><a href="../distage/distage-framework-docker.html#modifyconfig" class="header">modifyConfig</a></li>
+    <li><a href="../distage/distage-framework-docker.html#dependondocker" class="header">dependOnDocker</a></li>
   </ul></li>
   <li><a href="../distage/distage-framework-docker.html#availability-and-health-checks" class="header">Availability and Health Checks</a></li>
   <li><a href="../distage/distage-framework-docker.html#usage-in-integration-tests" class="header">Usage in Integration Tests</a></li>
@@ -273,9 +272,13 @@ data-md-source="github">
   <li>Excellent for providing Docker implementations of services for integration tests</li>
 </ul>
 <h3><a href="#dependencies" name="dependencies" class="anchor"><span class="anchor-link"></span></a>Dependencies</h3>
-<p>Add the <code>distage-framework-docker</code> library:</p>
-<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;io.7mind.izumi&quot; %% &quot;distage-framework-docker&quot; % &quot;0.10.19&quot;
-</code></pre>
+<p>Add the <code>distage-framework-docker</code> library:</p><dl class="dependency"><dt>sbt</dt><dd><pre class="prettyprint"><code class="language-scala">libraryDependencies += "io.7mind.izumi" %% "distage-framework-docker" % "1.0.0-M1"</code></pre></dd><dt>Maven</dt><dd><pre class="prettyprint"><code class="language-xml">&lt;dependency&gt;
+  &lt;groupId&gt;io.7mind.izumi&lt;/groupId&gt;
+  &lt;artifactId&gt;distage-framework-docker_2.13&lt;/artifactId&gt;
+  &lt;version&gt;1.0.0-M1&lt;/version&gt;
+&lt;/dependency&gt;</code></pre></dd><dt>Gradle</dt><dd><pre class="prettyprint"><code class="language-gradle">dependencies {
+  compile group: 'io.7mind.izumi', name: 'distage-framework-docker_2.13', version: '1.0.0-M1'
+}</code></pre></dd></dl>
 <h3><a href="#overview" name="overview" class="anchor"><span class="anchor-link"></span></a>Overview</h3>
 <p>Usage of <code>distage-framework-docker</code> generally follows these steps:</p>
 <ol>
@@ -283,13 +286,6 @@ data-md-source="github">
   <li>Create a module that declares the container component</li>
   <li>Include the <a href="/api/izumi/distage/docker/modules/DockerSupportModule.html"><code>DockerSupportModule</code></a> in  the application&rsquo;s modules</li>
 </ol>
-<h4><a href="#setup" name="setup" class="anchor"><span class="anchor-link"></span></a>Setup</h4>
-<p>Required imports:</p>
-<pre class="prettyprint"><code class="language-scala">import izumi.distage.docker.ContainerDef
-import izumi.distage.docker.Docker
-import izumi.distage.model.definition.ModuleDef
-import izumi.reflect.TagK
-</code></pre>
 <h4><a href="#1-create-a-containerdef" name="1-create-a-containerdef" class="anchor"><span class="anchor-link"></span></a>1. Create a <code>ContainerDef</code></h4>
 <p>The <a href="/api/izumi/distage/docker/ContainerDef.html"><code>ContainerDef</code></a> is a trait used to define a Docker container. Extend this trait and provide an implementation of the <code>config</code> method.</p>
 <p>The required parameters for <code>Config</code> are:</p>
@@ -299,7 +295,9 @@ import izumi.reflect.TagK
 </ul>
 <p>See <a href="/api/izumi/distage/docker/Docker$$ContainerConfig.html"><code>Docker.ContainerConfig[Tag]</code></a> for additional parameters.</p>
 <p>Example <a href="https://hub.docker.com/_/postgres/">postgres</a> container definition:</p>
-<pre class="prettyprint"><code class="language-scala">object PostgresDocker extends ContainerDef {
+<pre class="prettyprint"><code class="language-scala">import izumi.distage.docker.{ContainerDef, Docker}
+
+object PostgresDocker extends ContainerDef {
   val primaryPort: Docker.DockerPort = Docker.DockerPort.TCP(5432)
 
   override def config: Config = {
@@ -314,7 +312,10 @@ import izumi.reflect.TagK
 <h4><a href="#2-declare-container-components" name="2-declare-container-components" class="anchor"><span class="anchor-link"></span></a>2. Declare Container Components</h4>
 <p>To use this container, a module that declares this component is required:</p>
 <p>Use <a href="/api/izumi/distage/docker/ContainerDef.html#make"><code>make</code></a> for binding in a <code>ModuleDef</code>:</p>
-<pre class="prettyprint"><code class="language-scala">class PostgresDockerModule[F[_]: TagK] extends ModuleDef {
+<pre class="prettyprint"><code class="language-scala">import distage.ModuleDef
+import izumi.reflect.TagK
+
+class PostgresDockerModule[F[_]: TagK] extends ModuleDef {
   make[PostgresDocker.Container].fromResource {
     PostgresDocker.make[F]
   }
@@ -328,32 +329,31 @@ object PostgresDockerModule {
 <pre class="prettyprint"><code class="language-scala">import cats.effect.IO
 import com.typesafe.config.ConfigFactory
 import distage.Injector
-import izumi.distage.config.AppConfigModule
+import distage.config.AppConfigModule
 import izumi.distage.docker.modules.DockerSupportModule
-import izumi.distage.effect.modules.CatsDIEffectModule
-import izumi.logstage.api.routing.StaticLogRouter
 import izumi.logstage.distage.LogIOModule
+import logstage.LogRouter
 
-val distageFrameworkModules = new ModuleDef {
+object DistageFrameworkModules extends ModuleDef {
   // required for docker
   include(DockerSupportModule[IO])
 
   // standard distage framework modules
-  include(AppConfigModule(ConfigFactory.defaultApplication))
-  include(CatsDIEffectModule)
-  include(new LogIOModule[IO](StaticLogRouter.instance, false))
+  include(AppConfigModule(ConfigFactory.defaultApplication()))
+  include(LogIOModule[IO](LogRouter(), true))
 }
 </code></pre>
 <p>The required framework modules plus <code>PostgresDockerModule</code> is sufficient to depend on Docker containers:</p>
 <pre class="prettyprint"><code class="language-scala">def minimalExample = {
   val applicationModules = new ModuleDef {
     include(PostgresDockerModule[IO])
-    include(distageFrameworkModules)
+    include(DistageFrameworkModules)
   }
 
-  Injector().produceGetF[IO, PostgresDocker.Container](applicationModules).use { container =&gt;
-    val port = container.availablePorts.first(PostgresDocker.primaryPort)
-    IO(println(s&quot;postgres is available on port ${port}&quot;))
+  Injector[IO]().produceRun(applicationModules) {
+    container: PostgresDocker.Container =&gt;
+      val port = container.availablePorts.first(PostgresDocker.primaryPort)
+      IO(println(s&quot;postgres is available on port ${port}&quot;))
   }
 }
 
@@ -363,19 +363,22 @@ minimalExample.unsafeRunSync()
 <p>If the <code>DockerSupportModule</code> is not included in an application then a get of a Docker container dependent resource will fail with a <code>izumi.distage.model.exceptions.ProvisioningException</code>.</p>
 <h3><a href="#config-api" name="config-api" class="anchor"><span class="anchor-link"></span></a>Config API</h3>
 <p>The <a href="/api/izumi/distage/docker/DockerContainer$$DockerProviderExtensions.html"><code>DockerProviderExtensions</code></a> provides additional APIs for modiying the container definition.</p>
-<h4><a href="#modifyconfig" name="modifyconfig" class="anchor"><span class="anchor-link"></span></a><code>modifyConfig</code></h4>
-<p>Use <a href="/api/izumi/distage/docker/DockerContainer$$DockerProviderExtensions.html#modifyConfig"><code>modifyConfig</code></a> to modify the configuration of a container. The modifier is instantiated to a <code>ProviderMagnet</code>, which will summon any additional dependencies.</p>
+<h4><a href="#modifyconfig" name="modifyconfig" class="anchor"><span class="anchor-link"></span></a>modifyConfig</h4>
+<p>Use <a href="/api/izumi/distage/docker/DockerContainer$$DockerProviderExtensions.html#modifyConfig"><code>modifyConfig</code></a> to modify the configuration of a container. The modifier is instantiated to a <code>Functoid</code>, which will summon any additional dependencies.</p>
 <p>For example, to change the user of the PostgreSQL container:</p>
 <pre class="prettyprint"><code class="language-scala">class PostgresRunAsAdminModule[F[_]: TagK] extends ModuleDef {
   make[PostgresDocker.Container].fromResource {
-    PostgresDocker.make[F].modifyConfig { () =&gt; (old: PostgresDocker.Config) =&gt;
-      old.copy(user = Some(&quot;admin&quot;))
-    }
+    PostgresDocker
+      .make[F]
+      .modifyConfig { 
+        () =&gt; (old: PostgresDocker.Config) =&gt;
+          old.copy(user = Some(&quot;admin&quot;))
+      }
   }
 }
 </code></pre>
 <p>Suppose <code>HostPostgresData</code> is a component provided by the application modules. This path can be added to the PostgreSQL container&rsquo;s mounts by adding to the additional dependencies of the provider magnet:</p>
-<pre class="prettyprint"><code class="language-scala">case class HostPostgresData(path: String)
+<pre class="prettyprint"><code class="language-scala">final case class HostPostgresData(path: String)
 
 class PostgresWithMountsDockerModule[F[_]: TagK] extends ModuleDef {
   make[PostgresDocker.Container].fromResource {
@@ -388,10 +391,10 @@ class PostgresWithMountsDockerModule[F[_]: TagK] extends ModuleDef {
   }
 }
 </code></pre>
-<h4><a href="#dependondocker" name="dependondocker" class="anchor"><span class="anchor-link"></span></a><code>dependOnDocker</code></h4>
+<h4><a href="#dependondocker" name="dependondocker" class="anchor"><span class="anchor-link"></span></a>dependOnDocker</h4>
 <p><a href="/api/izumi/distage/docker/DockerContainer$$DockerProviderExtensions.html#dependOnDocker"><code>dependOnDocker</code></a> adds a dependency on a given Docker container. <code>distage</code> ensures the requested container is available before the dependent is provided.</p>
 <p>For example, suppose a system under test requires both PostgreSQL and Elasticsearch. One option is to use <code>dependOnDocker</code> to declare the Elasticsearch container depends on the PostgreSQL container:</p>
-<pre class="prettyprint"><code class="language-scala"><br/>object ElasticSearchDocker extends ContainerDef {
+<pre class="prettyprint"><code class="language-scala">object ElasticSearchDocker extends ContainerDef {
   val ports = Seq(9200, 9300)
 
   override def config: Config = {
@@ -424,11 +427,14 @@ class ElasticSearchPlusPostgresModule[F[_]: TagK] extends ModuleDef {
 <h3><a href="#usage-in-integration-tests" name="usage-in-integration-tests" class="anchor"><span class="anchor-link"></span></a>Usage in Integration Tests</h3>
 <p>A common use case is using Docker containers to provide service implementations for integration test, such as using a PostgreSQL container for verifying an application that uses a PostgreSQL database. <code>distage</code> container resources are easy to integrate as providers.</p>
 <p>Consider the example application below. This application is written to depend on a <a href="https://tpolecat.github.io/doobie/">doobie</a> <code>Transactor</code>, which is constructed from a <code>PostgresServerConfig</code>.</p>
-<pre class="prettyprint"><code class="language-scala">import doobie.Transactor
+<pre class="prettyprint"><code class="language-scala">import cats.effect.ContextShift
+import doobie.Transactor
 import doobie.syntax.connectionio._
 import doobie.syntax.string._
 
-class PostgresExampleApp(xa: Transactor[IO]) {
+final class PostgresExampleApp(
+  xa: Transactor[IO]
+) {
   def plusOne(a: Int): IO[Int] = {
     sql&quot;select ${a} + 1&quot;.query[Int].unique.transact(xa)
   }
@@ -442,7 +448,7 @@ class PostgresExampleApp(xa: Transactor[IO]) {
 }
 
 // the postgres configuration used to construct the Transactor
-case class PostgresServerConfig(
+final case class PostgresServerConfig(
   host: String,
   port: Int,
   database: String,
@@ -450,26 +456,23 @@ case class PostgresServerConfig(
   password: String,
 )
 
-class TransactorFromConfigModule extends ModuleDef {
-  make[Transactor[IO]].from { config: PostgresServerConfig =&gt;
-    import scala.concurrent.ExecutionContext.global
+object TransactorFromConfigModule extends ModuleDef {
+  make[Transactor[IO]].from {
+    (config: PostgresServerConfig, contextShift: ContextShift[IO]) =&gt;
+      implicit val CS = contextShift
 
-    implicit val contextShift = IO.contextShift(global)
-    implicit val timer = IO.timer(global)
-
-    Transactor.fromDriverManager[IO](
-      &quot;org.postgresql.Driver&quot;,
-      s&quot;jdbc:postgresql://${config.host}:${config.port}/${config.database}&quot;,
-      config.username,
-      config.password,
-    )
+      Transactor.fromDriverManager[IO](
+        driver = &quot;org.postgresql.Driver&quot;,
+        url    = s&quot;jdbc:postgresql://${config.host}:${config.port}/${config.database}&quot;,
+        user   = config.username,
+        pass   = config.password,
+      )
   }
 }
-
 </code></pre>
 <p>Note that the above code is agnostic of environment. Provided a <code>PostgresServerConfig</code>, the <code>Transactor</code> needed by <code>PostgresExampleApp</code> can be constructed.</p>
 <p>An integration test would use a module that provides the <code>PostgresServerConfig</code> from a <code>PostgresDocker.Container</code>:</p>
-<pre class="prettyprint"><code class="language-scala"><br/>class IntegUsingDockerModule extends ModuleDef {
+<pre class="prettyprint"><code class="language-scala">object PostgresUsingDockerModule extends ModuleDef {
   make[PostgresServerConfig].from {
     container: PostgresDocker.Container =&gt; {
       val knownAddress = container.availablePorts.first(PostgresDocker.primaryPort)
@@ -492,20 +495,21 @@ class TransactorFromConfigModule extends ModuleDef {
 <pre class="prettyprint"><code class="language-scala">import izumi.distage.testkit.scalatest.{AssertCIO, DistageSpecScalatest}
 import distage.DIKey
 
-class PostgresExampleAppIntegTest extends DistageSpecScalatest[IO] with AssertCIO {
+class PostgresExampleAppIntegrationTest extends DistageSpecScalatest[IO] with AssertCIO {
   override def config = super.config.copy(
     moduleOverrides = new ModuleDef {
-      include(new TransactorFromConfigModule)
-      include(new IntegUsingDockerModule)
-      include(distageFrameworkModules)
+      include(TransactorFromConfigModule)
+      include(PostgresUsingDockerModule)
+      include(DistageFrameworkModules)
       make[PostgresExampleApp]
     },
     memoizationRoots = Set(
       DIKey[PostgresServerConfig]
-    )
+    ),
   )
 
   &quot;distage docker&quot; should {
+  
     &quot;support integration tests using containers&quot; in {
       app: PostgresExampleApp =&gt;
         for {
@@ -513,21 +517,24 @@ class PostgresExampleAppIntegTest extends DistageSpecScalatest[IO] with AssertCI
           _ &lt;- assertIO(v == 2)
         } yield ()
     }
+    
   }
 }
 </code></pre>
 <p>Typically, this would be run by the test runner. For completeness, the example can be run directly using:</p>
 <pre class="prettyprint"><code class="language-scala">def postgresDockerIntegrationExample = {
   val applicationModules = new ModuleDef {
-    include(new TransactorFromConfigModule)
-    include(new IntegUsingDockerModule)
-    include(distageFrameworkModules)
+    include(TransactorFromConfigModule)
+    include(PostgresUsingDockerModule)
+    include(DistageFrameworkModules)
+   
     make[PostgresExampleApp]
   }
 
-  Injector()
-    .produceGetF[IO, PostgresExampleApp](applicationModules)
-    .use(app =&gt; app.run)
+  Injector[IO]().produceRun(applicationModules) {
+    app: PostgresExampleApp =&gt;
+      app.run
+  }
 }
 
 postgresDockerIntegrationExample.unsafeRunSync()
@@ -557,14 +564,14 @@ postgresDockerIntegrationExample.unsafeRunSync()
 <p>This will ensure the containers are all connected to the network. Assuming no reuse, distage will create the required network and add each container to that network.</p>
 <h4><a href="#1-create-a-containernetworkdef" name="1-create-a-containernetworkdef" class="anchor"><span class="anchor-link"></span></a>1. Create a <code>ContainerNetworkDef</code></h4>
 <p>A minimal <a href="/api/izumi/distage/docker/ContainerNetworkDef.html"><code>ContainerNetworkDef</code></a> uses the default configuration.</p>
-<pre class="prettyprint"><code class="language-mdoc:silent">object TestClusterNetwork extends ContainerNetworkDef {
+<pre class="prettyprint"><code class="language-mdoc:to-string">object TestClusterNetwork extends ContainerNetworkDef {
   override def config: Config = Config()
 }
 </code></pre>
 <p>By default this object identifies the network. The associated tag type uniquely identifies this network within the application. In addition, any created network will have a label with this name in Docker.</p>
 <h4><a href="#2-add-to-container-config" name="2-add-to-container-config" class="anchor"><span class="anchor-link"></span></a>2. Add to Container Config</h4>
 <p>A container will be connected to all networks in the <code>networks</code> of the <code>config</code>. The method <a href="/api/izumi/distage/docker/DockerContainer$$DockerProviderExtensions.html#connectToNetwork"><code>connectToNetwork</code></a> adds a dependency on a network defined by a <code>ContainerNetworkDef</code>, as in this example:</p>
-<pre class="prettyprint"><code class="language-mdoc:silent">class TestClusterNetworkModule[F[_]: TagK] extends ModuleDef {
+<pre class="prettyprint"><code class="language-mdoc:to-string">class TestClusterNetworkModule[F[_]: TagK] extends ModuleDef {
   make[TestClusterNetwork.Network].fromResource {
     TestClusterNetwork.make[F]
   }
@@ -578,9 +585,9 @@ postgresDockerIntegrationExample.unsafeRunSync()
 </code></pre>
 <p>The use of <code>connectToNetwork</code> automatically adds a dependency on <code>TestClusterNetwork.Network</code> to each container.</p>
 <h4><a href="#container-network-reuse" name="container-network-reuse" class="anchor"><span class="anchor-link"></span></a>Container Network Reuse</h4>
-<p>Container networks, like containers, are reused by default. If there is an existing network that matches a definition then that network will be used. This can be disabled by setting the <code>reuse</code> configuration to false:</p>
-<pre class="prettyprint"><code class="language-mdoc:silent">object AlwaysFreshNetwork extends ContainerNetworkDef {
-  override def config: Config = Config(reuse = false)
+<p>Container networks, like containers, are reused by default. If there is an existing network that matches a definition then that network will be used. This can be disabled by setting the <code>reuse</code> configuration to <code>DockerReusePolicy.KillOnExitNoReuse</code>:</p>
+<pre class="prettyprint"><code class="language-mdoc:to-string">object AlwaysFreshNetwork extends ContainerNetworkDef {
+  override def config: Config = Config(reuse = Docker.DockerReusePolicy.KillOnExitNoReuse)
 }
 </code></pre>
 <p>For an existing network to be reused, the config and object name at time of creation must be the match the current configuration value and object.</p>
@@ -596,21 +603,22 @@ include &quot;docker-reference.conf&quot;
 # override docker object fields
 docker {
   readTimeoutMs = 60000
-  allowReuse = false
+  globalReuse = &quot;always-kill&quot;
 }
 </code></pre>
 <ol>
-  <li>Override the <code>DockerSupportModule</code> using <code>overridenBy</code>:</li>
+  <li>Override the <code>DockerSupportModule</code> using <code>overriddenBy</code>:</li>
 </ol>
 <pre class="prettyprint"><code class="language-scala">import izumi.distage.docker.Docker
+import izumi.distage.docker.Docker.DockerReusePolicy
 
 class CustomDockerConfigExampleModule[F[_]: TagK] extends ModuleDef {
-  include(DockerSupportModule[F] overridenBy new ModuleDef {
+  include(DockerSupportModule[F] overriddenBy new ModuleDef {
     make[Docker.ClientConfig].from {
       Docker.ClientConfig(
         readTimeoutMs    = 10000,
         connectTimeoutMs = 10000,
-        allowReuse       = false,
+        globalReuse      = DockerReusePolicy.ReuseEnabled,
         useRemote        = true,
         useRegistry      = true,
         remote           = Some(
@@ -639,20 +647,25 @@ class CustomDockerConfigExampleModule[F[_]: TagK] extends ModuleDef {
 <h4><a href="#matching-containers-for-reuse" name="matching-containers-for-reuse" class="anchor"><span class="anchor-link"></span></a>Matching Containers for Reuse</h4>
 <p>For an existing container to be reused, all the following must be true:</p>
 <ul>
-  <li>The current client config has <code>allowReuse == true</code>.</li>
-  <li>The container config has <code>reuse == true</code>.</li>
+  <li>The current client config has <code>globalReuse == DockerReusePolicy.ReuseEnabled</code></li>
+  <li>The container config has <code>reuse == DockerReusePolicy.ReuseEnabled</code></li>
   <li>The running container was created for reuse.</li>
   <li>The running container uses the same image as the container config.</li>
   <li>All ports requested in the container config must be mapped for the running container.</li>
 </ul>
 <h4><a href="#configuring-reuse" name="configuring-reuse" class="anchor"><span class="anchor-link"></span></a>Configuring Reuse</h4>
-<p>The <code>ContainerDef.Config.reuse</code> should be false to disable reuse for a specific container. While <code>Docker.ClientConfig.allowReuse</code> should be false to disable reuse throughout the application.</p>
+<p><code>DockerReusePolicy</code> has 2 possible values:</p>
+<ul>
+  <li><code>ReuseEnabled</code>: the resource (container or network) will be always freed after use and existing matching containers will not be reused</li>
+  <li><code>ReuseDisabled</code>: the resource will be always be freed after use but existing matching containers will be reused</li>
+</ul>
+<p>The <code>ContainerDef.Config.reuse</code> should be <code>DockerReusePolicy.ReuseDisabled</code> to disable reuse for a specific container. While <code>Docker.ClientConfig.globalReuse</code> should be <code>DockerReusePolicy.ReuseDisabled</code> to disable reuse throughout the application.</p>
 <h4><a href="#improving-reuse-performance" name="improving-reuse-performance" class="anchor"><span class="anchor-link"></span></a>Improving Reuse Performance</h4>
 <p>When utilizing reuse, the performance cost of inspecting the Docker system can be avoided using memoization roots. For example, in this integration test the container resource is not reconstructed for each test. Because the resource is not reconstructed there is no repeated inspection of the Docker system.</p>
 <pre class="prettyprint"><code class="language-scala">class NoReuseByMemoizationExampleTest extends DistageSpecScalatest[IO] {
   override def config = super.config.copy(
     moduleOverrides = new ModuleDef {
-      include(distageFrameworkModules)
+      include(DistageFrameworkModules)
       include(PostgresDockerModule[IO])
     },
     memoizationRoots = Set(
@@ -684,7 +697,8 @@ class CustomDockerConfigExampleModule[F[_]: TagK] extends ModuleDef {
 <pre><code>// izumi.distage.model.exceptions.ProvisioningException: Provisioner stopped after 1 instances, 2/14 operations failed:
 //  - {type.izumi.distage.docker.DockerClientWrapper[=λ %0 → IO[+0]]} (distage-framework-docker.md:40), MissingInstanceException: Instance is not available in the object graph: {type.izumi.distage.docker.DockerClientWrapper[=λ %0 → IO[+0]]}.
 </code></pre>
-<p>The <code>DockerSupportModule</code> was not included in the application modules. The component <code>DockerClientWrapper</code> is provided by <code>izumi.distage.docker.modules.DockerSupportModule</code>.</p>
+<p>This error means that <a href="/api/izumi/distage/docker/modules/DockerSupportModule.html"><code>DockerSupportModule</code></a> hasn&rsquo;t been <code>include</code>d with the application modules.</p>
+<p><code>DockerClientWrapper</code> component is provided by <a href="/api/izumi/distage/docker/modules/DockerSupportModule.html"><code>izumi.distage.docker.modules.DockerSupportModule</code></a>.</p>
 <h3><a href="#references" name="references" class="anchor"><span class="anchor-link"></span></a>References</h3>
 <ul>
   <li>Introduced in <a href="https://github.com/7mind/izumi/releases/tag/v0.9.13">release 0.9.13</a></li>
@@ -693,13 +707,13 @@ class CustomDockerConfigExampleModule[F[_]: TagK] extends ModuleDef {
 </ul>
 </div>
 <div>
-<a href="https://github.com/7mind/izumi/tree/v0.10.19/doc/microsite/target/mdoc/distage/distage-framework-docker.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/7mind/izumi/tree/v1.0.0-M1/doc/microsite/target/mdoc/distage/distage-framework-docker.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>
 <div class="print-only">
 <span class="md-source-file md-version">
-0.10.19
+1.0.0-M1
 </span>
 </div>
 </article>

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="x-ua-compatible" content="ie=edge">
 <meta name="description" content="microsite">
-<meta name="generator" content="Paradox, paradox-material-theme=0.10.19, mkdocs-material=3.0.3">
+<meta name="generator" content="Paradox, paradox-material-theme=1.0.0-M1, mkdocs-material=3.0.3">
 
 <meta name="lang:clipboard.copy" content="Copy to clipboard">
 <meta name="lang:clipboard.copied" content="Copied to clipboard">
@@ -137,16 +137,16 @@ data-md-source="github">
 <ul>
   <li><a href="../distage/index.html" class="page">distage: Staged Dependency Injection</a>
   <ul>
-    <li><a href="../distage/basics.html" class="page">Basics</a></li>
-    <li><a href="../distage/advanced-features.html" class="page">Advanced Features</a></li>
+    <li><a href="../distage/basics.html" class="page">Overview</a></li>
     <li><a href="../distage/debugging.html" class="page">Debugging</a></li>
+    <li><a href="../distage/advanced-features.html" class="page">Advanced Features</a></li>
     <li><a href="../distage/distage-framework.html" class="page">distage-framework</a></li>
     <li><a href="../distage/distage-framework-docker.html" class="page">distage-framework-docker</a></li>
     <li><a href="../distage/distage-testkit.html" class="page">distage-testkit</a></li>
     <li><a href="../distage/reference.html" class="active page">Syntax Summary</a></li>
   </ul></li>
   <li><a href="../logstage/index.html" class="page">LogStage</a></li>
-  <li><a href="../bio/index.html" class="page">BIO</a></li>
+  <li><a href="../bio/index.html" class="page">BIO Hierarchy</a></li>
   <li><a href="../idealingua/index.html" class="page">IdeaLingua RPC/DML</a>
   <ul>
     <li><a href="../idealingua/language-reference.html" class="page">Idealingua Language Reference</a></li>
@@ -165,7 +165,7 @@ data-md-source="github">
 <ul style="display: none">
 <li class="md-nav__item md-version" id="project.version">
 <label class="md-nav__link" for="__version">
-<i class="md-icon" title="Version">label_outline</i> 0.10.19
+<i class="md-icon" title="Version">label_outline</i> 1.0.0-M1
 </label>
 </li>
 </ul>
@@ -181,25 +181,31 @@ data-md-source="github">
   - `make[X]` = create X using its constructor
   - `make[X].from[XImpl]` = bind X to its subtype XImpl using XImpl&#39;s constructor
   - `make[X].from(myX)` = bind X to an already existing instance `myX`
-  - `make[X].from { y: Y =&gt; new X(y) }` = bind X to an instance of X constructed by a given [[izumi.distage.model.providers.ProviderMagnet Provider]] function
-  - `make[X].fromEffect(X.create[F]: F[X])` = create X using a purely-functional effect `X.create` in `F` monad
-  - `make[X].fromResource(X.resource[F]: Resource[F, X])` = create X using a [[DIResource]] specifying its creation and destruction lifecycle
+  - `make[X].from { y: Y =&gt; new X(y) }` = bind X to an instance of X constructed by a given [[izumi.distage.model.providers.Functoid Functoid]] requesting an Y parameter
+  - `make[X].from { y: Y @Id(&quot;special&quot;) =&gt; new X(y) }` = bind X to an instance of X constructed by a given [[izumi.distage.model.providers.Functoid Functoid]], requesting a named &quot;special&quot; Y parameter
+  - `make[X].from { y: Y =&gt; new X(y) }`.annotateParameter[Y](&quot;special&quot;) = bind X to an instance of X constructed by a given [[izumi.distage.model.providers.Functoid Functoid]], requesting a named &quot;special&quot; Y parameter
   - `make[X].named(&quot;special&quot;)` = bind a named instance of X. It can then be summoned using [[Id]] annotation.
-  - `make[X].using[X]` = bind X to refer to another already bound instance of `X`
   - `make[X].using[X](&quot;special&quot;)` = bind X to refer to another already bound named instance at key `[X].named(&quot;special&quot;)`
-  - `make[ImplXYZ].aliased[X].aliased[Y].aliased[Z]` = bind ImplXYZ and bind X, Y, Z to refer to the bound instance of ImplXYZ
+  - `make[X].fromEffect(X.create[F]: F[X])` = create X using a purely-functional effect `X.create` in `F` monad
+  - `make[X].fromResource(X.resource[F]: Lifecycle[F, X])` = create X using a `Lifecycle` value specifying its creation and destruction lifecycle
+  - `make[X].from[XImpl].modify(fun(_))` = Create X using XImpl&#39;s constructor and apply `fun` to the result
+  - `make[X].from[XImpl].modifyBy(_.flatAp { (c: C, d: D) =&gt; (x: X) =&gt; c.method(x, d) })` = Create X using XImpl&#39;s constructor and modify its `Functoid` using the provided lambda - in this case by summoning additional `C` &amp; `D` dependencies and applying `C.method` to `X`
 
 Set bindings:
   - `many[X].add[X1].add[X2]` = bind a [[Set]] of X, and add subtypes X1 and X2 created via their constructors to it.
                                 Sets can be bound in multiple different modules. All the elements of the same set in different modules will be joined together.
   - `many[X].add(x1).add(x2)` = add *instances* x1 and x2 to a `Set[X]`
-  - `many[X].add { y: Y =&gt; new X1(y).add { y: Y =&gt; X2(y) }` = add instances of X1 and X2 constructed by a given [[izumi.distage.model.providers.ProviderMagnet Provider]] function
+  - `many[X].add { y: Y =&gt; new X1(y).add { y: Y =&gt; X2(y) }` = add instances of X1 and X2 constructed by a given [[izumi.distage.model.providers.Functoid Provider]] function
   - `many[X].named(&quot;special&quot;).add[X1]` = create a named set of X, all the elements of it are added to this named set.
   - `many[X].ref[XImpl]` = add a reference to an already **existing** binding of XImpl to a set of X&#39;s
   - `many[X].ref[X](&quot;special&quot;)` = add a reference to an **existing** named binding of X to a set of X&#39;s
 
+Mutators:
+  - `modify[X](fun(_))` = add a modifier applying `fun` to the value bound at `X` (mutator application order is unspecified)
+  - `modify[X].by(_.flatAp { (c: C, d: D) =&gt; (x: X) =&gt; c.method(x, d) })` = add a modifier, applying the provided lambda to a `Functoid` retrieving `X` - in this case by summoning additional `C` &amp; `D` dependencies and applying `C.method` to `X`
+
 Tags:
-  - `make[X].tagged(&quot;t1&quot;, &quot;t2)` = attach tags to X&#39;s binding. Tags can be processed in a special way. See [[izumi.distage.roles.model.RoleId]]
+  - `make[X].tagged(&quot;t1&quot;, &quot;t2)` = attach tags to X&#39;s binding.
   - `many[X].add[X1].tagged(&quot;x1tag&quot;)` = Tag a specific element of X. The tags of sets and their elements are separate.
   - `many[X].tagged(&quot;xsettag&quot;)` = Tag the binding of empty Set of X with a tag. The tags of sets and their elements are separate.
 
@@ -208,13 +214,13 @@ Includes:
 </code></pre>
 </div>
 <div>
-<a href="https://github.com/7mind/izumi/tree/v0.10.19/doc/microsite/target/mdoc/distage/reference.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/7mind/izumi/tree/v1.0.0-M1/doc/microsite/target/mdoc/distage/reference.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>
 <div class="print-only">
 <span class="md-source-file md-version">
-0.10.19
+1.0.0-M1
 </span>
 </div>
 </article>
