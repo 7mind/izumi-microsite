@@ -224,7 +224,7 @@ def badModule = new ModuleDef {
 
 val badPlan = Injector[cats.effect.IO]().plan(badModule, Roots.target[A])
 // badPlan: izumi.distage.model.plan.OrderedPlan = 
-// {effect.{type.MdocSession::App0::B}} (debugging.md:22) := value zio.ZIO$EffectPartial#689638219
+// {effect.{type.MdocSession::App0::B}} (debugging.md:22) := value zio.ZIO$EffectPartial#1716600145
 // {type.MdocSession::App0::B} (debugging.md:22) := effect[λ %0 → zio.ZIO[-Any,+Throwable,+0]]{effect.{type.MdocSession::App0::B}}
 // {type.MdocSession::App0::A} (debugging.md:21) := call(π:Class(MdocSession::App0::B): MdocSession::App0::A) {
 //   arg b: MdocSession::App0::B = lookup({type.MdocSession::App0::B})
@@ -243,20 +243,15 @@ badPlan.assertValid[cats.effect.IO]().unsafeRunSync()
 //   - To execute `make[_].fromEffect` and `make[_].fromResource` bindings for effects other than `Identity`, you must parameterize the `Injector` with the corresponding effect type when creating it, as in `Injector[F]()`.
 //   - Subtype type constructors are allowed. e.g. when using ZIO you can execute effects in `IO[Nothing, ?]` when using an `Injector[IO[Throwable, ?]]()`.
 //        
-// 	at izumi.distage.model.plan.impl.OrderedPlanOps.$anonfun$isValid$3(OrderedPlanOps.scala:57)
-// 	at izumi.distage.model.plan.impl.OrderedPlanOps.$anonfun$isValid$3$adapted(OrderedPlanOps.scala:56)
+// 	at izumi.distage.model.plan.impl.OrderedPlanOps.$anonfun$isValid$3(OrderedPlanOps.scala:58)
+// 	at izumi.distage.model.plan.impl.OrderedPlanOps.$anonfun$isValid$3$adapted(OrderedPlanOps.scala:57)
 // 	at scala.Option.map(Option.scala:242)
-// 	at izumi.distage.model.plan.impl.OrderedPlanOps.isValid(OrderedPlanOps.scala:56)
-// 	at izumi.distage.model.plan.impl.OrderedPlanOps.isValid$(OrderedPlanOps.scala:51)
+// 	at izumi.distage.model.plan.impl.OrderedPlanOps.isValid(OrderedPlanOps.scala:57)
+// 	at izumi.distage.model.plan.impl.OrderedPlanOps.isValid$(OrderedPlanOps.scala:52)
 // 	at izumi.distage.model.plan.OrderedPlan.isValid(AbstractPlan.scala:36)
-// 	at izumi.distage.model.plan.impl.OrderedPlanOps.assertValidOrThrow(OrderedPlanOps.scala:47)
-// 	at izumi.distage.model.plan.impl.OrderedPlanOps.assertValidOrThrow$(OrderedPlanOps.scala:46)
-// 	at izumi.distage.model.plan.OrderedPlan.assertValidOrThrow(AbstractPlan.scala:36)
-// 	at izumi.distage.model.plan.impl.OrderedPlanOps.$anonfun$assertValid$1(OrderedPlanOps.scala:38)
-// 	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.scala:18)
-// 	at cats.effect.internals.IORunLoop$.step(IORunLoop.scala:235)
-// 	at cats.effect.IO.unsafeRunTimed(IO.scala:338)
-// 	at cats.effect.IO.unsafeRunSync(IO.scala:256)
+// 	at izumi.distage.model.plan.impl.OrderedPlanOps.assertValid(OrderedPlanOps.scala:38)
+// 	at izumi.distage.model.plan.impl.OrderedPlanOps.assertValid$(OrderedPlanOps.scala:37)
+// 	at izumi.distage.model.plan.OrderedPlan.assertValid(AbstractPlan.scala:36)
 // 	at repl.MdocSession$App0$$anonfun$4.apply$mcV$sp(debugging.md:33)
 // 	at repl.MdocSession$App0$$anonfun$4.apply(debugging.md:33)
 // 	at repl.MdocSession$App0$$anonfun$4.apply(debugging.md:33)
@@ -268,7 +263,7 @@ badPlan.assertValid[cats.effect.IO]().unsafeRunSync()
 
 val plan = Injector[cats.effect.IO]().plan(goodModule, Roots.target[A])
 // plan: izumi.distage.model.plan.OrderedPlan = 
-// {effect.{type.MdocSession::App0::B}} (debugging.md:42) := value cats.effect.IO$Delay#-182453225
+// {effect.{type.MdocSession::App0::B}} (debugging.md:42) := value cats.effect.IO$Delay#469649149
 // {type.MdocSession::App0::B} (debugging.md:42) := effect[λ %0 → cats.effect.IO[+0]]{effect.{type.MdocSession::App0::B}}
 // {type.MdocSession::App0::A} (debugging.md:41) := call(π:Class(MdocSession::App0::B): MdocSession::App0::A) {
 //   arg b: MdocSession::App0::B = lookup({type.MdocSession::App0::B})
@@ -281,7 +276,7 @@ plan.assertValid[cats.effect.IO]().unsafeRunSync()
 <h3><a href="#pretty-printing-plans" name="pretty-printing-plans" class="anchor"><span class="anchor-link"></span></a>Pretty-printing plans</h3>
 <p>You can print the output of <code>plan.render()</code> to get detailed info on what will happen during instantiation. The printout includes source and line numbers so your IDE can show you where the binding was defined!</p>
 <pre class="prettyprint"><code class="language-scala">println(plan.render())
-// {effect.{type.MdocSession::App0::B}} (debugging.md:42) := value cats.effect.IO$Delay#-182453225
+// {effect.{type.MdocSession::App0::B}} (debugging.md:42) := value cats.effect.IO$Delay#469649149
 // {type.MdocSession::App0::B} (debugging.md:42) := effect[λ %0 → cats.effect.IO[+0]]{effect.{type.MdocSession::App0::B}}
 // {type.MdocSession::App0::A} (debugging.md:41) := call(π:Class(MdocSession::App0::B): MdocSession::App0::A) {
 //   arg b: MdocSession::App0::B = lookup({type.MdocSession::App0::B})
@@ -314,7 +309,7 @@ println(plan.topology.dependees.tree(DIKey[B]))
 <pre class="prettyprint"><code class="language-scala">import distage.{GraphDumpBootstrapModule, Injector}
 
 Injector(GraphDumpBootstrapModule)
-// res6: Injector[izumi.fundamentals.platform.functional.package.Identity[A]] = izumi.distage.InjectorDefaultImpl@56e273b
+// res6: Injector[izumi.fundamentals.platform.functional.package.Identity[A]] = izumi.distage.InjectorDefaultImpl@5693e4e7
 </code></pre>
 <p>You&rsquo;ll need a <code>GraphViz</code> installation to render these files into a viewable PNG images:</p>
 <pre class="prettyprint"><code class="language-bash">dot -Tpng target/plan-last-nogc.gv -o out.png

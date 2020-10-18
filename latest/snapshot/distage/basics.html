@@ -221,6 +221,7 @@ data-md-source="github">
 <ul>
   <li><a href="../distage/basics.html#quick-start" class="header">Quick Start</a>
   <ul>
+    <li><a href="../distage/basics.html#dependencies" class="header">Dependencies</a></li>
     <li><a href="../distage/basics.html#hello-world-example" class="header">Hello World example</a></li>
     <li><a href="../distage/basics.html#named-instances" class="header">Named instances</a></li>
     <li><a href="../distage/basics.html#non-singleton-components" class="header">Non-singleton components</a></li>
@@ -243,6 +244,7 @@ data-md-source="github">
   <li><a href="../distage/basics.html#auto-traits" class="header">Auto-Traits</a>
   <ul>
     <li><a href="../distage/basics.html#impl-annotation" class="header">@impl annotation</a></li>
+    <li><a href="../distage/basics.html#avoiding-constructors-even-further" class="header">Avoiding constructors even further</a></li>
   </ul></li>
   <li><a href="../distage/basics.html#auto-factories" class="header">Auto-Factories</a>
   <ul>
@@ -258,6 +260,14 @@ data-md-source="github">
 </ul>
 </div>
 <h3><a href="#quick-start" name="quick-start" class="anchor"><span class="anchor-link"></span></a>Quick Start</h3>
+<h4><a href="#dependencies" name="dependencies" class="anchor"><span class="anchor-link"></span></a>Dependencies</h4>
+<p>Add the <code>distage-core</code> library:</p><dl class="dependency"><dt>sbt</dt><dd><pre class="prettyprint"><code class="language-scala">libraryDependencies += "io.7mind.izumi" %% "distage-framework-docker" % "0.11.0-SNAPSHOT"</code></pre></dd><dt>Maven</dt><dd><pre class="prettyprint"><code class="language-xml">&lt;dependency&gt;
+  &lt;groupId&gt;io.7mind.izumi&lt;/groupId&gt;
+  &lt;artifactId&gt;distage-framework-docker_2.13&lt;/artifactId&gt;
+  &lt;version&gt;0.11.0-SNAPSHOT&lt;/version&gt;
+&lt;/dependency&gt;</code></pre></dd><dt>Gradle</dt><dd><pre class="prettyprint"><code class="language-gradle">dependencies {
+  compile group: 'io.7mind.izumi', name: 'distage-framework-docker_2.13', version: '0.11.0-SNAPSHOT'
+}</code></pre></dd></dl>
 <h4><a href="#hello-world-example" name="hello-world-example" class="anchor"><span class="anchor-link"></span></a>Hello World example</h4>
 <p>Suppose we have an abstract <code>Greeter</code> component, and some other components that depend on it:</p>
 <pre class="prettyprint"><code class="language-scala">import zio.RIO
@@ -312,7 +322,7 @@ val HelloByeModule = new ModuleDef {
 <pre class="prettyprint"><code class="language-scala">import distage.{Activation, Injector, Roots}
 
 val injector = Injector[RIO[Console, *]]()
-// injector: Injector[zio.ZIO[zio.Has[Console.Service], Throwable, β$0$]] = izumi.distage.InjectorDefaultImpl@57330148
+// injector: Injector[zio.ZIO[zio.Has[Console.Service], Throwable, β$0$]] = izumi.distage.InjectorDefaultImpl@31f36849
 
 val plan = injector.plan(HelloByeModule, Activation.empty, Roots.target[HelloByeApp])
 // plan: izumi.distage.model.plan.OrderedPlan = 
@@ -330,7 +340,7 @@ val plan = injector.plan(HelloByeModule, Activation.empty, Roots.target[HelloBye
 // Interpret into a Lifecycle value
 
 val resource = injector.produce(plan)
-// resource: izumi.distage.model.definition.Lifecycle[zio.ZIO[zio.Has[Console.Service], Throwable, β$0$], izumi.distage.model.Locator] = izumi.distage.model.definition.Lifecycle$$anon$10@6ecdc7c0
+// resource: izumi.distage.model.definition.Lifecycle[zio.ZIO[zio.Has[Console.Service], Throwable, β$0$], izumi.distage.model.Locator] = izumi.distage.model.definition.Lifecycle$$anon$10@7a2511d5
 
 // Use the object graph:
 // After `.use` exits, all objects will be deallocated,
@@ -340,7 +350,7 @@ val effect = resource.use {
   objects =&gt;
     objects.get[HelloByeApp].run
 }
-// effect: zio.ZIO[zio.Has[Console.Service], Throwable, Unit] = zio.ZIO$CheckInterrupt@55c01e02
+// effect: zio.ZIO[zio.Has[Console.Service], Throwable, Unit] = zio.ZIO$CheckInterrupt@68843ff9
 
 // Run the resulting program
 
@@ -389,11 +399,11 @@ new ModuleDef {
 <p>While Auto-Factories may remove the boilerplate of passing the singleton parts of the graph to your new non-singleton components along with dynamic arguments, if you absolutely must wire a new non-trivial subgraph in a dynamic scope you&rsquo;ll need to run <code>Injector</code> again in your scope. </p>
 <p>You may use <code>Injector.inherit</code> to obtain access to your outer object graph in your new sub-graph. It&rsquo;s safe to run <code>Injector</code> multiple times in nested scopes, as it&rsquo;s extremely fast, not least due to total absence of runtime reflection. See <a href="advanced-features.html#injector-inheritance">Injector Inheritance</a></p>
 <h4><a href="#real-world-example" name="real-world-example" class="anchor"><span class="anchor-link"></span></a>Real-world example</h4>
-<p>Check out <a href="https://github.com/7mind/distage-example"><code>distage-example</code> project</a> for a complete example built using <code>distage</code>, tagless final, <code>http4s</code>, <code>doobie</code> and <code>zio</code> libraries.</p>
+<p>Check out <a href="https://github.com/7mind/distage-example"><code>distage-example</code></a> sample project for a complete example built using <code>distage</code>, <a href="../bio/index.html">bifunctor tagless final</a>, <code>http4s</code>, <code>doobie</code> and <code>zio</code> libraries.</p>
 <p>It shows how to write an idiomatic <code>distage</code>-style from scratch and how to:</p>
 <ul>
   <li>write tests using <a href="distage-testkit.html"><code>distage-testkit</code></a></li>
-  <li>setup portable, zero-setup test environments using <a href="distage-framework-docker.html"><code>distage-framework-docker</code></a></li>
+  <li>setup portable test environments using <a href="distage-framework-docker.html"><code>distage-framework-docker</code></a></li>
   <li>create <a href="distage-framework.html#roles">role-based applications</a></li>
   <li>enable <a href="distage-framework.html">compile-time checks</a> for fast-feedback on wiring errors</li>
 </ul>
@@ -560,15 +570,15 @@ val module = new ModuleDef {
   make[MyApp]
 }
 // module: AnyRef with ModuleDef = 
-// make[{type.repl.MdocSession::repl.MdocSession.App10::repl.MdocSession.App10.MessageQueueConnection}].from(allocate[λ %0 → cats.effect.IO[+0]](call(ƒ:izumi.distage.model.providers.Functoid$$Lambda$20435/112579569@10e27e77(cats.effect.Sync[=λ %0 → IO[+0]]): izumi.distage.model.definition.Lifecycle::izumi.distage.model.definition.Lifecycle.FromCats[=λ %1:0 → IO[+1:0],=MdocSession::App10::MessageQueueConnection]))) ((basics.md:303))
-// make[{type.repl.MdocSession::repl.MdocSession.App10::repl.MdocSession.App10.DBConnection}].from(allocate[λ %0 → cats.effect.IO[+0]](call(ƒ:izumi.distage.model.providers.Functoid$$Lambda$20435/112579569@226bb25c(cats.effect.Sync[=λ %0 → IO[+0]]): izumi.distage.model.definition.Lifecycle::izumi.distage.model.definition.Lifecycle.FromCats[=λ %1:0 → IO[+1:0],=MdocSession::App10::DBConnection]))) ((basics.md:302))
+// make[{type.repl.MdocSession::repl.MdocSession.App10::repl.MdocSession.App10.MessageQueueConnection}].from(allocate[λ %0 → cats.effect.IO[+0]](call(ƒ:izumi.distage.model.providers.Functoid$$Lambda$20463/1806348860@78fa335f(cats.effect.Sync[=λ %0 → IO[+0]]): izumi.distage.model.definition.Lifecycle::izumi.distage.model.definition.Lifecycle.FromCats[=λ %1:0 → IO[+1:0],=MdocSession::App10::MessageQueueConnection]))) ((basics.md:303))
+// make[{type.repl.MdocSession::repl.MdocSession.App10::repl.MdocSession.App10.DBConnection}].from(allocate[λ %0 → cats.effect.IO[+0]](call(ƒ:izumi.distage.model.providers.Functoid$$Lambda$20463/1806348860@46bd69c6(cats.effect.Sync[=λ %0 → IO[+0]]): izumi.distage.model.definition.Lifecycle::izumi.distage.model.definition.Lifecycle.FromCats[=λ %1:0 → IO[+1:0],=MdocSession::App10::DBConnection]))) ((basics.md:302))
 // make[{type.repl.MdocSession::repl.MdocSession.App10::repl.MdocSession.App10.MyApp}].from(call(π:Class(repl.MdocSession::repl.MdocSession.App10::repl.MdocSession.App10.DBConnection, repl.MdocSession::repl.MdocSession.App10::repl.MdocSession.App10.MessageQueueConnection): repl.MdocSession::repl.MdocSession.App10::repl.MdocSession.App10.MyApp)) ((basics.md:304))
 </code></pre>
 <p>Will produce the following output:</p>
 <pre class="prettyprint"><code class="language-scala">import distage.DIKey
 
 val objectGraphResource = Injector[IO]().produce(module, Roots(root = DIKey[MyApp]))
-// objectGraphResource: izumi.distage.model.definition.Lifecycle[IO, izumi.distage.model.Locator] = izumi.distage.model.definition.Lifecycle$$anon$10@1a962bfe
+// objectGraphResource: izumi.distage.model.definition.Lifecycle[IO, izumi.distage.model.Locator] = izumi.distage.model.definition.Lifecycle$$anon$10@7a8718f8
 
 objectGraphResource
   .use(_.get[MyApp].run)
@@ -611,7 +621,7 @@ val closedInit = Injector()
       init
 }
 // true
-// closedInit: izumi.fundamentals.platform.functional.package.Identity[Init] = repl.MdocSession$App12$Init@5c3f50b1
+// closedInit: izumi.fundamentals.platform.functional.package.Identity[Init] = repl.MdocSession$App12$Init@1cab4330
 
 println(closedInit.initialized)
 // false
@@ -740,7 +750,7 @@ object AppModule extends ModuleDef {
 // wire the graph and get the app
 
 val app = Injector().produceGet[App](AppModule).unsafeGet()
-// app: App = repl.MdocSession$App16$App$Impl@17705087
+// app: App = repl.MdocSession$App16$App$Impl@6d7d6711
 
 // check how it works
 
@@ -772,7 +782,7 @@ app.interpret(&quot;help&quot;)
 <p>In these cases we can use <code>.fromEffect</code> to create a value using an effectful constructor.</p>
 <p>Example with a <code>Ref</code>-based Tagless Final <code>KVStore</code>:</p>
 <pre class="prettyprint"><code class="language-scala">import distage.{ModuleDef, Injector}
-import izumi.functional.bio.{BIOError, BIOPrimitives, F}
+import izumi.functional.bio.{BIOError, Primitives2, F}
 import zio.{Task, IO}
 
 trait KVStore[F[_, _]] {
@@ -780,7 +790,7 @@ trait KVStore[F[_, _]] {
   def put(key: String, value: String): F[Nothing, Unit]
 }
 
-def dummyKVStore[F[+_, +_]: BIOError: BIOPrimitives]: F[Nothing, KVStore[F]] = {
+def dummyKVStore[F[+_, +_]: BIOError: Primitives2]: F[Nothing, KVStore[F]] = {
   for {
     ref &lt;- F.mkRef(Map.empty[String, String])
   } yield new KVStore[F] {
@@ -814,14 +824,14 @@ val io = Injector[Task]()
         res2 &lt;- kv.get(&quot;apple&quot;)
       } yield res1 + res2
   }
-// io: Task[String] = zio.ZIO$CheckInterrupt@165cacef
+// io: Task[String] = zio.ZIO$CheckInterrupt@5b358e53
 
 zio.Runtime.default.unsafeRun(io)
 // res23: String = pieipad
 </code></pre>
 <p>You need to specify your effect type when constructing <code>Injector</code>, as in <code>Injector[F]()</code>, to use effect bindings in chosen <code>F[_]</code>.</p>
 <h3><a href="#zio-has-bindings" name="zio-has-bindings" class="anchor"><span class="anchor-link"></span></a>ZIO Has Bindings</h3>
-<p>You can inject into ZIO Environment using <code>make[_].fromHas</code> syntax for <code>ZLayer</code>, <code>ZManaged</code>, <code>ZIO</code> or any <code>F[_, _, _]: BIOLocal</code>:</p>
+<p>You can inject into ZIO Environment using <code>make[_].fromHas</code> syntax for <code>ZLayer</code>, <code>ZManaged</code>, <code>ZIO</code> or any <code>F[_, _, _]: Local3</code>:</p>
 <pre class="prettyprint"><code class="language-scala">import zio._
 import distage._
 
@@ -861,10 +871,10 @@ trait World {
 // using service functions from everywhere
 
 val hello: URIO[Has[Hello], String] = URIO.accessM(_.get.hello)
-// hello: URIO[Has[Hello], String] = zio.ZIO$Read@23c4f76a
+// hello: URIO[Has[Hello], String] = zio.ZIO$Read@1aae455e
 
 val world: URIO[Has[World], String] = URIO.accessM(_.get.world)
-// world: URIO[Has[World], String] = zio.ZIO$Read@32e432e7
+// world: URIO[Has[World], String] = zio.ZIO$Read@70aea4a4
 
 // service implementations
 
@@ -876,7 +886,7 @@ val makeHello = {
     putStrLn(&quot;Shutting down Enterprise Hellower&quot;)
   }
 }
-// makeHello: zio.ZManaged[Console, Nothing, AnyRef with Hello{val hello: zio.UIO[String]}] = zio.ZManaged$$anon$2@1efa1bbc
+// makeHello: zio.ZManaged[Console, Nothing, AnyRef with Hello{val hello: zio.UIO[String]}] = zio.ZManaged$$anon$2@6b35f291
 
 val makeWorld = {
   for {
@@ -885,7 +895,7 @@ val makeWorld = {
     val world = counter.get.map(c =&gt; if (c &lt; 1) &quot;World&quot; else &quot;THE World&quot;)
   }
 }
-// makeWorld: zio.ZIO[Any, Nothing, AnyRef with World{val world: zio.ZIO[Any,Nothing,String]}] = zio.ZIO$FlatMap@6db2e758
+// makeWorld: zio.ZIO[Any, Nothing, AnyRef with World{val world: zio.ZIO[Any,Nothing,String]}] = zio.ZIO$FlatMap@1c05aeb2
 
 // the main function
 
@@ -896,7 +906,7 @@ val turboFunctionalHelloWorld: URIO[Has[Hello] with Has[World] with Has[Console.
     _     &lt;- putStrLn(s&quot;$hello $world&quot;)
   } yield ()
 }
-// turboFunctionalHelloWorld: URIO[Has[Hello] with Has[World] with Has[Console.Service], Unit] = zio.ZIO$FlatMap@69492223
+// turboFunctionalHelloWorld: URIO[Has[Hello] with Has[World] with Has[Console.Service], Unit] = zio.ZIO$FlatMap@74699cd9
 
 def module = new ModuleDef {
   make[Hello].fromHas(makeHello)
@@ -907,7 +917,7 @@ def module = new ModuleDef {
 
 val main = Injector[Task]()
   .produceRun[Unit](module)((_: Unit) =&gt; Task.unit)
-// main: Task[Unit] = zio.ZIO$CheckInterrupt@7aa956e7
+// main: Task[Unit] = zio.ZIO$CheckInterrupt@71e78d74
 
 zio.Runtime.default.unsafeRun(main)
 // Creating Enterprise Hellower...
@@ -932,11 +942,11 @@ trait Depender[-R] {
 implicit val contra1: Contravariant[Dependee] = new Contravariant[Dependee] {
   def contramap[A, B](fa: Dependee[A])(f: B =&gt; A): Dependee[B] = new Dependee[B] { def x(y: String) = fa.x(y).provideSome(f) }
 }
-// contra1: Contravariant[Dependee] = repl.MdocSession$App27$$anon$16@34c095f5
+// contra1: Contravariant[Dependee] = repl.MdocSession$App27$$anon$16@358248a3
 implicit val contra2: Contravariant[Depender] = new Contravariant[Depender] {
   def contramap[A, B](fa: Depender[A])(f: B =&gt; A): Depender[B] = new Depender[B] { def y = fa.y.provideSome(f) }
 }
-// contra2: Contravariant[Depender] = repl.MdocSession$App27$$anon$18@4e322c12
+// contra2: Contravariant[Depender] = repl.MdocSession$App27$$anon$18@4c3009f
 
 type DependeeR = Has[Dependee[Any]]
 type DependerR = Has[Depender[Any]]
@@ -1042,16 +1052,17 @@ object PlusedInt {
 
 }
 
-Injector()
-  .produceRun(new ModuleDef {
-    make[Int].named(&quot;a&quot;).from(1)
-    make[Int].named(&quot;b&quot;).from(2)
-    make[Pluser]
-    make[PlusedInt].from[PlusedInt.Impl]
-  }) {
-    plusedInt: PlusedInt =&gt; 
-      plusedInt.result
-  }
+def module = new ModuleDef {
+  make[Int].named(&quot;a&quot;).from(1)
+  make[Int].named(&quot;b&quot;).from(2)
+  make[Pluser]
+  make[PlusedInt].from[PlusedInt.Impl]
+}
+
+Injector().produceRun(module) {
+  plusedInt: PlusedInt =&gt; 
+    plusedInt.result()
+}
 // res30: izumi.fundamentals.platform.functional.package.Identity[Int] = 3
 </code></pre>
 <h4><a href="#impl-annotation" name="impl-annotation" class="anchor"><span class="anchor-link"></span></a>@impl annotation</h4>
@@ -1065,6 +1076,36 @@ Injector()
     pluser.plus(a, b)
   }
 }
+</code></pre>
+<h4><a href="#avoiding-constructors-even-further" name="avoiding-constructors-even-further" class="anchor"><span class="anchor-link"></span></a>Avoiding constructors even further</h4>
+<p>When overriding behavior of a class, you may avoid writing a repeat of its constructor in your sub-class by inheriting it with a trait instead. Example:</p>
+<pre class="prettyprint"><code class="language-scala">/**
+  * Note how we avoid writing a call to the super-constructor 
+  * of `PlusedInt.Impl`, such as:
+  *
+  * {{{
+  *   abstract class OverridenPlusedIntImpl(
+  *     pluser: Pluser
+  *   ) extends PlusedInt.Impl(pluser)
+  * }}}
+  *
+  * Which would be unavoidable with class-to-class inheritance.
+  * Using trait-to-class inheritance we avoid writing any boilerplate
+  * besides the overrides we want to apply to the class. 
+  */
+@impl trait OverridenPlusedIntImpl extends PlusedInt.Impl {
+ override def result(): Int = {
+   super.result() * 10
+ }
+}
+
+Injector().produceRun(module overriddenBy new ModuleDef {
+  make[PlusedInt].from[OverridenPlusedIntImpl]
+}) {
+  plusedInt: PlusedInt =&gt; 
+    plusedInt.result()
+}
+// res31: izumi.fundamentals.platform.functional.package.Identity[Int] = 30
 </code></pre>
 <h3><a href="#auto-factories" name="auto-factories" class="anchor"><span class="anchor-link"></span></a>Auto-Factories</h3>
 <p><code>distage</code> can instantiate &lsquo;factory&rsquo; classes from suitable traits. This feature is especially useful with <code>Akka</code>. All unimplemented methods <em>with parameters</em> in a trait will be filled by factory methods:</p>
@@ -1123,14 +1164,14 @@ val factoryModule = new ModuleDef {
   make[Actor.Configuration].from(Actor.Configuration(allCaps = false))
 }
 // factoryModule: AnyRef with ModuleDef = 
-// make[{type.repl.MdocSession::repl.MdocSession.App32::repl.MdocSession.App32.Actor::repl.MdocSession.App32.Actor.Factory}].from(call(π:Factory(repl.MdocSession::repl.MdocSession.App32::repl.MdocSession.App32.Actor::repl.MdocSession.App32.Actor.Configuration): repl.MdocSession::repl.MdocSession.App32::repl.MdocSession.App32.Actor::repl.MdocSession.App32.Actor.Factory)) ((basics.md:980))
-// make[{type.repl.MdocSession::repl.MdocSession.App32::repl.MdocSession.App32.Actor::repl.MdocSession.App32.Actor.Configuration}].from(call(ƒ:&lt;function0&gt;(): repl.MdocSession::repl.MdocSession.App32::repl.MdocSession.App32.Actor::repl.MdocSession.App32.Actor.Configuration)) ((basics.md:981))
+// make[{type.repl.MdocSession::repl.MdocSession.App33::repl.MdocSession.App33.Actor::repl.MdocSession.App33.Actor.Configuration}].from(call(ƒ:&lt;function0&gt;(): repl.MdocSession::repl.MdocSession.App33::repl.MdocSession.App33.Actor::repl.MdocSession.App33.Actor.Configuration)) ((basics.md:1001))
+// make[{type.repl.MdocSession::repl.MdocSession.App33::repl.MdocSession.App33.Actor::repl.MdocSession.App33.Actor.Factory}].from(call(π:Factory(repl.MdocSession::repl.MdocSession.App33::repl.MdocSession.App33.Actor::repl.MdocSession.App33.Actor.Configuration): repl.MdocSession::repl.MdocSession.App33::repl.MdocSession.App33.Actor::repl.MdocSession.App33.Actor.Factory)) ((basics.md:1000))
 
 Injector()
   .produceGet[Actor.Factory](factoryModule)
   .use(_.newActor(&quot;Martin Odersky&quot;).receive(&quot;ping&quot;))
 // Actor `Martin Odersky` received a message: ping
-// res33: izumi.fundamentals.platform.functional.package.Identity[Unit] = ()
+// res34: izumi.fundamentals.platform.functional.package.Identity[Unit] = ()
 </code></pre>
 <p>You can use this feature to concisely provide non-Singleton semantics for some of your components.</p>
 <p>Factory implementations are derived at compile-time by <a href="/latest/snapshot/api/izumi/distage/constructors/FactoryConstructor.html">FactoryConstructor</a> macro and can be summoned at need.</p>
@@ -1210,7 +1251,7 @@ def SyncProgram[F[_]: TagK: Sync] = ProgramModule[F] ++ SyncInterpreters[F]
 // create object graph Resource
 
 val objectsResource = Injector[IO]().produce(SyncProgram[IO], Roots.Everything)
-// objectsResource: izumi.distage.model.definition.Lifecycle[IO, izumi.distage.model.Locator] = izumi.distage.model.definition.Lifecycle$$anon$10@6e4a57cd
+// objectsResource: izumi.distage.model.definition.Lifecycle[IO, izumi.distage.model.Locator] = izumi.distage.model.definition.Lifecycle$$anon$10@3cf4db8a
 
 // run
 
@@ -1227,9 +1268,9 @@ import zio.Task
 
 val ZIOProgram = ProgramModule[Task] ++ SyncInterpreters[Task]
 // ZIOProgram: Module = 
-// make[{type.repl.MdocSession::repl.MdocSession.App34::repl.MdocSession.App34.Validation[=λ %0 → ZIO[-Any,+Throwable,+0]]}].from(call(π:Class(cats.effect.Sync[=λ %0 → ZIO[-Any,+Throwable,+0]]): repl.MdocSession::repl.MdocSession.App34::repl.MdocSession.App34.SyncValidation[=λ %0 → ZIO[-Any,+Throwable,+0]])) ((basics.md:1062))
-// make[{type.repl.MdocSession::repl.MdocSession.App34::repl.MdocSession.App34.TaglessProgram[=λ %0 → ZIO[-Any,+Throwable,+0]]}].from(call(π:Class(cats.Monad[=λ %0 → ZIO[-Any,+Throwable,+0]], repl.MdocSession::repl.MdocSession.App34::repl.MdocSession.App34.Validation[=λ %0 → ZIO[-Any,+Throwable,+0]], repl.MdocSession::repl.MdocSession.App34::repl.MdocSession.App34.Interaction[=λ %0 → ZIO[-Any,+Throwable,+0]]): repl.MdocSession::repl.MdocSession.App34::repl.MdocSession.App34.TaglessProgram[=λ %0 → ZIO[-Any,+Throwable,+0]])) ((basics.md:1041))
-// make[{type.repl.MdocSession::repl.MdocSession.App34::repl.MdocSession.App34.Interaction[=λ %0 → ZIO[-Any,+Throwable,+0]]}].from(call(π:Class(cats.effect.Sync[=λ %0 → ZIO[-Any,+Throwable,+0]]): repl.MdocSession::repl.MdocSession.App34::repl.MdocSession.App34.SyncInteraction[=λ %0 → ZIO[-Any,+Throwable,+0]])) ((basics.md:1063))
+// make[{type.repl.MdocSession::repl.MdocSession.App35::repl.MdocSession.App35.Interaction[=λ %0 → ZIO[-Any,+Throwable,+0]]}].from(call(π:Class(cats.effect.Sync[=λ %0 → ZIO[-Any,+Throwable,+0]]): repl.MdocSession::repl.MdocSession.App35::repl.MdocSession.App35.SyncInteraction[=λ %0 → ZIO[-Any,+Throwable,+0]])) ((basics.md:1083))
+// make[{type.repl.MdocSession::repl.MdocSession.App35::repl.MdocSession.App35.Validation[=λ %0 → ZIO[-Any,+Throwable,+0]]}].from(call(π:Class(cats.effect.Sync[=λ %0 → ZIO[-Any,+Throwable,+0]]): repl.MdocSession::repl.MdocSession.App35::repl.MdocSession.App35.SyncValidation[=λ %0 → ZIO[-Any,+Throwable,+0]])) ((basics.md:1082))
+// make[{type.repl.MdocSession::repl.MdocSession.App35::repl.MdocSession.App35.TaglessProgram[=λ %0 → ZIO[-Any,+Throwable,+0]]}].from(call(π:Class(cats.Monad[=λ %0 → ZIO[-Any,+Throwable,+0]], repl.MdocSession::repl.MdocSession.App35::repl.MdocSession.App35.Validation[=λ %0 → ZIO[-Any,+Throwable,+0]], repl.MdocSession::repl.MdocSession.App35::repl.MdocSession.App35.Interaction[=λ %0 → ZIO[-Any,+Throwable,+0]]): repl.MdocSession::repl.MdocSession.App35::repl.MdocSession.App35.TaglessProgram[=λ %0 → ZIO[-Any,+Throwable,+0]])) ((basics.md:1061))
 </code></pre>
 <p>We may even choose different interpreters at runtime:</p>
 <pre class="prettyprint"><code class="language-scala">import zio.RIO
@@ -1247,8 +1288,8 @@ val RealInterpretersZIO = {
   }
 }
 // RealInterpretersZIO: Module = 
-// make[{type.repl.MdocSession::repl.MdocSession.App34::repl.MdocSession.App34.Interaction[=λ %1:0 → ZIO[-Has[=package::Console::Service],+Throwable,+1:0]]}].from(call(ƒ:&lt;function0&gt;(): repl.MdocSession::repl.MdocSession.App34::repl.MdocSession.App34.RealInteractionZIO)) ((basics.md:1109))
-// make[{type.repl.MdocSession::repl.MdocSession.App34::repl.MdocSession.App34.Validation[=λ %0 → ZIO[-Has[=package::Console::Service],+Throwable,+0]]}].from(call(π:Class(cats.effect.Sync[=λ %0 → ZIO[-Has[=package::Console::Service],+Throwable,+0]]): repl.MdocSession::repl.MdocSession.App34::repl.MdocSession.App34.SyncValidation[=λ %0 → ZIO[-Has[=package::Console::Service],+Throwable,+0]])) ((basics.md:1062))
+// make[{type.repl.MdocSession::repl.MdocSession.App35::repl.MdocSession.App35.Interaction[=λ %1:0 → ZIO[-Has[=package::Console::Service],+Throwable,+1:0]]}].from(call(ƒ:&lt;function0&gt;(): repl.MdocSession::repl.MdocSession.App35::repl.MdocSession.App35.RealInteractionZIO)) ((basics.md:1129))
+// make[{type.repl.MdocSession::repl.MdocSession.App35::repl.MdocSession.App35.Validation[=λ %0 → ZIO[-Has[=package::Console::Service],+Throwable,+0]]}].from(call(π:Class(cats.effect.Sync[=λ %0 → ZIO[-Has[=package::Console::Service],+Throwable,+0]]): repl.MdocSession::repl.MdocSession.App35::repl.MdocSession.App35.SyncValidation[=λ %0 → ZIO[-Has[=package::Console::Service],+Throwable,+0]])) ((basics.md:1082))
 
 def chooseInterpreters(isDummy: Boolean) = {
   val interpreters = if (isDummy) SyncInterpreters[RIO[Console, ?]]
@@ -1262,7 +1303,7 @@ def chooseInterpreters(isDummy: Boolean) = {
 // execute
 
 chooseInterpreters(true)
-// res36: izumi.distage.model.definition.Lifecycle[zio.ZIO[zio.Has[Console.Service], Throwable, β$6$], TaglessProgram[zio.ZIO[zio.Has[Console.Service], Throwable, β$7$]]] = izumi.distage.model.definition.Lifecycle$$anon$9@5ee43a8d
+// res37: izumi.distage.model.definition.Lifecycle[zio.ZIO[zio.Has[Console.Service], Throwable, β$6$], TaglessProgram[zio.ZIO[zio.Has[Console.Service], Throwable, β$7$]]] = izumi.distage.model.definition.Lifecycle$$anon$9@71b56d4d
 </code></pre>
 <h4><a href="#kind-polymorphism" name="kind-polymorphism" class="anchor"><span class="anchor-link"></span></a>Kind polymorphism</h4>
 <p>Modules can be polymorphic over arbitrary kinds - use <code>TagKK</code> to abstract over bifunctors:</p>

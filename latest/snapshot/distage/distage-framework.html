@@ -283,10 +283,10 @@ val module = new ConfigModuleDef {
   ))
 }
 // module: AnyRef with ConfigModuleDef = 
+// make[{type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.OtherConf@other}].from(call(ƒ:izumi.distage.config.codec.DIConfigReader$$Lambda$21206/479216079@256c04a0(izumi.distage.config.model.AppConfig): repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.OtherConf)).tagged(Set(ConfTag(conf))) ((distage-framework.md:46))
 // make[{type.izumi.distage.config.model.AppConfig}].from(call(ƒ:&lt;function0&gt;(): izumi.distage.config.model.AppConfig)) ((distage-framework.md:49))
-// make[{type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.OtherConf@other}].from(call(ƒ:izumi.distage.config.codec.DIConfigReader$$Lambda$21187/642553559@b466bf8(izumi.distage.config.model.AppConfig): repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.OtherConf)).tagged(Set(ConfTag(conf))) ((distage-framework.md:46))
+// make[{type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.Conf}].from(call(ƒ:izumi.distage.config.codec.DIConfigReader$$Lambda$21206/479216079@3b6ca43b(izumi.distage.config.model.AppConfig): repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.Conf)).tagged(Set(ConfTag(conf))) ((distage-framework.md:45))
 // make[{type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.ConfigPrinter}].from(call(π:Class(repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.Conf, repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.OtherConf): repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.ConfigPrinter)) ((distage-framework.md:42))
-// make[{type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.Conf}].from(call(ƒ:izumi.distage.config.codec.DIConfigReader$$Lambda$21187/642553559@68fa18e1(izumi.distage.config.model.AppConfig): repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.Conf)).tagged(Set(ConfTag(conf))) ((distage-framework.md:45))
 
 Injector().produceRun(module) {
   configPrinter: ConfigPrinter =&gt;
@@ -350,19 +350,19 @@ object PetStorePlugin extends PluginDef {
 // pluginConfig: PluginConfig = PluginConfig(List(com.example.petstore),List(),true,false,List(),List())
 
 val appModules = PluginLoader().load(pluginConfig)
-// appModules: Seq[izumi.distage.plugins.PluginBase] = List(
+// appModules: izumi.distage.plugins.load.LoadedPlugins = LoadedPlugins(List(
 // make[{type.com.example.petstore.PetStoreController}].from(call(π:Class(): com.example.petstore.PetStoreController)) ((PetStorePlugin.scala:8))
 // make[{type.com.example.petstore.PetStoreService}].from(call(π:Class(): com.example.petstore.PetStoreService)) ((PetStorePlugin.scala:7))
-// make[{type.com.example.petstore.PetRepository}].from(call(π:Class(): com.example.petstore.PetRepository)) ((PetStorePlugin.scala:6)))
+// make[{type.com.example.petstore.PetRepository}].from(call(π:Class(): com.example.petstore.PetRepository)) ((PetStorePlugin.scala:6))),List(),List())
 </code></pre>
 <p>Wire the collected modules as usual:</p>
 <pre class="prettyprint"><code class="language-scala">// combine all modules into one
 
-val appModule = appModules.merge
+val appModule = appModules.result.merge
 // appModule: izumi.distage.plugins.PluginBase = 
-// make[{type.com.example.petstore.PetStoreController}].from(call(π:Class(): com.example.petstore.PetStoreController)) ((PetStorePlugin.scala:8))
-// make[{type.com.example.petstore.PetStoreService}].from(call(π:Class(): com.example.petstore.PetStoreService)) ((PetStorePlugin.scala:7))
 // make[{type.com.example.petstore.PetRepository}].from(call(π:Class(): com.example.petstore.PetRepository)) ((PetStorePlugin.scala:6))
+// make[{type.com.example.petstore.PetStoreService}].from(call(π:Class(): com.example.petstore.PetStoreService)) ((PetStorePlugin.scala:7))
+// make[{type.com.example.petstore.PetStoreController}].from(call(π:Class(): com.example.petstore.PetStoreController)) ((PetStorePlugin.scala:8))
 
 // launch
 
@@ -373,69 +373,15 @@ Injector()
 // res5: izumi.fundamentals.platform.functional.package.Identity[Unit] = ()
 </code></pre>
 <h3><a href="#compile-time-checks" name="compile-time-checks" class="anchor"><span class="anchor-link"></span></a>Compile-time checks</h3>
-<p>An experimental compile-time verification API is available in the <code>distage-framework</code> module.</p>
-<p>To use it add <code>distage-framework</code> library:</p><dl class="dependency"><dt>sbt</dt><dd><pre class="prettyprint"><code class="language-scala">libraryDependencies += "io.7mind.izumi" %% "distage-framework" % "0.11.0-SNAPSHOT"</code></pre></dd><dt>Maven</dt><dd><pre class="prettyprint"><code class="language-xml">&lt;dependency&gt;
-  &lt;groupId&gt;io.7mind.izumi&lt;/groupId&gt;
-  &lt;artifactId&gt;distage-framework_2.13&lt;/artifactId&gt;
-  &lt;version&gt;0.11.0-SNAPSHOT&lt;/version&gt;
-&lt;/dependency&gt;</code></pre></dd><dt>Gradle</dt><dd><pre class="prettyprint"><code class="language-gradle">dependencies {
-  compile group: 'io.7mind.izumi', name: 'distage-framework_2.13', version: '0.11.0-SNAPSHOT'
-}</code></pre></dd></dl>
-<p>Only plugins defined in a different module can be checked at compile-time.</p>
-<p><code>test</code> scope counts as a separate module.</p>
-<p>Example:</p>
-<p>In main scope:</p>
-<pre class="prettyprint"><code class="language-scala">package com.example
-
-import distage.DIKey
-import distage.StandardAxis.Env
-import distage.config.ConfigModuleDef
-import distage.plugins.PluginDef
-import izumi.distage.staticinjector.plugins.ModuleRequirements
-
-final case class HostPort(host: String, port: Int)
-
-final case class Config(hostPort: HostPort)
-
-final class Service(conf: Config, otherService: OtherService)
-final class OtherService
-
-// error: OtherService is not bound here, even though Service depends on it
-final class AppPlugin extends PluginDef with ConfigModuleDef {
-  tag(Env.Prod)
-
-  make[Service]
-  makeConfig[Config](&quot;config&quot;)
-}
-
-// Declare OtherService as an external dependency
-final class AppRequirements extends ModuleRequirements(
-  // If we remove this line, compilation will rightfully break
-  Set(DIKey[OtherService])
-)
-</code></pre>
-<p>In config:</p>
-<pre class="prettyprint"><code class="language-scala">// src/main/resources/application.conf
-config {
-  host = localhost
-  port = 8080
-}
-</code></pre>
-<p>In test scope:</p>
-<pre class="prettyprint"><code class="language-scala">package com.example.test
-
-import com.example._
-import org.scalatest.wordspec.AnyWordSpec
-import izumi.distage.staticinjector.plugins.StaticPluginChecker
-
-final class AppPluginTest extends AnyWordSpec {
-  &quot;App plugin will work (if OtherService is provided later)&quot; in {
-    StaticPluginChecker.checkWithConfig[AppPlugin, AppRequirements](&quot;mode:prod&quot;, &quot;.*.application.conf&quot;)
-  }
-}
-</code></pre>
-<p><code>checkWithConfig</code> will run at compile-time whenever <code>AppPluginTest</code> is recompiled.</p>
-<p>Note: Since version <code>0.10.0</code>, configuration files are no longer checked for correctness by the compile-time checker, see: <a href="https://github.com/7mind/izumi/issues/763">https://github.com/7mind/izumi/issues/763</a></p>
+<p>WIP on current <code>1.0.0-M1</code>. Version<code>1.0.0</code> will have finalized API.</p>
+<ul>
+  <li><a href="https://github.com/7mind/izumi/pull/1285">https://github.com/7mind/izumi/pull/1285</a></li>
+  <li>(<a href="https://github.com/7mind/izumi/issues/1226">https://github.com/7mind/izumi/issues/1226</a>)</li>
+  <li>
+  <p><a href="/latest/snapshot/api/izumi/distage/framework/PlanCheck.html">izumi.distage.framework.PlanCheck</a></p></li>
+  <li><a href="/latest/snapshot/api/izumi/distage/framework/PlanCheckMacro.html">izumi.distage.framework.PlanCheckMacro</a></li>
+  <li><a href="/latest/snapshot/api/izumi/distage/planning/solver/PlanVerifier.html">izumi.distage.planning.solver.PlanVerifier</a></li>
+</ul>
 </div>
 <div>
 <a href="https://github.com/7mind/izumi/tree/master/doc/microsite/target/mdoc/distage/distage-framework.md" title="Edit this page" class="md-source-file md-edit">
