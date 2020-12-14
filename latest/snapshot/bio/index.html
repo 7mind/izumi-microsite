@@ -143,7 +143,7 @@ data-md-source="github">
     <li><a href="../distage/distage-framework.html" class="page">distage-framework</a></li>
     <li><a href="../distage/distage-framework-docker.html" class="page">distage-framework-docker</a></li>
     <li><a href="../distage/distage-testkit.html" class="page">distage-testkit</a></li>
-    <li><a href="../distage/reference.html" class="page">Syntax Summary</a></li>
+    <li><a href="../distage/reference.html" class="page">Syntax Reference</a></li>
   </ul></li>
   <li><a href="../logstage/index.html" class="page">LogStage</a></li>
   <li><a href="../bio/index.html" class="active page">BIO Hierarchy</a></li>
@@ -164,6 +164,7 @@ data-md-source="github">
   <li><a href="../bio/index.html#bio-hierarchy" class="header">BIO Hierarchy</a>
   <ul>
     <li><a href="../bio/index.html#overview" class="header">Overview</a></li>
+    <li><a href="../bio/index.html#syntax-implicit-punning" class="header">Syntax, Implicit Punning</a></li>
   </ul></li>
 </ul>
 </nav>
@@ -188,6 +189,7 @@ data-md-source="github">
   <li><a href="../bio/index.html#bio-hierarchy" class="header">BIO Hierarchy</a>
   <ul>
     <li><a href="../bio/index.html#overview" class="header">Overview</a></li>
+    <li><a href="../bio/index.html#syntax-implicit-punning" class="header">Syntax, Implicit Punning</a></li>
   </ul></li>
 </ul>
 </nav>
@@ -254,6 +256,19 @@ scalacOptions += &quot;-Xsource:2.13&quot;
 <p>Raw inheritance hierarchy:</p>
 <p><img src="media/bio-hierarchy.svg" alt="BIO-inheritance-hierarchy" /></p>
 <p><a href="media/bio-hierarchy.svg">(image)</a></p>
+<h2><a href="#syntax-implicit-punning" name="syntax-implicit-punning" class="anchor"><span class="anchor-link"></span></a>Syntax, Implicit Punning</h2>
+<p>All implicit syntax in BIO is available automatically without wildcard imports with the help of so-called &ldquo;implicit punning&rdquo;, as in the following example:</p>
+<pre class="prettyprint"><code class="language-scala">import izumi.functional.bio.Monad2
+
+def loop[F[+_, +_]: Monad2]: F[Nothing, Nothing] = {
+  val unitEffect: F[Nothing, Unit] = Monad2[F].unit
+  unitEffect.flatMap(_ =&gt; loop)
+}
+</code></pre>
+<p>Note: a <code>.flatMap</code> method is available on the <code>unitEffect</code> value of an abstract type parameter <code>F</code>, even though we did not import any syntax implicits using a wildcard import.</p>
+<p>The <code>flatMap</code> method was added by the implicit punning on the <code>Monad2</code> name.  In short, implicit punning just means that instead of creating a companion object for a type with the same name as the type, we create &ldquo;companion&rdquo; implicit conversions with the same name. So that whenever you import the type, you are also always importing the syntax-providing implicit conversions.</p>
+<p>This happens to be a great fit for Tagless Final Style, since nearly all TF code will import the names of the used typeclasses.</p>
+<p>Implicit Punning for typeclass syntax relieves the programmer from having to manually import syntax implicits in every file in their codebase.</p>
 </div>
 <div>
 <a href="https://github.com/7mind/izumi/tree/master/doc/microsite/target/mdoc/bio/00_bio.md" title="Edit this page" class="md-source-file md-edit">
