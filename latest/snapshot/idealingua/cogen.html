@@ -201,7 +201,7 @@ data-md-source="github">
 <article class="md-content__inner md-typeset">
 <div class="md-content__searchable">
 <h1><a href="#code-generator-reference" name="code-generator-reference" class="anchor"><span class="anchor-link"></span></a>Code generator reference</h1>
-<p>We support the following concepts: </p>
+<p>We support the following concepts:</p>
 <ol>
   <li>Enumerations</li>
   <li>Algebraic Data Types</li>
@@ -258,7 +258,7 @@ trait PointLike extends Metadata {
   def x: Int
   def name: String
   def id: String
-}      
+}
 </code></pre>
 <h1><a href="#constructs" name="constructs" class="anchor"><span class="anchor-link"></span></a>Constructs</h1>
 <p><em>Notes:</em></p>
@@ -276,7 +276,7 @@ trait PointLike extends Metadata {
 <pre class="prettyprint"><code class="language-scala">trait Person {
   def name: String
   def surname: String
-}      
+}
 </code></pre>
 <h2><a href="#data-data-class" name="data-data-class" class="anchor"><span class="anchor-link"></span></a><code>data</code>: Data Class</h2>
 <p>Differences between Mixins and Data Classes:</p>
@@ -296,11 +296,11 @@ trait PointLike extends Metadata {
 <pre class="prettyprint"><code class="language-idealingua"> mixin Success {
    values: map[str, str]
  }
- 
+
  mixin Failure {
    message: str
  }
- 
+
  adt Result {
    Success
    Failure
@@ -311,15 +311,15 @@ trait PointLike extends Metadata {
 
 trait Success extends Any { def values: scala.collection.immutable.Map[String, String] }
 
-sealed trait Result 
+sealed trait Result
 
 object Result {
   type Element = Result
-  
+
   case class Success(value: Success) extends Result
   case class Failure(value: Failure) extends Result
 }
-       
+
 </code></pre>
 <h2><a href="#alias-type-alias" name="alias-type-alias" class="anchor"><span class="anchor-link"></span></a><code>alias</code>: Type Alias</h2>
 <pre class="prettyprint"><code class="language-idealingua">alias UserId = str
@@ -333,7 +333,7 @@ type UserId = String
 <pre class="prettyprint"><code class="language-idealingua">enum Gender {
   MALE
   FEMALE
-}        
+}
 </code></pre>
 <h3><a href="#scala-output" name="scala-output" class="anchor"><span class="anchor-link"></span></a>Scala output</h3>
 <pre class="prettyprint"><code class="language-scala">sealed trait Gender
@@ -347,7 +347,7 @@ object Gender {
   }
   case object MALE extends Gender { override def toString: String = &quot;MALE&quot; }
   case object FEMALE extends Gender { override def toString: String = &quot;FEMALE&quot; }
-}     
+}
 </code></pre>
 <h2><a href="#id-identifier" name="id-identifier" class="anchor"><span class="anchor-link"></span></a><code>id</code>: Identifier</h2>
 <p>Notes:</p>
@@ -407,7 +407,7 @@ service UserService {
 }
 
 </code></pre>
-<p>Notes: </p>
+<p>Notes:</p>
 <ol>
   <li>Service signature cannot accept anything except of Mixins (improvements planned)</li>
   <li><code>ServerDispatcher</code> allows you to route wrapped result type to an appropriate method of an abstract implementation</li>
@@ -462,16 +462,16 @@ trait UserService[R[_]] extends izumi.idealingua.runtime.model.IDLService[R] {
   import UserService._
   override type InputType = UserService.InUserService
   override type OutputType = UserService.OutUserService
-  
+
   override def inputClass: Class[UserService.InUserService] = classOf[UserService.InUserService]
   override def outputClass: Class[UserService.OutUserService] = classOf[UserService.OutUserService]
-  
+
   def deleteUser(input: UserService.InDeleteUser): Result[UserService.OutDeleteUser]
   def createUser(input: UserService.InCreateUser): Result[UserService.OutCreateUser]
 }
 
 object UserService {
-  sealed trait InUserService extends Any 
+  sealed trait InUserService extends Any
   sealed trait OutUserService extends Any
 
   case class InDeleteUser(id: RecordId) extends UserService.InUserService with WithRecordId
@@ -479,7 +479,7 @@ object UserService {
   case class InCreateUser(balance: Double, email: String) extends UserService.InUserService with UserData with PrivateUserData
   case class OutCreateUser(result: shared.rpc.Result, id: RecordId) extends UserService.OutUserService with WithRecordId with WithResult
 }
-             
+
 </code></pre>
 </div>
 <div>
