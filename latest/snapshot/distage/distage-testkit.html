@@ -262,7 +262,10 @@ data-md-source="github">
   <li>Establish test case contexts  using <a href="https://www.scalatest.org/scaladoc/3.2.0/org/scalatest/verbs/ShouldVerb.html"><code>should</code></a>,  <a href="https://www.scalatest.org/scaladoc/3.2.0/org/scalatest/verbs/MustVerb.html"><code>must</code></a>,  or <a href="https://www.scalatest.org/scaladoc/3.2.0/org/scalatest/verbs/CanVerb.html"><code>can</code></a>.</li>
   <li>Introduce test cases using one of the <code>in</code> methods. These test cases can have a variety of forms, from plain  functions returning an  <a href="https://www.scalatest.org/scaladoc/3.2.0/org/scalatest/Assertions.html">assertion</a>, to effectful functions with  dependencies:
     <ul>
-      <li>No effect type / <code>Identity</code> -  <a href="/latest/snapshot/api/izumi/distage/testkit/services/scalatest/dstest/DistageAbstractScalatestSpec$$LowPriorityIdentityOverloads.html"><code>in</code></a> - <a href="/latest/snapshot/api/izumi/distage/testkit/services/scalatest/dstest/DistageAbstractScalatestSpec$$DSWordSpecStringWrapper.html"><code>in</code> for <code>F[_]</code></a> - <a href="/latest/snapshot/api/izumi/distage/testkit/services/scalatest/dstest/DistageAbstractScalatestSpec$$DSWordSpecStringWrapper2.html"><code>in</code> for <code>F[+_, +_]</code></a> - <a href="/latest/snapshot/api/izumi/distage/testkit/services/scalatest/dstest/DistageAbstractScalatestSpec$$DSWordSpecStringWrapper3.html"><code>in</code> for <code>F[-_, +_, +_]</code></a></li>
+      <li>No effect type / <code>Identity</code> -  <a href="/latest/snapshot/api/izumi/distage/testkit/services/scalatest/dstest/DistageAbstractScalatestSpec$$LowPriorityIdentityOverloads.html"><code>in</code></a></li>
+      <li><a href="/latest/snapshot/api/izumi/distage/testkit/services/scalatest/dstest/DistageAbstractScalatestSpec$$DSWordSpecStringWrapper.html"><code>in</code> for <code>F[_]</code></a></li>
+      <li><a href="/latest/snapshot/api/izumi/distage/testkit/services/scalatest/dstest/DistageAbstractScalatestSpec$$DSWordSpecStringWrapper2.html"><code>in</code> for <code>F[+_, +_]</code></a></li>
+      <li><a href="/latest/snapshot/api/izumi/distage/testkit/services/scalatest/dstest/DistageAbstractScalatestSpec$$DSWordSpecStringWrapper3.html"><code>in</code> for <code>F[-_, +_, +_]</code></a></li>
       <li>Test cases dependent on injectables: <a href="/latest/snapshot/api/izumi/distage/model/providers/Functoid.html"><code>Functoid</code></a></li>
     </ul>
   </li>
@@ -326,7 +329,6 @@ object Score {
 <pre class="prettyprint"><code class="language-scala">package app
 
 import com.typesafe.config.ConfigFactory
-import distage.config.AppConfigModule
 import distage.ModuleDef
 import izumi.distage.testkit.scalatest.{AssertZIO, Spec3}
 
@@ -340,10 +342,7 @@ abstract class Test extends Spec3[ZIO] with AssertZIO {
   override def config = super
     .config.copy(
       moduleOverrides = new ModuleDef {
-        include(AppConfigModule(ConfigFactory.defaultApplication()))
-
         make[Config].from(defaultConfig)
-        make[Console.Service].fromHas(Console.live)
       },
       debugOutput = true,
     )
@@ -365,6 +364,7 @@ abstract class Test extends Spec3[ZIO] with AssertZIO {
 <pre class="prettyprint"><code class="language-scala">package app
 
 class ScoreSimpleTest extends Test {
+
   &quot;Score&quot; should {
 
     &quot;increase by config star value&quot; in {
@@ -377,17 +377,24 @@ class ScoreSimpleTest extends Test {
       assert(actual == expected)
     }
 
-    // Use Config is from the module in the `Test` class above
-    &quot;increase by config start value from DI&quot; in {
+    // Use `Config` from the module in the `Test` class above
+    &quot;increase by config star value from DI&quot; in {
       config: Config =&gt;
         val expected = Score(defaultConfig.starValue)
         val actual = Score.addStar(config, Score.zero)
         assert(actual == expected)
     }
+
   }
 }
 </code></pre>
-<p>MdocSession$App$$anon$2:  - Score should increase by config start value from DI - Score should increase by config start value from DI - Score should increase by config star value</p>
+<pre><code>ScoreSimpleTest:
+  - Score should increase by config star value from DI 
+- Score should increase by config star value from DI
+- Score should increase by config star value
+
+
+</code></pre>
 <h4><a href="#assertions-with-effects" name="assertions-with-effects" class="anchor"><span class="anchor-link"></span></a>Assertions with Effects</h4>
 <p>All of the base classes support test cases that are effects with assertions. Functions returning effects will have arguments provided from the object graph. These test cases are supported by <a href="/latest/snapshot/api/izumi/distage/testkit/services/scalatest/dstest/DistageAbstractScalatestSpec$$DSWordSpecStringWrapper.html"><code>in</code> from DSWordSpecStringWrapper</a> .</p>
 <p>The different effect types fix the <code>F[_]</code> argument for this syntax:</p>
@@ -396,28 +403,40 @@ class ScoreSimpleTest extends Test {
   <li><code>Spec2</code>: <code>F[Throwable, _]</code></li>
   <li><code>Spec3</code>: <code>F[Any, Throwable, _]</code></li>
 </ul>
-<p>With our demonstration application we&rsquo;ll use this to verify the <code>Score.echoConfig</code> method. The <code>Config</code> required is from the <code>distage</code> object graph defined in <code>moduleOverrides</code>. By using a function from <code>Config</code>, the required argument will be injected by <code>distage-testkit</code>.</p>
+<p>With our demonstration application we&rsquo;ll use this to verify the <code>Score.echoConfig</code> method. The <code>Config</code> required is from the <code>distage</code> object graph defined in <code>moduleOverrides</code>. By using a function with a <code>Config</code> argument in <code>in</code>, the required argument will be injected by <code>distage-testkit</code>.</p>
 <pre class="prettyprint"><code class="language-scala">package app
 
 class ScoreEffectsTest extends Test {
   &quot;testkit operations with effects&quot; should {
 
-    &quot;assertions in effects&quot; in {
+    &quot;support assertions in effects&quot; in {
       (config: Config) =&gt;
         for {
           actual &lt;- Score.echoConfig(config)
-          _ &lt;- assertIO(actual == config)
+          _      &lt;- assertIO(actual == config)
         } yield ()
     }
 
-    &quot;assertions from effects&quot; in {
+    &quot;support assertions outside of effect&quot; in {
       (config: Config) =&gt;
-        Score.echoConfig(config) map {
-          actual =&gt; assert(actual == config)
+        for {
+          actual &lt;- Score.echoConfig(config)
+        } yield {
+          assert(actual == config)
         }
     }
   }
 }
+</code></pre>
+<pre><code>ScoreEffectsTest:
+Config(10,256,10)
+Config(10,256,10)
+  - testkit operations with effects should support assertions in effects 
+- testkit operations with effects should support assertions in effects
+  - testkit operations with effects should support assertions outside of effect 
+- testkit operations with effects should support assertions outside of effect
+
+
 </code></pre>
 <h4><a href="#assertions-with-effects-with-environments" name="assertions-with-effects-with-environments" class="anchor"><span class="anchor-link"></span></a>Assertions with Effects with Environments</h4>
 <p><a href="/latest/snapshot/api/izumi/distage/testkit/services/scalatest/dstest/DistageAbstractScalatestSpec$$DSWordSpecStringWrapper3.html">The <code>in</code> method for <code>F[_, _, _]</code> effect types</a> supports injection of environments from the object graph in addition to simple assertions and assertions with effects.</p>
@@ -426,80 +445,102 @@ class ScoreEffectsTest extends Test {
 
 abstract class BonusServiceTest extends Test {
   &quot;BonusService&quot; should {
+
     &quot;initially use default bonus as current&quot; in {
       for {
         bonusService &lt;- ZIO.service[BonusService]
         currentBonus &lt;- bonusService.queryCurrentBonus
-        _ &lt;- putStrLn(s&quot;currentBonus = $currentBonus&quot;)
-        _ &lt;- assertIO(currentBonus == defaultConfig.defaultBonus)
+        _            &lt;- putStrLn(s&quot;currentBonus = $currentBonus&quot;)
+        _            &lt;- assertIO(currentBonus == defaultConfig.defaultBonus)
       } yield ()
     }
 
     &quot;increment by delta&quot; in {
-      val delta = util.Random.nextInt()
       for {
+        delta        &lt;- zio.random.nextInt
         bonusService &lt;- ZIO.service[BonusService]
         initialBonus &lt;- bonusService.queryCurrentBonus
-        actualBonus &lt;- bonusService.increaseCurrentBonus(delta)
+        actualBonus  &lt;- bonusService.increaseCurrentBonus(delta)
         expectedBonus = initialBonus + delta
-        _ &lt;- assertIO(actualBonus == expectedBonus)
+        _            &lt;- assertIO(actualBonus == expectedBonus)
       } yield ()
     }
+
   }
 }
 </code></pre>
-<p>While this compiles this test cannot be run without the object graph containing a <code>BonusService</code> resource. For <code>ZIO[-R, +E, +A]</code>, the <code>Has</code> bindings are injected from <code>ZLayer</code>, <code>ZManaged</code> <code>ZIO</code> or any <code>F[-_, +_, +_]: Local3</code> (from <a href="../bio/index.html">BIO</a> typeclasses). See <a href="basics.html#zio-has-bindings">here for details on ZIO Has injection </a>.</p>
-<p>Our demonstration application has a dummy and production implementation of the <code>BonusService</code>. For each implementation, a <code>ZManaged</code> is provided. With the <code>ZManaged</code> resources added to the object graph test cases can inject <code>Has[BonusService]</code>.</p>
+<p>The <a href="basics.html#zio-has-bindings">ZIO Has injection</a> support extends to the test cases, here we request two components implicitly using the ZIO environment:</p>
+<ul>
+  <li><code>BonusService</code> - is requested by <code>ZIO.service[BonusService]</code></li>
+  <li><code>zio.Random.Service</code> - is requested by <code>zio.random.nextInt</code></li>
+</ul>
+<p>While this compiles just fine, this test cannot be run without the object graph containing a <code>BonusService</code> component!</p>
+<p>Our demonstration application includes <code>dummy</code> and <code>production</code> implementations for <code>BonusService</code>. For each implementation, we define a <code>ZManaged</code> value describing how to create and finalize it. After adding implementations for <code>BonusService</code> component using these <code>ZManaged</code>&rsquo;s as constructors, our test cases will be able to use the component <code>BonusService</code>.</p>
 <pre class="prettyprint"><code class="language-scala">package app
 
 object DummyBonusService {
-  class Impl(var bonusValue: Int) extends BonusService {
-    override def queryCurrentBonus = UIO(bonusValue)
-    override def increaseCurrentBonus(delta: Int) = UIO {
-        bonusValue += delta
-        bonusValue
+
+  class Impl(
+     bonusState: Ref[Int]
+  ) extends BonusService {
+
+    override def queryCurrentBonus: UIO[Int] = {
+      bonusState.get
+    }
+
+    override def increaseCurrentBonus(delta: Int): UIO[Int] = {
+      bonusState.updateAndGet(_ + delta)
     }
   }
 
-  val acquire = Task {
-    new Impl(10)
-  }
+  val acquire: Task[DummyBonusService.Impl] = for {
+    ref &lt;- Ref.make(10)
+    impl = new Impl(ref)
+  } yield impl
 
-  def release: UIO[Unit] = UIO.unit
+  val release: UIO[Unit] = UIO.unit
 
-  val managed = acquire.toManaged(_ =&gt; release)
+  val managed: TaskManaged[DummyBonusService.Impl] =
+    acquire.toManaged(_ =&gt; release)
 }
 </code></pre>
-<p>This small implementation is useful for verification in both automated tests as well as functional prototypes.</p>
+<p>This dummy implementation is useful for verification in both automated tests and functional prototypes.</p>
 <p>For a real system we might build a production implementation like the following. This hypothetical implementation would perform an HTTP request to a REST service. We&rsquo;ll introduce a production service, but this actual query will be unimplemented for our demonstration:</p>
 <pre class="prettyprint"><code class="language-scala">package app
 
 object ProdBonusService {
-  class Impl(console: Console.Service, url: String) extends BonusService {
+
+  class Impl(
+    console: Console.Service,
+    url: String,
+  ) extends BonusService {
+
     override def queryCurrentBonus = for {
       _ &lt;- console.putStrLn(s&quot;querying $url&quot;)
     } yield ???
+
     override def increaseCurrentBonus(delta: Int) = for {
       _ &lt;- console.putStrLn(s&quot;post to $url&quot;)
     } yield ???
   }
 
-  val acquire = for {
+  val acquire: RIO[Has[Console.Service], ProdBonusService.Impl] = for {
     console &lt;- ZIO.service[Console.Service]
-    impl &lt;- Task(new Impl(console, &quot;https://my-bonus-server/current-bonus.json&quot;))
+    impl      = new Impl(console, &quot;https://my-bonus-server/current-bonus.json&quot;)
   } yield impl
 
-  def release: UIO[Unit] = UIO {
-    ()
-  }
+  val release: UIO[Unit] = UIO.unit
 
-  val managed = acquire.toManaged(_ =&gt; release)
+  val managed: RManaged[Has[Console.Service], ProdBonusService.Impl] =
+    acquire.toManaged(_ =&gt; release)
 }
 </code></pre>
 <h4><a href="#pattern-dual-test-tactic" name="pattern-dual-test-tactic" class="anchor"><span class="anchor-link"></span></a>Pattern: Dual Test Tactic</h4>
 <p>The testing of <code>BonusService</code> in our demonstration application will follow the Dual Test Tactic. See our blog post <a href="https://blog.7mind.io/constructive-test-taxonomy.html">Unit, Functional, Integration? You are doing it wrong</a> for a discussion of test taxonomy and the value of this tactic.</p>
-<p>A <code>ZIO</code> resource for <code>BonusService</code> must be in the <code>distage</code> object graph for a <code>Has[BonusService]</code> to be injected into the <code>ZIO</code> environment. One option is to define separate modules for the dummy and production implementations. One module would be referenced by tests and the other only by production. However, this is not as useful as both implementations in the same object graph but different activations.</p>
-<p>Our demonstration application will use the <a href="/latest/snapshot/api/izumi/distage/model/definition/StandardAxis$$Repo$.html">StandardAxis.Repo</a> <code>Dummy</code> and <code>Prod</code> tags:</p>
+<p>A binding for the implementation of <code>BonusService</code> must be passed to <code>distage</code>, to be able to build a <code>Has[BonusService]</code> to inject into the <code>ZIO</code> environment of the test.</p>
+<p>But note that we have two implementations, to use both one option is to define separate modules for the dummy and production implementations. One module would be used by tests and the other only by production.</p>
+<p>However, this is not as declaring both implementations in our modules at the same time but with different activations.</p>
+<p>Our demonstration application will use the <a href="/latest/snapshot/api/izumi/distage/model/definition/StandardAxis$$Repo$.html">StandardAxis.Repo</a> <code>Dummy</code> and <code>Prod</code> axis tags:</p>
 <pre class="prettyprint"><code class="language-scala">package app
 
 import distage.plugins.PluginDef
@@ -516,8 +557,9 @@ object BonusServicePlugin extends PluginDef {
     .tagged(Repo.Prod)
 }
 </code></pre>
-<p>Note that the <code>BonusServicePlugin</code> is not explicitly added to the <code>Test.config</code>: This <code>PluginDef</code> is in the same package as the test, namely <code>app</code>. By default the <code>pluginConfig</code> for the test will include the test&rsquo;s package, which will be scanned by <code>distage</code> for <code>PluginDef</code> instances.</p>
-<p>Continuing with the pattern, a trait will control which repo is activated:</p>
+<p>Here we used <a href="basics.html#zio-has-bindings">ZIO Has injection</a> <code>.fromHas</code> to supply the environment dependencies for <code>ProdBonusService.managed</code>, namely <code>Has[Console.Service]</code>. (Implementation for <code>Console.Service</code> is provided by default from <a href="/latest/snapshot/api/izumi/distage/modules/support/ZIOSupportModule.html">ZIOSupportModule</a>) <code>.fromHas</code> can be used with <code>ZLayer</code>, <code>ZManaged</code> <code>ZIO</code> or any <code>F[-_, +_, +_]: Local3</code> (from <a href="../bio/index.html">BIO</a> typeclasses).</p>
+<p>Note that the <code>BonusServicePlugin</code> is not explicitly added to the <code>Test.config</code>: But, this <code>PluginDef</code> class is defined in the same package as the test, namely in <code>app</code>. By default the <code>pluginConfig</code> for the test will include the test&rsquo;s package, which will be scanned by <code>distage</code> for <code>PluginDef</code> instances.</p>
+<p>Continuing with the pattern, a trait will control which implementation is activated:</p>
 <pre class="prettyprint"><code class="language-scala">package app
 
 trait DummyTest extends Test {
@@ -534,16 +576,23 @@ trait ProdTest extends Test {
     )
 }
 </code></pre>
-<p>With these a production test and a dummy test can be introduced for the demonstration game score application. Note how these are the same scenario, <code>BonusServiceTest</code>, but differ in activations.</p>
+<p>With these, a production test and a dummy test can be introduced for the demonstration game score application. Note how these share the same test code, in <code>BonusServiceTest</code> and differ only in activations.</p>
 <p>When extended beyond this small example, this pattern simplifies system level tests, sanity checks, and even a pragmatic form of <a href="https://en.wikipedia.org/wiki/N-version_programming">N-Version Programming</a>:</p>
 <pre class="prettyprint"><code class="language-scala">package app
 
-final class ProdBonusServiceTest extends BonusServiceTest with ProdTest
+class ProdBonusServiceTest extends BonusServiceTest with ProdTest
 
-final class DummyBonusServiceTest extends BonusServiceTest with DummyTest
+class DummyBonusServiceTest extends BonusServiceTest with DummyTest
 </code></pre>
-<pre>
-</pre>
+<pre><code>DummyBonusServiceTest:
+currentBonus = 10
+  - BonusService should initially use default bonus as current 
+- BonusService should initially use default bonus as current
+  - BonusService should increment by delta 
+- BonusService should increment by delta
+
+
+</code></pre>
 <h4><a href="#test-case-context" name="test-case-context" class="anchor"><span class="anchor-link"></span></a>Test Case Context</h4>
 <p>The <code>testkit</code> ScalaTest base classes include the following verbs for establishing test context:</p>
 <ul>
@@ -552,7 +601,8 @@ final class DummyBonusServiceTest extends BonusServiceTest with DummyTest
   <li><a href="https://www.scalatest.org/scaladoc/3.2.0/org/scalatest/verbs/CanVerb.html"><code>can</code></a></li>
 </ul>
 <h4><a href="#configuration" name="configuration" class="anchor"><span class="anchor-link"></span></a>Configuration</h4>
-<p>The test suite class for your application should override the <code>def config: TestConfig</code> attributed. The config defines the plugin configuration, memoization, module overrides and other options.</p>
+<p>The test suite class for your application should override the <code>def config: TestConfig</code> attribute.</p>
+<p><code>config</code> defines plugin configuration, memoization, module overrides and other options.</p>
 <p>See also:</p>
 <ul>
   <li><a href="/latest/snapshot/api/izumi/distage/testkit/TestConfig.html"><code>TestConfig</code> API docs</a>.</li>
@@ -594,7 +644,7 @@ final class DummyBonusServiceTest extends BonusServiceTest with DummyTest
   <li><code>assertIO[F[_]: Sync](_: Boolean): F[Assertion]</code></li>
 </ul>
 <h3><a href="#execution-order" name="execution-order" class="anchor"><span class="anchor-link"></span></a>Execution Order</h3>
-<p>By default, tests are executed in parallel. This includes tests using <code>ZIO</code>, <code>monix</code>, <code>cats.effect.IO</code>, and any effect type with <code>cats-effect</code> or <a href="../bio/index.html">BIO</a> typeclass instances. <code>Identity</code> is treated as an effect type for imperative code.</p>
+<p>By default, tests are executed in parallel. This includes tests using <code>ZIO</code>, <code>monix</code>, <code>cats.effect.IO</code>, or any effect type with <a href="../bio/index.html">BIO</a> or <code>cats-effect</code> typeclass instances. <code>Identity</code> is treated as an effect type for imperative code.</p>
 <p>Interoperability with all existing Scala effect types is provided by implicit instances of <a href="/latest/snapshot/api/izumi/distage/model/effect/QuasiIO.html"><code>QuasiIO</code></a>, <a href="/latest/snapshot/api/izumi/distage/model/effect/QuasiAsync.html"><code>QuasiAsync</code></a> , and <a href="/latest/snapshot/api/izumi/distage/model/effect/QuasiIORunner.html"><code>QuasiIORunner</code></a>. These components will be provided to the application automatically via <a href="/latest/snapshot/api/izumi/distage/modules/DefaultModule.html"><code>DefaultModule</code></a>, but may be overridden by user bindings if different behavior or support for custom effect types is required.</p>
 <p>The execution of tests is grouped into:</p>
 <ul>
@@ -638,32 +688,50 @@ class NotUsingMemoTest extends DummyTest {
     )
 
   &quot;Not memoizing BonusService&quot; should {
-    &quot;should use a new instance in the first case&quot; in {
+    &quot;use a new instance in the first case&quot; in {
       val delta = util.Random.nextInt()
 
       for {
         bonusService &lt;- ZIO.service[BonusService]
+        _            &lt;- console.putStrLn(s&quot;\n bonusService = ${bonusService} \n&quot;)
+
         // change the bonus service state
         currentBonus &lt;- bonusService.increaseCurrentBonus(delta)
         expectedBonus = defaultConfig.defaultBonus + delta
-        _ &lt;- assertIO(currentBonus == expectedBonus)
+
+        _            &lt;- assertIO(currentBonus == expectedBonus)
       } yield ()
     }
 
-    &quot;and use a new instance in the second case&quot; in {
+    &quot;use a new instance in the second case&quot; in {
       for {
         bonusService &lt;- ZIO.service[BonusService]
+        _            &lt;- console.putStrLn(s&quot;\n bonusService = ${bonusService} \n&quot;)
+
         currentBonus &lt;- bonusService.queryCurrentBonus
+
         // verify the state is unchanged from default
-        _ &lt;- assertIO(currentBonus == defaultConfig.defaultBonus)
+        _            &lt;- assertIO(currentBonus == defaultConfig.defaultBonus)
       } yield ()
     }
   }
 }
 </code></pre>
 <p>These two tests will run sequentially. There is no memoization configured for the dependencies. Each test case will acquire a fresh instance from the object graph. For our demonstration this results in a new <code>BonusService</code> instance for each test case.</p>
-<pre>
-</pre>
+<pre><code>NotUsingMemoTest:
+
+ bonusService = repl.MdocSession$App$DummyBonusService$Impl@19c137bd 
+
+  - Not memoizing BonusService should use a new instance in the first case 
+- Not memoizing BonusService should use a new instance in the first case
+
+ bonusService = repl.MdocSession$App$DummyBonusService$Impl@1669d8a5 
+
+  - Not memoizing BonusService should use a new instance in the second case 
+- Not memoizing BonusService should use a new instance in the second case
+
+
+</code></pre>
 <p>Configuring the test to memoize <code>BonusService</code> will result in the same instance being used for both test cases:</p>
 <pre class="prettyprint"><code class="language-scala">package app
 
@@ -680,34 +748,39 @@ class UsingMemoTest extends DummyTest {
   val delta = util.Random.nextInt()
 
   &quot;Memoizing BonusService&quot; should {
-    &quot;should use a new instance in the first case&quot; in {
+    &quot;use a new instance in the first case&quot; in {
       for {
         bonusService &lt;- ZIO.service[BonusService]
-        _ &lt;- console.putStrLn(s&quot;bonusService = ${bonusService}&quot;)
+        _            &lt;- console.putStrLn(s&quot;\n bonusService = ${bonusService} \n&quot;)
+
         // change the bonus service state
         currentBonus &lt;- bonusService.increaseCurrentBonus(delta)
         expectedBonus = defaultConfig.defaultBonus + delta
-        _ &lt;- assertIO(currentBonus == expectedBonus)
+
+        _            &lt;- assertIO(currentBonus == expectedBonus)
       } yield ()
     }
 
-    &quot;and use the same instance in the second case&quot; in {
+    &quot;use the same instance in the second case&quot; in {
       for {
         bonusService &lt;- ZIO.service[BonusService]
-        _ &lt;- console.putStrLn(s&quot;bonusService = ${bonusService}&quot;)
+        _            &lt;- console.putStrLn(s&quot;\n bonusService = ${bonusService} \n&quot;)
+
         currentBonus &lt;- bonusService.queryCurrentBonus
         expectedBonus = defaultConfig.defaultBonus + delta
+
         // verify the change in the first case modified this bonusService
-        _ &lt;- assertIO(currentBonus == expectedBonus)
+        _            &lt;- assertIO(currentBonus == expectedBonus)
       } yield ()
     }
   }
 }
 </code></pre>
 <p>The memoization roots include <code>BonusService</code>. This results in the same <code>BonusService</code> instance for each test case.</p>
-<p>This test requires the effect of the first test case to occur prior to the second test case. As discussed <a href="#execution-order">Execution Order section</a>: Without configuring test cases for sequential parallel level this order would not be guaranteed.</p>
-<p>Note that the test did <em>not</em> use the same <code>BonusService</code> instance as <code>NotUsingMemoTest</code>. The config for each test has different memoization roots. This results in different <a href="#memoization-environments">memoization environments</a>.</p>
-<p>If the memoization environments are equal then the components will be shared. For our example, any other test with the same memoization environment would use the same <code>BonusService</code> instance.</p>
+<p>This test requires the effect of the first test case to occur prior to the second test case. As discussed <a href="#execution-order">Execution Order section</a>: Without configuring test cases for sequential execution this order would not be guaranteed.</p>
+<p>Note that this test will <em>not</em> use the same <code>BonusService</code> instance as <code>NotUsingMemoTest</code>. The configs for these test have different memoization roots. This results in different <a href="#memoization-environments">memoization environments</a>.</p>
+<p>If the memoization environments are equal then the components will be shared.</p>
+<p>For our example, any other test suite with the same memoization environment will share the same <code>BonusService</code> instance:</p>
 <pre class="prettyprint"><code class="language-scala">package app
 
 class AnotherUsingMemoTest extends DummyTest {
@@ -723,24 +796,38 @@ class AnotherUsingMemoTest extends DummyTest {
     &quot;use the same instance&quot; in {
       for {
         bonusService &lt;- ZIO.service[BonusService]
-        _ &lt;- console.putStrLn(s&quot;bonusService = ${bonusService}&quot;)
+        _            &lt;- console.putStrLn(s&quot;\n bonusService = ${bonusService} \n&quot;)
         currentBonus &lt;- bonusService.queryCurrentBonus
-        _ &lt;- console.putStrLn(s&quot;currentBonus = ${currentBonus}&quot;)
+        _            &lt;- console.putStrLn(s&quot;currentBonus = ${currentBonus}&quot;)
       } yield ()
     }
   }
 }
 </code></pre>
-<p>Both tests, all three test cases, will use same memoization environment and <code>bonusService</code> instance:</p>
-<pre><code>&lt;from logging&gt;
-[info] phase=late, memoEnv=407164314 Memoization environment with suites=1 tests=2 test_suites=
-&lt;from console&gt;
-bonusService = repl.MdocSession$App$DummyBonusService$Impl@2843b83b
-bonusService = repl.MdocSession$App$DummyBonusService$Impl@2843b83b
-bonusService = repl.MdocSession$App$DummyBonusService$Impl@2843b83b
+<p>Both tests suites, all three test cases, will use same memoization environment and the same <code>bonusService</code> instance:</p>
+<pre><code>UsingMemoTest:
+
+ bonusService = repl.MdocSession$App$DummyBonusService$Impl@6e8df89e 
+
+
+ bonusService = repl.MdocSession$App$DummyBonusService$Impl@6e8df89e 
+
+currentBonus = 10
+  - Memoizing BonusService should use a new instance in the first case 
+- Memoizing BonusService should use a new instance in the first case
+
+ bonusService = repl.MdocSession$App$DummyBonusService$Impl@6e8df89e 
+
+  - Memoizing BonusService should use the same instance in the second case 
+- Memoizing BonusService should use the same instance in the second case
+
+
+AnotherUsingMemoTest:
+  - Another test using BonusService should use the same instance 
+- Another test using BonusService should use the same instance
+
+
 </code></pre>
-<pre>
-</pre>
 <h4><a href="#pseudocode" name="pseudocode" class="anchor"><span class="anchor-link"></span></a>Pseudocode</h4>
 <p>Suppose that the lookup of an instance for a component uses a hypothetical function <code>lookup(graph, type and tag)</code>. This function is memoized using storage specific to the current memoization environment. This memoization environment is uniquely defined by the test config options above. This would have pseudocode like:</p>
 <pre><code>rootComponents = planRoots(memoizationRoots, activation, forcedRoots, ...)
@@ -760,18 +847,23 @@ for each test case
     ...
 </code></pre>
 <h3><a href="#forced-roots" name="forced-roots" class="anchor"><span class="anchor-link"></span></a>Forced Roots</h3>
-<p>The <code>forcedRoots</code> of <code>TestConfig</code> specifies components added to the dependencies of every test within this memoization environment. Without memoization these are acquired and release each test case. With memoization these are acquired before all and released after all tests within this memoization environment.</p>
+<p><code>forcedRoots</code> field of <code>TestConfig</code> specifies components to synthetically add to the dependencies of every test within this test suite / memoization environment.</p>
+<p>If forced root components are not memoized, they will be acquired and released for each test case.</p>
+<p>If memoized, they will be acquired and released once, before all and after all the tests within this memoization environment.</p>
+<p>They provide an alternative to ScalaTest&rsquo;s native <code>beforeEach/beforeAll</code> that can use functional effects instead of mutability (However, <code>All</code> here includes the entire memoization environment, not the enclosing test suite)</p>
 <h3><a href="#test-selection" name="test-selection" class="anchor"><span class="anchor-link"></span></a>Test Selection</h3>
 <h4><a href="#using-integrationcheck" name="using-integrationcheck" class="anchor"><span class="anchor-link"></span></a>Using <code>IntegrationCheck</code></h4>
-<p>Implementation classes that inherit from <a href="/latest/snapshot/api/izumi/distage/framework/model/IntegrationCheck.html"><code>izumi.distage.framework.model.IntegrationCheck</code></a> will implement a <code>resourceCheck()</code> method that will be called before the test instantiation to check if external test dependencies (such as Docker containers in <a href="distage-framework-docker.html#docker-test-resources">distage-framework-docker</a>) are available for the test (or role, when in main scope). If not, the test will be canceled/ignored.</p>
-<p>This feature allows you to therefore selectively run only the fast in-memory tests that have no external dependencies. Integration checks are executed only in <code>distage-testkit</code> tests and <code>distage-framework</code>&rsquo;s <a href="distage-framework.html#roles">Roles</a>.</p>
+<p>Implementation classes that inherit from <a href="/latest/snapshot/api/izumi/distage/framework/model/IntegrationCheck.html"><code>izumi.distage.framework.model.IntegrationCheck</code></a> will have their <code>resourceCheck()</code> method called before the test instantiation to check if external test dependencies — such as Docker containers in <a href="distage-framework-docker.html#docker-test-resources">distage-framework-docker</a> — are available for the test (or for the role when in main scope).</p>
+<p>If not, the test will be canceled/ignored.</p>
+<p>This feature therefore allows you to selectively run only the fast in-memory tests that have no external dependencies by shutting down the docker daemon (or another source of external dependencies).</p>
+<p>Integration checks are executed only in <code>distage-testkit</code> tests and <code>distage-framework</code> <a href="distage-framework.html#roles">roles</a>.</p>
 <h3><a href="#references" name="references" class="anchor"><span class="anchor-link"></span></a>References</h3>
 <ul>
+  <li><a href="https://github.com/7mind/distage-example">distage Example Project</a> project shows how to use <code>distage</code>, <code>distage-testkit</code> &amp; <code>distage-framework-docker</code></li>
+  <li>Video for <a href="https://www.youtube.com/watch?v=CzpvjkUukAs">Hyper-pragmatic Pure FP Testing with distage-testkit</a> – is an overview of the concepts, design and usage.</li>
   <li>Slides for <a href="https://www.slideshare.net/7mind/hyperpragmatic-pure-fp-testing-with-distagetestkit">Hyper-pragmatic Pure FP testing with distage-testkit</a></li>
-  <li>Slides for <a href="https://www.slideshare.net/7mind/scala-functional-programming-and-team-productivity">Scala, Functional Programming and Team Productivity  </a></li>
-  <li><a href="https://github.com/7mind/distage-example">distage Example Project</a> project shows how to use  <code>distage</code>, <code>distage-testkit</code> &amp; <code>distage-framework-docker</code></li>
-  <li>The <a href="https://www.youtube.com/watch?v=CzpvjkUukAs">Hyper-pragmatic Pure FP Testing with distage-testkit</a> talk is an  overview of the concepts, design and usage.</li>
-  <li>7mind&rsquo;s blog <a href="https://blog.7mind.io/constructive-test-taxonomy.html">Constructive Test Taxonomy</a></li>
+  <li>Slides for <a href="https://www.slideshare.net/7mind/scala-functional-programming-and-team-productivity">Scala, Functional Programming and Team Productivity</a></li>
+  <li>7mind blog <a href="https://blog.7mind.io/constructive-test-taxonomy.html">Constructive Test Taxonomy</a></li>
   <li><a href="https://en.wikipedia.org/wiki/N-version_programming">N-Version Programming</a></li>
 </ul>
 <h2><a href="#extended-example" name="extended-example" class="anchor"><span class="anchor-link"></span></a>Extended Example</h2>
