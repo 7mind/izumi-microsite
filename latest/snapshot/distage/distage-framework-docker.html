@@ -419,9 +419,9 @@ class ElasticSearchPlusPostgresModule[F[_]: TagK] extends ModuleDef {
 </code></pre>
 <p>would be a host and port mapped to the Postgres container&rsquo;s primary port that have passed the health check.</p>
 <h3><a href="#usage-in-integration-tests" name="usage-in-integration-tests" class="anchor"><span class="anchor-link"></span></a>Usage in Integration Tests</h3>
-<p>A common use case is using Docker containers to provide service implementations for integration test, such as using a PostgreSQL container for verifying an application that uses a PostgreSQL database. <code>distage</code> container resources are easy to integrate as providers.</p>
+<p>A common use case is using Docker containers to provide service implementations for integration test, such as using a PostgreSQL container for verifying an application that uses a PostgreSQL database.</p>
 <p>Consider the example application below. This application is written to depend on a <a href="https://tpolecat.github.io/doobie/">doobie</a> <code>Transactor</code>, which is constructed from a <code>PostgresServerConfig</code>.</p>
-<pre class="prettyprint"><code class="language-scala">import cats.effect.ContextShift
+<pre class="prettyprint"><code class="language-scala">import cats.effect.{Async, ContextShift}
 import doobie.Transactor
 import doobie.syntax.connectionio._
 import doobie.syntax.string._
@@ -452,15 +452,14 @@ final case class PostgresServerConfig(
 
 object TransactorFromConfigModule extends ModuleDef {
   make[Transactor[IO]].from {
-    (config: PostgresServerConfig, contextShift: ContextShift[IO]) =&gt;
-      implicit val CS = contextShift
+    (config: PostgresServerConfig, async: Async[IO], contextShift: ContextShift[IO]) =&gt;
 
       Transactor.fromDriverManager[IO](
         driver = &quot;org.postgresql.Driver&quot;,
         url    = s&quot;jdbc:postgresql://${config.host}:${config.port}/${config.database}&quot;,
         user   = config.username,
         pass   = config.password,
-      )
+      )(async, contextShift)
   }
 }
 </code></pre>

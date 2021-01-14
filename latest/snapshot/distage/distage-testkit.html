@@ -234,6 +234,7 @@ data-md-source="github">
   <li><a href="../distage/distage-testkit.html#resource-reuse-memoization" class="header">Resource Reuse - Memoization</a>
   <ul>
     <li><a href="../distage/distage-testkit.html#memoization-environments" class="header">Memoization Environments</a></li>
+    <li><a href="../distage/distage-testkit.html#memoization-levels" class="header">Memoization Levels</a></li>
     <li><a href="../distage/distage-testkit.html#examples" class="header">Examples</a></li>
     <li><a href="../distage/distage-testkit.html#pseudocode" class="header">Pseudocode</a></li>
   </ul></li>
@@ -396,7 +397,7 @@ class ScoreSimpleTest extends Test {
 
 </code></pre>
 <h4><a href="#assertions-with-effects" name="assertions-with-effects" class="anchor"><span class="anchor-link"></span></a>Assertions with Effects</h4>
-<p>All of the base classes support test cases that are effects with assertions. Functions returning effects will have arguments provided from the object graph. These test cases are supported by <a href="/latest/snapshot/api/izumi/distage/testkit/services/scalatest/dstest/DistageAbstractScalatestSpec$$DSWordSpecStringWrapper.html"><code>in</code> from DSWordSpecStringWrapper</a> .</p>
+<p>All of the base classes support test cases that are effects with assertions. Functions returning effects will have arguments provided from the object graph. These test cases are supported by <a href="/latest/snapshot/api/izumi/distage/testkit/services/scalatest/dstest/DistageAbstractScalatestSpec$$DSWordSpecStringWrapper.html"><code>in</code> from DSWordSpecStringWrapper</a>.</p>
 <p>The different effect types fix the <code>F[_]</code> argument for this syntax:</p>
 <ul>
   <li><code>Spec1</code>: <code>F[_]</code></li>
@@ -430,11 +431,11 @@ class ScoreEffectsTest extends Test {
 </code></pre>
 <pre><code>ScoreEffectsTest:
 Config(10,256,10)
-  - testkit operations with effects should support assertions in effects 
-- testkit operations with effects should support assertions in effects
-Config(10,256,10)
   - testkit operations with effects should support assertions outside of effect 
 - testkit operations with effects should support assertions outside of effect
+Config(10,256,10)
+  - testkit operations with effects should support assertions in effects 
+- testkit operations with effects should support assertions in effects
 
 
 </code></pre>
@@ -585,9 +586,9 @@ class ProdBonusServiceTest extends BonusServiceTest with ProdTest
 class DummyBonusServiceTest extends BonusServiceTest with DummyTest
 </code></pre>
 <pre><code>DummyBonusServiceTest:
+currentBonus = 10
   - BonusService should increment by delta 
 - BonusService should increment by delta
-currentBonus = 10
   - BonusService should initially use default bonus as current 
 - BonusService should initially use default bonus as current
 
@@ -648,32 +649,65 @@ currentBonus = 10
 <p>Interoperability with all existing Scala effect types is provided by implicit instances of <a href="/latest/snapshot/api/izumi/distage/model/effect/QuasiIO.html"><code>QuasiIO</code></a>, <a href="/latest/snapshot/api/izumi/distage/model/effect/QuasiAsync.html"><code>QuasiAsync</code></a> , and <a href="/latest/snapshot/api/izumi/distage/model/effect/QuasiIORunner.html"><code>QuasiIORunner</code></a>. These components will be provided to the application automatically via <a href="/latest/snapshot/api/izumi/distage/modules/DefaultModule.html"><code>DefaultModule</code></a>, but may be overridden by user bindings if different behavior or support for custom effect types is required.</p>
 <p>The execution of tests is grouped into:</p>
 <ul>
-  <li><a href="#resource-reuse-memoization">memoization environments</a>.</li>
+  <li><a href="#resource-reuse-memoization">memoization levels</a>.</li>
   <li>test suite</li>
   <li>test cases</li>
 </ul>
-<p>The default is to run all of these in parallel. The <a href="/latest/snapshot/api/izumi/distage/testkit/TestConfig.html"><code>TestConfig</code></a> has options to change the behavior for each of these groups. The default is <a href="/latest/snapshot/api/izumi/distage/testkit/TestConfig$$ParallelLevel$$Unlimited$.html"><code>ParallelLevel.Unlimited</code></a> which does not constrain the number of parallel tests. <code>ParallelLevel.Fixed(n: Int)</code> limits the execution to at most <code>n</code> test cases. While <code>ParallelLevel.Sequential</code> executes the test cases one at a time.</p>
+<p>The default is to run all of these in parallel.</p>
+<p>The <a href="/latest/snapshot/api/izumi/distage/testkit/TestConfig.html"><code>TestConfig</code></a> has options to change the behavior for each of these groups. The default is <a href="/latest/snapshot/api/izumi/distage/testkit/TestConfig$$ParallelLevel$$Unlimited$.html"><code>ParallelLevel.Unlimited</code></a> which does not constrain the number of parallel tests. <code>ParallelLevel.Fixed(n: Int)</code> limits the execution to at most <code>n</code> test cases. While <code>ParallelLevel.Sequential</code> executes the test cases one at a time.</p>
 <ul>
-  <li><code>parallelEnvs</code> - Parallel level for distinct memoization environments.</li>
-  <li><code>parallelSuites</code> - Parallel level for test suites.</li>
-  <li><code>parallelTests</code> - Parallel level for test cases.</li>
+  <li><code>parallelEnvs</code> - Parallelism level for distinct memoization environments.</li>
+  <li><code>parallelSuites</code> - Parallelism level for test suites.</li>
+  <li><code>parallelTests</code> - Parallelism level for test cases.</li>
 </ul>
 <p>If a group is configured to execute sequentially this will execute after the parallel tests.</p>
-<p>For example, the <code>BonusServiceTest</code> above consists of two test cases and one test suite. Both test cases will be executed in parallel using the async behavior of the effect type. The <code>NotUsingMemoTest</code> and <code>UsingMemoTest</code> below demonstrate executing the test cases sequentially for each test suite. However, the test suites will execute in parallel as they use the same memoization environment.</p>
+<p>For example, the <code>BonusServiceTest</code> above consists of two test cases and one test suite. Both test cases will be executed in parallel using the capabilities of the effect type.</p>
+<p>The <code>NotUsingMemoTest</code> and <code>UsingMemoTest</code> test suites below demonstrate executing the test cases sequentially for each test suite. However, the two suites themselves will execute in parallel as they are in the same memoization environment.</p>
 <h3><a href="#resource-reuse-memoization" name="resource-reuse-memoization" class="anchor"><span class="anchor-link"></span></a>Resource Reuse - Memoization</h3>
-<p>Injected values are summoned from the object graph for each test. Without using memoization, the components will be acquired and released for each test. This may be unwanted. For example, a single PostgreSQL container may be required for a sequence of test cases. In which case the PostgreSQL component should be memoized for the duration of those test cases. Configuring memoization enables changing whether instantiating a component results in a fresh component or reuses an existing, memoized, instance.</p>
+<p>For each test, a new object graph with injected values is created. Without using memoization, all components will be created, acquired and released anew for each test case. This may be unwanted. For example, you may wish to reuse a single PostgreSQL container for a sequence of test cases. In which case the PostgreSQL component should be memoized for the duration of those test cases.</p>
+<p>Configuring memoization determines whether summoning a component results in a fresh component or reuses an existing, memoized, instance.</p>
 <p>Further, the memoization environment determines how the test cases are scheduled for execution. See <a href="#execution-order">the execution order section for further information.</a></p>
 <h4><a href="#memoization-environments" name="memoization-environments" class="anchor"><span class="anchor-link"></span></a>Memoization Environments</h4>
-<p>The memoization applied when an component is summoned is defined by the <em>memoization environment</em>. Each distinct memoization environment uses a distinct memoization store. When a component instance is memoized that instance is shared across all tests that use the same memoization environment. The <a href="/latest/snapshot/api/izumi/distage/testkit/TestConfig.html"><code>TestConfig</code></a> contains the options that define the memoization environment:</p>
+<p>Memoization strategy applied when a component is summoned is defined by the <em>memoization environment</em>. Each distinct memoization environment uses a distinct memoization store. When a component instance is memoized that instance is shared across all tests that use the same memoization environment. <a href="/latest/snapshot/api/izumi/distage/testkit/TestConfig.html"><code>TestConfig</code></a> contains the options that define the memoization environment:</p>
 <ol>
   <li><code>memoizationRoots</code> - These components will be acquired once and shared across all tests that used the same  memoization environment.</li>
-  <li><code>activation</code> - Chosen activation axis. Changes in Activation that alter implementations of components in  memoizationRoots OR their dependencies will cause the test to execute in a new memoization environment.</li>
+  <li><code>activation</code> - Chosen activation axis. Differences in Activation that affect the memoized part of the graph (that  alter implementations of components in <code>memoizationRoots</code> <em>or</em> their transitive dependencies) will  cause the test to execute in a new memoization environment.</li>
   <li><code>pluginConfig</code> - Defines the plugins to source module definitions.</li>
-  <li><code>forcedRoots</code> - Components treated as a dependency of every test. A component added to this and  <code>memoizationRoots</code> will be acquired at the start of all tests and released at the end of all tests.</li>
+  <li><code>forcedRoots</code> - Components treated as a dependency of every test. A component added both to <code>forcedRoots</code> and  <code>memoizationRoots</code> will be acquired at the start of all tests and released at the end of all tests in the memoization  environment.</li>
   <li><code>moduleOverrides</code> - Overrides the modules from <code>pluginConfig</code>.</li>
 </ol>
-<p>The module environment depends on instantiation of the <code>memoizationRoots</code> and <code>forcedRoots</code> components. Changes to the config that alter implementations of these components <em>or</em> their dependencies will change the memoization environment used. This includes, but is not limited to, changes to <code>activation</code>, <code>pluginConfig</code> and <code>moduleOverrides</code>.</p>
-<p>When the <code>TestConfig</code> option <a href="/latest/snapshot/api/izumi/distage/testkit/TestConfig.html"><code>debugOutput</code></a> is true the debug output will include memoization environment diagnostics. This can also be controlled using the <code>izumi.distage.testkit.debug</code> system property.</p>
+<p>The module environment depends on instantiation of the <code>memoizationRoots</code> components. Changes to the config that alter implementations of these components <em>or</em> their dependencies will change the memoization environment used. This includes, but is not limited to, changes to <code>activation</code>, <code>pluginConfig</code> and <code>moduleOverrides</code>.</p>
+<p>When the <code>TestConfig</code> option <a href="/latest/snapshot/api/izumi/distage/testkit/TestConfig.html"><code>debugOutput</code></a> is true the debug output will include memoization environment diagnostics. This can also be controlled using the <a href="izumi.distage.testkit.DebugProperties$"><code>izumi.distage.testkit.debug</code></a> system property.</p>
+<h4><a href="#memoization-levels" name="memoization-levels" class="anchor"><span class="anchor-link"></span></a>Memoization Levels</h4>
+<p>Since version <code>1.0</code> the above memoization environments scheme has been generalized to support unlimited nesting of memoization environments.</p>
+<p>Nested memoization levels allow more and better sharing of heavy components among test suites. With previous strategy of single-level memoization environments, any change in <code>TestConfig</code> that forces a new memoization environment would cause every single memoized component to be recreated in a new environment.</p>
+<p>With new strategy, the memoization environment may be manually partitioned into levels and if a change in <code>TestConfig</code> does not cause a divergence at one of the levels, the nested levels may then fully reuse the object sub-graph of all parent levels that do not diverge.</p>
+<p>For clarity, the memoization tree structure is printed before test runs. For example, a memoization tree of a project with the following test suites:</p>
+<pre class="prettyprint"><code class="language-scala">class SameLevel_1_WithActivationsOverride extends Spec3[ZIO] {
+  override protected def config: TestConfig = {
+    super.config.copy(
+        memoizationRoots = Map(
+          1 -&gt; Set(DIKey[MemoizedInstance], DIKey[MemoizedLevel1]),
+          2 -&gt; Set(DIKey[MemoizedLevel2]),
+        ),
+    )
+  }
+}
+
+class SameLevel_1_2_WithAdditionalLevel3 extends SameLevel_1_WithActivationsOverride {
+  override protected def config: TestConfig = {
+    super.config.copy(
+      memoizationRoots =
+        super.config.memoizationRoots ++
+        Set(DIKey[MemoizedLevel3]),
+    )
+  }
+}
+</code></pre>
+<p>May be visualized as follows:</p>
+<p><img src="media/memoization-tree.png" alt="Memoization Tree Log during tests" /></p>
+<p>Technical note: divergence of memoization levels is calculated based on equality of <a href="debugging.html#pretty-printing-plans">recipes of future object graphs</a>, not equality of allocated/existing object graphs.</p>
+<p>Note: <a href="https://github.com/7mind/izumi/issues/1188">original github ticket</a></p>
 <h4><a href="#examples" name="examples" class="anchor"><span class="anchor-link"></span></a>Examples</h4>
 <p>The first example will acquire the <code>BonusService</code> for each test case. This will not use memoization.</p>
 <pre class="prettyprint"><code class="language-scala">package app
@@ -720,12 +754,12 @@ class NotUsingMemoTest extends DummyTest {
 <p>These two tests will run sequentially. There is no memoization configured for the dependencies. Each test case will acquire a fresh instance from the object graph. For our demonstration this results in a new <code>BonusService</code> instance for each test case.</p>
 <pre><code>NotUsingMemoTest:
 
- bonusService = repl.MdocSession$App$DummyBonusService$Impl@43ebe316 
+ bonusService = repl.MdocSession$App$DummyBonusService$Impl@12603366 
 
   - Not memoizing BonusService should use a new instance in the first case 
 - Not memoizing BonusService should use a new instance in the first case
 
- bonusService = repl.MdocSession$App$DummyBonusService$Impl@2b9b2d71 
+ bonusService = repl.MdocSession$App$DummyBonusService$Impl@ab24eba 
 
   - Not memoizing BonusService should use a new instance in the second case 
 - Not memoizing BonusService should use a new instance in the second case
@@ -807,16 +841,16 @@ class AnotherUsingMemoTest extends DummyTest {
 <p>Both tests suites, all three test cases, will use same memoization environment and the same <code>bonusService</code> instance:</p>
 <pre><code>UsingMemoTest:
 
- bonusService = repl.MdocSession$App$DummyBonusService$Impl@142725e2 
+ bonusService = repl.MdocSession$App$DummyBonusService$Impl@407ef929 
 
 
- bonusService = repl.MdocSession$App$DummyBonusService$Impl@142725e2 
+ bonusService = repl.MdocSession$App$DummyBonusService$Impl@407ef929 
 
-currentBonus = -186452201
+currentBonus = 1963958659
   - Memoizing BonusService should use a new instance in the first case 
 - Memoizing BonusService should use a new instance in the first case
 
- bonusService = repl.MdocSession$App$DummyBonusService$Impl@142725e2 
+ bonusService = repl.MdocSession$App$DummyBonusService$Impl@407ef929 
 
   - Memoizing BonusService should use the same instance in the second case 
 - Memoizing BonusService should use the same instance in the second case
@@ -851,6 +885,7 @@ for each test case
 <p>If forced root components are not memoized, they will be acquired and released for each test case.</p>
 <p>If memoized, they will be acquired and released once, before all and after all the tests within this memoization environment.</p>
 <p>They provide an alternative to ScalaTest&rsquo;s native <code>beforeEach/beforeAll</code> that can use functional effects instead of mutability (However, <code>All</code> here includes the entire memoization environment, not the enclosing test suite)</p>
+<p>Forced roots may be configured per-activation / combination of activations, e.g. you may force postgres table setup to happen only in test environments with <code>Repo -&gt; Repo.Prod</code> activation.</p>
 <h3><a href="#test-selection" name="test-selection" class="anchor"><span class="anchor-link"></span></a>Test Selection</h3>
 <h4><a href="#using-integrationcheck" name="using-integrationcheck" class="anchor"><span class="anchor-link"></span></a>Using <code>IntegrationCheck</code></h4>
 <p>Implementation classes that inherit from <a href="/latest/snapshot/api/izumi/distage/framework/model/IntegrationCheck.html"><code>izumi.distage.framework.model.IntegrationCheck</code></a> will have their <code>resourceCheck()</code> method called before the test instantiation to check if external test dependencies — such as Docker containers in <a href="distage-framework-docker.html#docker-test-resources">distage-framework-docker</a> — are available for the test (or for the role when in main scope).</p>

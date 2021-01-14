@@ -165,6 +165,9 @@ data-md-source="github">
   <ul>
     <li><a href="../bio/index.html#overview" class="header">Overview</a></li>
     <li><a href="../bio/index.html#syntax-implicit-punning" class="header">Syntax, Implicit Punning</a></li>
+    <li><a href="../bio/index.html#cats-effect-compatibilty" class="header">cats-effect compatibilty</a></li>
+    <li><a href="../bio/index.html#data-types" class="header">Data Types</a></li>
+    <li><a href="../bio/index.html#misc-capabilities" class="header">Misc Capabilities</a></li>
   </ul></li>
 </ul>
 </nav>
@@ -190,6 +193,9 @@ data-md-source="github">
   <ul>
     <li><a href="../bio/index.html#overview" class="header">Overview</a></li>
     <li><a href="../bio/index.html#syntax-implicit-punning" class="header">Syntax, Implicit Punning</a></li>
+    <li><a href="../bio/index.html#cats-effect-compatibilty" class="header">cats-effect compatibilty</a></li>
+    <li><a href="../bio/index.html#data-types" class="header">Data Types</a></li>
+    <li><a href="../bio/index.html#misc-capabilities" class="header">Misc Capabilities</a></li>
   </ul></li>
 </ul>
 </nav>
@@ -269,6 +275,16 @@ def loop[F[+_, +_]: Monad2]: F[Nothing, Nothing] = {
 <p>The <code>flatMap</code> method was added by the implicit punning on the <code>Monad2</code> name.  In short, implicit punning just means that instead of creating a companion object for a type with the same name as the type, we create &ldquo;companion&rdquo; implicit conversions with the same name. So that whenever you import the type, you are also always importing the syntax-providing implicit conversions.</p>
 <p>This happens to be a great fit for Tagless Final Style, since nearly all TF code will import the names of the used typeclasses.</p>
 <p>Implicit Punning for typeclass syntax relieves the programmer from having to manually import syntax implicits in every file in their codebase.</p>
+<h2><a href="#cats-effect-compatibilty" name="cats-effect-compatibilty" class="anchor"><span class="anchor-link"></span></a>cats-effect compatibilty</h2>
+<p>Import <code>izumi.functional.bio.catz._</code> for shim compatibilty with cats-effect. You can run <code>http4s</code> and all the other cats-effect libraries with just BIO typeclasses, without requiring any cats-effect typeclasses.</p>
+<h2><a href="#data-types" name="data-types" class="anchor"><span class="anchor-link"></span></a>Data Types</h2>
+<p><code>Ref2/3</code>, <code>Promise2/3</code> and <code>Semaphore2/3</code> provide basic concurrent mutable state primitives. They require a <code>Primitives2/3</code> capability to create. With <code>Primitiives*[F]</code> in implicit scope, use <code>F.mkRef</code>/<code>F.mkPromise</code>/<code>F.mkSemaphore</code> respectively. (See also example at top of the page)</p>
+<p><code>Free</code> monad, as well as <code>FreeError</code> and <code>FreePanic</code> provide building blocks for DSLs when combined with a DSL describing functor.</p>
+<p><code>Morphism1/2/3</code> provide unboxed natural transformations for functors with 1,2,3-arity respectively, with <code>Isomorphism1/2/3</code> modeling two-way transformations.</p>
+<h2><a href="#misc-capabilities" name="misc-capabilities" class="anchor"><span class="anchor-link"></span></a>Misc Capabilities</h2>
+<p><code>Clock1/2/3</code> gives access to current time.</p>
+<p><code>Entropy1/2/3</code> models random numbers.</p>
+<p><code>UnsafeRun2/3</code> allows executing effects (it is required for conversion to cats&rsquo; <code>ConcurrentEffect</code> which also allows unsafe running)</p>
 </div>
 <div>
 <a href="https://github.com/7mind/izumi/tree/master/doc/microsite/target/mdoc/bio/00_bio.md" title="Edit this page" class="md-source-file md-edit">

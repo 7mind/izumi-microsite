@@ -311,7 +311,7 @@ import com.example.myapp.MainLauncher
 
 object WiringCheck extends PlanCheck.Main(MainLauncher)
 </code></pre>
-<p>This object will emit compile-time errors for any issues or omissions in your <code>ModuleDefs</code>, it will be recompiled as necessary to provide feedback during development.</p>
+<p>This object will emit compile-time errors for any issues or omissions in your <code>ModuleDefs</code>. It will recompile itself as necessary to provide feedback during development.</p>
 <p>By default, all possible roles and activations are checked efficiently.</p>
 <p>You may exclude specific roles or activations from the check by passing a <a href="/latest/snapshot/api/izumi/distage/framework/PlanCheckConfig.html">PlanCheckConfig</a> case class to PlanCheck API. Most options in <code>PlanCheckConfig</code> can also be set using system properties, see <a href="/latest/snapshot/api/izumi/distage/framework/DebugProperties$.html">DebugProperties</a>.</p>
 <h3><a href="#checking-default-config" name="checking-default-config" class="anchor"><span class="anchor-link"></span></a>Checking default config</h3>
@@ -401,10 +401,10 @@ val module = new ConfigModuleDef {
   ))
 }
 // module: AnyRef with ConfigModuleDef = 
+// make[{type.repl.MdocSession::repl.MdocSession.App4::repl.MdocSession.App4.OtherConf@other}].from(call(ƒ:izumi.distage.config.codec.DIConfigReader$$Lambda$22245/1108795763@2be32d57(izumi.distage.config.model.AppConfig): repl.MdocSession::repl.MdocSession.App4::repl.MdocSession.App4.OtherConf)).tagged(Set(ConfTag(conf))) ((distage-framework.md:176))
 // make[{type.repl.MdocSession::repl.MdocSession.App4::repl.MdocSession.App4.ConfigPrinter}].from(call(π:Class(repl.MdocSession::repl.MdocSession.App4::repl.MdocSession.App4.Conf, repl.MdocSession::repl.MdocSession.App4::repl.MdocSession.App4.OtherConf): repl.MdocSession::repl.MdocSession.App4::repl.MdocSession.App4.ConfigPrinter)) ((distage-framework.md:172))
-// make[{type.repl.MdocSession::repl.MdocSession.App4::repl.MdocSession.App4.OtherConf@other}].from(call(ƒ:izumi.distage.config.codec.DIConfigReader$$Lambda$22168/24083861@621b30ad(izumi.distage.config.model.AppConfig): repl.MdocSession::repl.MdocSession.App4::repl.MdocSession.App4.OtherConf)).tagged(Set(ConfTag(conf))) ((distage-framework.md:176))
 // make[{type.izumi.distage.config.model.AppConfig}].from(call(ƒ:&lt;function0&gt;(): izumi.distage.config.model.AppConfig)) ((distage-framework.md:179))
-// make[{type.repl.MdocSession::repl.MdocSession.App4::repl.MdocSession.App4.Conf}].from(call(ƒ:izumi.distage.config.codec.DIConfigReader$$Lambda$22168/24083861@186265e1(izumi.distage.config.model.AppConfig): repl.MdocSession::repl.MdocSession.App4::repl.MdocSession.App4.Conf)).tagged(Set(ConfTag(conf))) ((distage-framework.md:175))
+// make[{type.repl.MdocSession::repl.MdocSession.App4::repl.MdocSession.App4.Conf}].from(call(ƒ:izumi.distage.config.codec.DIConfigReader$$Lambda$22245/1108795763@5e8b428c(izumi.distage.config.model.AppConfig): repl.MdocSession::repl.MdocSession.App4::repl.MdocSession.App4.Conf)).tagged(Set(ConfTag(conf))) ((distage-framework.md:175))
 
 Injector().produceRun(module) {
   configPrinter: ConfigPrinter =&gt;
@@ -440,9 +440,11 @@ Injector().produceRun(module) {
   <li>resources: <code>role1[-reference,-dev].conf</code>, <code>role2[-reference,-dev].conf</code>, ,<code>application[-reference,-dev].conf</code>, <code>common[-reference,-dev].conf</code></li>
 </ul>
 <h2><a href="#plugins" name="plugins" class="anchor"><span class="anchor-link"></span></a>Plugins</h2>
-<p><code>distage-extension-plugins</code> module adds classpath discovery for modules that inherit a marker trait <code>PluginBase</code>. Plugins enable extreme late-binding; e.g. they allow a program to extend itself at launch time with new <code>Plugin</code> classes on the classpath. Plugins are compatible with <a href="distage-framework.html#compile-time-checks">compile-time checks</a> as long as they&rsquo;re defined in a separate module.</p>
-<p>To use plugins, first add the <code>distage-extension-plugins</code> library:</p><dl class="dependency"><dt>sbt</dt><dd><pre class="prettyprint"><code class="language-scala">libraryDependencies += "io.7mind.izumi" %% "distage-extension-plugins" % "1.0.2-SNAPSHOT"</code></pre></dd></dl>
-<p>Create a module extending the <code>PluginDef</code> trait instead of <code>ModuleDef</code>:</p>
+<p><code>distage-extension-plugins</code> module adds classpath discovery for modules that inherit a marker trait <code>PluginBase</code>.</p>
+<p>Plugins reduce friction in adding new components, a programmer needs only to define new plugins and does not also have to stop to add a new plugin to a central wiring point. Plugins also enable extreme late-binding: they allow a program to extend itself at launch time with new <code>Plugin</code> classes on the classpath.</p>
+<p>Plugins are compatible with <a href="distage-framework.html#compile-time-checks">compile-time checks</a> as long as they&rsquo;re defined in a separate module.</p>
+<p>To use plugins, add the <code>distage-extension-plugins</code> library:</p><dl class="dependency"><dt>sbt</dt><dd><pre class="prettyprint"><code class="language-scala">libraryDependencies += "io.7mind.izumi" %% "distage-extension-plugins" % "1.0.2-SNAPSHOT"</code></pre></dd></dl>
+<p>To declare a plugin, create a top-level object extending the <code>PluginDef</code> trait instead of <code>ModuleDef</code>:</p>
 <pre class="prettyprint"><code class="language-scala">package com.example.petstore
 
 import distage.Injector
@@ -454,7 +456,7 @@ object PetStorePlugin extends PluginDef {
   make[PetStoreController]
 }
 </code></pre>
-<p>Collect all the <code>PluginDef</code> classes and objects in a package:</p>
+<p>Use <code>PluginLoader</code> to find all the <code>PluginDef</code> objects in a specific package or its subpackages:</p>
 <pre class="prettyprint"><code class="language-scala">val pluginConfig = PluginConfig.cached(
   // packages to scan
   packagesEnabled = Seq(&quot;com.example.petstore&quot;)
@@ -467,8 +469,8 @@ val appModules = PluginLoader().load(pluginConfig)
 // make[{type.com.example.petstore.PetStoreService}].from(call(π:Class(): com.example.petstore.PetStoreService)) ((PetStorePlugin.scala:7))
 // make[{type.com.example.petstore.PetRepository}].from(call(π:Class(): com.example.petstore.PetRepository)) ((PetStorePlugin.scala:6))),List(),List())
 </code></pre>
-<p>Wire the collected modules as usual:</p>
-<pre class="prettyprint"><code class="language-scala">// combine all modules into one
+<p>You may then pass plugins to <code>Injector</code> as ordinary modules:</p>
+<pre class="prettyprint"><code class="language-scala">// combine all plugins into one
 
 val appModule = appModules.result.merge
 // appModule: izumi.distage.plugins.PluginBase = 
