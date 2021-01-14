@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="x-ua-compatible" content="ie=edge">
 <meta name="description" content="microsite">
-<meta name="generator" content="Paradox, paradox-material-theme=1.0.1, mkdocs-material=3.0.3">
+<meta name="generator" content="Paradox, paradox-material-theme=1.0.2, mkdocs-material=3.0.3">
 
 <meta name="lang:clipboard.copy" content="Copy to clipboard">
 <meta name="lang:clipboard.copied" content="Copied to clipboard">
@@ -186,7 +186,7 @@ data-md-source="github">
 <ul style="display: none">
 <li class="md-nav__item md-version" id="project.version">
 <label class="md-nav__link" for="__version">
-<i class="md-icon" title="Version">label_outline</i> 1.0.1
+<i class="md-icon" title="Version">label_outline</i> 1.0.2
 </label>
 </li>
 </ul>
@@ -240,7 +240,7 @@ data-md-source="github">
   <li><a href="../distage/distage-framework-docker.html#config-api" class="header">Config API</a>
   <ul>
     <li><a href="../distage/distage-framework-docker.html#modifyconfig" class="header">modifyConfig</a></li>
-    <li><a href="../distage/distage-framework-docker.html#dependondocker" class="header">dependOnDocker</a></li>
+    <li><a href="../distage/distage-framework-docker.html#dependoncontainer" class="header">dependOnContainer</a></li>
   </ul></li>
   <li><a href="../distage/distage-framework-docker.html#availability-and-health-checks" class="header">Availability and Health Checks</a></li>
   <li><a href="../distage/distage-framework-docker.html#usage-in-integration-tests" class="header">Usage in Integration Tests</a></li>
@@ -272,7 +272,7 @@ data-md-source="github">
   <li>Excellent for providing Docker implementations of services for integration tests</li>
 </ul>
 <h3><a href="#dependencies" name="dependencies" class="anchor"><span class="anchor-link"></span></a>Dependencies</h3>
-<p>Add the <code>distage-framework-docker</code> library:</p><dl class="dependency"><dt>sbt</dt><dd><pre class="prettyprint"><code class="language-scala">libraryDependencies += "io.7mind.izumi" %% "distage-framework-docker" % "1.0.1"</code></pre></dd></dl>
+<p>Add the <code>distage-framework-docker</code> library:</p><dl class="dependency"><dt>sbt</dt><dd><pre class="prettyprint"><code class="language-scala">libraryDependencies += "io.7mind.izumi" %% "distage-framework-docker" % "1.0.2"</code></pre></dd></dl>
 <h3><a href="#overview" name="overview" class="anchor"><span class="anchor-link"></span></a>Overview</h3>
 <p>Usage of <code>distage-framework-docker</code> generally follows these steps:</p>
 <ol>
@@ -385,9 +385,9 @@ class PostgresWithMountsDockerModule[F[_]: TagK] extends ModuleDef {
   }
 }
 </code></pre>
-<h4><a href="#dependondocker" name="dependondocker" class="anchor"><span class="anchor-link"></span></a>dependOnDocker</h4>
-<p><a href="/api/izumi/distage/docker/DockerContainer$$DockerProviderExtensions.html#dependOnDocker"><code>dependOnDocker</code></a> adds a dependency on a given Docker container. <code>distage</code> ensures the requested container is available before the dependent is provided.</p>
-<p>For example, suppose a system under test requires both PostgreSQL and Elasticsearch. One option is to use <code>dependOnDocker</code> to declare the Elasticsearch container depends on the PostgreSQL container:</p>
+<h4><a href="#dependoncontainer" name="dependoncontainer" class="anchor"><span class="anchor-link"></span></a>dependOnContainer</h4>
+<p><a href="/api/izumi/distage/docker/DockerContainer$$DockerProviderExtensions.html#dependOnContainer"><code>dependOnContainer</code></a> adds a dependency on a given Docker container. <code>distage</code> ensures the requested container is available before the dependent.</p>
+<p>For example, suppose a system under test requires both PostgreSQL and Elasticsearch. One option is to use <code>dependOnContainer</code> to declare the Elasticsearch container depends on the PostgreSQL container:</p>
 <pre class="prettyprint"><code class="language-scala">object ElasticSearchDocker extends ContainerDef {
   val ports = Seq(9200, 9300)
 
@@ -406,7 +406,7 @@ class ElasticSearchPlusPostgresModule[F[_]: TagK] extends ModuleDef {
   }
 
   make[ElasticSearchDocker.Container].fromResource {
-    ElasticSearchDocker.make[F].dependOnDocker(PostgresDocker)
+    ElasticSearchDocker.make[F].dependOnContainer(PostgresDocker)
   }
 }
 </code></pre>
@@ -419,9 +419,9 @@ class ElasticSearchPlusPostgresModule[F[_]: TagK] extends ModuleDef {
 </code></pre>
 <p>would be a host and port mapped to the Postgres container&rsquo;s primary port that have passed the health check.</p>
 <h3><a href="#usage-in-integration-tests" name="usage-in-integration-tests" class="anchor"><span class="anchor-link"></span></a>Usage in Integration Tests</h3>
-<p>A common use case is using Docker containers to provide service implementations for integration test, such as using a PostgreSQL container for verifying an application that uses a PostgreSQL database. <code>distage</code> container resources are easy to integrate as providers.</p>
+<p>A common use case is using Docker containers to provide service implementations for integration test, such as using a PostgreSQL container for verifying an application that uses a PostgreSQL database.</p>
 <p>Consider the example application below. This application is written to depend on a <a href="https://tpolecat.github.io/doobie/">doobie</a> <code>Transactor</code>, which is constructed from a <code>PostgresServerConfig</code>.</p>
-<pre class="prettyprint"><code class="language-scala">import cats.effect.ContextShift
+<pre class="prettyprint"><code class="language-scala">import cats.effect.{Async, ContextShift}
 import doobie.Transactor
 import doobie.syntax.connectionio._
 import doobie.syntax.string._
@@ -452,15 +452,14 @@ final case class PostgresServerConfig(
 
 object TransactorFromConfigModule extends ModuleDef {
   make[Transactor[IO]].from {
-    (config: PostgresServerConfig, contextShift: ContextShift[IO]) =&gt;
-      implicit val CS = contextShift
+    (config: PostgresServerConfig, async: Async[IO], contextShift: ContextShift[IO]) =&gt;
 
       Transactor.fromDriverManager[IO](
         driver = &quot;org.postgresql.Driver&quot;,
         url    = s&quot;jdbc:postgresql://${config.host}:${config.port}/${config.database}&quot;,
         user   = config.username,
         pass   = config.password,
-      )
+      )(async, contextShift)
   }
 }
 </code></pre>
@@ -573,7 +572,7 @@ postgresDockerIntegrationExample.unsafeRunSync()
     PostgresDocker.make[F].connectToNetwork(TestClusterNetwork)
   }
   make[ElasticSearchDocker.Container].fromResource {
-    ElasticSearchDocker.make[F].dependOnDocker(PostgresDocker).connectToNetwork(TestClusterNetwork)
+    ElasticSearchDocker.make[F].dependOnContainer(PostgresDocker).connectToNetwork(TestClusterNetwork)
   }
 }
 </code></pre>
@@ -701,13 +700,13 @@ class CustomDockerConfigExampleModule[F[_]: TagK] extends ModuleDef {
 </ul>
 </div>
 <div>
-<a href="https://github.com/7mind/izumi/tree/v1.0.1/doc/microsite/target/mdoc/distage/distage-framework-docker.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/7mind/izumi/tree/v1.0.2/doc/microsite/target/mdoc/distage/distage-framework-docker.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>
 <div class="print-only">
 <span class="md-source-file md-version">
-1.0.1
+1.0.2
 </span>
 </div>
 </article>
