@@ -224,7 +224,7 @@ def badModule = new ModuleDef {
 
 val badPlan = Injector[cats.effect.IO]().plan(badModule, Roots.target[A])
 // badPlan: izumi.distage.model.plan.OrderedPlan = 
-// {effect.{type.MdocSession::App0::B}} (debugging.md:22) := value zio.ZIO$EffectPartial#382068058
+// {effect.{type.MdocSession::App0::B}} (debugging.md:22) := value zio.ZIO$EffectPartial#709016061
 // {type.MdocSession::App0::B} (debugging.md:22) := effect[λ %0 → zio.ZIO[-Any,+Throwable,+0]]{effect.{type.MdocSession::App0::B}}
 // {type.MdocSession::App0::A} (debugging.md:21) := call(π:Class(MdocSession::App0::B): MdocSession::App0::A) {
 //   arg b: MdocSession::App0::B = lookup({type.MdocSession::App0::B})
@@ -241,7 +241,7 @@ badPlan.assertValid[cats.effect.IO]().unsafeRunSync()
 // Can&#39;t execute an effect in `λ %0 → zio.ZIO[-Any,+Throwable,+0]` which is neither equivalent to `izumi.fundamentals.platform.Identity`, nor a subtype of the Injector&#39;s effect type: `λ %0 → cats.effect.IO[+0]`
 // 
 //   - To execute `make[_].fromEffect` and `make[_].fromResource` bindings for effects other than `Identity`, you must parameterize the `Injector` with the corresponding effect type when creating it, as in `Injector[F]()`.
-//   - Subtype type constructors are allowed. e.g. when using ZIO you can execute effects in `IO[Nothing, ?]` when using an `Injector[IO[Throwable, ?]]()`.
+//   - Subtype type constructors are allowed. e.g. when using ZIO you can execute effects in `IO[Nothing, _]` when using an `Injector[IO[Throwable, _]]()`.
 //        
 // 	at izumi.distage.model.plan.impl.OrderedPlanOps.$anonfun$isValid$3(OrderedPlanOps.scala:57)
 // 	at izumi.distage.model.plan.impl.OrderedPlanOps.$anonfun$isValid$3$adapted(OrderedPlanOps.scala:56)
@@ -263,7 +263,7 @@ badPlan.assertValid[cats.effect.IO]().unsafeRunSync()
 
 val plan = Injector[cats.effect.IO]().plan(goodModule, Roots.target[A])
 // plan: izumi.distage.model.plan.OrderedPlan = 
-// {effect.{type.MdocSession::App0::B}} (debugging.md:42) := value cats.effect.IO$Delay#-1370411549
+// {effect.{type.MdocSession::App0::B}} (debugging.md:42) := value cats.effect.IO$Delay#998850573
 // {type.MdocSession::App0::B} (debugging.md:42) := effect[λ %0 → cats.effect.IO[+0]]{effect.{type.MdocSession::App0::B}}
 // {type.MdocSession::App0::A} (debugging.md:41) := call(π:Class(MdocSession::App0::B): MdocSession::App0::A) {
 //   arg b: MdocSession::App0::B = lookup({type.MdocSession::App0::B})
@@ -276,7 +276,7 @@ plan.assertValid[cats.effect.IO]().unsafeRunSync()
 <h3><a href="#pretty-printing-plans" name="pretty-printing-plans" class="anchor"><span class="anchor-link"></span></a>Pretty-printing plans</h3>
 <p>You can print the output of <code>plan.render()</code> to get detailed info on what will happen during instantiation. The printout includes source and line numbers so your IDE can show you where the binding was defined!</p>
 <pre class="prettyprint"><code class="language-scala">println(plan.render())
-// {effect.{type.MdocSession::App0::B}} (debugging.md:42) := value cats.effect.IO$Delay#-1370411549
+// {effect.{type.MdocSession::App0::B}} (debugging.md:42) := value cats.effect.IO$Delay#998850573
 // {type.MdocSession::App0::B} (debugging.md:42) := effect[λ %0 → cats.effect.IO[+0]]{effect.{type.MdocSession::App0::B}}
 // {type.MdocSession::App0::A} (debugging.md:41) := call(π:Class(MdocSession::App0::B): MdocSession::App0::A) {
 //   arg b: MdocSession::App0::B = lookup({type.MdocSession::App0::B})
@@ -309,7 +309,7 @@ println(plan.topology.dependees.tree(DIKey[B]))
 <pre class="prettyprint"><code class="language-scala">import distage.{GraphDumpBootstrapModule, Injector}
 
 Injector(GraphDumpBootstrapModule)
-// res6: Injector[izumi.fundamentals.platform.functional.package.Identity[A]] = izumi.distage.InjectorDefaultImpl@78823e5f
+// res6: Injector[izumi.fundamentals.platform.functional.package.Identity[A]] = izumi.distage.InjectorDefaultImpl@342f622c
 </code></pre>
 <p>You&rsquo;ll need a <code>GraphViz</code> installation to render these files into a viewable PNG images:</p>
 <pre class="prettyprint"><code class="language-bash">dot -Tpng target/plan-last-nogc.gv -o out.png
