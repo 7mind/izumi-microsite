@@ -316,20 +316,254 @@ def HelloByeModule = new ModuleDef {
   make[HelloByeApp] // `.from` is not required for concrete classes
 }
 </code></pre>
-<p><code>ModuleDef</code> merely contains a description of the desired object graph, let&rsquo;s transform that high-level description into an actionable series of steps - an <a href="/latest/snapshot/api/izumi/distage/model/plan/OrderedPlan.html">OrderedPlan</a>, a datatype we can <a href="debugging.html#pretty-printing-plans">inspect</a>, <a href="debugging.html#testing-plans">test</a> or <a href="distage-framework.html#compile-time-checks">verify at compile-time</a> – without having to actually create objects or execute effects.</p>
+<p><code>ModuleDef</code> merely contains a description of the desired object graph, let&rsquo;s transform that high-level description into an actionable series of steps - an <a href="/latest/snapshot/api/izumi/distage/model/plan/DIPlan.html">DIPlan</a>, a datatype we can <a href="debugging.html#pretty-printing-plans">inspect</a>, <a href="debugging.html#testing-plans">test</a> or <a href="distage-framework.html#compile-time-checks">verify at compile-time</a> – without having to actually create objects or execute effects.</p>
 <pre class="prettyprint"><code class="language-scala">import distage.{Activation, Injector, Roots}
 
 val injector = Injector[RIO[Console, _]]()
-// injector: Injector[zio.ZIO[zio.Has[Console.Service], Throwable, β$0$]] = izumi.distage.InjectorDefaultImpl@3eeb4c8b
+// injector: Injector[zio.ZIO[zio.Has[Console.Service], Throwable, β$0$]] = izumi.distage.InjectorDefaultImpl@779e21b3
 
 val plan = injector.plan(HelloByeModule, Activation.empty, Roots.target[HelloByeApp])
-// plan: izumi.distage.model.plan.OrderedPlan = 
-// {type.MdocSession::App1::Greeter} (basics.md:84) := call(π:Class(): MdocSession::App1::PrintGreeter) {}
-// {type.MdocSession::App1::Byer} (basics.md:85) := call(π:Class(): MdocSession::App1::PrintByer) {}
-// {type.MdocSession::App1::HelloByeApp} (basics.md:86) := call(π:Class(MdocSession::App1::Greeter, MdocSession::App1::Byer): MdocSession::App1::HelloByeApp) {
-//   arg greeter: MdocSession::App1::Greeter = lookup({type.MdocSession::App1::Greeter})
-//   arg byer: MdocSession::App1::Byer = lookup({type.MdocSession::App1::Byer})
-// }
+// plan: izumi.distage.model.plan.DIPlan = DIPlan(DG(IncidenceMatrix(Map({type.repl.MdocSession::repl.MdocSession.App1::repl.MdocSession.App1.Greeter} -&gt; Set({type.repl.MdocSession::repl.MdocSession.App1::repl.MdocSession.App1.HelloByeApp}), {type.repl.MdocSession::repl.MdocSession.App1::repl.MdocSession.App1.HelloByeApp} -&gt; Set(), {type.repl.MdocSession::repl.MdocSession.App1::repl.MdocSession.App1.Byer} -&gt; Set({type.repl.MdocSession::repl.MdocSession.App1::repl.MdocSession.App1.HelloByeApp}))),IncidenceMatrix(Map({type.repl.MdocSession::repl.MdocSession.App1::repl.MdocSession.App1.Greeter} -&gt; Set(), {type.repl.MdocSession::repl.MdocSession.App1::repl.MdocSession.App1.HelloByeApp} -&gt; Set({type.repl.MdocSession::repl.MdocSession.App1::repl.MdocSession.App1.Greeter}, {type.repl.MdocSession::repl.MdocSession.App1::repl.MdocSession.App1.Byer}), {type.repl.MdocSession::repl.MdocSession.App1::repl.MdocSession.App1.Byer} -&gt; Set())),GraphMeta(Map({type.repl.MdocSession::repl.MdocSession.App1::repl.MdocSession.App1.Greeter} -&gt; {type.repl.MdocSession::repl.MdocSession.App1::repl.MdocSession.App1.Greeter} (basics.md:84) := call(π:Class(): repl.MdocSession::repl.MdocSession.App1::repl.MdocSession.App1.PrintGreeter[32m) {}, {type.repl.MdocSession::repl.MdocSession.App1::repl.MdocSession.App1.HelloByeApp} -&gt; {type.repl.MdocSession::repl.MdocSession.App1::repl.MdocSession.App1.HelloByeApp} (basics.md:86) :=
+//     call(π:Class(repl.MdocSession::repl.MdocSession.App1::repl.MdocSession.App1.Greeter, repl.MdocSession::repl.MdocSession.App1::repl.MdocSession.App1.Byer): repl.MdocSession::repl.MdocSession.App1::repl.MdocSession.App1.HelloByeApp[32m) {
+//       arg greeter: repl.MdocSession::repl.MdocSession.App1::repl.MdocSession.App1.Greeter &lt;- {type.repl.MdocSession::repl.MdocSession.App1::repl.MdocSession.App1.Greeter}
+//       arg byer: repl.MdocSession::repl.MdocSession.App1::repl.MdocSession.App1.Byer &lt;- {type.repl.MdocSession::repl.MdocSession.App1::repl.MdocSession.App1.Byer}
+//     }, {type.repl.MdocSession::repl.MdocSession.App1::repl.MdocSession.App1.Byer} -&gt; {type.repl.MdocSession::repl.MdocSession.App1::repl.MdocSession.App1.Byer} (basics.md:85) := call(π:Class(): repl.MdocSession::repl.MdocSession.App1::repl.MdocSession.App1.PrintByer[32m) {}))),PlannerInput(
+// make[{type.izumi.functional.bio.UnsafeRun2::izumi.functional.bio.UnsafeRun2.FailureHandler}].from(value(Default: izumi.functional.bio.UnsafeRun2::izumi.functional.bio.UnsafeRun2.FailureHandler::izumi.functional.bio.UnsafeRun2.FailureHandler.Default)) ((ZIOPlatformDependentSupportModule.scala:47))
+// make[{type.cats.Apply[=λ %0 → ZIO[-Any,+Throwable,+0]]}].from(using[{type.cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]}: cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]]) ((CatsEffectInstancesModule.scala:19))
+// make[{type.repl.MdocSession::repl.MdocSession.App1::repl.MdocSession.App1.Byer}].from(call(π:Class(): repl.MdocSession::repl.MdocSession.App1::repl.MdocSession.App1.PrintByer)) ((basics.md:85))
+// make[{type.cats.Applicative[=λ %0 → ZIO[-Any,+Throwable,+0]]}].from(using[{type.cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]}: cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]]) ((CatsEffectInstancesModule.scala:20))
+// make[{type.{zio.Has[=package::Blocking::Service] &amp; zio.Has[=package::Console::Service] &amp; zio.Has[=package::Random::Service] &amp; zio.Has[=package::System::Service] &amp; zio.Has[=package::Clock::Service]}}].from(call(ƒ:izumi.distage.modules.platform.ZIOPlatformDependentSupportModule$$Lambda$22354/0x00000008033d8c40@62c6518d(zio.clock.package::zio.clock.Clock::zio.clock.Clock.Service, zio.console.package::zio.console.Console::zio.console.Console.Service, zio.system.package::zio.system.System::zio.system.System.Service, zio.random.package::zio.random.Random::zio.random.Random.Service, zio.blocking.package::zio.blocking.Blocking::zio.blocking.Blocking.Service): {zio.Has[=package::Blocking::Service] &amp; zio.Has[=package::Console::Service] &amp; zio.Has[=package::Random::Service] &amp; zio.Has[=package::System::Service] &amp; zio.Has[=package::Clock::Service]})) ((ZIOPlatformDependentSupportModule.scala:21))
+// make[{type.izumi.functional.mono.Entropy[+λ %1 → ZIO[-Any,+Throwable,+1]]}].from(using[{type.izumi.functional.mono.Entropy[+λ %1 → ZIO[-Any,+Nothing,+1]]}: izumi.functional.mono.Entropy[+λ %1 → ZIO[-Any,+Nothing,+1]]]) ((AnyBIO2SupportModule.scala:43))
+// make[{type.izumi.functional.bio.Guarantee3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}].from(using[{type.izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}: izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]]) ((BIO2InstancesModule.scala:18))
+// make[{type.zio.Has[=package::System::Service]}].from(call(ƒ:izumi.distage.modules.support.ZIOSupportModule$$Lambda$22418/0x000000080354b840@66991377(zio.system.package::zio.system.System::zio.system.System.Service): zio.Has[=package::System::Service])) ((ZIOSupportModule.scala:52))
+// make[{type.izumi.functional.bio.Primitives2[=λ %1:0,%1:1 → ZIO[-Any,+1:0,+1:1]]}].from(value(izumi.functional.bio.impl.PrimitivesZio$@44bc6dc3: izumi.functional.bio.Primitives2[=λ %1:0,%1:1 → ZIO[-Any,+1:0,+1:1]])) ((ZIOSupportModule.scala:40))
+// make[{type.cats.FlatMap[=λ %0 → ZIO[-Any,+Throwable,+0]]}].from(using[{type.cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]}: cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]]) ((CatsEffectInstancesModule.scala:21))
+// make[{type.cats.MonadError[=λ %0 → ZIO[-Any,+Throwable,+0],=Throwable]}].from(using[{type.cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]}: cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]]) ((CatsEffectInstancesModule.scala:24))
+// make[{type.izumi.functional.bio.Bracket3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}].from(using[{type.izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}: izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]]) ((BIO2InstancesModule.scala:22))
+// make[{type.cats.effect.ContextShift[=λ %1:0 → ZIO[-Any,+Throwable,+1:0]]}].from(call(ƒ:izumi.distage.modules.typeclass.ZIOCatsEffectInstancesModule$$Lambda$22428/0x00000008056e4c40@523d878a(): cats.effect.ContextShift[=λ %1:0 → ZIO[-Any,+Throwable,+1:0]])) ((ZIOCatsEffectInstancesModule.scala:35))
+// make[{type.zio.blocking.package::zio.blocking.Blocking::zio.blocking.Blocking.Service}].from(call(ƒ:izumi.distage.modules.platform.ZIOPlatformDependentSupportModule$$Lambda$22362/0x00000008033d2040@4aa92b7a(java.util.concurrent.ThreadPoolExecutor): (zio.blocking.package::zio.blocking.Blocking::zio.blocking.Blocking.Service &amp; {def blockingExecutor(): zio.internal.Executor}))) ((ZIOPlatformDependentSupportModule.scala:31))
+// make[{type.izumi.functional.bio.Fork3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}].from(call(ƒ:izumi.distage.modules.support.AnyBIO3SupportModule$$Lambda$22406/0x0000000803493840@3b327bed(izumi.functional.bio.Fork3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]): izumi.functional.bio.Fork3[=λ %2,%3,%4 → ZIO[-3,+3,+4]])) ((AnyBIO3SupportModule.scala:38))
+// make[{type.izumi.functional.mono.SyncSafe[=λ %1 → ZIO[-Any,+Nothing,+1]]}].from(call(ƒ:izumi.distage.modules.support.AnyBIO2SupportModule$$Lambda$22394/0x0000000803454840@25efb834(izumi.functional.bio.IO3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]): izumi.functional.mono.SyncSafe[=λ %1 → ZIO[-Any,+Nothing,+1]])) ((AnyBIO2SupportModule.scala:36))
+// make[{type.izumi.functional.mono.Clock[+λ %1 → ZIO[-Any,+Throwable,+1]]}].from(using[{type.izumi.functional.mono.Clock[+λ %1 → ZIO[-Any,+Nothing,+1]]}: izumi.functional.mono.Clock[+λ %1 → ZIO[-Any,+Nothing,+1]]]) ((AnyBIO2SupportModule.scala:40))
+// make[{type.izumi.functional.bio.Concurrent3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}].from(using[{type.izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}: izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]]) ((BIO3InstancesModule.scala:28))
+// make[{type.cats.Invariant[=λ %0 → ZIO[-Any,+Throwable,+0]]}].from(using[{type.cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]}: cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]]) ((CatsEffectInstancesModule.scala:14))
+// make[{type.repl.MdocSession::repl.MdocSession.App1::repl.MdocSession.App1.Greeter}].from(call(π:Class(): repl.MdocSession::repl.MdocSession.App1::repl.MdocSession.App1.PrintGreeter)) ((basics.md:84))
+// make[{type.izumi.functional.mono.SyncSafe[=λ %1 → ZIO[-Any,+Throwable,+1]]}].from(call(ƒ:izumi.distage.modules.support.AnyBIO2SupportModule$$Lambda$22396/0x0000000803453040@4d8c9224(izumi.functional.mono.SyncSafe[=λ %1 → ZIO[-Any,+Nothing,+1]]): izumi.functional.mono.SyncSafe[=λ %1 → ZIO[-Any,+Throwable,+1]])) ((AnyBIO2SupportModule.scala:39))
+// make[{type.izumi.functional.bio.Parallel3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}].from(using[{type.izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}: izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]]) ((BIO3InstancesModule.scala:27))
+// make[{type.izumi.functional.bio.Temporal3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}].from(call(ƒ:izumi.distage.modules.support.AnyBIO3SupportModule$$Lambda$22404/0x0000000803495040@dae1e2f(izumi.functional.bio.Temporal3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]): izumi.functional.bio.Temporal3[=λ %2,%3,%4 → ZIO[-3,+3,+4]])) ((AnyBIO3SupportModule.scala:35))
+// make[{type.izumi.functional.bio.Guarantee3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}].from(using[{type.izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}: izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]]) ((BIO3InstancesModule.scala:20))
+// make[{type.zio.console.package::zio.console.Console::zio.console.Console.Service}].from(call(ƒ:izumi.distage.modules.support.ZIOSupportModule$$Lambda$22417/0x000000080354c040@1dc886a3(): zio.console.package::zio.console.Console::zio.console.Console.Service)) ((ZIOSupportModule.scala:50))
+// make[{type.izumi.distage.model.effect.QuasiIO[=λ %1:0 → 1:0]}].from(value(izumi.distage.model.effect.QuasiIO$QuasiIOIdentity$@61363eb2: izumi.distage.model.effect.QuasiIO[=λ %1:0 → 1:0])) ((IdentitySupportModule.scala:17))
+// make[{type.cats.effect.Bracket[=λ %0 → ZIO[-Any,+Throwable,+0],=Throwable]}].from(using[{type.cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]}: cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]]) ((CatsEffectInstancesModule.scala:26))
+// make[{type.izumi.functional.bio.MonadAsk3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}].from(using[{type.izumi.functional.bio.Local3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}: izumi.functional.bio.Local3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]]) ((BIO3InstancesModule.scala:31))
+// make[{type.izumi.distage.model.PlannerInput}].from(value(PlannerInput(
+// make[{type.repl.MdocSession::repl.MdocSession.App1::repl.MdocSession.App1.Byer}].from(call(π:Class(): repl.MdocSession::repl.MdocSession.App1::repl.MdocSession.App1.PrintByer)) ((basics.md:85))
+// make[{type.repl.MdocSession::repl.MdocSession.App1::repl.MdocSession.App1.Greeter}].from(call(π:Class(): repl.MdocSession::repl.MdocSession.App1::repl.MdocSession.App1.PrintGreeter)) ((basics.md:84))
+// make[{type.repl.MdocSession::repl.MdocSession.App1::repl.MdocSession.App1.HelloByeApp}].from(call(π:Class(repl.MdocSession::repl.MdocSession.App1::repl.MdocSession.App1.Greeter, repl.MdocSession::repl.MdocSession.App1::repl.MdocSession.App1.Byer): repl.MdocSession::repl.MdocSession.App1::repl.MdocSession.App1.HelloByeApp)) ((basics.md:86)),Activation(Map()),Of(NonEmptySet({type.repl.MdocSession::repl.MdocSession.App1::repl.MdocSession.App1.HelloByeApp}))): izumi.distage.model.PlannerInput)) ((InjectorDefaultImpl.scala:120))
+// make[{type.cats.effect.Sync[=λ %0 → ZIO[-Any,+Throwable,+0]]}].from(using[{type.cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]}: cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]]) ((CatsEffectInstancesModule.scala:27))
+// make[{type.izumi.functional.bio.Monad3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}].from(using[{type.izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}: izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]]) ((BIO2InstancesModule.scala:20))
+// make[{type.izumi.functional.bio.Panic3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}].from(using[{type.izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}: izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]]) ((BIO3InstancesModule.scala:25))
+// make[{type.zio.clock.package::zio.clock.Clock::zio.clock.Clock.Service}].from(call(ƒ:izumi.distage.modules.support.ZIOSupportModule$$Lambda$22414/0x000000080354ec40@19fd0426(): zio.clock.package::zio.clock.Clock::zio.clock.Clock.Service)) ((ZIOSupportModule.scala:47))
+// make[{type.izumi.distage.model.effect.QuasiApplicative[=λ %1:0 → 1:0]}].from(value(izumi.distage.model.effect.QuasiIO$QuasiIOIdentity$@61363eb2: izumi.distage.model.effect.QuasiApplicative[=λ %1:0 → 1:0])) ((IdentitySupportModule.scala:16))
+// make[{type.izumi.functional.bio.Applicative3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}].from(using[{type.izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}: izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]]) ((BIO3InstancesModule.scala:19))
+// make[{type.cats.effect.LiftIO[=λ %0 → ZIO[-Any,+Throwable,+0]]}].from(using[{type.cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]}: cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]]) ((CatsEffectInstancesModule.scala:29))
+// make[{type.cats.effect.Timer[=λ %1:0 → ZIO[-Any,+Throwable,+1:0]]}].from(call(π:Class(zio.clock.package::zio.clock.Clock::zio.clock.Clock.Service): izumi.distage.modules.typeclass.ZIOClockTimer[=Throwable])) ((ZIOCatsEffectInstancesModule.scala:33))
+// make[{type.izumi.functional.bio.Local3[=λ %1:0,%1:1,%1:2 → ZIO[-1:0,+1:1,+1:2]]}].from(value(izumi.functional.bio.impl.AsyncZio$@5de47810: izumi.functional.bio.Local3[=λ %1:0,%1:1,%1:2 → ZIO[-1:0,+1:1,+1:2]])) ((ZIOSupportModule.scala:38))
+// make[{type.zio.Runtime[+Any]}].from(call(ƒ:izumi.distage.modules.platform.ZIOPlatformDependentSupportModule$$Lambda$22366/0x00000008033ff840@330690c7(izumi.functional.bio.UnsafeRun2::izumi.functional.bio.UnsafeRun2.ZIORunner): zio.Runtime[+Unit])) ((ZIOPlatformDependentSupportModule.scala:48))
+// make[{type.izumi.distage.InjectorFactory}].from(value(distage.Injector$@2ad5e998: izumi.distage.InjectorFactory)) ((InjectorDefaultImpl.scala:117))
+// make[{type.izumi.functional.bio.Fork3[=λ %1:0,%1:1,%1:2 → ZIO[-1:0,+1:1,+1:2]]}].from(value(izumi.functional.bio.impl.ForkZio$@634fdbfd: izumi.functional.bio.Fork3[=λ %1:0,%1:1,%1:2 → ZIO[-1:0,+1:1,+1:2]])) ((ZIOSupportModule.scala:39))
+// make[{type.cats.Parallel[=λ %1:0 → ZIO[-Any,+Throwable,+1:0]]}].from(call(ƒ:izumi.distage.modules.typeclass.ZIOCatsEffectInstancesModule$$Lambda$22426/0x00000008056e3c40@72eb0b0c(): (cats.Parallel[=λ %1:0 → ZIO[-Any,+Throwable,+1:0]] &amp; {type F = λ %0 → Par::T[-Any,+Throwable,+0]}))) ((ZIOCatsEffectInstancesModule.scala:30))
+// make[{type.izumi.functional.bio.Applicative3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}].from(using[{type.izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}: izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]]) ((BIO2InstancesModule.scala:17))
+// make[{type.zio.random.package::zio.random.Random::zio.random.Random.Service}].from(call(ƒ:izumi.distage.modules.support.ZIOSupportModule$$Lambda$22423/0x0000000803548840@13bbecd7(): zio.random.package::zio.random.Random::zio.random.Random.Service)) ((ZIOSupportModule.scala:56))
+// make[{type.izumi.distage.model.effect.QuasiIORunner[=λ %1 → ZIO[-Any,+Throwable,+1]]}].from(call(π:Class(izumi.functional.bio.UnsafeRun2[=λ %0,%1 → ZIO[-Any,+0,+1]]): izumi.distage.model.effect.QuasiIORunner::izumi.distage.model.effect.QuasiIORunner.BIOImpl[=λ %0,%1 → ZIO[-Any,+0,+1]])) ((AnyBIO2SupportModule.scala:24))
+// make[{type.izumi.functional.bio.Parallel3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}].from(using[{type.izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}: izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]]) ((BIO2InstancesModule.scala:25))
+// make[{type.izumi.distage.model.recursive.Bootloader}].from(call(π:Class(izumi.distage.InjectorFactory, izumi.distage.model.definition.BootstrapModule, izumi.distage.model.definition.Activation, izumi.distage.model.definition.Module, izumi.distage.model.PlannerInput): izumi.distage.model.recursive.Bootloader)) ((InjectorDefaultImpl.scala:115))
+// make[{type.izumi.distage.model.effect.QuasiIO[=λ %1 → ZIO[-Any,+Throwable,+1]]}].from(call(ƒ:izumi.distage.modules.support.AnyBIO2SupportModule$$Lambda$22388/0x0000000803439040@77a3e508(izumi.functional.bio.IO3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]): izumi.distage.model.effect.QuasiIO[=λ %1 → ZIO[-Any,+Throwable,+1]])) ((AnyBIO2SupportModule.scala:27))
+// make[{type.izumi.distage.model.effect.QuasiIORunner[=λ %1:0 → 1:0]}].from(value(izumi.distage.model.effect.QuasiIORunner$IdentityImpl$@5feaddba: izumi.distage.model.effect.QuasiIORunner[=λ %1:0 → 1:0])) ((IdentitySupportModule.scala:18))
+// make[{type.izumi.distage.model.effect.QuasiAsync[=λ %1:0 → 1:0]}].from(value(izumi.distage.model.effect.QuasiAsync$$anon$1@79933206: izumi.distage.model.effect.QuasiAsync[=λ %1:0 → 1:0])) ((IdentitySupportModule.scala:19))
+// make[{type.izumi.functional.bio.Bifunctor3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}].from(using[{type.izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}: izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]]) ((BIO3InstancesModule.scala:18))
+// make[{type.izumi.functional.bio.Arrow3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}].from(using[{type.izumi.functional.bio.Local3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}: izumi.functional.bio.Local3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]]) ((BIO3InstancesModule.scala:33))
+// make[{type.java.util.concurrent.ThreadPoolExecutor@zio.io}].from(allocate[λ %0 → 0](call(ƒ:izumi.distage.modules.platform.ZIOPlatformDependentSupportModule$$Lambda$22372/0x00000008033fcc40@51e634d0(): izumi.distage.model.definition.Lifecycle[+λ %1:0 → 1:0,+ThreadPoolExecutor]))) ((ZIOPlatformDependentSupportModule.scala:56))
+// make[{type.cats.Monad[=λ %0 → ZIO[-Any,+Throwable,+0]]}].from(using[{type.cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]}: cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]]) ((CatsEffectInstancesModule.scala:22))
+// make[{type.zio.Has[=package::Random::Service]}].from(call(ƒ:izumi.distage.modules.support.ZIOSupportModule$$Lambda$22421/0x0000000803549840@4a1f96a9(zio.random.package::zio.random.Random::zio.random.Random.Service): zio.Has[=package::Random::Service])) ((ZIOSupportModule.scala:55))
+// make[{type.izumi.functional.bio.IO3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}].from(using[{type.izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}: izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]]) ((BIO3InstancesModule.scala:26))
+// make[{type.cats.Semigroupal[=λ %0 → ZIO[-Any,+Throwable,+0]]}].from(using[{type.cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]}: cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]]) ((CatsEffectInstancesModule.scala:15))
+// make[{type.repl.MdocSession::repl.MdocSession.App1::repl.MdocSession.App1.HelloByeApp}].from(call(π:Class(repl.MdocSession::repl.MdocSession.App1::repl.MdocSession.App1.Greeter, repl.MdocSession::repl.MdocSession.App1::repl.MdocSession.App1.Byer): repl.MdocSession::repl.MdocSession.App1::repl.MdocSession.App1.HelloByeApp)) ((basics.md:86))
+// make[{type.cats.effect.Concurrent[=λ %0 → ZIO[-Any,+Throwable,+0]]}].from(using[{type.cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]}: cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]]) ((CatsEffectInstancesModule.scala:31))
+// make[{type.zio.Has[=package::Blocking::Service]}].from(call(ƒ:izumi.distage.modules.platform.ZIOPlatformDependentSupportModule$$Lambda$22360/0x00000008033d3840@1a335b88(zio.blocking.package::zio.blocking.Blocking::zio.blocking.Blocking.Service): zio.Has[=package::Blocking::Service])) ((ZIOPlatformDependentSupportModule.scala:30))
+// make[{type.izumi.functional.bio.Monad3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}].from(using[{type.izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}: izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]]) ((BIO3InstancesModule.scala:22))
+// make[{type.izumi.functional.mono.Clock[+λ %1 → ZIO[-Any,+Nothing,+1]]}].from(call(ƒ:izumi.distage.modules.support.AnyBIO2SupportModule$$Lambda$22398/0x0000000803451840@18971c3f(izumi.functional.mono.Clock[+λ %1:0 → 1:0], izumi.functional.mono.SyncSafe[=λ %1 → ZIO[-Any,+Nothing,+1]]): izumi.functional.mono.Clock[+λ %1 → ZIO[-Any,+Nothing,+1]])) ((AnyBIO2SupportModule.scala:40))
+// make[{type.scala.concurrent.ExecutionContext@zio.io}].from(call(ƒ:izumi.distage.modules.platform.ZIOPlatformDependentSupportModule$$Lambda$22376/0x00000008033f9040@2e6126b9(java.util.concurrent.ThreadPoolExecutor): scala.concurrent.ExecutionContextExecutor)) ((ZIOPlatformDependentSupportModule.scala:62))
+// make[{type.cats.ApplicativeError[=λ %0 → ZIO[-Any,+Throwable,+0],=Throwable]}].from(using[{type.cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]}: cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]]) ((CatsEffectInstancesModule.scala:23))
+// make[{type.cats.effect.Blocker}].from(call(ƒ:izumi.distage.modules.typeclass.ZIOCatsEffectInstancesModule$$Lambda$22429/0x00000008056e6040@1d3ab674(java.util.concurrent.ThreadPoolExecutor): cats.effect.Blocker)) ((ZIOCatsEffectInstancesModule.scala:38))
+// make[{type.izumi.functional.bio.ApplicativeError3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}].from(using[{type.izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}: izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]]) ((BIO3InstancesModule.scala:21))
+// make[{type.izumi.functional.bio.Concurrent3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}].from(using[{type.izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}: izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]]) ((BIO2InstancesModule.scala:26))
+// make[{type.izumi.functional.mono.Entropy[+λ %1:0 → 1:0]}].from(value(izumi.functional.mono.Entropy$Standard$@260a8b3a: izumi.functional.mono.Entropy::izumi.functional.mono.Entropy.Standard)) ((IdentitySupportModule.scala:21))
+// make[{type.izumi.functional.bio.Async3[=λ %1:0,%1:1,%1:2 → ZIO[-1:0,+1:1,+1:2]]}].from(value(izumi.functional.bio.impl.AsyncZio$@5de47810: izumi.functional.bio.Async3[=λ %1:0,%1:1,%1:2 → ZIO[-1:0,+1:1,+1:2]])) ((ZIOSupportModule.scala:33))
+// make[{type.scala.concurrent.ExecutionContext@zio.cpu}].from(call(ƒ:izumi.distage.modules.platform.ZIOPlatformDependentSupportModule$$Lambda$22374/0x00000008033fa840@56e11683(java.util.concurrent.ThreadPoolExecutor): scala.concurrent.ExecutionContextExecutor)) ((ZIOPlatformDependentSupportModule.scala:61))
+// make[{type.izumi.distage.model.definition.Module@defaultModule}].from(value(
+// make[{type.izumi.functional.bio.UnsafeRun2::izumi.functional.bio.UnsafeRun2.FailureHandler}].from(value(Default: izumi.functional.bio.UnsafeRun2::izumi.functional.bio.UnsafeRun2.FailureHandler::izumi.functional.bio.UnsafeRun2.FailureHandler.Default)) ((ZIOPlatformDependentSupportModule.scala:47))
+// make[{type.cats.Apply[=λ %0 → ZIO[-Any,+Throwable,+0]]}].from(using[{type.cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]}: cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]]) ((CatsEffectInstancesModule.scala:19))
+// make[{type.zio.Runtime[+Any]}].from(call(ƒ:izumi.distage.modules.platform.ZIOPlatformDependentSupportModule$$Lambda$22366/0x00000008033ff840@330690c7(izumi.functional.bio.UnsafeRun2::izumi.functional.bio.UnsafeRun2.ZIORunner): zio.Runtime[+Unit])) ((ZIOPlatformDependentSupportModule.scala:48))
+// make[{type.scala.concurrent.ExecutionContext@zio.cpu}].from(call(ƒ:izumi.distage.modules.platform.ZIOPlatformDependentSupportModule$$Lambda$22374/0x00000008033fa840@56e11683(java.util.concurrent.ThreadPoolExecutor): scala.concurrent.ExecutionContextExecutor)) ((ZIOPlatformDependentSupportModule.scala:61))
+// make[{type.cats.Applicative[=λ %0 → ZIO[-Any,+Throwable,+0]]}].from(using[{type.cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]}: cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]]) ((CatsEffectInstancesModule.scala:20))
+// make[{type.{zio.Has[=package::Blocking::Service] &amp; zio.Has[=package::Console::Service] &amp; zio.Has[=package::Random::Service] &amp; zio.Has[=package::System::Service] &amp; zio.Has[=package::Clock::Service]}}].from(call(ƒ:izumi.distage.modules.platform.ZIOPlatformDependentSupportModule$$Lambda$22354/0x00000008033d8c40@62c6518d(zio.clock.package::zio.clock.Clock::zio.clock.Clock.Service, zio.console.package::zio.console.Console::zio.console.Console.Service, zio.system.package::zio.system.System::zio.system.System.Service, zio.random.package::zio.random.Random::zio.random.Random.Service, zio.blocking.package::zio.blocking.Blocking::zio.blocking.Blocking.Service): {zio.Has[=package::Blocking::Service] &amp; zio.Has[=package::Console::Service] &amp; zio.Has[=package::Random::Service] &amp; zio.Has[=package::System::Service] &amp; zio.Has[=package::Clock::Service]})) ((ZIOPlatformDependentSupportModule.scala:21))
+// make[{type.izumi.functional.mono.Entropy[+λ %1 → ZIO[-Any,+Throwable,+1]]}].from(using[{type.izumi.functional.mono.Entropy[+λ %1 → ZIO[-Any,+Nothing,+1]]}: izumi.functional.mono.Entropy[+λ %1 → ZIO[-Any,+Nothing,+1]]]) ((AnyBIO2SupportModule.scala:43))
+// make[{type.izumi.functional.bio.Guarantee3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}].from(using[{type.izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}: izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]]) ((BIO2InstancesModule.scala:18))
+// make[{type.zio.Has[=package::System::Service]}].from(call(ƒ:izumi.distage.modules.support.ZIOSupportModule$$Lambda$22418/0x000000080354b840@66991377(zio.system.package::zio.system.System::zio.system.System.Service): zio.Has[=package::System::Service])) ((ZIOSupportModule.scala:52))
+// make[{type.izumi.functional.bio.Primitives2[=λ %1:0,%1:1 → ZIO[-Any,+1:0,+1:1]]}].from(value(izumi.functional.bio.impl.PrimitivesZio$@44bc6dc3: izumi.functional.bio.Primitives2[=λ %1:0,%1:1 → ZIO[-Any,+1:0,+1:1]])) ((ZIOSupportModule.scala:40))
+// make[{type.cats.FlatMap[=λ %0 → ZIO[-Any,+Throwable,+0]]}].from(using[{type.cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]}: cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]]) ((CatsEffectInstancesModule.scala:21))
+// make[{type.cats.MonadError[=λ %0 → ZIO[-Any,+Throwable,+0],=Throwable]}].from(using[{type.cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]}: cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]]) ((CatsEffectInstancesModule.scala:24))
+// make[{type.izumi.functional.bio.Bracket3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}].from(using[{type.izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}: izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]]) ((BIO2InstancesModule.scala:22))
+// make[{type.cats.effect.ContextShift[=λ %1:0 → ZIO[-Any,+Throwable,+1:0]]}].from(call(ƒ:izumi.distage.modules.typeclass.ZIOCatsEffectInstancesModule$$Lambda$22428/0x00000008056e4c40@523d878a(): cats.effect.ContextShift[=λ %1:0 → ZIO[-Any,+Throwable,+1:0]])) ((ZIOCatsEffectInstancesModule.scala:35))
+// make[{type.zio.blocking.package::zio.blocking.Blocking::zio.blocking.Blocking.Service}].from(call(ƒ:izumi.distage.modules.platform.ZIOPlatformDependentSupportModule$$Lambda$22362/0x00000008033d2040@4aa92b7a(java.util.concurrent.ThreadPoolExecutor): (zio.blocking.package::zio.blocking.Blocking::zio.blocking.Blocking.Service &amp; {def blockingExecutor(): zio.internal.Executor}))) ((ZIOPlatformDependentSupportModule.scala:31))
+// make[{type.izumi.functional.bio.Fork3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}].from(call(ƒ:izumi.distage.modules.support.AnyBIO3SupportModule$$Lambda$22406/0x0000000803493840@3b327bed(izumi.functional.bio.Fork3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]): izumi.functional.bio.Fork3[=λ %2,%3,%4 → ZIO[-3,+3,+4]])) ((AnyBIO3SupportModule.scala:38))
+// make[{type.izumi.functional.mono.SyncSafe[=λ %1 → ZIO[-Any,+Nothing,+1]]}].from(call(ƒ:izumi.distage.modules.support.AnyBIO2SupportModule$$Lambda$22394/0x0000000803454840@25efb834(izumi.functional.bio.IO3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]): izumi.functional.mono.SyncSafe[=λ %1 → ZIO[-Any,+Nothing,+1]])) ((AnyBIO2SupportModule.scala:36))
+// make[{type.izumi.functional.mono.Clock[+λ %1 → ZIO[-Any,+Throwable,+1]]}].from(using[{type.izumi.functional.mono.Clock[+λ %1 → ZIO[-Any,+Nothing,+1]]}: izumi.functional.mono.Clock[+λ %1 → ZIO[-Any,+Nothing,+1]]]) ((AnyBIO2SupportModule.scala:40))
+// make[{type.izumi.functional.bio.Concurrent3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}].from(using[{type.izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}: izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]]) ((BIO3InstancesModule.scala:28))
+// make[{type.cats.Invariant[=λ %0 → ZIO[-Any,+Throwable,+0]]}].from(using[{type.cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]}: cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]]) ((CatsEffectInstancesModule.scala:14))
+// make[{type.izumi.functional.mono.SyncSafe[=λ %1 → ZIO[-Any,+Throwable,+1]]}].from(call(ƒ:izumi.distage.modules.support.AnyBIO2SupportModule$$Lambda$22396/0x0000000803453040@4d8c9224(izumi.functional.mono.SyncSafe[=λ %1 → ZIO[-Any,+Nothing,+1]]): izumi.functional.mono.SyncSafe[=λ %1 → ZIO[-Any,+Throwable,+1]])) ((AnyBIO2SupportModule.scala:39))
+// make[{type.izumi.functional.bio.Parallel3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}].from(using[{type.izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}: izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]]) ((BIO3InstancesModule.scala:27))
+// make[{type.izumi.functional.bio.Temporal3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}].from(call(ƒ:izumi.distage.modules.support.AnyBIO3SupportModule$$Lambda$22404/0x0000000803495040@dae1e2f(izumi.functional.bio.Temporal3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]): izumi.functional.bio.Temporal3[=λ %2,%3,%4 → ZIO[-3,+3,+4]])) ((AnyBIO3SupportModule.scala:35))
+// make[{type.izumi.functional.bio.Guarantee3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}].from(using[{type.izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}: izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]]) ((BIO3InstancesModule.scala:20))
+// make[{type.zio.console.package::zio.console.Console::zio.console.Console.Service}].from(call(ƒ:izumi.distage.modules.support.ZIOSupportModule$$Lambda$22417/0x000000080354c040@1dc886a3(): zio.console.package::zio.console.Console::zio.console.Console.Service)) ((ZIOSupportModule.scala:50))
+// make[{type.izumi.distage.model.effect.QuasiIO[=λ %1:0 → 1:0]}].from(value(izumi.distage.model.effect.QuasiIO$QuasiIOIdentity$@61363eb2: izumi.distage.model.effect.QuasiIO[=λ %1:0 → 1:0])) ((IdentitySupportModule.scala:17))
+// make[{type.cats.effect.Bracket[=λ %0 → ZIO[-Any,+Throwable,+0],=Throwable]}].from(using[{type.cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]}: cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]]) ((CatsEffectInstancesModule.scala:26))
+// make[{type.izumi.functional.bio.MonadAsk3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}].from(using[{type.izumi.functional.bio.Local3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}: izumi.functional.bio.Local3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]]) ((BIO3InstancesModule.scala:31))
+// make[{type.cats.effect.Sync[=λ %0 → ZIO[-Any,+Throwable,+0]]}].from(using[{type.cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]}: cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]]) ((CatsEffectInstancesModule.scala:27))
+// make[{type.izumi.functional.bio.Monad3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}].from(using[{type.izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}: izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]]) ((BIO2InstancesModule.scala:20))
+// make[{type.izumi.functional.bio.Panic3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}].from(using[{type.izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}: izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]]) ((BIO3InstancesModule.scala:25))
+// make[{type.zio.clock.package::zio.clock.Clock::zio.clock.Clock.Service}].from(call(ƒ:izumi.distage.modules.support.ZIOSupportModule$$Lambda$22414/0x000000080354ec40@19fd0426(): zio.clock.package::zio.clock.Clock::zio.clock.Clock.Service)) ((ZIOSupportModule.scala:47))
+// make[{type.izumi.distage.model.effect.QuasiApplicative[=λ %1:0 → 1:0]}].from(value(izumi.distage.model.effect.QuasiIO$QuasiIOIdentity$@61363eb2: izumi.distage.model.effect.QuasiApplicative[=λ %1:0 → 1:0])) ((IdentitySupportModule.scala:16))
+// make[{type.izumi.functional.bio.Applicative3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}].from(using[{type.izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}: izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]]) ((BIO3InstancesModule.scala:19))
+// make[{type.cats.effect.LiftIO[=λ %0 → ZIO[-Any,+Throwable,+0]]}].from(using[{type.cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]}: cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]]) ((CatsEffectInstancesModule.scala:29))
+// make[{type.cats.effect.Timer[=λ %1:0 → ZIO[-Any,+Throwable,+1:0]]}].from(call(π:Class(zio.clock.package::zio.clock.Clock::zio.clock.Clock.Service): izumi.distage.modules.typeclass.ZIOClockTimer[=Throwable])) ((ZIOCatsEffectInstancesModule.scala:33))
+// make[{type.izumi.functional.bio.Local3[=λ %1:0,%1:1,%1:2 → ZIO[-1:0,+1:1,+1:2]]}].from(value(izumi.functional.bio.impl.AsyncZio$@5de47810: izumi.functional.bio.Local3[=λ %1:0,%1:1,%1:2 → ZIO[-1:0,+1:1,+1:2]])) ((ZIOSupportModule.scala:38))
+// make[{type.izumi.functional.bio.Fork3[=λ %1:0,%1:1,%1:2 → ZIO[-1:0,+1:1,+1:2]]}].from(value(izumi.functional.bio.impl.ForkZio$@634fdbfd: izumi.functional.bio.Fork3[=λ %1:0,%1:1,%1:2 → ZIO[-1:0,+1:1,+1:2]])) ((ZIOSupportModule.scala:39))
+// make[{type.cats.Parallel[=λ %1:0 → ZIO[-Any,+Throwable,+1:0]]}].from(call(ƒ:izumi.distage.modules.typeclass.ZIOCatsEffectInstancesModule$$Lambda$22426/0x00000008056e3c40@72eb0b0c(): (cats.Parallel[=λ %1:0 → ZIO[-Any,+Throwable,+1:0]] &amp; {type F = λ %0 → Par::T[-Any,+Throwable,+0]}))) ((ZIOCatsEffectInstancesModule.scala:30))
+// make[{type.izumi.functional.bio.Applicative3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}].from(using[{type.izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}: izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]]) ((BIO2InstancesModule.scala:17))
+// make[{type.zio.random.package::zio.random.Random::zio.random.Random.Service}].from(call(ƒ:izumi.distage.modules.support.ZIOSupportModule$$Lambda$22423/0x0000000803548840@13bbecd7(): zio.random.package::zio.random.Random::zio.random.Random.Service)) ((ZIOSupportModule.scala:56))
+// make[{type.izumi.distage.model.effect.QuasiIORunner[=λ %1 → ZIO[-Any,+Throwable,+1]]}].from(call(π:Class(izumi.functional.bio.UnsafeRun2[=λ %0,%1 → ZIO[-Any,+0,+1]]): izumi.distage.model.effect.QuasiIORunner::izumi.distage.model.effect.QuasiIORunner.BIOImpl[=λ %0,%1 → ZIO[-Any,+0,+1]])) ((AnyBIO2SupportModule.scala:24))
+// make[{type.izumi.functional.bio.Parallel3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}].from(using[{type.izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}: izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]]) ((BIO2InstancesModule.scala:25))
+// make[{type.izumi.distage.model.effect.QuasiIO[=λ %1 → ZIO[-Any,+Throwable,+1]]}].from(call(ƒ:izumi.distage.modules.support.AnyBIO2SupportModule$$Lambda$22388/0x0000000803439040@77a3e508(izumi.functional.bio.IO3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]): izumi.distage.model.effect.QuasiIO[=λ %1 → ZIO[-Any,+Throwable,+1]])) ((AnyBIO2SupportModule.scala:27))
+// make[{type.izumi.distage.model.effect.QuasiIORunner[=λ %1:0 → 1:0]}].from(value(izumi.distage.model.effect.QuasiIORunner$IdentityImpl$@5feaddba: izumi.distage.model.effect.QuasiIORunner[=λ %1:0 → 1:0])) ((IdentitySupportModule.scala:18))
+// make[{type.izumi.distage.model.effect.QuasiAsync[=λ %1:0 → 1:0]}].from(value(izumi.distage.model.effect.QuasiAsync$$anon$1@79933206: izumi.distage.model.effect.QuasiAsync[=λ %1:0 → 1:0])) ((IdentitySupportModule.scala:19))
+// make[{type.izumi.functional.bio.Bifunctor3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}].from(using[{type.izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}: izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]]) ((BIO3InstancesModule.scala:18))
+// make[{type.izumi.functional.bio.Arrow3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}].from(using[{type.izumi.functional.bio.Local3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}: izumi.functional.bio.Local3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]]) ((BIO3InstancesModule.scala:33))
+// make[{type.java.util.concurrent.ThreadPoolExecutor@zio.io}].from(allocate[λ %0 → 0](call(ƒ:izumi.distage.modules.platform.ZIOPlatformDependentSupportModule$$Lambda$22372/0x00000008033fcc40@51e634d0(): izumi.distage.model.definition.Lifecycle[+λ %1:0 → 1:0,+ThreadPoolExecutor]))) ((ZIOPlatformDependentSupportModule.scala:56))
+// make[{type.cats.Monad[=λ %0 → ZIO[-Any,+Throwable,+0]]}].from(using[{type.cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]}: cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]]) ((CatsEffectInstancesModule.scala:22))
+// make[{type.cats.Semigroupal[=λ %0 → ZIO[-Any,+Throwable,+0]]}].from(using[{type.cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]}: cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]]) ((CatsEffectInstancesModule.scala:15))
+// make[{type.zio.Has[=package::Random::Service]}].from(call(ƒ:izumi.distage.modules.support.ZIOSupportModule$$Lambda$22421/0x0000000803549840@4a1f96a9(zio.random.package::zio.random.Random::zio.random.Random.Service): zio.Has[=package::Random::Service])) ((ZIOSupportModule.scala:55))
+// make[{type.izumi.functional.bio.IO3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}].from(using[{type.izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}: izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]]) ((BIO3InstancesModule.scala:26))
+// make[{type.cats.effect.Concurrent[=λ %0 → ZIO[-Any,+Throwable,+0]]}].from(using[{type.cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]}: cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]]) ((CatsEffectInstancesModule.scala:31))
+// make[{type.zio.Has[=package::Blocking::Service]}].from(call(ƒ:izumi.distage.modules.platform.ZIOPlatformDependentSupportModule$$Lambda$22360/0x00000008033d3840@1a335b88(zio.blocking.package::zio.blocking.Blocking::zio.blocking.Blocking.Service): zio.Has[=package::Blocking::Service])) ((ZIOPlatformDependentSupportModule.scala:30))
+// make[{type.izumi.functional.bio.Monad3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}].from(using[{type.izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}: izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]]) ((BIO3InstancesModule.scala:22))
+// make[{type.izumi.functional.mono.Clock[+λ %1 → ZIO[-Any,+Nothing,+1]]}].from(call(ƒ:izumi.distage.modules.support.AnyBIO2SupportModule$$Lambda$22398/0x0000000803451840@18971c3f(izumi.functional.mono.Clock[+λ %1:0 → 1:0], izumi.functional.mono.SyncSafe[=λ %1 → ZIO[-Any,+Nothing,+1]]): izumi.functional.mono.Clock[+λ %1 → ZIO[-Any,+Nothing,+1]])) ((AnyBIO2SupportModule.scala:40))
+// make[{type.scala.concurrent.ExecutionContext@zio.io}].from(call(ƒ:izumi.distage.modules.platform.ZIOPlatformDependentSupportModule$$Lambda$22376/0x00000008033f9040@2e6126b9(java.util.concurrent.ThreadPoolExecutor): scala.concurrent.ExecutionContextExecutor)) ((ZIOPlatformDependentSupportModule.scala:62))
+// make[{type.cats.ApplicativeError[=λ %0 → ZIO[-Any,+Throwable,+0],=Throwable]}].from(using[{type.cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]}: cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]]) ((CatsEffectInstancesModule.scala:23))
+// make[{type.cats.effect.Blocker}].from(call(ƒ:izumi.distage.modules.typeclass.ZIOCatsEffectInstancesModule$$Lambda$22429/0x00000008056e6040@1d3ab674(java.util.concurrent.ThreadPoolExecutor): cats.effect.Blocker)) ((ZIOCatsEffectInstancesModule.scala:38))
+// make[{type.izumi.functional.bio.ApplicativeError3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}].from(using[{type.izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}: izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]]) ((BIO3InstancesModule.scala:21))
+// make[{type.izumi.functional.bio.Concurrent3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}].from(using[{type.izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}: izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]]) ((BIO2InstancesModule.scala:26))
+// make[{type.izumi.functional.mono.Entropy[+λ %1:0 → 1:0]}].from(value(izumi.functional.mono.Entropy$Standard$@260a8b3a: izumi.functional.mono.Entropy::izumi.functional.mono.Entropy.Standard)) ((IdentitySupportModule.scala:21))
+// make[{type.izumi.functional.bio.Async3[=λ %1:0,%1:1,%1:2 → ZIO[-1:0,+1:1,+1:2]]}].from(value(izumi.functional.bio.impl.AsyncZio$@5de47810: izumi.functional.bio.Async3[=λ %1:0,%1:1,%1:2 → ZIO[-1:0,+1:1,+1:2]])) ((ZIOSupportModule.scala:33))
+// make[{type.cats.effect.Effect[=λ %0 → ZIO[-Any,+Throwable,+0]]}].from(using[{type.cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]}: cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]]) ((CatsEffectInstancesModule.scala:30))
+// make[{type.cats.effect.Async[=λ %0 → ZIO[-Any,+Throwable,+0]]}].from(using[{type.cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]}: cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]]) ((CatsEffectInstancesModule.scala:28))
+// make[{type.izumi.functional.bio.Ask3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}].from(using[{type.izumi.functional.bio.Local3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}: izumi.functional.bio.Local3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]]) ((BIO3InstancesModule.scala:30))
+// make[{type.izumi.functional.bio.data.Isomorphism2[=λ %1:0,%1:1 → ZIO[-Any,+1:0,+1:1],=λ %1:0,%1:1 → ZIO[-Any,+1:0,+1:1]]}].from(value(izumi.functional.bio.data.Isomorphism2$$anon$1@3a66a9bc: izumi.functional.bio.data.Isomorphism2[=λ %1:0,%1:1 → ZIO[-Any,+1:0,+1:1],=λ %1:0,%1:1 → ZIO[-Any,+1:0,+1:1]])) ((ZIOSupportModule.scala:42))
+// make[{type.izumi.functional.mono.Entropy[+λ %1 → ZIO[-Any,+Nothing,+1]]}].from(call(ƒ:izumi.distage.modules.support.AnyBIO2SupportModule$$Lambda$22400/0x0000000803490040@7e5623ca(izumi.functional.mono.Entropy[+λ %1:0 → 1:0], izumi.functional.mono.SyncSafe[=λ %1 → ZIO[-Any,+Nothing,+1]]): izumi.functional.mono.Entropy[+λ %1 → ZIO[-Any,+Nothing,+1]])) ((AnyBIO2SupportModule.scala:43))
+// make[{type.cats.InvariantSemigroupal[=λ %0 → ZIO[-Any,+Throwable,+0]]}].from(using[{type.cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]}: cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]]) ((CatsEffectInstancesModule.scala:16))
+// make[{type.izumi.functional.bio.BlockingIO3[=λ %1:0,%1:1,%1:2 → ZIO[-1:0,+1:1,+1:2]]}].from(call(ƒ:izumi.distage.modules.platform.ZIOPlatformDependentSupportModule$$Lambda$22356/0x00000008033d6840@11855f9(zio.blocking.package::zio.blocking.Blocking::zio.blocking.Blocking.Service): izumi.functional.bio.BlockingIO3[=λ %1:0,%1:1,%1:2 → ZIO[-1:0,+1:1,+1:2]])) ((ZIOPlatformDependentSupportModule.scala:25))
+// make[{type.cats.effect.ConcurrentEffect[=λ %1:0 → ZIO[-Any,+Throwable,+1:0]]}].from(call(ƒ:izumi.distage.modules.typeclass.ZIOCatsEffectInstancesModule$$Lambda$22424/0x00000008056e3040@71984c5e(zio.Runtime[+Any]): cats.effect.ConcurrentEffect[=λ %1:0 → ZIO[-Any,+Throwable,+1:0]])) ((ZIOCatsEffectInstancesModule.scala:26))
+// make[{type.izumi.distage.model.effect.QuasiAsync[=λ %1 → ZIO[-Any,+Throwable,+1]]}].from(call(ƒ:izumi.distage.modules.support.AnyBIO2SupportModule$$Lambda$22392/0x0000000803456040@d2a476f(izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]], izumi.functional.bio.Temporal3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]): izumi.distage.model.effect.QuasiAsync[=λ %1 → ZIO[-Any,+Throwable,+1]])) ((AnyBIO2SupportModule.scala:33))
+// make[{type.zio.Has[=package::Console::Service]}].from(call(ƒ:izumi.distage.modules.support.ZIOSupportModule$$Lambda$22415/0x000000080354d040@16d975ec(zio.console.package::zio.console.Console::zio.console.Console.Service): zio.Has[=package::Console::Service])) ((ZIOSupportModule.scala:49))
+// make[{type.izumi.functional.bio.BlockingIO3[=λ %1:0,%1:1,%1:2 → ZIO[-Any,+1:1,+1:2]]}].from(call(ƒ:izumi.distage.modules.platform.ZIOPlatformDependentSupportModule$$Lambda$22358/0x00000008033d5040@22e3105f(izumi.functional.bio.BlockingIO3[=λ %1:0,%1:1,%1:2 → ZIO[-1:0,+1:1,+1:2]]): izumi.functional.bio.BlockingIO3[=λ %1:0,%1:1,%1:2 → ZIO[-Any,+1:1,+1:2]])) ((ZIOPlatformDependentSupportModule.scala:26))
+// make[{type.izumi.functional.bio.Functor3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}].from(using[{type.izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}: izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]]) ((BIO3InstancesModule.scala:17))
+// make[{type.izumi.functional.bio.Panic3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}].from(using[{type.izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}: izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]]) ((BIO2InstancesModule.scala:23))
+// make[{type.zio.internal.tracing.TracingConfig}].from(value(TracingConfig(true,true,true,100,100,10,10,10): zio.internal.tracing.TracingConfig)) ((ZIOPlatformDependentSupportModule.scala:46))
+// make[{type.izumi.functional.bio.Bifunctor3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}].from(using[{type.izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}: izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]]) ((BIO2InstancesModule.scala:16))
+// make[{type.izumi.functional.bio.UnsafeRun2[=λ %1:0,%1:1 → ZIO[-Any,+1:0,+1:1]]}].from(using[{type.izumi.functional.bio.UnsafeRun2::izumi.functional.bio.UnsafeRun2.ZIORunner}: izumi.functional.bio.UnsafeRun2::izumi.functional.bio.UnsafeRun2.ZIORunner]) ((ZIOPlatformDependentSupportModule.scala:23))
+// make[{type.izumi.functional.bio.Bracket3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}].from(using[{type.izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}: izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]]) ((BIO3InstancesModule.scala:24))
+// make[{type.cats.Functor[=λ %0 → ZIO[-Any,+Throwable,+0]]}].from(using[{type.cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]}: cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]]) ((CatsEffectInstancesModule.scala:18))
+// make[{type.izumi.functional.bio.IO3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}].from(using[{type.izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}: izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]]) ((BIO2InstancesModule.scala:24))
+// make[{type.izumi.distage.model.effect.QuasiApplicative[=λ %1 → ZIO[-Any,+Throwable,+1]]}].from(call(ƒ:izumi.distage.modules.support.AnyBIO2SupportModule$$Lambda$22390/0x0000000803457840@70886037(izumi.functional.bio.Applicative3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]): izumi.distage.model.effect.QuasiApplicative[=λ %1 → ZIO[-Any,+Throwable,+1]])) ((AnyBIO2SupportModule.scala:30))
+// make[{type.zio.Has[=package::Clock::Service]}].from(call(ƒ:izumi.distage.modules.support.ZIOSupportModule$$Lambda$22412/0x000000080354f040@3e08b451(zio.clock.package::zio.clock.Clock::zio.clock.Clock.Service): zio.Has[=package::Clock::Service])) ((ZIOSupportModule.scala:46))
+// make[{type.izumi.functional.bio.Functor3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}].from(using[{type.izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}: izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]]) ((BIO2InstancesModule.scala:15))
+// make[{type.java.util.concurrent.ThreadPoolExecutor@zio.cpu}].from(allocate[λ %0 → 0](call(ƒ:izumi.distage.modules.platform.ZIOPlatformDependentSupportModule$$Lambda$22370/0x00000008033fdc40@30187dd8(): izumi.distage.model.definition.Lifecycle[+λ %1:0 → 1:0,+ThreadPoolExecutor]))) ((ZIOPlatformDependentSupportModule.scala:51))
+// make[{type.izumi.functional.bio.ApplicativeError3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}].from(using[{type.izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}: izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]]) ((BIO2InstancesModule.scala:19))
+// make[{type.izumi.functional.bio.UnsafeRun2::izumi.functional.bio.UnsafeRun2.ZIORunner}].from(call(ƒ:izumi.distage.modules.platform.ZIOPlatformDependentSupportModule$$Lambda$22364/0x00000008033d1c40@9dd184b(java.util.concurrent.ThreadPoolExecutor, izumi.functional.bio.UnsafeRun2::izumi.functional.bio.UnsafeRun2.FailureHandler, zio.internal.tracing.TracingConfig): izumi.functional.bio.UnsafeRun2::izumi.functional.bio.UnsafeRun2.ZIORunner)) ((ZIOPlatformDependentSupportModule.scala:38))
+// make[{type.izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}].from(call(ƒ:izumi.distage.modules.support.AnyBIO3SupportModule$$Lambda$22402/0x0000000803496840@3d97577c(izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]): izumi.functional.bio.Async3[=λ %2,%3,%4 → ZIO[-3,+3,+4]])) ((AnyBIO3SupportModule.scala:32))
+// make[{type.zio.system.package::zio.system.System::zio.system.System.Service}].from(call(ƒ:izumi.distage.modules.support.ZIOSupportModule$$Lambda$22420/0x000000080354b440@1734e7b6(): zio.system.package::zio.system.System::zio.system.System.Service)) ((ZIOSupportModule.scala:53))
+// make[{type.izumi.functional.bio.Error3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}].from(using[{type.izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}: izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]]) ((BIO3InstancesModule.scala:23))
+// make[{type.izumi.functional.bio.Profunctor3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}].from(using[{type.izumi.functional.bio.Local3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}: izumi.functional.bio.Local3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]]) ((BIO3InstancesModule.scala:32))
+// make[{type.zio.internal.Platform}].from(call(ƒ:izumi.distage.modules.platform.ZIOPlatformDependentSupportModule$$Lambda$22368/0x00000008033fe040@33697234(zio.Runtime[+Any]): zio.internal.Platform)) ((ZIOPlatformDependentSupportModule.scala:49))
+// make[{type.izumi.functional.bio.Temporal3[=λ %1:0,%1:1,%1:2 → ZIO[-1:0,+1:1,+1:2]]}].from(call(ƒ:izumi.distage.modules.support.ZIOSupportModule$$Lambda$22408/0x0000000803492040@3dc497c8(zio.Has[=package::Clock::Service]): izumi.functional.bio.Temporal3[=λ %1:0,%1:1,%1:2 → ZIO[-1:0,+1:1,+1:2]])) ((ZIOSupportModule.scala:34))
+// make[{type.izumi.functional.bio.Error3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}].from(using[{type.izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}: izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]]) ((BIO2InstancesModule.scala:21))
+// make[{type.zio.Runtime[+{Has[=package::System::Service] &amp; Has[=package::Clock::Service] &amp; Has[=package::Random::Service] &amp; Has[=package::Blocking::Service] &amp; Has[=package::Console::Service]}]}].from(call(ƒ:izumi.distage.modules.support.ZIOSupportModule$$Lambda$22410/0x0000000803490840@238503ef(zio.Runtime[+Any], {zio.Has[=package::Blocking::Service] &amp; zio.Has[=package::Console::Service] &amp; zio.Has[=package::Random::Service] &amp; zio.Has[=package::System::Service] &amp; zio.Has[=package::Clock::Service]}): zio.Runtime[+{Has[=package::System::Service] &amp; Has[=package::Clock::Service] &amp; Has[=package::Random::Service] &amp; Has[=package::Blocking::Service] &amp; Has[=package::Console::Service]}])) ((ZIOSupportModule.scala:44))
+// make[{type.izumi.functional.mono.Clock[+λ %1:0 → 1:0]}].from(value(izumi.functional.mono.Clock$Standard$@7699e8f5: izumi.functional.mono.Clock::izumi.functional.mono.Clock.Standard)) ((IdentitySupportModule.scala:20)): izumi.distage.model.definition.Module)) ((InjectorDefaultImpl.scala:119))
+// make[{type.cats.effect.Effect[=λ %0 → ZIO[-Any,+Throwable,+0]]}].from(using[{type.cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]}: cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]]) ((CatsEffectInstancesModule.scala:30))
+// make[{type.izumi.distage.model.definition.BootstrapModule}].from(value(
+// make[{type.izumi.distage.model.provisioning.strategies.ResourceStrategy}].from(call(π:Class(): izumi.distage.provisioning.strategies.ResourceStrategyDefaultImpl)) ((BootstrapLocator.scala:128))
+// many[{type.scala.collection.immutable.Set[=PlanningHook]}] ((BootstrapLocator.scala:133))
+// many[{type.scala.collection.immutable.Set[=PlanningObserver]}] ((BootstrapLocator.scala:132))
+// make[{type.izumi.distage.model.provisioning.ProvisioningFailureInterceptor}].from(call(π:Class(): izumi.distage.model.provisioning.ProvisioningFailureInterceptor::izumi.distage.model.provisioning.ProvisioningFailureInterceptor.DefaultImpl)) ((BootstrapLocator.scala:130))
+// make[{type.izumi.distage.planning.BindingTranslator}].from(call(π:Class(): izumi.distage.planning.BindingTranslator::izumi.distage.planning.BindingTranslator.Impl)) ((BootstrapLocator.scala:138))
+// make[{type.izumi.distage.model.planning.ForwardingRefResolver}].from(call(π:Class(izumi.distage.planning.sequential.FwdrefLoopBreaker): izumi.distage.planning.sequential.ForwardingRefResolverDefaultImpl)) ((BootstrapLocator.scala:117))
+// make[{type.izumi.distage.model.planning.PlanningObserver}].from(call(π:Class(scala.collection.immutable.Set[=PlanningObserver]): izumi.distage.planning.PlanningObserverAggregate)) ((BootstrapLocator.scala:135))
+// make[{type.izumi.distage.model.provisioning.strategies.EffectStrategy}].from(call(π:Class(): izumi.distage.provisioning.strategies.EffectStrategyDefaultImpl)) ((BootstrapLocator.scala:127))
+// make[{type.izumi.distage.model.planning.PlanAnalyzer}].from(call(π:Class(): izumi.distage.planning.PlanAnalyzerDefaultImpl)) ((BootstrapLocator.scala:110))
+// make[{type.izumi.distage.model.planning.SanityChecker}].from(call(π:Class(izumi.distage.model.planning.PlanAnalyzer): izumi.distage.planning.sequential.SanityCheckerDefaultImpl)) ((BootstrapLocator.scala:118))
+// make[{type.izumi.distage.model.provisioning.PlanInterpreter}].from(call(π:Class(izumi.distage.model.provisioning.strategies.SetStrategy, izumi.distage.model.provisioning.strategies.ProxyStrategy, izumi.distage.model.provisioning.strategies.ProviderStrategy, izumi.distage.model.provisioning.strategies.ImportStrategy, izumi.distage.model.provisioning.strategies.InstanceStrategy, izumi.distage.model.provisioning.strategies.EffectStrategy, izumi.distage.model.provisioning.strategies.ResourceStrategy, izumi.distage.model.provisioning.ProvisioningFailureInterceptor, izumi.distage.provisioning.ProvisionOperationVerifier, scala.Boolean, izumi.distage.model.planning.PlanAnalyzer): izumi.distage.provisioning.PlanInterpreterDefaultRuntimeImpl)) ((BootstrapLocator.scala:121))
+// make[{type.izumi.distage.planning.solver.GraphPreparations}].from(call(π:Class(izumi.distage.planning.BindingTranslator): izumi.distage.planning.solver.GraphPreparations)) ((BootstrapLocator.scala:113))
+// make[{type.izumi.distage.model.provisioning.proxies.ProxyProvider}].from(call(π:Class(): izumi.distage.provisioning.strategies.cglib.CglibProxyProvider)).tagged(Set(AxisTag(cycles:proxy))) ((BootstrapLocator.scala:140))
+// make[{type.izumi.distage.model.provisioning.strategies.InstanceStrategy}].from(call(π:Class(): izumi.distage.provisioning.strategies.InstanceStrategyDefaultImpl)) ((BootstrapLocator.scala:126))
+// make[{type.izumi.distage.planning.solver.PlanSolver}].from(call(π:Class(izumi.distage.planning.solver.SemigraphSolver[=DIKey,=Int,=ExecutableOp::InstantiationOp], izumi.distage.planning.solver.GraphPreparations): izumi.distage.planning.solver.PlanSolver::izumi.distage.planning.solver.PlanSolver.Impl)) ((BootstrapLocator.scala:112))
+// make[{type.izumi.distage.model.reflection.MirrorProvider}].from(value(izumi.distage.model.reflection.MirrorProvider$Impl$@55951179: izumi.distage.model.reflection.MirrorProvider::izumi.distage.model.reflection.MirrorProvider.Impl)) ((BootstrapLocator.scala:108))
+// make[{type.izumi.distage.model.provisioning.strategies.ProxyStrategy}].from(call(π:Class(): izumi.distage.provisioning.strategies.ProxyStrategyFailingImpl)).tagged(Set(AxisTag(cycles:disable))) ((BootstrapLocator.scala:143))
+// make[{type.scala.Boolean@izumi.distage.interpreter.full-stacktraces}].from(value(true: scala.Boolean)) ((BootstrapLocator.scala:104))
+// make[{type.izumi.distage.model.Planner}].from(call(π:Class(izumi.distage.model.planning.ForwardingRefResolver, izumi.distage.model.planning.SanityChecker, izumi.distage.model.planning.PlanningObserver, izumi.distage.model.planning.PlanningHook, izumi.distage.planning.solver.PlanSolver): izumi.distage.planning.PlannerDefaultImpl)) ((BootstrapLocator.scala:120))
+// make[{type.izumi.distage.model.provisioning.strategies.ProxyStrategy}].from(call(π:Class(izumi.distage.model.provisioning.proxies.ProxyProvider, izumi.distage.model.reflection.MirrorProvider): izumi.distage.provisioning.strategies.ProxyStrategyDefaultImpl)) ((BootstrapLocator.scala:144))
+// make[{type.izumi.distage.model.provisioning.proxies.ProxyProvider}].from(call(π:Class(): izumi.distage.model.provisioning.proxies.ProxyProvider::izumi.distage.model.provisioning.proxies.ProxyProvider.ProxyProviderFailingImpl)) ((BootstrapLocator.scala:141))
+// make[{type.izumi.distage.provisioning.ProvisionOperationVerifier}].from(call(π:Class(izumi.distage.model.reflection.MirrorProvider): izumi.distage.provisioning.ProvisionOperationVerifier::izumi.distage.provisioning.ProvisionOperationVerifier.Default)) ((BootstrapLocator.scala:106))
+// make[{type.izumi.distage.model.provisioning.strategies.SetStrategy}].from(call(π:Class(): izumi.distage.provisioning.strategies.SetStrategyDefaultImpl)) ((BootstrapLocator.scala:123))
+// make[{type.izumi.distage.planning.sequential.FwdrefLoopBreaker}].from(call(π:Class(izumi.distage.model.reflection.MirrorProvider, izumi.distage.model.planning.PlanAnalyzer): izumi.distage.planning.sequential.FwdrefLoopBreaker::izumi.distage.planning.sequential.FwdrefLoopBreaker.FwdrefLoopBreakerDefaultImpl)) ((BootstrapLocator.scala:146))
+// make[{type.izumi.distage.planning.solver.SemigraphSolver[=DIKey,=Int,=ExecutableOp::InstantiationOp]}].from(call(π:Class(): izumi.distage.planning.solver.SemigraphSolver::izumi.distage.planning.solver.SemigraphSolver.SemigraphSolverImpl[=DIKey,=Int,=ExecutableOp::InstantiationOp])) ((BootstrapLocator.scala:115))
+// make[{type.izumi.distage.model.provisioning.strategies.ImportStrategy}].from(call(π:Class(): izumi.distage.provisioning.strategies.ImportStrategyDefaultImpl)) ((BootstrapLocator.scala:125))
+// make[{type.izumi.distage.model.planning.PlanningHook}].from(call(π:Class(scala.collection.immutable.Set[=PlanningHook]): izumi.distage.planning.PlanningHookAggregate)) ((BootstrapLocator.scala:136))
+// make[{type.izumi.distage.model.provisioning.strategies.ProviderStrategy}].from(call(π:Class(): izumi.distage.provisioning.strategies.ProviderStrategyDefaultImpl)) ((BootstrapLocator.scala:124)): izumi.distage.model.definition.BootstrapModule)) ((InjectorDefaultImpl.scala:118))
+// make[{type.cats.effect.Async[=λ %0 → ZIO[-Any,+Throwable,+0]]}].from(using[{type.cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]}: cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]]) ((CatsEffectInstancesModule.scala:28))
+// make[{type.izumi.distage.model.definition.Activation}].from(value(Activation(Map()): izumi.distage.model.definition.Activation)) ((InjectorDefaultImpl.scala:122))
+// make[{type.izumi.functional.bio.Ask3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}].from(using[{type.izumi.functional.bio.Local3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}: izumi.functional.bio.Local3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]]) ((BIO3InstancesModule.scala:30))
+// make[{type.izumi.functional.bio.data.Isomorphism2[=λ %1:0,%1:1 → ZIO[-Any,+1:0,+1:1],=λ %1:0,%1:1 → ZIO[-Any,+1:0,+1:1]]}].from(value(izumi.functional.bio.data.Isomorphism2$$anon$1@3a66a9bc: izumi.functional.bio.data.Isomorphism2[=λ %1:0,%1:1 → ZIO[-Any,+1:0,+1:1],=λ %1:0,%1:1 → ZIO[-Any,+1:0,+1:1]])) ((ZIOSupportModule.scala:42))
+// make[{type.izumi.functional.mono.Entropy[+λ %1 → ZIO[-Any,+Nothing,+1]]}].from(call(ƒ:izumi.distage.modules.support.AnyBIO2SupportModule$$Lambda$22400/0x0000000803490040@7e5623ca(izumi.functional.mono.Entropy[+λ %1:0 → 1:0], izumi.functional.mono.SyncSafe[=λ %1 → ZIO[-Any,+Nothing,+1]]): izumi.functional.mono.Entropy[+λ %1 → ZIO[-Any,+Nothing,+1]])) ((AnyBIO2SupportModule.scala:43))
+// make[{type.cats.InvariantSemigroupal[=λ %0 → ZIO[-Any,+Throwable,+0]]}].from(using[{type.cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]}: cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]]) ((CatsEffectInstancesModule.scala:16))
+// make[{type.izumi.functional.bio.BlockingIO3[=λ %1:0,%1:1,%1:2 → ZIO[-1:0,+1:1,+1:2]]}].from(call(ƒ:izumi.distage.modules.platform.ZIOPlatformDependentSupportModule$$Lambda$22356/0x00000008033d6840@11855f9(zio.blocking.package::zio.blocking.Blocking::zio.blocking.Blocking.Service): izumi.functional.bio.BlockingIO3[=λ %1:0,%1:1,%1:2 → ZIO[-1:0,+1:1,+1:2]])) ((ZIOPlatformDependentSupportModule.scala:25))
+// make[{type.cats.effect.ConcurrentEffect[=λ %1:0 → ZIO[-Any,+Throwable,+1:0]]}].from(call(ƒ:izumi.distage.modules.typeclass.ZIOCatsEffectInstancesModule$$Lambda$22424/0x00000008056e3040@71984c5e(zio.Runtime[+Any]): cats.effect.ConcurrentEffect[=λ %1:0 → ZIO[-Any,+Throwable,+1:0]])) ((ZIOCatsEffectInstancesModule.scala:26))
+// make[{type.izumi.distage.model.effect.QuasiAsync[=λ %1 → ZIO[-Any,+Throwable,+1]]}].from(call(ƒ:izumi.distage.modules.support.AnyBIO2SupportModule$$Lambda$22392/0x0000000803456040@d2a476f(izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]], izumi.functional.bio.Temporal3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]): izumi.distage.model.effect.QuasiAsync[=λ %1 → ZIO[-Any,+Throwable,+1]])) ((AnyBIO2SupportModule.scala:33))
+// make[{type.zio.Has[=package::Console::Service]}].from(call(ƒ:izumi.distage.modules.support.ZIOSupportModule$$Lambda$22415/0x000000080354d040@16d975ec(zio.console.package::zio.console.Console::zio.console.Console.Service): zio.Has[=package::Console::Service])) ((ZIOSupportModule.scala:49))
+// make[{type.izumi.functional.bio.BlockingIO3[=λ %1:0,%1:1,%1:2 → ZIO[-Any,+1:1,+1:2]]}].from(call(ƒ:izumi.distage.modules.platform.ZIOPlatformDependentSupportModule$$Lambda$22358/0x00000008033d5040@22e3105f(izumi.functional.bio.BlockingIO3[=λ %1:0,%1:1,%1:2 → ZIO[-1:0,+1:1,+1:2]]): izumi.functional.bio.BlockingIO3[=λ %1:0,%1:1,%1:2 → ZIO[-Any,+1:1,+1:2]])) ((ZIOPlatformDependentSupportModule.scala:26))
+// make[{type.izumi.functional.bio.Functor3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}].from(using[{type.izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}: izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]]) ((BIO3InstancesModule.scala:17))
+// make[{type.izumi.functional.bio.Panic3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}].from(using[{type.izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}: izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]]) ((BIO2InstancesModule.scala:23))
+// make[{type.zio.internal.tracing.TracingConfig}].from(value(TracingConfig(true,true,true,100,100,10,10,10): zio.internal.tracing.TracingConfig)) ((ZIOPlatformDependentSupportModule.scala:46))
+// make[{type.izumi.functional.bio.Bifunctor3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}].from(using[{type.izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}: izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]]) ((BIO2InstancesModule.scala:16))
+// make[{type.izumi.functional.bio.UnsafeRun2[=λ %1:0,%1:1 → ZIO[-Any,+1:0,+1:1]]}].from(using[{type.izumi.functional.bio.UnsafeRun2::izumi.functional.bio.UnsafeRun2.ZIORunner}: izumi.functional.bio.UnsafeRun2::izumi.functional.bio.UnsafeRun2.ZIORunner]) ((ZIOPlatformDependentSupportModule.scala:23))
+// make[{type.izumi.functional.bio.Bracket3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}].from(using[{type.izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}: izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]]) ((BIO3InstancesModule.scala:24))
+// make[{type.cats.Functor[=λ %0 → ZIO[-Any,+Throwable,+0]]}].from(using[{type.cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]}: cats.effect.ConcurrentEffect[=λ %0 → ZIO[-Any,+Throwable,+0]]]) ((CatsEffectInstancesModule.scala:18))
+// make[{type.izumi.functional.bio.IO3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}].from(using[{type.izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}: izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]]) ((BIO2InstancesModule.scala:24))
+// make[{type.izumi.distage.model.effect.QuasiApplicative[=λ %1 → ZIO[-Any,+Throwable,+1]]}].from(call(ƒ:izumi.distage.modules.support.AnyBIO2SupportModule$$Lambda$22390/0x0000000803457840@70886037(izumi.functional.bio.Applicative3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]): izumi.distage.model.effect.QuasiApplicative[=λ %1 → ZIO[-Any,+Throwable,+1]])) ((AnyBIO2SupportModule.scala:30))
+// make[{type.zio.Has[=package::Clock::Service]}].from(call(ƒ:izumi.distage.modules.support.ZIOSupportModule$$Lambda$22412/0x000000080354f040@3e08b451(zio.clock.package::zio.clock.Clock::zio.clock.Clock.Service): zio.Has[=package::Clock::Service])) ((ZIOSupportModule.scala:46))
+// make[{type.izumi.functional.bio.Functor3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}].from(using[{type.izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}: izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]]) ((BIO2InstancesModule.scala:15))
+// make[{type.java.util.concurrent.ThreadPoolExecutor@zio.cpu}].from(allocate[λ %0 → 0](call(ƒ:izumi.distage.modules.platform.ZIOPlatformDependentSupportModule$$Lambda$22370/0x00000008033fdc40@30187dd8(): izumi.distage.model.definition.Lifecycle[+λ %1:0 → 1:0,+ThreadPoolExecutor]))) ((ZIOPlatformDependentSupportModule.scala:51))
+// make[{type.izumi.functional.bio.ApplicativeError3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}].from(using[{type.izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}: izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]]) ((BIO2InstancesModule.scala:19))
+// make[{type.izumi.functional.bio.UnsafeRun2::izumi.functional.bio.UnsafeRun2.ZIORunner}].from(call(ƒ:izumi.distage.modules.platform.ZIOPlatformDependentSupportModule$$Lambda$22364/0x00000008033d1c40@9dd184b(java.util.concurrent.ThreadPoolExecutor, izumi.functional.bio.UnsafeRun2::izumi.functional.bio.UnsafeRun2.FailureHandler, zio.internal.tracing.TracingConfig): izumi.functional.bio.UnsafeRun2::izumi.functional.bio.UnsafeRun2.ZIORunner)) ((ZIOPlatformDependentSupportModule.scala:38))
+// make[{type.izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}].from(call(ƒ:izumi.distage.modules.support.AnyBIO3SupportModule$$Lambda$22402/0x0000000803496840@3d97577c(izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]): izumi.functional.bio.Async3[=λ %2,%3,%4 → ZIO[-3,+3,+4]])) ((AnyBIO3SupportModule.scala:32))
+// make[{type.zio.system.package::zio.system.System::zio.system.System.Service}].from(call(ƒ:izumi.distage.modules.support.ZIOSupportModule$$Lambda$22420/0x000000080354b440@1734e7b6(): zio.system.package::zio.system.System::zio.system.System.Service)) ((ZIOSupportModule.scala:53))
+// make[{type.izumi.functional.bio.Error3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}].from(using[{type.izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}: izumi.functional.bio.Async3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]]) ((BIO3InstancesModule.scala:23))
+// make[{type.izumi.functional.bio.Profunctor3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}].from(using[{type.izumi.functional.bio.Local3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]}: izumi.functional.bio.Local3[=λ %0,%1,%2 → ZIO[-0,+1,+2]]]) ((BIO3InstancesModule.scala:32))
+// make[{type.zio.internal.Platform}].from(call(ƒ:izumi.distage.modules.platform.ZIOPlatformDependentSupportModule$$Lambda$22368/0x00000008033fe040@33697234(zio.Runtime[+Any]): zio.internal.Platform)) ((ZIOPlatformDependentSupportModule.scala:49))
+// make[{type.izumi.functional.bio.Temporal3[=λ %1:0,%1:1,%1:2 → ZIO[-1:0,+1:1,+1:2]]}].from(call(ƒ:izumi.distage.modules.support.ZIOSupportModule$$Lambda$22408/0x0000000803492040@3dc497c8(zio.Has[=package::Clock::Service]): izumi.functional.bio.Temporal3[=λ %1:0,%1:1,%1:2 → ZIO[-1:0,+1:1,+1:2]])) ((ZIOSupportModule.scala:34))
+// make[{type.izumi.functional.bio.Error3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}].from(using[{type.izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]}: izumi.functional.bio.Async3[=λ %1,%2,%3 → ZIO[-Any,+2,+3]]]) ((BIO2InstancesModule.scala:21))
+// make[{type.zio.Runtime[+{Has[=package::System::Service] &amp; Has[=package::Clock::Service] &amp; Has[=package::Random::Service] &amp; Has[=package::Blocking::Service] &amp; Has[=package::Console::Service]}]}].from(call(ƒ:izumi.distage.modules.support.ZIOSupportModule$$Lambda$22410/0x0000000803490840@238503ef(zio.Runtime[+Any], {zio.Has[=package::Blocking::Service] &amp; zio.Has[=package::Console::Service] &amp; zio.Has[=package::Random::Service] &amp; zio.Has[=package::System::Service] &amp; zio.Has[=package::Clock::Service]}): zio.Runtime[+{Has[=package::System::Service] &amp; Has[=package::Clock::Service] &amp; Has[=package::Random::Service] &amp; Has[=package::Blocking::Service] &amp; Has[=package::Console::Service]}])) ((ZIOSupportModule.scala:44))
+// make[{type.izumi.functional.mono.Clock[+λ %1:0 → 1:0]}].from(value(izumi.functional.mono.Clock$Standard$@7699e8f5: izumi.functional.mono.Clock::izumi.functional.mono.Clock.Standard)) ((IdentitySupportModule.scala:20)),Activation(Map()),Of(NonEmptySet({type.repl.MdocSession::repl.MdocSession.App1::repl.MdocSession.App1.HelloByeApp}))))
 </code></pre>
 <p>The series of steps must be executed to produce the object graph.</p>
 <p><code>Injector.produce</code> will interpret the steps into a <a href="basics.html#resource-bindings-lifecycle"><code>Lifecycle</code></a> value holding the lifecycle of the object graph:</p>
@@ -338,7 +572,7 @@ val plan = injector.plan(HelloByeModule, Activation.empty, Roots.target[HelloBye
 // Interpret into a Lifecycle value
 
 val resource = injector.produce(plan)
-// resource: izumi.distage.model.definition.Lifecycle[zio.ZIO[zio.Has[Console.Service], Throwable, β$0$], izumi.distage.model.Locator] = izumi.distage.model.definition.Lifecycle$$anon$10@375c6b24
+// resource: izumi.distage.model.definition.Lifecycle[zio.ZIO[zio.Has[Console.Service], Throwable, β$0$], izumi.distage.model.Locator] = izumi.distage.model.definition.Lifecycle$$anon$10@5c494653
 
 // Use the object graph:
 // After `.use` exits, all objects will be deallocated,
@@ -348,7 +582,7 @@ val effect = resource.use {
   objects =&gt;
     objects.get[HelloByeApp].run
 }
-// effect: zio.ZIO[zio.Has[Console.Service], Throwable, Unit] = zio.ZIO$CheckInterrupt@6133c2c5
+// effect: zio.ZIO[zio.Has[Console.Service], Throwable, Unit] = zio.ZIO$CheckInterrupt@4e4cf520
 
 // Run the resulting program
 
@@ -637,7 +871,7 @@ val objectGraphResource = {
   Injector[IO]()
     .produce(module, Roots.target[MyApp])
 }
-// objectGraphResource: izumi.distage.model.definition.Lifecycle[IO, izumi.distage.model.Locator] = izumi.distage.model.definition.Lifecycle$$anon$10@158be082
+// objectGraphResource: izumi.distage.model.definition.Lifecycle[IO, izumi.distage.model.Locator] = izumi.distage.model.definition.Lifecycle$$anon$10@2fecef8a
 
 objectGraphResource
   .use(_.get[MyApp].run)
@@ -678,7 +912,7 @@ val closedInit = Injector()
       init
 }
 // true
-// closedInit: izumi.fundamentals.platform.functional.package.Identity[Init] = repl.MdocSession$App21$Init@4934a869
+// closedInit: izumi.fundamentals.platform.functional.package.Identity[Init] = repl.MdocSession$App21$Init@7ac469c5
 
 println(closedInit.initialized)
 // false
@@ -762,16 +996,16 @@ def polymorphicHelloWorld[F[_]: TagK: QuasiIO: DefaultModule]: F[Unit] = {
 }
 
 val catsEffectHello = polymorphicHelloWorld[cats.effect.IO]
-// catsEffectHello: IO[Unit] = IO$592080269
+// catsEffectHello: IO[Unit] = IO$1854475950
 
 val monixHello = polymorphicHelloWorld[monix.eval.Task]
-// monixHello: monix.eval.Task[Unit] = Task.Async$475193924
+// monixHello: monix.eval.Task[Unit] = Task.Async$2016775359
 
 val zioHello = polymorphicHelloWorld[zio.IO[Throwable, _]]
-// zioHello: zio.ZIO[Any, Throwable, Unit] = zio.ZIO$CheckInterrupt@4d0394ad
+// zioHello: zio.ZIO[Any, Throwable, Unit] = zio.ZIO$CheckInterrupt@36d2ee33
 
 val monixBioHello = polymorphicHelloWorld[monix.bio.IO[Throwable, _]]
-// monixBioHello: monix.bio.IO[Throwable, Unit] = IO.Async$171750119
+// monixBioHello: monix.bio.IO[Throwable, Unit] = IO.Async$269265702
 </code></pre>
 <p>See <a href="/latest/snapshot/api/izumi/distage/modules/DefaultModule.html"><code>DefaultModule</code></a> implicit for implementation details. For details on what exact components are available for each effect type, see <a href="/latest/snapshot/api/izumi/distage/modules/support/ZIOSupportModule.html">ZIOSupportModule</a>, <a href="/latest/snapshot/api/izumi/distage/modules/support/CatsIOSupportModule.html">CatsIOSupportModule</a>, <a href="/latest/snapshot/api/izumi/distage/modules/support/MonixSupportModule.html">MonixSupportModule</a>, <a href="/latest/snapshot/api/izumi/distage/modules/support/MonixBIOSupportModule.html">MonixBIOSupportModule</a>, <a href="/latest/snapshot/api/izumi/distage/modules/typeclass/ZIOCatsEffectInstancesModule.html">ZIOCatsEffectInstancesModule</a>, respectively.</p>
 <p>DefaultModule occurs as an implicit parameter in <code>distage</code> entrypoints that require an effect type parameter, namely: <code>Injector[F]()</code> in <code>distage-core</code>, <a href="distage-framework.html#roles"><code>extends RoleAppMain[F]</code></a> and <a href="distage-framework.html#compile-time-checks"><code>extends PlanCheck.Main[F]</code></a> in <code>distage-framework</code> and <a href="distage-testkit.html"><code>extends Spec1[F]</code></a> in <code>distage-testkit</code>.</p>
@@ -845,7 +1079,7 @@ object AppModule extends ModuleDef {
 // wire the graph and get the app
 
 val app = Injector().produceGet[App](AppModule).unsafeGet()
-// app: App = repl.MdocSession$App26$App$Impl@35bdb744
+// app: App = repl.MdocSession$App26$App$Impl@38a5fc68
 
 // check how it works
 
@@ -995,7 +1229,7 @@ val io = Injector[Task]()
         res2 &lt;- kv.get(&quot;apple&quot;)
       } yield res1 + res2
   }
-// io: Task[String] = zio.ZIO$CheckInterrupt@64bbf2fb
+// io: Task[String] = zio.ZIO$CheckInterrupt@483e7db0
 
 zio.Runtime.default.unsafeRun(io)
 // res38: String = pieipad
@@ -1064,10 +1298,10 @@ trait World {
 // using service functions from everywhere
 
 val hello: RIO[Has[Hello], String] = RIO.accessM(_.get.hello)
-// hello: RIO[Has[Hello], String] = zio.ZIO$Read@c87dc07
+// hello: RIO[Has[Hello], String] = zio.ZIO$Read@1f0a6d95
 
 val world: RIO[Has[World], String] = RIO.accessM(_.get.world)
-// world: RIO[Has[World], String] = zio.ZIO$Read@5ee0f1f
+// world: RIO[Has[World], String] = zio.ZIO$Read@1962c6ea
 
 // service implementations
 
@@ -1079,7 +1313,7 @@ val makeHello = {
     putStrLn(&quot;Shutting down Enterprise Hellower&quot;).orDie
   )
 }
-// makeHello: zio.ZManaged[Console, java.io.IOException, AnyRef with Hello{val hello: zio.UIO[String]}] = zio.ZManaged$$anon$2@3f28458b
+// makeHello: zio.ZManaged[Console, java.io.IOException, AnyRef with Hello{val hello: zio.UIO[String]}] = zio.ZManaged$$anon$2@7bf00f8e
 
 val makeWorld = {
   for {
@@ -1088,7 +1322,7 @@ val makeWorld = {
     val world = counter.get.map(c =&gt; if (c &lt; 1) &quot;World&quot; else &quot;THE World&quot;)
   }
 }
-// makeWorld: zio.ZIO[Any, Nothing, AnyRef with World{val world: zio.ZIO[Any,Nothing,String]}] = zio.ZIO$FlatMap@77ba17e5
+// makeWorld: zio.ZIO[Any, Nothing, AnyRef with World{val world: zio.ZIO[Any,Nothing,String]}] = zio.ZIO$FlatMap@41173384
 
 // the main function
 
@@ -1099,7 +1333,7 @@ val turboFunctionalHelloWorld: RIO[Has[Hello] with Has[World] with Has[Console.S
     _     &lt;- putStrLn(s&quot;$hello $world&quot;)
   } yield ()
 }
-// turboFunctionalHelloWorld: RIO[Has[Hello] with Has[World] with Has[Console.Service], Unit] = zio.ZIO$FlatMap@2faf1a25
+// turboFunctionalHelloWorld: RIO[Has[Hello] with Has[World] with Has[Console.Service], Unit] = zio.ZIO$FlatMap@13ee9da1
 
 def module = new ModuleDef {
   make[Hello].fromHas(makeHello)
@@ -1109,7 +1343,7 @@ def module = new ModuleDef {
 
 val main = Injector[Task]()
   .produceRun[Unit](module)((_: Unit) =&gt; Task.unit)
-// main: Task[Unit] = zio.ZIO$CheckInterrupt@4be3c530
+// main: Task[Unit] = zio.ZIO$CheckInterrupt@bc8e253
 
 zio.Runtime.default.unsafeRun(main)
 // Creating Enterprise Hellower...
@@ -1134,11 +1368,11 @@ trait Depender[-R] {
 implicit val contra1: Contravariant[Dependee] = new Contravariant[Dependee] {
   def contramap[A, B](fa: Dependee[A])(f: B =&gt; A): Dependee[B] = new Dependee[B] { def x(y: String) = fa.x(y).provideSome(f) }
 }
-// contra1: Contravariant[Dependee] = repl.MdocSession$App41$$anon$25@7fdb5be2
+// contra1: Contravariant[Dependee] = repl.MdocSession$App41$$anon$25@49b9a5d3
 implicit val contra2: Contravariant[Depender] = new Contravariant[Depender] {
   def contramap[A, B](fa: Depender[A])(f: B =&gt; A): Depender[B] = new Depender[B] { def y = fa.y.provideSome(f) }
 }
-// contra2: Contravariant[Depender] = repl.MdocSession$App41$$anon$27@2872180e
+// contra2: Contravariant[Depender] = repl.MdocSession$App41$$anon$27@2edd3ad0
 
 type DependeeR = Has[Dependee[Any]]
 type DependerR = Has[Depender[Any]]
@@ -1440,7 +1674,7 @@ def SyncProgram[F[_]: TagK: Sync] = ProgramModule[F] ++ SyncInterpreters[F]
 // create object graph Lifecycle
 
 val objectsLifecycle = Injector[IO]().produce(SyncProgram[IO], Roots.Everything)
-// objectsLifecycle: izumi.distage.model.definition.Lifecycle[IO, izumi.distage.model.Locator] = izumi.distage.model.definition.Lifecycle$$anon$10@9aef943
+// objectsLifecycle: izumi.distage.model.definition.Lifecycle[IO, izumi.distage.model.Locator] = izumi.distage.model.definition.Lifecycle$$anon$10@7d3eddd
 
 // run
 
@@ -1486,7 +1720,7 @@ def chooseInterpreters(isDummy: Boolean) = {
 // execute
 
 chooseInterpreters(true)
-// res51: izumi.distage.model.definition.Lifecycle[zio.ZIO[zio.Has[Console.Service], Throwable, β$8$], TaglessProgram[zio.ZIO[zio.Has[Console.Service], Throwable, β$9$]]] = izumi.distage.model.definition.Lifecycle$$anon$9@63dfd596
+// res51: izumi.distage.model.definition.Lifecycle[zio.ZIO[zio.Has[Console.Service], Throwable, β$8$], TaglessProgram[zio.ZIO[zio.Has[Console.Service], Throwable, β$9$]]] = izumi.distage.model.definition.Lifecycle$$anon$9@35f6fb68
 </code></pre>
 <h3><a href="#kind-polymorphism" name="kind-polymorphism" class="anchor"><span class="anchor-link"></span></a>Kind polymorphism</h3>
 <p>Modules can be polymorphic over arbitrary kinds - use <code>TagKK</code> to abstract over bifunctors:</p>
@@ -1504,44 +1738,6 @@ chooseInterpreters(true)
 <p>Cats &amp; ZIO instances and syntax are available automatically in <code>distage-core</code>, without wildcard imports, if your project depends on <code>cats-core</code>, <code>cats-effect</code> or <code>zio</code>. However, distage <em>won&rsquo;t</em> bring in <code>cats</code> or <code>zio</code> as dependencies if you don&rsquo;t already depend on them. (see <a href="https://blog.7mind.io/no-more-orphans.html">No More Orphans</a> blog post for details on how that works)</p>
 <p><a href="basics.html#resource-bindings-lifecycle">Cats Resource &amp; ZIO ZManaged Bindings</a> also work out of the box without any magic imports.</p>
 <p>All relevant typeclass instances for chosen effect type, such as <code>ConcurrentEffect[F]</code>, are <a href="basics.html#out-of-the-box-typeclass-instances">included by default</a> (overridable by user bindings)</p>
-<p>Example:</p>
-<pre class="prettyprint"><code class="language-scala">import cats.syntax.semigroup._
-import cats.effect.{ExitCode, IO, IOApp}
-import distage.{DIKey, Roots, Injector}
-
-trait AppEntrypoint {
-  def run: IO[Unit]
-}
-
-object Main extends IOApp {
-  override def run(args: List[String]): IO[ExitCode] = {
-
-    // `distage.Module` has a Monoid instance
-
-    val myModules = ProgramModule[IO] |+| SyncInterpreters[IO]
-
-    val plan = Injector().plan(myModules, Roots.target[AppEntrypoint])
-
-    for {
-      // resolveImportsF can effectfully add missing instances to an existing plan
-      // (You can also create instances effectfully inside `ModuleDef` via `make[_].fromEffect` bindings)
-
-      newPlan &lt;- plan.resolveImportsF[IO] {
-        case i if i.target == DIKey[DBConnection] =&gt;
-           DBConnection.create[IO]
-      }
-
-      // Effects used in Resource and Effect Bindings
-      // should match the effect `F[_]` in `Injector[F]()`
-
-      _ &lt;- Injector[IO]().produce(newPlan).use {
-        classes =&gt;
-          classes.get[AppEntrypoint].run
-      }
-    } yield ExitCode.Success
-  }
-}
-</code></pre>
 </div>
 <div>
 <a href="https://github.com/7mind/izumi/tree/master/doc/microsite/target/mdoc/distage/basics.md" title="Edit this page" class="md-source-file md-edit">
