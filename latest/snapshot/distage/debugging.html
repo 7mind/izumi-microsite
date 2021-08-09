@@ -207,7 +207,11 @@ data-md-source="github">
 <ul>
   <li><a href="../distage/debugging.html#testing-plans" class="header">Testing Plans</a></li>
   <li><a href="../distage/debugging.html#pretty-printing-plans" class="header">Pretty-printing plans</a></li>
-  <li><a href="../distage/debugging.html#graphviz-rendering" class="header">Graphviz rendering</a></li>
+  <li><a href="../distage/debugging.html#graphviz-rendering" class="header">Graphviz rendering</a>
+  <ul>
+    <li><a href="../distage/debugging.html#command-line-activation" class="header">Command-line activation</a></li>
+    <li><a href="../distage/debugging.html#testkit-activation" class="header">Testkit activation</a></li>
+  </ul></li>
 </ul>
 </div>
 <h3><a href="#testing-plans" name="testing-plans" class="anchor"><span class="anchor-link"></span></a>Testing Plans</h3>
@@ -257,35 +261,32 @@ Injector[cats.effect.IO]().assert(goodModule, Roots.target[A])
 <pre class="prettyprint"><code class="language-scala">import distage.PlannerInput
 
 val plan = Injector().plan(goodModule, Roots.target[A])
-// plan: izumi.distage.model.plan.DIPlan = DIPlan(DG(IncidenceMatrix(Map({effect.{type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B}/cats.effect.IO[+MdocSession::App0::B]} -&gt; Set({type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B}), {type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B} -&gt; Set({type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.A}), {type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.A} -&gt; Set())),IncidenceMatrix(Map({effect.{type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B}/cats.effect.IO[+MdocSession::App0::B]} -&gt; Set(), {type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B} -&gt; Set({effect.{type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B}/cats.effect.IO[+MdocSession::App0::B]}), {type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.A} -&gt; Set({type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B}))),GraphMeta(Map({effect.{type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B}/cats.effect.IO[+MdocSession::App0::B]} -&gt; {effect.{type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B}/cats.effect.IO[+MdocSession::App0::B]} (debugging.md:39) := value cats.effect.IO$Delay#-393800457, {type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B} -&gt; {type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B} (debugging.md:39) := effect[λ %0 → cats.effect.IO[+0]]{effect.{type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B}/cats.effect.IO[+MdocSession::App0::B]}, {type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.A} -&gt; {type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.A} (debugging.md:38) :=
+// plan: izumi.distage.model.plan.DIPlan = DIPlan(DG(IncidenceMatrix(Map({effect.{type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B}/cats.effect.IO[+MdocSession::App0::B]} -&gt; Set({type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B}), {type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B} -&gt; Set({type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.A}), {type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.A} -&gt; Set())),IncidenceMatrix(Map({effect.{type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B}/cats.effect.IO[+MdocSession::App0::B]} -&gt; Set(), {type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B} -&gt; Set({effect.{type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B}/cats.effect.IO[+MdocSession::App0::B]}), {type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.A} -&gt; Set({type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B}))),GraphMeta(Map({effect.{type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B}/cats.effect.IO[+MdocSession::App0::B]} -&gt; {effect.{type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B}/cats.effect.IO[+MdocSession::App0::B]} (debugging.md:39) := value cats.effect.IO$Delay#-951553505, {type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B} -&gt; {type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B} (debugging.md:39) := effect[λ %0 → cats.effect.IO[+0]]{effect.{type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B}/cats.effect.IO[+MdocSession::App0::B]}, {type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.A} -&gt; {type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.A} (debugging.md:38) :=
 //     call(π:Class(repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B): repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.A[32m) {
 //       arg b: repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B &lt;- {type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B}
 //     }))),PlannerInput(
-// make[{type.izumi.distage.model.effect.QuasiAsync[=λ %1:0 → 1:0]}].from(value(izumi.distage.model.effect.QuasiAsync$$anon$1@4811128d: izumi.distage.model.effect.QuasiAsync[=λ %1:0 → 1:0])) ((IdentitySupportModule.scala:19))
-// make[{type.izumi.functional.mono.Clock[+λ %1:0 → 1:0]}].from(value(izumi.functional.mono.Clock$Standard$@77bd4de3: izumi.functional.mono.Clock::izumi.functional.mono.Clock.Standard)) ((IdentitySupportModule.scala:20))
 // make[{type.izumi.distage.model.PlannerInput}].from(value(PlannerInput(
-// make[{type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.A}].from(call(π:Class(repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B): repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.A)) ((debugging.md:38))
-// make[{type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B}].from(effect[λ %0 → cats.effect.IO[+0]](value(IO$1570135906: cats.effect.IO[+MdocSession::App0::B]))) ((debugging.md:39)),Activation(Map()),Of(NonEmptySet({type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.A}))): izumi.distage.model.PlannerInput)) ((InjectorDefaultImpl.scala:120))
+// make[{type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B}].from(effect[λ %0 → cats.effect.IO[+0]](value(IO$2069340249: cats.effect.IO[+MdocSession::App0::B]))) ((debugging.md:39))
+// make[{type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.A}].from(call(π:Class(repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B): repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.A)) ((debugging.md:38)),Activation(Map()),Of(NonEmptySet({type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.A}))): izumi.distage.model.PlannerInput)) ((InjectorDefaultImpl.scala:120))
+// make[{type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B}].from(effect[λ %0 → cats.effect.IO[+0]](value(IO$2069340249: cats.effect.IO[+MdocSession::App0::B]))) ((debugging.md:39))
+// make[{type.izumi.distage.model.effect.QuasiAsync[=λ %1:0 → 1:0]}].from(value(izumi.distage.model.effect.QuasiAsync$$anon$1@3d6620: izumi.distage.model.effect.QuasiAsync[=λ %1:0 → 1:0])) ((IdentitySupportModule.scala:19))
 // make[{type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.A}].from(call(π:Class(repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B): repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.A)) ((debugging.md:38))
 // make[{type.izumi.distage.model.recursive.Bootloader}].from(call(π:Class(izumi.distage.InjectorFactory, izumi.distage.model.definition.BootstrapModule, izumi.distage.model.definition.Activation, izumi.distage.model.definition.Module, izumi.distage.model.PlannerInput): izumi.distage.model.recursive.Bootloader)) ((InjectorDefaultImpl.scala:115))
 // make[{type.izumi.distage.model.definition.Activation}].from(value(Activation(Map()): izumi.distage.model.definition.Activation)) ((InjectorDefaultImpl.scala:122))
-// make[{type.izumi.distage.model.effect.QuasiIO[=λ %1:0 → 1:0]}].from(value(izumi.distage.model.effect.QuasiIO$QuasiIOIdentity$@5a0397f7: izumi.distage.model.effect.QuasiIO[=λ %1:0 → 1:0])) ((IdentitySupportModule.scala:17))
-// make[{type.izumi.distage.model.effect.QuasiApplicative[=λ %1:0 → 1:0]}].from(value(izumi.distage.model.effect.QuasiIO$QuasiIOIdentity$@5a0397f7: izumi.distage.model.effect.QuasiApplicative[=λ %1:0 → 1:0])) ((IdentitySupportModule.scala:16))
-// make[{type.izumi.distage.model.effect.QuasiIORunner[=λ %1:0 → 1:0]}].from(value(izumi.distage.model.effect.QuasiIORunner$IdentityImpl$@2d4f17e3: izumi.distage.model.effect.QuasiIORunner[=λ %1:0 → 1:0])) ((IdentitySupportModule.scala:18))
-// make[{type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.B}].from(effect[λ %0 → cats.effect.IO[+0]](value(IO$1570135906: cats.effect.IO[+MdocSession::App0::B]))) ((debugging.md:39))
-// make[{type.izumi.distage.InjectorFactory}].from(value(distage.Injector$@3c7f7b77: izumi.distage.InjectorFactory)) ((InjectorDefaultImpl.scala:117))
-// make[{type.izumi.functional.mono.Entropy[+λ %1:0 → 1:0]}].from(value(izumi.functional.mono.Entropy$Standard$@3147d0cc: izumi.functional.mono.Entropy::izumi.functional.mono.Entropy.Standard)) ((IdentitySupportModule.scala:21))
+// make[{type.izumi.distage.model.effect.QuasiApplicative[=λ %1:0 → 1:0]}].from(value(izumi.distage.model.effect.QuasiIO$QuasiIOIdentity$@a2dd772: izumi.distage.model.effect.QuasiApplicative[=λ %1:0 → 1:0])) ((IdentitySupportModule.scala:16))
+// make[{type.izumi.functional.mono.Clock[+λ %1:0 → 1:0]}].from(value(izumi.functional.mono.Clock$Standard$@94d1a55: izumi.functional.mono.Clock::izumi.functional.mono.Clock.Standard)) ((IdentitySupportModule.scala:20))
+// make[{type.izumi.distage.model.effect.QuasiIORunner[=λ %1:0 → 1:0]}].from(value(izumi.distage.model.effect.QuasiIORunner$IdentityImpl$@1f848a57: izumi.distage.model.effect.QuasiIORunner[=λ %1:0 → 1:0])) ((IdentitySupportModule.scala:18))
+// make[{type.izumi.distage.model.effect.QuasiIO[=λ %1:0 → 1:0]}].from(value(izumi.distage.model.effect.QuasiIO$QuasiIOIdentity$@a2dd772: izumi.distage.model.effect.QuasiIO[=λ %1:0 → 1:0])) ((IdentitySupportModule.scala:17))
 // make[{type.izumi.distage.model.definition.Module@defaultModule}].from(value(
-// make[{type.izumi.distage.model.effect.QuasiAsync[=λ %1:0 → 1:0]}].from(value(izumi.distage.model.effect.QuasiAsync$$anon$1@4811128d: izumi.distage.model.effect.QuasiAsync[=λ %1:0 → 1:0])) ((IdentitySupportModule.scala:19))
-// make[{type.izumi.functional.mono.Clock[+λ %1:0 → 1:0]}].from(value(izumi.functional.mono.Clock$Standard$@77bd4de3: izumi.functional.mono.Clock::izumi.functional.mono.Clock.Standard)) ((IdentitySupportModule.scala:20))
-// make[{type.izumi.functional.mono.Entropy[+λ %1:0 → 1:0]}].from(value(izumi.functional.mono.Entropy$Standard$@3147d0cc: izumi.functional.mono.Entropy::izumi.functional.mono.Entropy.Standard)) ((IdentitySupportModule.scala:21))
-// make[{type.izumi.distage.model.effect.QuasiIO[=λ %1:0 → 1:0]}].from(value(izumi.distage.model.effect.QuasiIO$QuasiIOIdentity$@5a0397f7: izumi.distage.model.effect.QuasiIO[=λ %1:0 → 1:0])) ((IdentitySupportModule.scala:17))
-// make[{type.izumi.distage.model.effect.QuasiApplicative[=λ %1:0 → 1:0]}].from(value(izumi.distage.model.effect.QuasiIO$QuasiIOIdentity$@5a0397f7: izumi.distage.model.effect.QuasiApplicative[=λ %1:0 → 1:0])) ((IdentitySupportModule.scala:16))
-// make[{type.izumi.distage.model.effect.QuasiIORunner[=λ %1:0 → 1:0]}].from(value(izumi.distage.model.effect.QuasiIORunner$IdentityImpl$@2d4f17e3: izumi.distage.model.effect.QuasiIORunner[=λ %1:0 → 1:0])) ((IdentitySupportModule.scala:18)): izumi.distage.model.definition.Module)) ((InjectorDefaultImpl.scala:119))
+// make[{type.izumi.distage.model.effect.QuasiAsync[=λ %1:0 → 1:0]}].from(value(izumi.distage.model.effect.QuasiAsync$$anon$1@3d6620: izumi.distage.model.effect.QuasiAsync[=λ %1:0 → 1:0])) ((IdentitySupportModule.scala:19))
+// make[{type.izumi.distage.model.effect.QuasiApplicative[=λ %1:0 → 1:0]}].from(value(izumi.distage.model.effect.QuasiIO$QuasiIOIdentity$@a2dd772: izumi.distage.model.effect.QuasiApplicative[=λ %1:0 → 1:0])) ((IdentitySupportModule.scala:16))
+// make[{type.izumi.functional.mono.Clock[+λ %1:0 → 1:0]}].from(value(izumi.functional.mono.Clock$Standard$@94d1a55: izumi.functional.mono.Clock::izumi.functional.mono.Clock.Standard)) ((IdentitySupportModule.scala:20))
+// make[{type.izumi.functional.mono.Entropy[+λ %1:0 → 1:0]}].from(value(izumi.functional.mono.Entropy$Standard$@6d3fda49: izumi.functional.mono.Entropy::izumi.functional.mono.Entropy.Standard)) ((IdentitySupportModule.scala:21))
+// make[{type.izumi.distage.model.effect.QuasiIORunner[=λ %1:0 → 1:0]}].from(value(izumi.distage.model.effect.QuasiIORunner$IdentityImpl$@1f848a57: izumi.distage.model.effect.QuasiIORunner[=λ %1:0 → 1:0])) ((IdentitySupportModule.scala:18))
+// make[{type.izumi.distage.model.effect.QuasiIO[=λ %1:0 → 1:0]}].from(value(izumi.distage.model.effect.QuasiIO$QuasiIOIdentity$@a2dd772: izumi.distage.model.effect.QuasiIO[=λ %1:0 → 1:0])) ((IdentitySupportModule.scala:17)): izumi.distage.model.definition.Module)) ((InjectorDefaultImpl.scala:119))
+// make[{type.izumi.distage.InjectorFactory}].from(value(distage.Injector$@8ce2b1e: izumi.distage.InjectorFactory)) ((InjectorDefaultImpl.scala:117))
 // make[{type.izumi.distage.model.definition.BootstrapModule}].from(value(
-// make[{type.izumi.distage.model.provisioning.strategies.ResourceStrategy}].from(call(π:Class(): izumi.distage.provisioning.strategies.ResourceStrategyDefaultImpl)) ((BootstrapLocator.scala:128))
 // many[{type.scala.collection.immutable.Set[=PlanningHook]}] ((BootstrapLocator.scala:133))
-// make[{type.izumi.distage.model.reflection.MirrorProvider}].from(value(izumi.distage.model.reflection.MirrorProvider$Impl$@523fc0d9: izumi.distage.model.reflection.MirrorProvider::izumi.distage.model.reflection.MirrorProvider.Impl)) ((BootstrapLocator.scala:108))
 // many[{type.scala.collection.immutable.Set[=PlanningObserver]}] ((BootstrapLocator.scala:132))
 // make[{type.izumi.distage.model.provisioning.ProvisioningFailureInterceptor}].from(call(π:Class(): izumi.distage.model.provisioning.ProvisioningFailureInterceptor::izumi.distage.model.provisioning.ProvisioningFailureInterceptor.DefaultImpl)) ((BootstrapLocator.scala:130))
 // make[{type.izumi.distage.planning.BindingTranslator}].from(call(π:Class(): izumi.distage.planning.BindingTranslator::izumi.distage.planning.BindingTranslator.Impl)) ((BootstrapLocator.scala:138))
@@ -296,6 +297,8 @@ val plan = Injector().plan(goodModule, Roots.target[A])
 // make[{type.izumi.distage.model.planning.PlanAnalyzer}].from(call(π:Class(): izumi.distage.planning.PlanAnalyzerDefaultImpl)) ((BootstrapLocator.scala:110))
 // make[{type.izumi.distage.model.planning.SanityChecker}].from(call(π:Class(izumi.distage.model.planning.PlanAnalyzer): izumi.distage.planning.sequential.SanityCheckerDefaultImpl)) ((BootstrapLocator.scala:118))
 // make[{type.izumi.distage.model.provisioning.PlanInterpreter}].from(call(π:Class(izumi.distage.model.provisioning.strategies.SetStrategy, izumi.distage.model.provisioning.strategies.ProxyStrategy, izumi.distage.model.provisioning.strategies.ProviderStrategy, izumi.distage.model.provisioning.strategies.ImportStrategy, izumi.distage.model.provisioning.strategies.InstanceStrategy, izumi.distage.model.provisioning.strategies.EffectStrategy, izumi.distage.model.provisioning.strategies.ResourceStrategy, izumi.distage.model.provisioning.ProvisioningFailureInterceptor, izumi.distage.provisioning.ProvisionOperationVerifier, scala.Boolean, izumi.distage.model.planning.PlanAnalyzer): izumi.distage.provisioning.PlanInterpreterDefaultRuntimeImpl)) ((BootstrapLocator.scala:121))
+// make[{type.izumi.distage.model.reflection.MirrorProvider}].from(value(izumi.distage.model.reflection.MirrorProvider$Impl$@20bc888e: izumi.distage.model.reflection.MirrorProvider::izumi.distage.model.reflection.MirrorProvider.Impl)) ((BootstrapLocator.scala:108))
+// make[{type.izumi.distage.model.provisioning.strategies.ResourceStrategy}].from(call(π:Class(): izumi.distage.provisioning.strategies.ResourceStrategyDefaultImpl)) ((BootstrapLocator.scala:128))
 // make[{type.izumi.distage.planning.solver.GraphPreparations}].from(call(π:Class(izumi.distage.planning.BindingTranslator): izumi.distage.planning.solver.GraphPreparations)) ((BootstrapLocator.scala:113))
 // make[{type.izumi.distage.model.provisioning.proxies.ProxyProvider}].from(call(π:Class(): izumi.distage.provisioning.strategies.cglib.CglibProxyProvider)).tagged(Set(AxisTag(cycles:proxy))) ((BootstrapLocator.scala:140))
 // make[{type.izumi.distage.model.provisioning.strategies.InstanceStrategy}].from(call(π:Class(): izumi.distage.provisioning.strategies.InstanceStrategyDefaultImpl)) ((BootstrapLocator.scala:126))
@@ -310,10 +313,11 @@ val plan = Injector().plan(goodModule, Roots.target[A])
 // make[{type.izumi.distage.planning.solver.SemigraphSolver[=DIKey,=Int,=ExecutableOp::InstantiationOp]}].from(call(π:Class(): izumi.distage.planning.solver.SemigraphSolver::izumi.distage.planning.solver.SemigraphSolver.SemigraphSolverImpl[=DIKey,=Int,=ExecutableOp::InstantiationOp])) ((BootstrapLocator.scala:115))
 // make[{type.izumi.distage.model.provisioning.strategies.ImportStrategy}].from(call(π:Class(): izumi.distage.provisioning.strategies.ImportStrategyDefaultImpl)) ((BootstrapLocator.scala:125))
 // make[{type.izumi.distage.model.planning.PlanningHook}].from(call(π:Class(scala.collection.immutable.Set[=PlanningHook]): izumi.distage.planning.PlanningHookAggregate)) ((BootstrapLocator.scala:136))
-// make[{type.izumi.distage.model.provisioning.strategies.ProviderStrategy}].from(call(π:Class(): izumi.distage.provisioning.strategies.ProviderStrategyDefaultImpl)) ((BootstrapLocator.scala:124)): izumi.distage.model.definition.BootstrapModule)) ((InjectorDefaultImpl.scala:118)),Activation(Map()),Of(NonEmptySet({type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.A}))))
+// make[{type.izumi.distage.model.provisioning.strategies.ProviderStrategy}].from(call(π:Class(): izumi.distage.provisioning.strategies.ProviderStrategyDefaultImpl)) ((BootstrapLocator.scala:124)): izumi.distage.model.definition.BootstrapModule)) ((InjectorDefaultImpl.scala:118))
+// make[{type.izumi.functional.mono.Entropy[+λ %1:0 → 1:0]}].from(value(izumi.functional.mono.Entropy$Standard$@6d3fda49: izumi.functional.mono.Entropy::izumi.functional.mono.Entropy.Standard)) ((IdentitySupportModule.scala:21)),Activation(Map()),Of(NonEmptySet({type.repl.MdocSession::repl.MdocSession.App0::repl.MdocSession.App0.A}))))
 
 println(plan.render())
-// 1: {effect.{type.MdocSession::App0::B}} (debugging.md:39) := value cats.effect.IO$Delay#-393800457
+// 1: {effect.{type.MdocSession::App0::B}} (debugging.md:39) := value cats.effect.IO$Delay#-951553505
 // 2: {type.MdocSession::App0::B} (debugging.md:39) := effect[λ %0 → cats.effect.IO[+0]]{effect.{type.MdocSession::App0::B}}
 // 3: {type.MdocSession::App0::A} (debugging.md:38) :=
 // 4:     call(π:Class(MdocSession::App0::B): MdocSession::App0::A[32m) {
@@ -352,12 +356,43 @@ println(plan.renderDependees(DIKey[B]))
 <pre class="prettyprint"><code class="language-scala">import distage.{GraphDumpBootstrapModule, Injector}
 
 Injector(GraphDumpBootstrapModule)
-// res6: Injector[izumi.fundamentals.platform.functional.package.Identity[A]] = izumi.distage.InjectorDefaultImpl@73e6a04c
+// res6: Injector[izumi.fundamentals.platform.functional.package.Identity[A]] = izumi.distage.InjectorDefaultImpl@2106d0a3
 </code></pre>
 <p>You&rsquo;ll need a <code>GraphViz</code> installation to render these files into a viewable PNG images:</p>
 <pre class="prettyprint"><code class="language-bash">dot -Tpng target/plan-last-nogc.gv -o out.png
 </code></pre>
 <p><img src="media/plan-graph.png" alt="plan-graph" /></p>
+<h4><a href="#command-line-activation" name="command-line-activation" class="anchor"><span class="anchor-link"></span></a>Command-line activation</h4>
+<p>You may activate GraphViz dump for a <code>distage-framework</code> <a href="distage-framework.html#roles">Role-based application</a> by passing a <code>--debug-dump-graph</code> option:</p>
+<pre><code>./launcher --debug-dump-graph :myrole
+</code></pre>
+<h4><a href="#testkit-activation" name="testkit-activation" class="anchor"><span class="anchor-link"></span></a>Testkit activation</h4>
+<p>You may activate GraphViz dump in <code>distage-testkit</code> tests by setting <code>PlanningOptions(addGraphVizDump = true)</code> in <code>config</code>:</p>
+<pre class="prettyprint"><code class="language-scala">import izumi.distage.testkit.scalatest.Spec2
+import izumi.distage.testkit.TestConfig
+import izumi.distage.framework.config.PlanningOptions
+
+final class MyTest extends Spec2[zio.IO] {
+  override def config: TestConfig = super.config.copy(
+    planningOptions = PlanningOptions(
+      addGraphVizDump = true,
+    )
+  )
+}
+</code></pre>
+<h5><a href="#launcher-activation" name="launcher-activation" class="anchor"><span class="anchor-link"></span></a>Launcher activation</h5>
+<p>PlanningOptions are also modifiable in <code>distage-framework</code> applications:</p>
+<pre class="prettyprint"><code class="language-scala">import distage.{Module, ModuleDef}
+import izumi.distage.framework.config.PlanningOptions
+import izumi.distage.roles.RoleAppMain
+import zio.IO
+
+abstract class MyRoleLauncher extends RoleAppMain.LauncherBIO2[IO] {
+  override protected def roleAppBootOverrides(argv: RoleAppMain.ArgV): Module = new ModuleDef {
+    make[PlanningOptions].from(PlanningOptions(addGraphVizDump = true))
+  }
+}
+</code></pre>
 </div>
 <div>
 <a href="https://github.com/7mind/izumi/tree/master/doc/microsite/target/mdoc/distage/debugging.md" title="Edit this page" class="md-source-file md-edit">
