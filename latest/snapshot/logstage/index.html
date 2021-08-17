@@ -264,7 +264,7 @@ data-md-source="github">
 import scala.util.Random
 
 val logger = IzLogger()
-// logger: IzLogger = izumi.logstage.api.IzLogger@6b512d88
+// logger: IzLogger = izumi.logstage.api.IzLogger@638cbd1d
 
 val justAnArg = &quot;example&quot;
 // justAnArg: String = example
@@ -284,9 +284,9 @@ logger.warn(s&quot;Invisible argument: ${Random.nextInt() -&gt; &quot;random num
 // add following fields to all messages printed by a new logger value
 
 val ctxLogger = logger(&quot;userId&quot; -&gt; &quot;user@google.com&quot;, &quot;company&quot; -&gt; &quot;acme&quot;)
-// ctxLogger: IzLogger = izumi.logstage.api.IzLogger@77e52d8e
+// ctxLogger: IzLogger = izumi.logstage.api.IzLogger@5d5a3679
 val delta = Random.nextInt(1000)
-// delta: Int = 818
+// delta: Int = 40
 
 ctxLogger.info(s&quot;Processing time: $delta&quot;)
 </code></pre>
@@ -320,17 +320,17 @@ ctxLogger.info(s&quot;Processing time: $delta&quot;)
 import logstage.circe.LogstageCirceRenderingPolicy
 
 val textSink = ConsoleSink.text(colored = true)
-// textSink: ConsoleSink = izumi.logstage.sink.ConsoleSink$ColoredConsoleSink$@43caba18
+// textSink: ConsoleSink = izumi.logstage.sink.ConsoleSink$ColoredConsoleSink$@5fdbee16
 val jsonSink = ConsoleSink(LogstageCirceRenderingPolicy(prettyPrint = true))
-// jsonSink: ConsoleSink = izumi.logstage.sink.ConsoleSink@2115f284
+// jsonSink: ConsoleSink = izumi.logstage.sink.ConsoleSink@5939d4a5
 
 val sinks = List(jsonSink, textSink)
-// sinks: List[ConsoleSink] = List(izumi.logstage.sink.ConsoleSink@2115f284, izumi.logstage.sink.ConsoleSink$ColoredConsoleSink$@43caba18)
+// sinks: List[ConsoleSink] = List(izumi.logstage.sink.ConsoleSink@5939d4a5, izumi.logstage.sink.ConsoleSink$ColoredConsoleSink$@5fdbee16)
 
 val logger: IzLogger = IzLogger(Trace, sinks)
-// logger: IzLogger = izumi.logstage.api.IzLogger@68d5d1f2
+// logger: IzLogger = izumi.logstage.api.IzLogger@2f48c3a0
 val contextLogger: IzLogger = logger(&quot;key&quot; -&gt; &quot;value&quot;)
-// contextLogger: IzLogger = izumi.logstage.api.IzLogger@7e59bc8a
+// contextLogger: IzLogger = izumi.logstage.api.IzLogger@2f633301
 
 logger.info(&quot;Hey&quot;)
 
@@ -342,10 +342,10 @@ contextLogger.info(&quot;Hey&quot;)
 import cats.effect.IO
 
 val logger = IzLogger()
-// logger: IzLogger = izumi.logstage.api.IzLogger@7056f017
+// logger: IzLogger = izumi.logstage.api.IzLogger@38e846b4
 
 val log = LogIO.fromLogger[IO](logger)
-// log: LogIO[IO] = logstage.LogIO$$anon$1@62a91d63
+// log: LogIO[IO] = logstage.LogIO$$anon$1@28c87d5d
 
 log.info(s&quot;Hey! I&#39;m logging with ${log}stage!&quot;).unsafeRunSync()
 </code></pre>
@@ -392,10 +392,10 @@ import zio.{Has, URIO}
 val fn: URIO[LogZIO, Unit] = {
   log.info(s&quot;I&#39;m logging with ${log}stage!&quot;)
 }
-// fn: URIO[LogZIO, Unit] = zio.ZIO$Read@23ff2a71
+// fn: URIO[LogZIO, Unit] = zio.ZIO$Read@2afb65c5
 
 val logger: LogZIO.Service = LogIO3.fromLogger(IzLogger())
-// logger: LogZIO.Service = logstage.LogIO$$anon$1@64eeb051
+// logger: LogZIO.Service = logstage.LogIO$$anon$1@50dc5bc8
 
 zio.Runtime.default.unsafeRun {
   fn.provide(Has(logger))
@@ -404,7 +404,7 @@ zio.Runtime.default.unsafeRun {
 <h3><a href="#adding-fiberid-to-log-messages" name="adding-fiberid-to-log-messages" class="anchor"><span class="anchor-link"></span></a>Adding FiberId to log messages</h3>
 <p><code>LogZIO.withFiberId</code> provides a <code>LogIO</code> instance that logs the current ZIO <code>FiberId</code> in addition to the JVM thread id:</p>
 <pre class="prettyprint"><code class="language-scala">val logger: LogZIO.Service = LogZIO.withFiberId(IzLogger())
-// logger: LogZIO.Service = logstage.LogZIO$$anon$1@597d427b
+// logger: LogZIO.Service = logstage.LogZIO$$anon$1@7407d88e
 
 zio.Runtime.default.unsafeRun {
    fn.provide(Has(logger))
@@ -413,37 +413,41 @@ zio.Runtime.default.unsafeRun {
 <pre><code>I 2019-03-29T23:21:48.760Z[Europe/Dublin] r.S.App9.res10 ...main-12:5384  (00_logstage.md:123) {fiberId=0} Hey! I&#39;m logging with log=logstage.LogZIO$$anon$1@c39104astage!
 </code></pre>
 <h3><a href="#adding-custom-logging-context-to-log-messages" name="adding-custom-logging-context-to-log-messages" class="anchor"><span class="anchor-link"></span></a>Adding custom logging context to log messages</h3>
-<p><code>LogZIO.withCustomContext</code> allows to provide custom log context which will be by-passed to the underlying effect via ZIO environment:</p>
+<p><code>LogZIO.withCustomContext</code> allows to append to the custom log context carried in ZIO environment when <code>LogZIO.log</code> is used for logging:</p>
 <pre class="prettyprint"><code class="language-scala">import zio._
 
 def databaseCall(): ZIO[LogZIO, Throwable, String] = ZIO.succeed(&quot;stubbed&quot;)
 
-def daoLayerFunction(arg: Int): ZIO[LogZIO, Throwable, String] =
-    LogZIO.withCustomContext(&quot;arg&quot; -&gt; arg) {
-      for {
-        result &lt;- databaseCall
-        _ &lt;- log.info(s&quot;Database call $result&quot;)
-      } yield result
-    }
+def dbLayerFunction(arg: Int): ZIO[LogZIO, Throwable, String] = {
+  LogZIO.withCustomContext(&quot;arg&quot; -&gt; arg) {
+    for {
+      result &lt;- databaseCall
+      _      &lt;- log.info(s&quot;Database call $result&quot;)
+    } yield result
+ }
+}
 
-def serviceLayerFunction1(): ZIO[LogZIO, Throwable, String] =
-   for {
-     _ &lt;- log.info(&quot;Going to call daoLayerFunction&quot;)
-     result &lt;- daoLayerFunction(1)
-   } yield result
+def serviceLayerFunction1(): ZIO[LogZIO, Throwable, String] = {
+  for {
+    _      &lt;- log.info(&quot;Going to call dbLayerFunction&quot;)
+    result &lt;- dbLayerFunction(1)
+  } yield result
+}
 
-def serviceLayerFunction2(): ZIO[LogZIO, Throwable, String] =
-   log.info(&quot;Called serviceLayerFunction2&quot;).as(&quot;stubbed&quot;)
+def serviceLayerFunction2(): ZIO[LogZIO, Throwable, String] = {
+  log.info(&quot;Called serviceLayerFunction2&quot;).as(&quot;stubbed&quot;)
+}
 
-def controllerFunction(correlationId: String): ZIO[LogZIO, Throwable, String] =
-   LogZIO.withCustomContext(&quot;correlation_id&quot; -&gt; correlationId) {
-     for {
-       x &lt;- serviceLayerFunction1()
-       y &lt;- serviceLayerFunction2()
-       result = x + y
-       _ &lt;- log.info(s&quot;Controller produced $result&quot;)
-     } yield result
-   } &lt;* log.info(&quot;Some log after controller function (without correlation_id)&quot;)
+def controllerFunction(correlationId: String): ZIO[LogZIO, Throwable, String] = {
+  LogZIO.withCustomContext(&quot;correlation_id&quot; -&gt; correlationId) {
+    for {
+      x     &lt;- serviceLayerFunction1()
+      y     &lt;- serviceLayerFunction2()
+      result = x + y
+      _     &lt;- log.info(s&quot;Controller produced $result&quot;)
+    } yield result
+  } &lt;* log.info(&quot;Some log after controller function (without correlation_id)&quot;)
+}
 
 // at the end of the world
 zio.Runtime.default.unsafeRun {
@@ -451,8 +455,8 @@ zio.Runtime.default.unsafeRun {
 }
 // res15: String = &quot;stubbedstubbed&quot;
 </code></pre>
-<pre><code>I 2021-08-17T15:07:54.244 (00_logstage.md:220)  …App12.serviceLayerFunction1 [2280:Thread-60           ] correlation_id=123 Going to call daoLayerFunction
-I 2021-08-17T15:07:54.342 (00_logstage.md:213)  ….App12.daoLayerFunction.212 [2280:Thread-60           ] correlation_id=123, arg=1 Database call result=stubbed
+<pre><code>I 2021-08-17T15:07:54.244 (00_logstage.md:220)  …App12.serviceLayerFunction1 [2280:Thread-60           ] correlation_id=123 Going to call dbLayerFunction
+I 2021-08-17T15:07:54.342 (00_logstage.md:213)  …n.App12.dbLayerFunction.212 [2280:Thread-60           ] correlation_id=123, arg=1 Database call result=stubbed
 I 2021-08-17T15:07:54.358 (00_logstage.md:226)  …App12.serviceLayerFunction2 [2280:Thread-60           ] correlation_id=123 Called serviceLayerFunction2
 I 2021-08-17T15:07:54.367 (00_logstage.md:235)  ….controllerFunction.232.233 [2280:Thread-60           ] correlation_id=123 Controller produced result=stubbedstubbed
 I 2021-08-17T15:07:54.371 (00_logstage.md:237)  …on.App12.controllerFunction [2280:Thread-60           ] Some log after controller function (without correlation_id)
@@ -469,7 +473,7 @@ def fn[F[-_, +_, +_]: LogIO3Ask]: F[Has[LogIO3[F]], Nothing, Unit] = {
 }
 
 val logger = LogIO3.fromLogger(IzLogger())
-// logger: LogIO3[ZIO] = logstage.LogIO$$anon$1@425f41fc
+// logger: LogIO3[ZIO] = logstage.LogIO$$anon$1@5d2b2d99
 
 zio.Runtime.default.unsafeRun {
   fn[ZIO].provide(Has(logger))
@@ -497,7 +501,7 @@ import logstage.ConsoleSink
 import logstage.circe.LogstageCirceRenderingPolicy
 
 val logger = IzStrictLogger(sink = ConsoleSink(LogstageCirceRenderingPolicy()))
-// logger: IzStrictLogger = izumi.logstage.api.strict.IzStrictLogger@18295764
+// logger: IzStrictLogger = izumi.logstage.api.strict.IzStrictLogger@2c0fbeb4
 
 logger.info(s&quot;Got ${KV(&quot;key&quot;, 7) -&gt; &quot;KeyValue&quot;}&quot;)
 </code></pre>
@@ -508,7 +512,7 @@ logger.info(s&quot;Got ${KV(&quot;key&quot;, 7) -&gt; &quot;KeyValue&quot;}&quot
 import izumi.logstage.api.routing.StaticLogRouter
 
 val myLogger = IzLogger()
-// myLogger: IzLogger = izumi.logstage.api.IzLogger@9d40008
+// myLogger: IzLogger = izumi.logstage.api.IzLogger@1e3fb2e6
 
 // configure SLF4j to use the same router that `myLogger` uses
 StaticLogRouter.instance.setup(myLogger.router)
