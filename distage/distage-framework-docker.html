@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="x-ua-compatible" content="ie=edge">
 <meta name="description" content="microsite">
-<meta name="generator" content="Paradox, paradox-material-theme=1.0.8, mkdocs-material=3.0.3">
+<meta name="generator" content="Paradox, paradox-material-theme=1.1.0-M2, mkdocs-material=3.0.3">
 
 <meta name="lang:clipboard.copy" content="Copy to clipboard">
 <meta name="lang:clipboard.copied" content="Copied to clipboard">
@@ -186,7 +186,7 @@ data-md-source="github">
 <ul style="display: none">
 <li class="md-nav__item md-version" id="project.version">
 <label class="md-nav__link" for="__version">
-<i class="md-icon" title="Version">label_outline</i> 1.0.8
+<i class="md-icon" title="Version">label_outline</i> 1.1.0-M2
 </label>
 </li>
 </ul>
@@ -272,7 +272,7 @@ data-md-source="github">
   <li>Excellent for providing Docker implementations of services for integration tests</li>
 </ul>
 <h3><a href="#dependencies" name="dependencies" class="anchor"><span class="anchor-link"></span></a>Dependencies</h3>
-<p>Add the <code>distage-framework-docker</code> library:</p><dl class="dependency"><dt>sbt</dt><dd><pre class="prettyprint"><code class="language-scala">libraryDependencies += "io.7mind.izumi" %% "distage-framework-docker" % "1.0.8"</code></pre></dd></dl>
+<p>Add the <code>distage-framework-docker</code> library:</p><dl class="dependency"><dt>sbt</dt><dd><pre class="prettyprint"><code class="language-scala">libraryDependencies += "io.7mind.izumi" %% "distage-framework-docker" % "1.1.0-M2"</code></pre></dd></dl>
 <h3><a href="#overview" name="overview" class="anchor"><span class="anchor-link"></span></a>Overview</h3>
 <p>Usage of <code>distage-framework-docker</code> generally follows these steps:</p>
 <ol>
@@ -351,10 +351,10 @@ object DistageFrameworkModules extends ModuleDef {
   }
 }
 
-minimalExample.unsafeRunSync()
-// postgres is available on port AvailablePort(10.1.0.97,46587)
+minimalExample.unsafeRunSync()(cats.effect.unsafe.IORuntime.global)
+// postgres is available on port AvailablePort(10.1.0.70,46007)
 </code></pre>
-<p>If the <code>DockerSupportModule</code> is not included in an application then a get of a Docker container dependent resource will fail with a <code>izumi.distage.model.exceptions.ProvisioningException</code>.</p>
+<p>If the <code>DockerSupportModule</code> is not included in an application then a get of a Docker container dependent resource will fail with a <code>izumi.distage.model.exceptions.interpretation.ProvisioningException</code>.</p>
 <h3><a href="#config-api" name="config-api" class="anchor"><span class="anchor-link"></span></a>Config API</h3>
 <p>The <a href="/api/izumi/distage/docker/DockerContainer$$DockerProviderExtensions.html"><code>DockerProviderExtensions</code></a> provides additional APIs for modiying the container definition.</p>
 <h4><a href="#modifyconfig" name="modifyconfig" class="anchor"><span class="anchor-link"></span></a>modifyConfig</h4>
@@ -421,7 +421,7 @@ class ElasticSearchPlusPostgresModule[F[_]: TagK] extends ModuleDef {
 <h3><a href="#usage-in-integration-tests" name="usage-in-integration-tests" class="anchor"><span class="anchor-link"></span></a>Usage in Integration Tests</h3>
 <p>A common use case is using Docker containers to provide service implementations for integration test, such as using a PostgreSQL container for verifying an application that uses a PostgreSQL database.</p>
 <p>Consider the example application below. This application is written to depend on a <a href="https://tpolecat.github.io/doobie/">doobie</a> <code>Transactor</code>, which is constructed from a <code>PostgresServerConfig</code>.</p>
-<pre class="prettyprint"><code class="language-scala">import cats.effect.{Async, ContextShift}
+<pre class="prettyprint"><code class="language-scala">import cats.effect.Async
 import doobie.Transactor
 import doobie.syntax.connectionio._
 import doobie.syntax.string._
@@ -452,14 +452,14 @@ final case class PostgresServerConfig(
 
 object TransactorFromConfigModule extends ModuleDef {
   make[Transactor[IO]].from {
-    (config: PostgresServerConfig, async: Async[IO], contextShift: ContextShift[IO]) =&gt;
+    (config: PostgresServerConfig, async: Async[IO]) =&gt;
 
       Transactor.fromDriverManager[IO](
         driver = &quot;org.postgresql.Driver&quot;,
         url    = s&quot;jdbc:postgresql://${config.host}:${config.port}/${config.database}&quot;,
         user   = config.username,
         pass   = config.password,
-      )(async, contextShift)
+      )(async)
   }
 }
 </code></pre>
@@ -530,7 +530,7 @@ class PostgresExampleAppIntegrationTest extends Spec1[IO] with AssertCIO {
   }
 }
 
-postgresDockerIntegrationExample.unsafeRunSync()
+postgresDockerIntegrationExample.unsafeRunSync()(cats.effect.unsafe.IORuntime.global)
 // 1 + 1 = 2.
 </code></pre>
 <h3><a href="#docker-container-environment" name="docker-container-environment" class="anchor"><span class="anchor-link"></span></a>Docker Container Environment</h3>
@@ -684,7 +684,7 @@ class CustomDockerConfigExampleModule[F[_]: TagK] extends ModuleDef {
 <pre class="prettyprint"><code class="language-shell">docker rm -f $(docker ps -q -a -f &#39;label=distage.type&#39;)
 </code></pre>
 <h3><a href="#troubleshooting" name="troubleshooting" class="anchor"><span class="anchor-link"></span></a>Troubleshooting</h3>
-<pre><code>// izumi.distage.model.exceptions.ProvisioningException: Provisioner stopped after 1 instances, 2/14 operations failed:
+<pre><code>// izumi.distage.model.exceptions.interpretation.ProvisioningException: Provisioner stopped after 1 instances, 2/14 operations failed:
 //  - {type.izumi.distage.docker.DockerClientWrapper[=λ %0 → IO[+0]]} (distage-framework-docker.md:40), MissingInstanceException: Instance is not available in the object graph: {type.izumi.distage.docker.DockerClientWrapper[=λ %0 → IO[+0]]}.
 </code></pre>
 <p>This error means that <a href="/api/izumi/distage/docker/modules/DockerSupportModule.html"><code>DockerSupportModule</code></a> hasn&rsquo;t been <code>include</code>d with the application modules.</p>
@@ -697,13 +697,13 @@ class CustomDockerConfigExampleModule[F[_]: TagK] extends ModuleDef {
 </ul>
 </div>
 <div>
-<a href="https://github.com/7mind/izumi/tree/v1.0.8/doc/microsite/target/mdoc/distage/distage-framework-docker.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/7mind/izumi/tree/v1.1.0-M2/doc/microsite/target/mdoc/distage/distage-framework-docker.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>
 <div class="print-only">
 <span class="md-source-file md-version">
-1.0.8
+1.1.0-M2
 </span>
 </div>
 </article>

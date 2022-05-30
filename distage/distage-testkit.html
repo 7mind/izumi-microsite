@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="x-ua-compatible" content="ie=edge">
 <meta name="description" content="microsite">
-<meta name="generator" content="Paradox, paradox-material-theme=1.0.8, mkdocs-material=3.0.3">
+<meta name="generator" content="Paradox, paradox-material-theme=1.1.0-M2, mkdocs-material=3.0.3">
 
 <meta name="lang:clipboard.copy" content="Copy to clipboard">
 <meta name="lang:clipboard.copied" content="Copied to clipboard">
@@ -180,7 +180,7 @@ data-md-source="github">
 <ul style="display: none">
 <li class="md-nav__item md-version" id="project.version">
 <label class="md-nav__link" for="__version">
-<i class="md-icon" title="Version">label_outline</i> 1.0.8
+<i class="md-icon" title="Version">label_outline</i> 1.1.0-M2
 </label>
 </li>
 </ul>
@@ -390,9 +390,9 @@ class ScoreSimpleTest extends Test {
 }
 </code></pre>
 <pre><code>ScoreSimpleTest:
+- Score should increase by config star value
   - Score should increase by config star value from DI 
 - Score should increase by config star value from DI
-- Score should increase by config star value
 
 
 </code></pre>
@@ -431,11 +431,11 @@ class ScoreEffectsTest extends Test {
 </code></pre>
 <pre><code>ScoreEffectsTest:
 Config(10,256,10)
-  - testkit operations with effects should support assertions outside of effect 
-- testkit operations with effects should support assertions outside of effect
-Config(10,256,10)
   - testkit operations with effects should support assertions in effects 
 - testkit operations with effects should support assertions in effects
+Config(10,256,10)
+  - testkit operations with effects should support assertions outside of effect 
+- testkit operations with effects should support assertions outside of effect
 
 
 </code></pre>
@@ -754,12 +754,12 @@ class NotUsingMemoTest extends DummyTest {
 <p>These two tests will run sequentially. There is no memoization configured for the dependencies. Each test case will acquire a fresh instance from the object graph. For our demonstration this results in a new <code>BonusService</code> instance for each test case.</p>
 <pre><code>NotUsingMemoTest:
 
- bonusService = repl.MdocSession$App$DummyBonusService$Impl@2722b76 
+ bonusService = repl.MdocSession$App$DummyBonusService$Impl@67ca8fca 
 
   - Not memoizing BonusService should use a new instance in the first case 
 - Not memoizing BonusService should use a new instance in the first case
 
- bonusService = repl.MdocSession$App$DummyBonusService$Impl@4841cc9c 
+ bonusService = repl.MdocSession$App$DummyBonusService$Impl@7eb17b45 
 
   - Not memoizing BonusService should use a new instance in the second case 
 - Not memoizing BonusService should use a new instance in the second case
@@ -841,16 +841,16 @@ class AnotherUsingMemoTest extends DummyTest {
 <p>Both tests suites, all three test cases, will use same memoization environment and the same <code>bonusService</code> instance:</p>
 <pre><code>UsingMemoTest:
 
- bonusService = repl.MdocSession$App$DummyBonusService$Impl@35e879e4 
+ bonusService = repl.MdocSession$App$DummyBonusService$Impl@4768c21e 
+
+currentBonus = 10
+
+ bonusService = repl.MdocSession$App$DummyBonusService$Impl@4768c21e 
 
   - Memoizing BonusService should use a new instance in the first case 
 - Memoizing BonusService should use a new instance in the first case
 
- bonusService = repl.MdocSession$App$DummyBonusService$Impl@35e879e4 
-
-currentBonus = 1653298668
-
- bonusService = repl.MdocSession$App$DummyBonusService$Impl@35e879e4 
+ bonusService = repl.MdocSession$App$DummyBonusService$Impl@4768c21e 
 
   - Memoizing BonusService should use the same instance in the second case 
 - Memoizing BonusService should use the same instance in the second case
@@ -888,7 +888,7 @@ for each test case
 <p>Forced roots may be configured per-activation / combination of activations, e.g. you may force postgres table setup to happen only in test environments with <code>Repo -&gt; Repo.Prod</code> activation.</p>
 <h3><a href="#test-selection" name="test-selection" class="anchor"><span class="anchor-link"></span></a>Test Selection</h3>
 <h4><a href="#using-integrationcheck" name="using-integrationcheck" class="anchor"><span class="anchor-link"></span></a>Using <code>IntegrationCheck</code></h4>
-<p>Implementation classes that inherit from <a href="/api/izumi/distage/framework/model/IntegrationCheck.html"><code>izumi.distage.framework.model.IntegrationCheck</code></a> will have their <code>resourceCheck()</code> method called before the test instantiation to check if external test dependencies — such as Docker containers in <a href="distage-framework-docker.html#docker-test-resources">distage-framework-docker</a> — are available for the test (or for the role when in main scope).</p>
+<p>Implementation classes that inherit from <a href="/api/izumi/distage/model/provisioning/IntegrationCheck.html"><code>izumi.distage.model.provisioning.IntegrationCheck</code></a> will have their <code>resourceCheck()</code> method called before the test instantiation to check if external test dependencies — such as Docker containers in <a href="distage-framework-docker.html#docker-test-resources">distage-framework-docker</a> — are available for the test (or for the role when in main scope).</p>
 <p>If not, the test will be canceled/ignored.</p>
 <p>This feature therefore allows you to selectively run only the fast in-memory tests that have no external dependencies by shutting down the docker daemon (or another source of external dependencies).</p>
 <p>Integration checks are executed only in <code>distage-testkit</code> tests and <code>distage-framework</code> <a href="distage-framework.html#roles">roles</a>.</p>
@@ -1025,13 +1025,13 @@ abstract class LadderTest extends LeaderboardTest {
 </code></pre>
 </div>
 <div>
-<a href="https://github.com/7mind/izumi/tree/v1.0.8/doc/microsite/target/mdoc/distage/distage-testkit.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/7mind/izumi/tree/v1.1.0-M2/doc/microsite/target/mdoc/distage/distage-testkit.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>
 <div class="print-only">
 <span class="md-source-file md-version">
-1.0.8
+1.1.0-M2
 </span>
 </div>
 </article>
