@@ -351,8 +351,8 @@ object DistageFrameworkModules extends ModuleDef {
   }
 }
 
-minimalExample.unsafeRunSync()
-// postgres is available on port AvailablePort(10.1.0.29,38433)
+minimalExample.unsafeRunSync()(cats.effect.unsafe.IORuntime.global)
+// postgres is available on port AvailablePort(172.17.0.2,5432)
 </code></pre>
 <p>If the <code>DockerSupportModule</code> is not included in an application then a get of a Docker container dependent resource will fail with a <code>izumi.distage.model.exceptions.interpretation.ProvisioningException</code>.</p>
 <h3><a href="#config-api" name="config-api" class="anchor"><span class="anchor-link"></span></a>Config API</h3>
@@ -421,7 +421,7 @@ class ElasticSearchPlusPostgresModule[F[_]: TagK] extends ModuleDef {
 <h3><a href="#usage-in-integration-tests" name="usage-in-integration-tests" class="anchor"><span class="anchor-link"></span></a>Usage in Integration Tests</h3>
 <p>A common use case is using Docker containers to provide service implementations for integration test, such as using a PostgreSQL container for verifying an application that uses a PostgreSQL database.</p>
 <p>Consider the example application below. This application is written to depend on a <a href="https://tpolecat.github.io/doobie/">doobie</a> <code>Transactor</code>, which is constructed from a <code>PostgresServerConfig</code>.</p>
-<pre class="prettyprint"><code class="language-scala">import cats.effect.{Async, ContextShift}
+<pre class="prettyprint"><code class="language-scala">import cats.effect.Async
 import doobie.Transactor
 import doobie.syntax.connectionio._
 import doobie.syntax.string._
@@ -452,14 +452,14 @@ final case class PostgresServerConfig(
 
 object TransactorFromConfigModule extends ModuleDef {
   make[Transactor[IO]].from {
-    (config: PostgresServerConfig, async: Async[IO], contextShift: ContextShift[IO]) =&gt;
+    (config: PostgresServerConfig, async: Async[IO]) =&gt;
 
       Transactor.fromDriverManager[IO](
         driver = &quot;org.postgresql.Driver&quot;,
         url    = s&quot;jdbc:postgresql://${config.host}:${config.port}/${config.database}&quot;,
         user   = config.username,
         pass   = config.password,
-      )(async, contextShift)
+      )(async)
   }
 }
 </code></pre>
@@ -530,7 +530,7 @@ class PostgresExampleAppIntegrationTest extends Spec1[IO] with AssertCIO {
   }
 }
 
-postgresDockerIntegrationExample.unsafeRunSync()
+postgresDockerIntegrationExample.unsafeRunSync()(cats.effect.unsafe.IORuntime.global)
 // 1 + 1 = 2.
 </code></pre>
 <h3><a href="#docker-container-environment" name="docker-container-environment" class="anchor"><span class="anchor-link"></span></a>Docker Container Environment</h3>
