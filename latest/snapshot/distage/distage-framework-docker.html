@@ -352,7 +352,7 @@ object DistageFrameworkModules extends ModuleDef {
 }
 
 minimalExample.unsafeRunSync()(cats.effect.unsafe.IORuntime.global)
-// postgres is available on port AvailablePort(172.17.0.2,5432)
+// postgres is available on port AvailablePort(10.1.0.73,38475)
 </code></pre>
 <p>If the <code>DockerSupportModule</code> is not included in an application then a get of a Docker container dependent resource will fail with a <code>izumi.distage.model.exceptions.interpretation.ProvisioningException</code>.</p>
 <h3><a href="#config-api" name="config-api" class="anchor"><span class="anchor-link"></span></a>Config API</h3>
@@ -608,10 +608,10 @@ class CustomDockerConfigExampleModule[F[_]: TagK] extends ModuleDef {
   include(DockerSupportModule[F] overriddenBy new ModuleDef {
     make[Docker.ClientConfig].from {
       Docker.ClientConfig(
-        globalReuse      = DockerReusePolicy.ReuseEnabled,
-        useRemote        = true,
-        useRegistry      = true,
-        remote           = Some(
+        globalReuse       = DockerReusePolicy.ReuseEnabled,
+        useRemote         = true,
+        useGlobalRegistry = true,
+        remote            = Some(
           Docker.RemoteDockerConfig(
             host      = &quot;tcp://localhost:2376&quot;,
             tlsVerify = true,
@@ -619,13 +619,19 @@ class CustomDockerConfigExampleModule[F[_]: TagK] extends ModuleDef {
             config    = &quot;/home/user/.docker&quot;,
           )
         ),
-        registry = Some(
-          Docker.DockerRegistryConfig(
-            url      = &quot;https://index.docker.io/v1/&quot;,
-            username = &quot;dockeruser&quot;,
-            password = &quot;ilovedocker&quot;,
-            email    = &quot;dockeruser@github.com&quot;,
-          )
+        globalRegistry = Some(&quot;index.docker.io&quot;), // docker hub default registry
+        registryConfigs = List(
+            Docker.DockerRegistryConfig(
+              registry = &quot;index.docker.io&quot;,
+              username = &quot;docker_user&quot;,
+              password = &quot;i_love_docker&quot;,
+              email    = Some(&quot;dockeruser@github.com&quot;),
+            ),
+            Docker.DockerRegistryConfig(
+              registry = &quot;your.registry&quot;,
+              username = &quot;my_registry_user&quot;,
+              password = &quot;i_love_my_registry&quot;,
+            ),
         ),
       )
     }
