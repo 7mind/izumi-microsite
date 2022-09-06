@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="x-ua-compatible" content="ie=edge">
 <meta name="description" content="microsite">
-<meta name="generator" content="Paradox, paradox-material-theme=1.1.0-M6, mkdocs-material=3.0.3">
+<meta name="generator" content="Paradox, paradox-material-theme=1.1.0-M7, mkdocs-material=3.0.3">
 
 <meta name="lang:clipboard.copy" content="Copy to clipboard">
 <meta name="lang:clipboard.copied" content="Copied to clipboard">
@@ -186,7 +186,7 @@ data-md-source="github">
 <ul style="display: none">
 <li class="md-nav__item md-version" id="project.version">
 <label class="md-nav__link" for="__version">
-<i class="md-icon" title="Version">label_outline</i> 1.1.0-M6
+<i class="md-icon" title="Version">label_outline</i> 1.1.0-M7
 </label>
 </li>
 </ul>
@@ -272,7 +272,7 @@ data-md-source="github">
   <li>Excellent for providing Docker implementations of services for integration tests</li>
 </ul>
 <h3><a href="#dependencies" name="dependencies" class="anchor"><span class="anchor-link"></span></a>Dependencies</h3>
-<p>Add the <code>distage-framework-docker</code> library:</p><dl class="dependency"><dt>sbt</dt><dd><pre class="prettyprint"><code class="language-scala">libraryDependencies += "io.7mind.izumi" %% "distage-framework-docker" % "1.1.0-M6"</code></pre></dd></dl>
+<p>Add the <code>distage-framework-docker</code> library:</p><dl class="dependency"><dt>sbt</dt><dd><pre class="prettyprint"><code class="language-scala">libraryDependencies += "io.7mind.izumi" %% "distage-framework-docker" % "1.1.0-M7"</code></pre></dd></dl>
 <h3><a href="#overview" name="overview" class="anchor"><span class="anchor-link"></span></a>Overview</h3>
 <p>Usage of <code>distage-framework-docker</code> generally follows these steps:</p>
 <ol>
@@ -608,10 +608,10 @@ class CustomDockerConfigExampleModule[F[_]: TagK] extends ModuleDef {
   include(DockerSupportModule[F] overriddenBy new ModuleDef {
     make[Docker.ClientConfig].from {
       Docker.ClientConfig(
-        globalReuse      = DockerReusePolicy.ReuseEnabled,
-        useRemote        = true,
-        useRegistry      = true,
-        remote           = Some(
+        globalReuse       = DockerReusePolicy.ReuseEnabled,
+        useRemote         = true,
+        useGlobalRegistry = true,
+        remote            = Some(
           Docker.RemoteDockerConfig(
             host      = &quot;tcp://localhost:2376&quot;,
             tlsVerify = true,
@@ -619,13 +619,19 @@ class CustomDockerConfigExampleModule[F[_]: TagK] extends ModuleDef {
             config    = &quot;/home/user/.docker&quot;,
           )
         ),
-        registry = Some(
-          Docker.DockerRegistryConfig(
-            url      = &quot;https://index.docker.io/v1/&quot;,
-            username = &quot;dockeruser&quot;,
-            password = &quot;ilovedocker&quot;,
-            email    = &quot;dockeruser@github.com&quot;,
-          )
+        globalRegistry = Some(&quot;index.docker.io&quot;), // docker hub default registry
+        registryConfigs = List(
+            Docker.DockerRegistryConfig(
+              registry = &quot;index.docker.io&quot;,
+              username = &quot;docker_user&quot;,
+              password = &quot;i_love_docker&quot;,
+              email    = Some(&quot;dockeruser@github.com&quot;),
+            ),
+            Docker.DockerRegistryConfig(
+              registry = &quot;your.registry&quot;,
+              username = &quot;my_registry_user&quot;,
+              password = &quot;i_love_my_registry&quot;,
+            ),
         ),
       )
     }
@@ -697,13 +703,13 @@ class CustomDockerConfigExampleModule[F[_]: TagK] extends ModuleDef {
 </ul>
 </div>
 <div>
-<a href="https://github.com/7mind/izumi/tree/v1.1.0-M6/doc/microsite/target/mdoc/distage/distage-framework-docker.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/7mind/izumi/tree/v1.1.0-M7/doc/microsite/target/mdoc/distage/distage-framework-docker.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>
 <div class="print-only">
 <span class="md-source-file md-version">
-1.1.0-M6
+1.1.0-M7
 </span>
 </div>
 </article>
