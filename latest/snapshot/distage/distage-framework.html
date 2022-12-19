@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="x-ua-compatible" content="ie=edge">
 <meta name="description" content="microsite">
-<meta name="generator" content="Paradox, paradox-material-theme=1.1.0-SNAPSHOT, mkdocs-material=3.0.3">
+<meta name="generator" content="Paradox, paradox-material-theme=0.6.0, mkdocs-material=3.0.3">
 
 <meta name="lang:clipboard.copy" content="Copy to clipboard">
 <meta name="lang:clipboard.copied" content="Copied to clipboard">
@@ -227,11 +227,11 @@ data-md-source="github">
 <p>Many software suites have more than one entrypoint. For example Scalac provides a REPL and a Compiler. A typical distributed application may provide both server and client code, as well as a host of utility applications for maintenance.</p>
 <p>In <code>distage</code> such entrypoints are called &ldquo;roles&rdquo;. Role-based applications may contain roles of different types:</p>
 <ul>
-  <li><a href="/latest/snapshot/api/izumi/distage/roles/model/RoleService.html"><code>RoleService[F]</code></a>, for persistent services and daemons</li>
-  <li><a href="/latest/snapshot/api/izumi/distage/roles/model/RoleTask.html"><code>RoleTask[F]</code></a>, for one-off tasks and applications</li>
+  <li><a href="/latest/snapshot/api/izumi/distage/roles/model/RoleService.html" title="izumi.distage.roles.model.RoleService"><code>`RoleService[F]`</code></a>, for persistent services and daemons</li>
+  <li><a href="/latest/snapshot/api/izumi/distage/roles/model/RoleTask.html" title="izumi.distage.roles.model.RoleTask"><code>`RoleTask[F]`</code></a>, for one-off tasks and applications</li>
 </ul>
 <p>To use roles, add <code>distage-framework</code> library:</p><dl class="dependency"><dt>sbt</dt><dd><pre class="prettyprint"><code class="language-scala">libraryDependencies += "io.7mind.izumi" %% "distage-framework" % "1.1.0-SNAPSHOT"</code></pre></dd></dl>
-<p>To declare roles use <a href="/latest/snapshot/api/izumi/distage/roles/model/definition/RoleModuleDef.html">RoleModuleDef#makeRole</a>:</p>
+<p>To declare roles use <a href="/latest/snapshot/api/izumi/distage/roles/model/definition/RoleModuleDef.html" title="izumi.distage.roles.model.definition.RoleModuleDef"><code>RoleModuleDef#makeRole</code></a>:</p>
 <pre class="prettyprint"><code class="language-scala">import distage.plugins.PluginDef
 import izumi.distage.roles.model.definition.RoleModuleDef
 import izumi.distage.roles.model.RoleDescriptor
@@ -258,7 +258,7 @@ object ExampleRoleTask extends RoleDescriptor {
   override def id = &quot;exampletask&quot;
 }
 </code></pre>
-<p>Create a Role Launcher, <a href="/latest/snapshot/api/izumi/distage/roles/RoleAppMain.html">RoleAppMain</a>, with the example role:</p>
+<p>Create a Role Launcher, <a href="/latest/snapshot/api/izumi/distage/roles/RoleAppMain.html" title="izumi.distage.roles.RoleAppMain"><code>RoleAppMain</code></a>, with the example role:</p>
 <pre class="prettyprint"><code class="language-scala">import distage.plugins.PluginConfig
 import izumi.distage.roles.RoleAppMain
 import zio.IO
@@ -284,10 +284,10 @@ I 2020-12-14T10:00:16.263           (distage-framework.md:43)  ….App0.ExampleR
 I 2020-12-14T10:00:16.267       (RoleAppEntrypoint.scala:106)  ….R.I.r.1.loggedTask.104.105 [ 944:run-main-1          ] phase=late Task finished: task=repl.MdocSession$App0$ExampleRoleTask@76b7592c
 </code></pre>
 <p>Only the components required by the specified roles will be created, everything else will be pruned. (see: <a href="advanced-features.html#dependency-pruning">Dependency Pruning</a>)</p>
-<p><a href="/latest/snapshot/api/izumi/distage/roles/bundled/BundledRolesModule.html">BundledRolesModule</a> contains two example roles:</p>
+<p><a href="/latest/snapshot/api/izumi/distage/roles/bundled/BundledRolesModule.html" title="izumi.distage.roles.bundled.BundledRolesModule"><code>BundledRolesModule</code></a> contains two example roles:</p>
 <ul>
-  <li><a href="/latest/snapshot/api/izumi/distage/roles/bundled/Help.html">Help</a> - prints help message when launched <code>./launcher :help</code></li>
-  <li><a href="/latest/snapshot/api/izumi/distage/roles/bundled/ConfigWriter.html">ConfigWriter</a> - writes reference config into files, split by  roles (includes only parts of the config used by the application)</li>
+  <li><a href="/latest/snapshot/api/izumi/distage/roles/bundled/Help.html" title="izumi.distage.roles.bundled.Help"><code>Help</code></a> - prints help message when launched <code>./launcher :help</code></li>
+  <li><a href="/latest/snapshot/api/izumi/distage/roles/bundled/ConfigWriter.html" title="izumi.distage.roles.bundled.ConfigWriter"><code>ConfigWriter</code></a> - writes reference config into files, split by  roles (includes only parts of the config used by the application)</li>
 </ul>
 <p>Use <code>include</code> to add it to your application:</p>
 <pre class="prettyprint"><code class="language-scala">import distage.plugins.PluginDef
@@ -305,7 +305,7 @@ object RolesPlugin extends PluginDef {
 </ul>
 <h2><a href="#compile-time-checks" name="compile-time-checks" class="anchor"><span class="anchor-link"></span></a>Compile-time checks</h2>
 <p>To use compile-time checks, add <code>distage-framework</code> library:</p><dl class="dependency"><dt>sbt</dt><dd><pre class="prettyprint"><code class="language-scala">libraryDependencies += "io.7mind.izumi" %% "distage-framework" % "1.1.0-SNAPSHOT"</code></pre></dd></dl>
-<p>The easiest way to add full compile-time safety to your application is to add an object inheriting <a href="/latest/snapshot/api/izumi/distage/framework/PlanCheck$.html">PlanCheck</a><a href="/latest/snapshot/api/izumi/distage/framework/PlanCheck$$Main.html">.Main</a> in __ test scope__ of the same module where you define your <a href="/latest/snapshot/api/izumi/distage/roles/RoleAppMain.html">Role Launcher</a></p>
+<p>The easiest way to add full compile-time safety to your application is to add an object inheriting <a href="/latest/snapshot/api/izumi/distage/framework/PlanCheck$.html" title="izumi.distage.framework.PlanCheck"><code>PlanCheck</code></a><a href="/latest/snapshot/api/izumi/distage/framework/PlanCheck$$Main.html" title="izumi.distage.framework.PlanCheck.Main"><code>.Main</code></a> in __ test scope__ of the same module where you define your <a href="/latest/snapshot/api/izumi/distage/roles/RoleAppMain.html" title="izumi.distage.roles.RoleAppMain"><code>Role Launcher</code></a></p>
 <pre class="prettyprint"><code class="language-scala">import izumi.distage.framework.PlanCheck
 import com.example.myapp.MainLauncher
 
@@ -313,13 +313,13 @@ object WiringCheck extends PlanCheck.Main(MainLauncher)
 </code></pre>
 <p>This object will emit compile-time errors for any issues or omissions in your <code>ModuleDefs</code>. It will recompile itself as necessary to provide feedback during development.</p>
 <p>By default, all possible roles and activations are checked efficiently.</p>
-<p>You may exclude specific roles or activations from the check by passing a <a href="/latest/snapshot/api/izumi/distage/framework/PlanCheckConfig.html">PlanCheckConfig</a> case class to PlanCheck API. Most options in <code>PlanCheckConfig</code> can also be set using system properties, see <a href="/latest/snapshot/api/izumi/distage/framework/DebugProperties$.html">DebugProperties</a>.</p>
+<p>You may exclude specific roles or activations from the check by passing a <a href="/latest/snapshot/api/izumi/distage/framework/PlanCheckConfig.html" title="izumi.distage.framework.PlanCheckConfig"><code>PlanCheckConfig</code></a> case class to PlanCheck API. Most options in <code>PlanCheckConfig</code> can also be set using system properties, see <a href="/latest/snapshot/api/izumi/distage/framework/DebugProperties$.html" title="izumi.distage.framework.DebugProperties"><code>DebugProperties</code></a>.</p>
 <h3><a href="#checking-default-config" name="checking-default-config" class="anchor"><span class="anchor-link"></span></a>Checking default config</h3>
 <p>By default <code>PlanCheck</code> will check parsing of config bindings (from <a href="distage-framework.html#typesafe-config">distage-extension-config</a>) using configs loaded with the same settings as the role launcher.</p>
 <p>This allows you to ensure correctness of default configs during development without writing tests.</p>
 <p>If you need to disable this check, set <code>checkConfig</code> option of <code>PlanCheckConfig</code> to <code>false</code>.</p>
 <h3><a href="#using-with-distage-teskit" name="using-with-distage-teskit" class="anchor"><span class="anchor-link"></span></a>Using with <code>distage-teskit</code></h3>
-<p>Use <a href="/latest/snapshot/api/izumi/distage/testkit/scalatest/SpecWiring.html">SpecWiring</a> to spawn a test-suite that also triggers compile-time checks.</p>
+<p>Use <a href="/latest/snapshot/api/izumi/distage/testkit/scalatest/SpecWiring.html" title="izumi.distage.testkit.scalatest.SpecWiring"><code>SpecWiring</code></a> to spawn a test-suite that also triggers compile-time checks.</p>
 <p><code>SpecWiring</code> will check the passed application when compiled, then perform the check again at runtime when ran as a test.</p>
 <pre class="prettyprint"><code class="language-scala">import izumi.distage.framework.PlanCheckConfig
 import izumi.distage.testkit.scalatest.SpecWiring
@@ -332,10 +332,10 @@ object WiringCheck extends SpecWiring(
 )
 </code></pre>
 <h3><a href="#checking-distage-core-apps" name="checking-distage-core-apps" class="anchor"><span class="anchor-link"></span></a>Checking <code>distage-core</code> apps</h3>
-<p><code>distage-framework</code>&rsquo;s Role-based applications are checkable out of the box, but applications assembled directly via <code>distage-core</code>&rsquo;s <code>distage.Injector</code> APIs must implement the <a href="/latest/snapshot/api/izumi/distage/framework/CheckableApp.html">CheckableApp</a> trait to provide all the data necessary for the checks. You may use <a href="/latest/snapshot/api/izumi/distage/framework/CoreCheckableAppSimple.html">CoreCheckableAppSimple</a> implementation for applications definable by a single collection of modules.</p>
+<p><code>distage-framework</code>&rsquo;s Role-based applications are checkable out of the box, but applications assembled directly via <code>distage-core</code>&rsquo;s <code>distage.Injector</code> APIs must implement the <a href="/latest/snapshot/api/izumi/distage/framework/CheckableApp.html" title="izumi.distage.framework.CheckableApp"><code>CheckableApp</code></a> trait to provide all the data necessary for the checks. You may use <a href="/latest/snapshot/api/izumi/distage/framework/CoreCheckableAppSimple.html" title="izumi.distage.framework.CoreCheckableAppSimple"><code>CoreCheckableAppSimple</code></a> implementation for applications definable by a single collection of modules.</p>
 <h3><a href="#low-level-apis" name="low-level-apis" class="anchor"><span class="anchor-link"></span></a>Low-Level APIs</h3>
-<p><a href="/latest/snapshot/api/izumi/distage/framework/PlanCheckMaterializer.html">PlanCheckMaterializer</a>, <a href="/latest/snapshot/api/izumi/distage/plugins/ForcedRecompilationToken.html">ForcedRecompilationToken</a> and <a href="/latest/snapshot/api/izumi/distage/framework/PlanCheck$$runtime$.html">PlanCheck.runtime</a> provide the low-level APIs behind <code>distage</code> compile-time checks, they can be used to wrap the capability in other APIs or implement similar functionality.</p>
-<p><a href="/latest/snapshot/api/izumi/distage/planning/solver/PlanVerifier.html">PlanVerifier</a> hosts the multi-graph traversal doing the actual checking and can be invoked at runtime or in macro. It can also be invoked using <code>Injector#assert</code> and <code>Injector#verify</code> methods.</p>
+<p><a href="/latest/snapshot/api/izumi/distage/framework/PlanCheckMaterializer.html" title="izumi.distage.framework.PlanCheckMaterializer"><code>PlanCheckMaterializer</code></a>, <a href="/latest/snapshot/api/izumi/distage/plugins/ForcedRecompilationToken.html" title="izumi.distage.plugins.ForcedRecompilationToken"><code>ForcedRecompilationToken</code></a> and <a href="/latest/snapshot/api/izumi/distage/framework/PlanCheck$$runtime$.html" title="izumi.distage.framework.PlanCheck$$runtime"><code>PlanCheck.runtime</code></a> provide the low-level APIs behind <code>distage</code> compile-time checks, they can be used to wrap the capability in other APIs or implement similar functionality.</p>
+<p><a href="/latest/snapshot/api/izumi/distage/planning/solver/PlanVerifier.html" title="izumi.distage.planning.solver.PlanVerifier"><code>PlanVerifier</code></a> hosts the multi-graph traversal doing the actual checking and can be invoked at runtime or in macro. It can also be invoked using <code>Injector#assert</code> and <code>Injector#verify</code> methods.</p>
 <h3><a href="#scala-2-12" name="scala-2-12" class="anchor"><span class="anchor-link"></span></a>Scala 2.12</h3>
 <p>If you&rsquo;re using Scala <code>2.12</code> and get compilation errors such as</p>
 <pre class="prettyprint"><code class="language-scalak">[error]  type mismatch;
@@ -403,8 +403,8 @@ val module = new ConfigModuleDef {
 // module: AnyRef with ConfigModuleDef = 
 // make[{type.izumi.distage.config.model.AppConfig}].from(call(ƒ:&lt;function0&gt;(): izumi.distage.config.model.AppConfig)) ((distage-framework.md:179))
 // make[{type.repl.MdocSession::MdocApp4::ConfigPrinter}].from(call(π:Class(repl.MdocSession::MdocApp4::Conf, repl.MdocSession::MdocApp4::OtherConf): repl.MdocSession::MdocApp4::ConfigPrinter)) ((distage-framework.md:172))
-// make[{type.repl.MdocSession::MdocApp4::OtherConf@other}].from(call(ƒ:izumi.distage.config.codec.DIConfigReader$$Lambda$23656/1991634548@4d023588(izumi.distage.config.model.AppConfig): repl.MdocSession::MdocApp4::OtherConf)).tagged(Set(ConfTag(conf))) ((distage-framework.md:176))
-// make[{type.repl.MdocSession::MdocApp4::Conf}].from(call(ƒ:izumi.distage.config.codec.DIConfigReader$$Lambda$23656/1991634548@141dbf31(izumi.distage.config.model.AppConfig): repl.MdocSession::MdocApp4::Conf)).tagged(Set(ConfTag(conf))) ((distage-framework.md:175))
+// make[{type.repl.MdocSession::MdocApp4::OtherConf@other}].from(call(ƒ:izumi.distage.config.codec.DIConfigReader$$Lambda$24017/0x0000000805cce840@7ffee955(izumi.distage.config.model.AppConfig): repl.MdocSession::MdocApp4::OtherConf)).tagged(Set(ConfTag(conf))) ((distage-framework.md:176))
+// make[{type.repl.MdocSession::MdocApp4::Conf}].from(call(ƒ:izumi.distage.config.codec.DIConfigReader$$Lambda$24017/0x0000000805cce840@6a379b46(izumi.distage.config.model.AppConfig): repl.MdocSession::MdocApp4::Conf)).tagged(Set(ConfTag(conf))) ((distage-framework.md:175))
 
 Injector().produceRun(module) {
   configPrinter: ConfigPrinter =&gt;
@@ -428,7 +428,7 @@ Injector().produceRun(module) {
   <li><code>common-reference.conf</code></li>
   <li><code>common-reference-dev.conf</code></li>
 </ul>
-<p>Where <code>distage-testkit</code> uses <a href="/latest/snapshot/api/izumi/distage/testkit/TestConfig.html#configBaseName"><code>TestConfig#configBaseName</code></a> instead of <code>roleName</code>.</p>
+<p>Where <code>distage-testkit</code> uses <a href="/latest/snapshot/api/izumi/distage/testkit/TestConfig.html#configBaseName" title="izumi.distage.testkit.TestConfig"><code>`TestConfig#configBaseName`</code></a> instead of <code>roleName</code>.</p>
 <p>Explicit config files passed to the role launcher <code>-c file.conf</code> the command-line flag have a higher priority than resource configs.</p>
 <p>Role-specific configs on the command-line, passed via <code>-c file.conf</code> option <em>after</em> a <code>:roleName</code> argument, in turn have a higher priority than the explicit config files passed <em>before</em> the first <code>:role</code> argument.</p>
 <p>Example:</p>
@@ -487,7 +487,7 @@ Injector()
 // res9: izumi.fundamentals.platform.functional.package.Identity[Unit] = ()
 </code></pre>
 <h3><a href="#compile-time-scanning" name="compile-time-scanning" class="anchor"><span class="anchor-link"></span></a>Compile-time scanning</h3>
-<p>Plugin scan can be performed at compile-time, this is mainly useful for deployment on platforms with reduced runtime reflection capabilities compared to the JVM, such as Graal Native Image, Scala.js and Scala Native. Use <a href="/latest/snapshot/api/izumi/distage/plugins/PluginConfig$.html#compileTime">PluginConfig.compileTime</a> to perform a compile-time scan.</p>
+<p>Plugin scan can be performed at compile-time, this is mainly useful for deployment on platforms with reduced runtime reflection capabilities compared to the JVM, such as Graal Native Image, Scala.js and Scala Native. Use <a href="/latest/snapshot/api/izumi/distage/plugins/PluginConfig$.html#compileTime" title="izumi.distage.plugins.PluginConfig"><code>PluginConfig.compileTime</code></a> to perform a compile-time scan.</p>
 <p>Be warned though, for compile-time scanning to find plugins, they must be placed in a separate module from the one in which scan is performed. When placed in the same module, scanning will fail.</p>
 <p>Example:</p>
 <pre class="prettyprint"><code class="language-scala">package com.example.petstore.another.module

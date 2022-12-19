@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="x-ua-compatible" content="ie=edge">
 <meta name="description" content="microsite">
-<meta name="generator" content="Paradox, paradox-material-theme=1.1.0-SNAPSHOT, mkdocs-material=3.0.3">
+<meta name="generator" content="Paradox, paradox-material-theme=0.6.0, mkdocs-material=3.0.3">
 
 <meta name="lang:clipboard.copy" content="Copy to clipboard">
 <meta name="lang:clipboard.copied" content="Copied to clipboard">
@@ -276,18 +276,18 @@ data-md-source="github">
 <h3><a href="#overview" name="overview" class="anchor"><span class="anchor-link"></span></a>Overview</h3>
 <p>Usage of <code>distage-framework-docker</code> generally follows these steps:</p>
 <ol>
-  <li>Create <a href="/latest/snapshot/api/izumi/distage/docker/ContainerDef.html"><code>ContainerDef</code></a>s for the containers the  application requires</li>
+  <li>Create <a href="/latest/snapshot/api/izumi/distage/docker/ContainerDef.html" title="izumi.distage.docker.ContainerDef"><code>`ContainerDef`</code></a>s for the containers the  application requires</li>
   <li>Create a module that declares the container component</li>
-  <li>Include the <a href="/latest/snapshot/api/izumi/distage/docker/modules/DockerSupportModule.html"><code>DockerSupportModule</code></a> in  the application&rsquo;s modules</li>
+  <li>Include the <a href="/latest/snapshot/api/izumi/distage/docker/modules/DockerSupportModule.html" title="izumi.distage.docker.modules.DockerSupportModule"><code>`DockerSupportModule`</code></a> in  the application&rsquo;s modules</li>
 </ol>
 <h4><a href="#1-create-a-containerdef" name="1-create-a-containerdef" class="anchor"><span class="anchor-link"></span></a>1. Create a <code>ContainerDef</code></h4>
-<p>The <a href="/latest/snapshot/api/izumi/distage/docker/ContainerDef.html"><code>ContainerDef</code></a> is a trait used to define a Docker container. Extend this trait and provide an implementation of the <code>config</code> method.</p>
+<p>The <a href="/latest/snapshot/api/izumi/distage/docker/ContainerDef.html" title="izumi.distage.docker.ContainerDef"><code>`ContainerDef`</code></a> is a trait used to define a Docker container. Extend this trait and provide an implementation of the <code>config</code> method.</p>
 <p>The required parameters for <code>Config</code> are:</p>
 <ul>
   <li><code>image</code> - the docker image to use</li>
   <li><code>ports</code> - ports to map on the docker container</li>
 </ul>
-<p>See <a href="/latest/snapshot/api/izumi/distage/docker/Docker$$ContainerConfig.html"><code>Docker.ContainerConfig[Tag]</code></a> for additional parameters.</p>
+<p>See <a href="/latest/snapshot/api/izumi/distage/docker/Docker$$ContainerConfig.html" title="izumi.distage.docker.Docker.ContainerConfig"><code>`Docker.ContainerConfig[Tag]`</code></a> for additional parameters.</p>
 <p>Example <a href="https://hub.docker.com/_/postgres/">postgres</a> container definition:</p>
 <pre class="prettyprint"><code class="language-scala">import izumi.distage.docker.{ContainerDef, Docker}
 
@@ -305,7 +305,7 @@ object PostgresDocker extends ContainerDef {
 </code></pre>
 <h4><a href="#2-declare-container-components" name="2-declare-container-components" class="anchor"><span class="anchor-link"></span></a>2. Declare Container Components</h4>
 <p>To use this container, a module that declares this component is required:</p>
-<p>Use <a href="/latest/snapshot/api/izumi/distage/docker/ContainerDef.html#make"><code>make</code></a> for binding in a <code>ModuleDef</code>:</p>
+<p>Use <a href="/latest/snapshot/api/izumi/distage/docker/ContainerDef.html#make" title="izumi.distage.docker.ContainerDef"><code>`make`</code></a> for binding in a <code>ModuleDef</code>:</p>
 <pre class="prettyprint"><code class="language-scala">import distage.ModuleDef
 import izumi.reflect.TagK
 
@@ -352,13 +352,13 @@ object DistageFrameworkModules extends ModuleDef {
 }
 
 minimalExample.unsafeRunSync()(cats.effect.unsafe.IORuntime.global)
-// postgres is available on port AvailablePort(10.1.0.57,33027)
+// postgres is available on port AvailablePort(10.1.0.92,41107)
 </code></pre>
 <p>If the <code>DockerSupportModule</code> is not included in an application then a get of a Docker container dependent resource will fail with a <code>izumi.distage.model.exceptions.interpretation.ProvisioningException</code>.</p>
 <h3><a href="#config-api" name="config-api" class="anchor"><span class="anchor-link"></span></a>Config API</h3>
-<p>The <a href="/latest/snapshot/api/izumi/distage/docker/DockerContainer$$DockerProviderExtensions.html"><code>DockerProviderExtensions</code></a> provides additional APIs for modiying the container definition.</p>
+<p>The <a href="/latest/snapshot/api/izumi/distage/docker/DockerContainer$$DockerProviderExtensions.html" title="izumi.distage.docker.DockerContainer.DockerProviderExtensions"><code>`DockerProviderExtensions`</code></a> provides additional APIs for modiying the container definition.</p>
 <h4><a href="#modifyconfig" name="modifyconfig" class="anchor"><span class="anchor-link"></span></a>modifyConfig</h4>
-<p>Use <a href="/latest/snapshot/api/izumi/distage/docker/DockerContainer$$DockerProviderExtensions.html#modifyConfig"><code>modifyConfig</code></a> to modify the configuration of a container. The modifier is instantiated to a <code>Functoid</code>, which will summon any additional dependencies.</p>
+<p>Use <a href="/latest/snapshot/api/izumi/distage/docker/DockerContainer$$DockerProviderExtensions.html#modifyConfig" title="izumi.distage.docker.DockerContainer.DockerProviderExtensions"><code>`modifyConfig`</code></a> to modify the configuration of a container. The modifier is instantiated to a <code>Functoid</code>, which will summon any additional dependencies.</p>
 <p>For example, to change the user of the PostgreSQL container:</p>
 <pre class="prettyprint"><code class="language-scala">class PostgresRunAsAdminModule[F[_]: TagK] extends ModuleDef {
   make[PostgresDocker.Container].fromResource {
@@ -386,7 +386,7 @@ class PostgresWithMountsDockerModule[F[_]: TagK] extends ModuleDef {
 }
 </code></pre>
 <h4><a href="#dependoncontainer" name="dependoncontainer" class="anchor"><span class="anchor-link"></span></a>dependOnContainer</h4>
-<p><a href="/latest/snapshot/api/izumi/distage/docker/DockerContainer$$DockerProviderExtensions.html#dependOnContainer"><code>dependOnContainer</code></a> adds a dependency on a given Docker container. <code>distage</code> ensures the requested container is available before the dependent.</p>
+<p><a href="/latest/snapshot/api/izumi/distage/docker/DockerContainer$$DockerProviderExtensions.html#dependOnContainer" title="izumi.distage.docker.DockerContainer.DockerProviderExtensions"><code>`dependOnContainer`</code></a> adds a dependency on a given Docker container. <code>distage</code> ensures the requested container is available before the dependent.</p>
 <p>For example, suppose a system under test requires both PostgreSQL and Elasticsearch. One option is to use <code>dependOnContainer</code> to declare the Elasticsearch container depends on the PostgreSQL container:</p>
 <pre class="prettyprint"><code class="language-scala">object ElasticSearchDocker extends ContainerDef {
   val ports = Seq(9200, 9300)
@@ -412,9 +412,9 @@ class ElasticSearchPlusPostgresModule[F[_]: TagK] extends ModuleDef {
 </code></pre>
 <p>Another example of dependencies between containers is in the &ldquo;Docker Container Networks&rdquo; section later in this document.</p>
 <h3><a href="#availability-and-health-checks" name="availability-and-health-checks" class="anchor"><span class="anchor-link"></span></a>Availability and Health Checks</h3>
-<p>The <code>healthCheck</code> properties of <a href="/latest/snapshot/api/izumi/distage/docker/Docker$$ContainerConfig.html">Docker.ContainerConfig</a> configure the health checks. A container resource will not be provided if the health checks did not succeed at acquire time. These are used to determine if an existing container can be used and if starting a fresh container succeeded.</p>
-<p>By default, the <code>healthCheck</code> is a port check of the ports from the container config. There are several standard checks provided in <a href="/latest/snapshot/api/izumi/distage/docker/healthcheck/ContainerHealthCheck$.html">ContainerHealthCheck</a> that can be combined to cover many common cases.</p>
-<p>The <a href="/latest/snapshot/api/izumi/distage/docker/DockerContainer.html#availablePorts">availablePorts</a> property of the container resource are the mapped ports that passed the health check. This is a map from a <code>Docker.DockerPort</code> provided in the config to a host and port. For example:</p>
+<p>The <code>healthCheck</code> properties of <a href="/latest/snapshot/api/izumi/distage/docker/Docker$$ContainerConfig.html" title="izumi.distage.docker.Docker.ContainerConfig"><code>Docker.ContainerConfig</code></a> configure the health checks. A container resource will not be provided if the health checks did not succeed at acquire time. These are used to determine if an existing container can be used and if starting a fresh container succeeded.</p>
+<p>By default, the <code>healthCheck</code> is a port check of the ports from the container config. There are several standard checks provided in <a href="/latest/snapshot/api/izumi/distage/docker/healthcheck/ContainerHealthCheck$.html" title="izumi.distage.docker.healthcheck.ContainerHealthCheck"><code>ContainerHealthCheck</code></a> that can be combined to cover many common cases.</p>
+<p>The <a href="/latest/snapshot/api/izumi/distage/docker/DockerContainer.html#availablePorts" title="izumi.distage.docker.DockerContainer"><code>availablePorts</code></a> property of the container resource are the mapped ports that passed the health check. This is a map from a <code>Docker.DockerPort</code> provided in the config to a host and port. For example:</p>
 <pre class="prettyprint"><code class="language-scala">val port = container.availablePorts.first(PostgresDocker.primaryPort)
 </code></pre>
 <p>would be a host and port mapped to the Postgres container&rsquo;s primary port that have passed the health check.</p>
@@ -534,7 +534,7 @@ postgresDockerIntegrationExample.unsafeRunSync()(cats.effect.unsafe.IORuntime.gl
 // 1 + 1 = 2.
 </code></pre>
 <h3><a href="#docker-container-environment" name="docker-container-environment" class="anchor"><span class="anchor-link"></span></a>Docker Container Environment</h3>
-<p>The container config (<a href="/latest/snapshot/api/izumi/distage/docker/Docker$$ContainerConfig.html">Docker.ContainerConfig</a>) defines the container environment. Of note are the environment variables, command of entrypoint, and working directory properties:</p>
+<p>The container config (<a href="/latest/snapshot/api/izumi/distage/docker/Docker$$ContainerConfig.html" title="izumi.distage.docker.Docker.ContainerConfig"><code>Docker.ContainerConfig</code></a>) defines the container environment. Of note are the environment variables, command of entrypoint, and working directory properties:</p>
 <ul>
   <li><code>env: Map[String, String]</code> - environment variables to setup in container</li>
   <li><code>cmd: Seq[String]</code> - command of entrypoint</li>
@@ -549,21 +549,21 @@ postgresDockerIntegrationExample.unsafeRunSync()(cats.effect.unsafe.IORuntime.gl
 <p>The host ports allocated for the container are also added to the container metadata as labels. These labels follow the pattern <code>distage.port.&lt;protocol&gt;.&lt;originalPort&gt;</code>. The value is the integer port number.</p>
 <h3><a href="#docker-container-networks" name="docker-container-networks" class="anchor"><span class="anchor-link"></span></a>Docker Container Networks</h3>
 <p><code>distage-framework-docker</code> can automatically manage <a href="https://docs.docker.com/engine/reference/commandline/network/">Docker networks</a>.</p>
-<p>To connect containers to the same Docker network, use a <a href="/latest/snapshot/api/izumi/distage/docker/ContainerNetworkDef.html"><code>ContainerNetworkDef</code></a>:</p>
+<p>To connect containers to the same Docker network, use a <a href="/latest/snapshot/api/izumi/distage/docker/ContainerNetworkDef.html" title="izumi.distage.docker.ContainerNetworkDef"><code>`ContainerNetworkDef`</code></a>:</p>
 <ol>
   <li>Create a <code>ContainerNetworkDef</code>.</li>
   <li>Add the network to each container&rsquo;s config.</li>
 </ol>
 <p>This will ensure the containers are all connected to the network. Assuming no reuse, distage will create the required network and add each container to that network.</p>
 <h4><a href="#1-create-a-containernetworkdef" name="1-create-a-containernetworkdef" class="anchor"><span class="anchor-link"></span></a>1. Create a <code>ContainerNetworkDef</code></h4>
-<p>A minimal <a href="/latest/snapshot/api/izumi/distage/docker/ContainerNetworkDef.html"><code>ContainerNetworkDef</code></a> uses the default configuration.</p>
+<p>A minimal <a href="/latest/snapshot/api/izumi/distage/docker/ContainerNetworkDef.html" title="izumi.distage.docker.ContainerNetworkDef"><code>`ContainerNetworkDef`</code></a> uses the default configuration.</p>
 <pre class="prettyprint"><code class="language-mdoc:to-string">object TestClusterNetwork extends ContainerNetworkDef {
   override def config: Config = Config()
 }
 </code></pre>
 <p>By default this object identifies the network. The associated tag type uniquely identifies this network within the application. In addition, any created network will have a label with this name in Docker.</p>
 <h4><a href="#2-add-to-container-config" name="2-add-to-container-config" class="anchor"><span class="anchor-link"></span></a>2. Add to Container Config</h4>
-<p>A container will be connected to all networks in the <code>networks</code> of the <code>config</code>. The method <a href="/latest/snapshot/api/izumi/distage/docker/DockerContainer$$DockerProviderExtensions.html#connectToNetwork"><code>connectToNetwork</code></a> adds a dependency on a network defined by a <code>ContainerNetworkDef</code>, as in this example:</p>
+<p>A container will be connected to all networks in the <code>networks</code> of the <code>config</code>. The method <a href="/latest/snapshot/api/izumi/distage/docker/DockerContainer$$DockerProviderExtensions.html#connectToNetwork" title="izumi.distage.docker.DockerContainer.DockerProviderExtensions"><code>`connectToNetwork`</code></a> adds a dependency on a network defined by a <code>ContainerNetworkDef</code>, as in this example:</p>
 <pre class="prettyprint"><code class="language-mdoc:to-string">class TestClusterNetworkModule[F[_]: TagK] extends ModuleDef {
   make[TestClusterNetwork.Network].fromResource {
     TestClusterNetwork.make[F]
@@ -585,7 +585,7 @@ postgresDockerIntegrationExample.unsafeRunSync()(cats.effect.unsafe.IORuntime.gl
 </code></pre>
 <p>For an existing network to be reused, the config and object name at time of creation must be the match the current configuration value and object.</p>
 <h3><a href="#docker-client-configuration" name="docker-client-configuration" class="anchor"><span class="anchor-link"></span></a>Docker Client Configuration</h3>
-<p>The <a href="/latest/snapshot/api/izumi/distage/docker/Docker$$ClientConfig.html"><code>Docker.ClientConfig</code></a> is the configuration of the Docker client used. Including the module <code>DockerSupportModule</code> will provide a <code>Docker.ClientConfig</code>.</p>
+<p>The <a href="/latest/snapshot/api/izumi/distage/docker/Docker$$ClientConfig.html" title="izumi.distage.docker.Docker.ClientConfig"><code>`Docker.ClientConfig`</code></a> is the configuration of the Docker client used. Including the module <code>DockerSupportModule</code> will provide a <code>Docker.ClientConfig</code>.</p>
 <p>There are two primary mechanisms to change the <code>Docker.ClientConfig</code> provided by <code>DockerSupportModule</code>:</p>
 <ol>
   <li>Provide a <code>docker</code> configuration in the <code>application.conf</code>:</li>
@@ -693,8 +693,8 @@ class CustomDockerConfigExampleModule[F[_]: TagK] extends ModuleDef {
 <pre><code>// izumi.distage.model.exceptions.interpretation.ProvisioningException: Provisioner stopped after 1 instances, 2/14 operations failed:
 //  - {type.izumi.distage.docker.DockerClientWrapper[=λ %0 → IO[+0]]} (distage-framework-docker.md:40), MissingInstanceException: Instance is not available in the object graph: {type.izumi.distage.docker.DockerClientWrapper[=λ %0 → IO[+0]]}.
 </code></pre>
-<p>This error means that <a href="/latest/snapshot/api/izumi/distage/docker/modules/DockerSupportModule.html"><code>DockerSupportModule</code></a> hasn&rsquo;t been <code>include</code>d with the application modules.</p>
-<p><code>DockerClientWrapper</code> component is provided by <a href="/latest/snapshot/api/izumi/distage/docker/modules/DockerSupportModule.html"><code>izumi.distage.docker.modules.DockerSupportModule</code></a>.</p>
+<p>This error means that <a href="/latest/snapshot/api/izumi/distage/docker/modules/DockerSupportModule.html" title="izumi.distage.docker.modules.DockerSupportModule"><code>`DockerSupportModule`</code></a> hasn&rsquo;t been <code>include</code>d with the application modules.</p>
+<p><code>DockerClientWrapper</code> component is provided by <a href="/latest/snapshot/api/izumi/distage/docker/modules/DockerSupportModule.html" title="izumi.distage.docker.modules.DockerSupportModule"><code>`izumi.distage.docker.modules.DockerSupportModule`</code></a>.</p>
 <h3><a href="#references" name="references" class="anchor"><span class="anchor-link"></span></a>References</h3>
 <ul>
   <li>Introduced in <a href="https://github.com/7mind/izumi/releases/tag/v0.9.13">release 0.9.13</a></li>

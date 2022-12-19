@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="x-ua-compatible" content="ie=edge">
 <meta name="description" content="microsite">
-<meta name="generator" content="Paradox, paradox-material-theme=1.1.0-SNAPSHOT, mkdocs-material=3.0.3">
+<meta name="generator" content="Paradox, paradox-material-theme=0.6.0, mkdocs-material=3.0.3">
 
 <meta name="lang:clipboard.copy" content="Copy to clipboard">
 <meta name="lang:clipboard.copied" content="Copied to clipboard">
@@ -316,11 +316,11 @@ def HelloByeModule = new ModuleDef {
   make[HelloByeApp] // `.from` is not required for concrete classes
 }
 </code></pre>
-<p><code>ModuleDef</code> merely contains a description of the desired object graph, let&rsquo;s transform that high-level description into an actionable series of steps - a <a href="/latest/snapshot/api/izumi/distage/model/plan/Plan.html">Plan</a>, a datatype we can <a href="debugging.html#pretty-printing-plans">inspect</a>, <a href="debugging.html#testing-plans">test</a> or <a href="distage-framework.html#compile-time-checks">verify at compile-time</a> – without having to actually create objects or execute effects.</p>
+<p><code>ModuleDef</code> merely contains a description of the desired object graph, let&rsquo;s transform that high-level description into an actionable series of steps - a <a href="/latest/snapshot/api/izumi/distage/model/plan/Plan.html" title="izumi.distage.model.plan.Plan"><code>Plan</code></a>, a datatype we can <a href="debugging.html#pretty-printing-plans">inspect</a>, <a href="debugging.html#testing-plans">test</a> or <a href="distage-framework.html#compile-time-checks">verify at compile-time</a> – without having to actually create objects or execute effects.</p>
 <pre class="prettyprint"><code class="language-scala">import distage.{Activation, Injector, Roots}
 
 val injector = Injector[RIO[Console, _]]()
-// injector: Injector[[β$0$]zio.ZIO[zio.Has[Console.Service], Throwable, β$0$]] = izumi.distage.InjectorDefaultImpl@2b619f23
+// injector: Injector[[β$0$]zio.ZIO[zio.Has[Console.Service], Throwable, β$0$]] = izumi.distage.InjectorDefaultImpl@191379f1
 
 val plan = injector.plan(HelloByeModule, Activation.empty, Roots.target[HelloByeApp])
 // plan: izumi.distage.model.plan.Plan = 1: {type.MdocSession::MdocApp1::Greeter} (basics.md:84) := call(π:Class(): MdocSession::MdocApp1::PrintGreeter[32m) {}
@@ -338,7 +338,7 @@ val plan = injector.plan(HelloByeModule, Activation.empty, Roots.target[HelloBye
 // Interpret into a Lifecycle value
 
 val resource = injector.produce(plan)
-// resource: izumi.distage.model.definition.Lifecycle[[β$0$]zio.ZIO[zio.Has[Console.Service], Throwable, β$0$], izumi.distage.model.Locator] = izumi.distage.model.definition.Lifecycle$$anon$8@4d4b8194
+// resource: izumi.distage.model.definition.Lifecycle[[β$0$]zio.ZIO[zio.Has[Console.Service], Throwable, β$0$], izumi.distage.model.Locator] = izumi.distage.model.definition.Lifecycle$$anon$8@6119c6b1
 
 // Use the object graph:
 // After `.use` exits, all objects will be deallocated,
@@ -348,7 +348,7 @@ val effect = resource.use {
   objects =&gt;
     objects.get[HelloByeApp].run
 }
-// effect: zio.ZIO[zio.Has[Console.Service], Throwable, Unit] = zio.ZIO$CheckInterrupt@48f3b0cd
+// effect: zio.ZIO[zio.Has[Console.Service], Throwable, Unit] = zio.ZIO$CheckInterrupt@5053ccf1
 
 // Run the resulting program
 
@@ -363,7 +363,7 @@ unsafeRun(effect)
 <p>A given component <code>X</code> will be the <em>same</em> <code>X</code> everywhere in the object graph, i.e. a singleton.</p>
 <p>It&rsquo;s impossible to create non-singletons in <code>distage</code>.</p>
 <h3><a href="#named-components" name="named-components" class="anchor"><span class="anchor-link"></span></a>Named components</h3>
-<p>If you need multiple singleton instances of the same type, you may create &ldquo;named&rdquo; instances and disambiguate between them using <a href="/latest/snapshot/api/izumi/distage/model/definition/Id.html"><code>@distage.Id</code></a> annotation. (<code>javax.inject.Named</code> is also supported)</p>
+<p>If you need multiple singleton instances of the same type, you may create &ldquo;named&rdquo; instances and disambiguate between them using <a href="/latest/snapshot/api/izumi/distage/model/definition/Id.html" title="izumi.distage.model.definition.Id"><code>`@distage.Id`</code></a> annotation. (<code>javax.inject.Named</code> is also supported)</p>
 <pre class="prettyprint"><code class="language-scala">import distage.Id
 
 def negateByer(otherByer: Byer): Byer = {
@@ -463,21 +463,21 @@ unsafeRun {
 // Hello Pavel!
 // Bye Pavel!
 </code></pre>
-<p><a href="/latest/snapshot/api/izumi/distage/model/definition/StandardAxis$.html">distage.StandardAxis</a> contains bundled Axes for back-end development:</p>
+<p><a href="/latest/snapshot/api/izumi/distage/model/definition/StandardAxis$.html" title="izumi.distage.model.definition.StandardAxis"><code>distage.StandardAxis</code></a> contains bundled Axes for back-end development:</p>
 <ul>
   <li>
-  <p><a href="/latest/snapshot/api/izumi/distage/model/definition/StandardAxis$$Repo$.html">Repo</a> axis, with <code>Prod</code>/<code>Dummy</code> choices, describes any entities which may store and persist state or &ldquo;repositories&rdquo;. e.g. databases, message queues, KV storages, file systems, etc. Those may typically have both in-memory <code>Dummy</code> implementations and heavyweight <code>Prod</code> implementations using external databases.</p></li>
+  <p><a href="/latest/snapshot/api/izumi/distage/model/definition/StandardAxis$$Repo$.html" title="izumi.distage.model.definition.StandardAxis$$Repo"><code>Repo</code></a> axis, with <code>Prod</code>/<code>Dummy</code> choices, describes any entities which may store and persist state or &ldquo;repositories&rdquo;. e.g. databases, message queues, KV storages, file systems, etc. Those may typically have both in-memory <code>Dummy</code> implementations and heavyweight <code>Prod</code> implementations using external databases.</p></li>
   <li>
-  <p><a href="/latest/snapshot/api/izumi/distage/model/definition/StandardAxis$$Mode$.html">Mode</a> axis, with <code>Prod</code>/<code>Test</code> choices, describes a generic choice between production and test implementations of a component.</p></li>
+  <p><a href="/latest/snapshot/api/izumi/distage/model/definition/StandardAxis$$Mode$.html" title="izumi.distage.model.definition.StandardAxis$$Mode"><code>Mode</code></a> axis, with <code>Prod</code>/<code>Test</code> choices, describes a generic choice between production and test implementations of a component.</p></li>
   <li>
-  <p><a href="/latest/snapshot/api/izumi/distage/model/definition/StandardAxis$$World$.html">World</a> axis, with <code>Real</code>/<code>Mock</code> choices, describes third-party integrations which are not controlled by the application and provided &ldquo;as is&rdquo;. e.g. Facebook API, Google API, etc. those may contact a <code>Real</code> external integration or a <code>Mock</code> one with predefined responses.</p></li>
+  <p><a href="/latest/snapshot/api/izumi/distage/model/definition/StandardAxis$$World$.html" title="izumi.distage.model.definition.StandardAxis$$World"><code>World</code></a> axis, with <code>Real</code>/<code>Mock</code> choices, describes third-party integrations which are not controlled by the application and provided &ldquo;as is&rdquo;. e.g. Facebook API, Google API, etc. those may contact a <code>Real</code> external integration or a <code>Mock</code> one with predefined responses.</p></li>
   <li>
-  <p><a href="/latest/snapshot/api/izumi/distage/model/definition/StandardAxis$$Scene$.html">Scene</a> axis with <code>Managed</code>/<code>Provided</code> choices, describes whether external services required by the application should be set-up on the fly by an orchestrator library such as <a href="distage-framework-docker.html"><code>distage-framework-docker</code></a> (<code>Scene.Managed</code>), or whether the application should try to connect to external services as if they already exist in the environment (<code>Scene.Provided</code>).  We call a set of external services required by the application a <code>Scene</code>, etymology being that the running external services required by the application are like a &ldquo;scene&rdquo; that the &ldquo;staff&rdquo; (the orchestrator) must prepare for the &ldquo;actor&rdquo; (the application) to enter.</p></li>
+  <p><a href="/latest/snapshot/api/izumi/distage/model/definition/StandardAxis$$Scene$.html" title="izumi.distage.model.definition.StandardAxis$$Scene"><code>Scene</code></a> axis with <code>Managed</code>/<code>Provided</code> choices, describes whether external services required by the application should be set-up on the fly by an orchestrator library such as <a href="distage-framework-docker.html"><code>distage-framework-docker</code></a> (<code>Scene.Managed</code>), or whether the application should try to connect to external services as if they already exist in the environment (<code>Scene.Provided</code>).  We call a set of external services required by the application a <code>Scene</code>, etymology being that the running external services required by the application are like a &ldquo;scene&rdquo; that the &ldquo;staff&rdquo; (the orchestrator) must prepare for the &ldquo;actor&rdquo; (the application) to enter.</p></li>
 </ul>
-<p>In <code>distage-framework</code>&rsquo;s <a href="/latest/snapshot/api/izumi/distage/roles/RoleAppMain.html">RoleAppMain</a>, you can choose axes using the <code>-u</code> command-line parameter:</p>
+<p>In <code>distage-framework</code>&rsquo;s <a href="/latest/snapshot/api/izumi/distage/roles/RoleAppMain.html" title="izumi.distage.roles.RoleAppMain"><code>RoleAppMain</code></a>, you can choose axes using the <code>-u</code> command-line parameter:</p>
 <pre><code>./launcher -u repo:dummy -u env:prod app1
 </code></pre>
-<p>In <code>distage-testkit</code>, choose axes using <a href="/latest/snapshot/api/izumi/distage/testkit/TestConfig.html">TestConfig</a>:</p>
+<p>In <code>distage-testkit</code>, choose axes using <a href="/latest/snapshot/api/izumi/distage/testkit/TestConfig.html" title="izumi.distage.testkit.TestConfig"><code>TestConfig</code></a>:</p>
 <pre class="prettyprint"><code class="language-scala">import distage.StandardAxis.Repo
 import izumi.distage.testkit.TestConfig
 import izumi.distage.testkit.scalatest.Spec2
@@ -591,7 +591,7 @@ Try { Injector().produceRun(SpecificityModule, Activation(Style -&gt; Style.Norm
 // res18: Boolean = true
 </code></pre>
 <h2><a href="#resource-bindings-lifecycle" name="resource-bindings-lifecycle" class="anchor"><span class="anchor-link"></span></a>Resource Bindings, Lifecycle</h2>
-<p>You can specify object lifecycle by injecting <a href="/latest/snapshot/api/izumi/distage/model/definition/Lifecycle.html">distage.Lifecycle</a>, <a href="https://typelevel.org/cats-effect/datatypes/resource.html">cats.effect.Resource</a> or <a href="https://zio.dev/docs/datatypes/datatypes_managed">zio.ZManaged</a> values specifying the allocation and finalization actions of an object.</p>
+<p>You can specify object lifecycle by injecting <a href="/latest/snapshot/api/izumi/distage/model/definition/Lifecycle.html" title="izumi.distage.model.definition.Lifecycle"><code>distage.Lifecycle</code></a>, <a href="https://typelevel.org/cats-effect/datatypes/resource.html">cats.effect.Resource</a> or <a href="https://zio.dev/docs/datatypes/datatypes_managed">zio.ZManaged</a> values specifying the allocation and finalization actions of an object.</p>
 <p>When ran, distage <code>Injector</code> itself returns a <code>Lifecycle</code> value that describes actions to create and finalize the object graph; the <code>Lifecycle</code> value is pure and can be reused multiple times.</p>
 <p>A <code>Lifecycle</code> is executed using its <code>.use</code> method, the function passed to <code>use</code> will receive an allocated resource and when the function exits the resource will be deallocated. <code>Lifecycle</code> is generally not invalidated after <code>.use</code> and may be executed multiple times.</p>
 <p>Example with <code>cats.effect.Resource</code>:</p>
@@ -606,14 +606,14 @@ val dbResource = Resource.make(
     println(&quot;Connecting to DB!&quot;)
     new DBConnection
 })(release = _ =&gt; IO(println(&quot;Disconnecting DB&quot;)))
-// dbResource: Resource[IO, DBConnection] = Allocate(cats.effect.kernel.Resource$$$Lambda$22607/1414332732@127970a3)
+// dbResource: Resource[IO, DBConnection] = Allocate(cats.effect.kernel.Resource$$$Lambda$22968/0x0000000803f15840@1978f1f3)
 
 val mqResource = Resource.make(
   acquire = IO {
    println(&quot;Connecting to Message Queue!&quot;)
    new MessageQueueConnection
 })(release = _ =&gt; IO(println(&quot;Disconnecting Message Queue&quot;)))
-// mqResource: Resource[IO, MessageQueueConnection] = Allocate(cats.effect.kernel.Resource$$$Lambda$22607/1414332732@35c67d48)
+// mqResource: Resource[IO, MessageQueueConnection] = Allocate(cats.effect.kernel.Resource$$$Lambda$22968/0x0000000803f15840@1ba6cfdc)
 
 class MyApp(
   db: DBConnection,
@@ -637,7 +637,7 @@ val objectGraphResource = {
   Injector[IO]()
     .produce(module, Roots.target[MyApp])
 }
-// objectGraphResource: izumi.distage.model.definition.Lifecycle[IO, izumi.distage.model.Locator] = izumi.distage.model.definition.Lifecycle$$anon$8@24900d45
+// objectGraphResource: izumi.distage.model.definition.Lifecycle[IO, izumi.distage.model.Locator] = izumi.distage.model.definition.Lifecycle$$anon$8@34a5be57
 
 objectGraphResource
   .use(_.get[MyApp].run)
@@ -678,7 +678,7 @@ val closedInit = Injector()
       init
 }
 // true
-// closedInit: izumi.fundamentals.platform.functional.package.Identity[Init] = repl.MdocSession$MdocApp21$Init@7130b4c2
+// closedInit: izumi.fundamentals.platform.functional.package.Identity[Init] = repl.MdocSession$MdocApp21$Init@7a5fd876
 
 println(closedInit.initialized)
 // false
@@ -688,17 +688,17 @@ println(closedInit.initialized)
 <h3><a href="#inheritance-helpers" name="inheritance-helpers" class="anchor"><span class="anchor-link"></span></a>Inheritance helpers</h3>
 <p>The following helpers allow defining <code>Lifecycle</code> sub-classes using expression-like syntax:</p>
 <ul>
-  <li><a href="/latest/snapshot/api/izumi/distage/model/definition/Lifecycle$$Of.html">Lifecycle.Of</a></li>
-  <li><a href="/latest/snapshot/api/izumi/distage/model/definition/Lifecycle$$OfInner.html">Lifecycle.OfInner</a></li>
-  <li><a href="/latest/snapshot/api/izumi/distage/model/definition/Lifecycle$$OfCats.html">Lifecycle.OfCats</a></li>
-  <li><a href="/latest/snapshot/api/izumi/distage/model/definition/Lifecycle$$OfZIO.html">Lifecycle.OfZIO</a></li>
-  <li><a href="/latest/snapshot/api/izumi/distage/model/definition/Lifecycle$$LiftF.html">Lifecycle.LiftF</a></li>
-  <li><a href="/latest/snapshot/api/izumi/distage/model/definition/Lifecycle$$Make.html">Lifecycle.Make</a></li>
-  <li><a href="/latest/snapshot/api/izumi/distage/model/definition/Lifecycle$$Make_.html">Lifecycle.Make_</a></li>
-  <li><a href="/latest/snapshot/api/izumi/distage/model/definition/Lifecycle$$MakePair.html">Lifecycle.MakePair</a></li>
-  <li><a href="/latest/snapshot/api/izumi/distage/model/definition/Lifecycle$$FromAutoCloseable.html">Lifecycle.FromAutoCloseable</a></li>
-  <li><a href="/latest/snapshot/api/izumi/distage/model/definition/Lifecycle$$SelfOf.html">Lifecycle.SelfOf</a></li>
-  <li><a href="/latest/snapshot/api/izumi/distage/model/definition/Lifecycle$$MutableOf.html">Lifecycle.MutableOf</a></li>
+  <li><a href="/latest/snapshot/api/izumi/distage/model/definition/Lifecycle$$Of.html" title="izumi.distage.model.definition.Lifecycle.Of"><code>Lifecycle.Of</code></a></li>
+  <li><a href="/latest/snapshot/api/izumi/distage/model/definition/Lifecycle$$OfInner.html" title="izumi.distage.model.definition.Lifecycle.OfInner"><code>Lifecycle.OfInner</code></a></li>
+  <li><a href="/latest/snapshot/api/izumi/distage/model/definition/Lifecycle$$OfCats.html" title="izumi.distage.model.definition.Lifecycle.OfCats"><code>Lifecycle.OfCats</code></a></li>
+  <li><a href="/latest/snapshot/api/izumi/distage/model/definition/Lifecycle$$OfZIO.html" title="izumi.distage.model.definition.Lifecycle.OfZIO"><code>Lifecycle.OfZIO</code></a></li>
+  <li><a href="/latest/snapshot/api/izumi/distage/model/definition/Lifecycle$$LiftF.html" title="izumi.distage.model.definition.Lifecycle.LiftF"><code>Lifecycle.LiftF</code></a></li>
+  <li><a href="/latest/snapshot/api/izumi/distage/model/definition/Lifecycle$$Make.html" title="izumi.distage.model.definition.Lifecycle.Make"><code>Lifecycle.Make</code></a></li>
+  <li><a href="/latest/snapshot/api/izumi/distage/model/definition/Lifecycle$$Make_.html" title="izumi.distage.model.definition.Lifecycle.Make_"><code>Lifecycle.Make_</code></a></li>
+  <li><a href="/latest/snapshot/api/izumi/distage/model/definition/Lifecycle$$MakePair.html" title="izumi.distage.model.definition.Lifecycle.MakePair"><code>Lifecycle.MakePair</code></a></li>
+  <li><a href="/latest/snapshot/api/izumi/distage/model/definition/Lifecycle$$FromAutoCloseable.html" title="izumi.distage.model.definition.Lifecycle.FromAutoCloseable"><code>Lifecycle.FromAutoCloseable</code></a></li>
+  <li><a href="/latest/snapshot/api/izumi/distage/model/definition/Lifecycle$$SelfOf.html" title="izumi.distage.model.definition.Lifecycle.SelfOf"><code>Lifecycle.SelfOf</code></a></li>
+  <li><a href="/latest/snapshot/api/izumi/distage/model/definition/Lifecycle$$MutableOf.html" title="izumi.distage.model.definition.Lifecycle.MutableOf"><code>Lifecycle.MutableOf</code></a></li>
 </ul>
 <p>The main reason to employ them is to workaround a limitation in Scala 2&rsquo;s eta-expansion — when converting a method to a function value, Scala always tries to fulfill implicit parameters eagerly instead of making them parameters of the function value, this limitation makes it harder to inject implicits using <code>distage</code>.</p>
 <p>However, when using <code>distage</code>&rsquo;s type-based syntax: <code>make[A].fromResource[A.Resource[F]]</code> — this limitation does not apply and implicits inject successfully.</p>
@@ -728,16 +728,16 @@ object A {
 
 }
 </code></pre>
-<p>And inject successfully using <code>make[A].fromResource[A.Resource[F]]</code> syntax of <a href="/latest/snapshot/api/izumi/distage/model/definition/dsl/ModuleDefDSL.html">ModuleDefDSL</a>.</p>
+<p>And inject successfully using <code>make[A].fromResource[A.Resource[F]]</code> syntax of <a href="/latest/snapshot/api/izumi/distage/model/definition/dsl/ModuleDefDSL.html" title="izumi.distage.model.definition.dsl.ModuleDefDSL"><code>ModuleDefDSL</code></a>.</p>
 <p>The following helpers ease defining <code>Lifecycle</code> sub-classes using traditional inheritance where <code>acquire</code>/<code>release</code> parts are defined as methods:</p>
 <ul>
-  <li><a href="/latest/snapshot/api/izumi/distage/model/definition/Lifecycle$$Basic.html">Lifecycle.Basic</a></li>
-  <li><a href="/latest/snapshot/api/izumi/distage/model/definition/Lifecycle$$Simple.html">Lifecycle.Simple</a></li>
-  <li><a href="/latest/snapshot/api/izumi/distage/model/definition/Lifecycle$$Mutable.html">Lifecycle.Mutable</a></li>
-  <li><a href="/latest/snapshot/api/izumi/distage/model/definition/Lifecycle$$MutableNoClose.html">Lifecycle.MutableNoClose</a></li>
-  <li><a href="/latest/snapshot/api/izumi/distage/model/definition/Lifecycle$$Self.html">Lifecycle.Self</a></li>
-  <li><a href="/latest/snapshot/api/izumi/distage/model/definition/Lifecycle$$SelfNoClose.html">Lifecycle.SelfNoClose</a></li>
-  <li><a href="/latest/snapshot/api/izumi/distage/model/definition/Lifecycle$$NoClose.html">Lifecycle.NoClose</a></li>
+  <li><a href="/latest/snapshot/api/izumi/distage/model/definition/Lifecycle$$Basic.html" title="izumi.distage.model.definition.Lifecycle.Basic"><code>Lifecycle.Basic</code></a></li>
+  <li><a href="/latest/snapshot/api/izumi/distage/model/definition/Lifecycle$$Simple.html" title="izumi.distage.model.definition.Lifecycle.Simple"><code>Lifecycle.Simple</code></a></li>
+  <li><a href="/latest/snapshot/api/izumi/distage/model/definition/Lifecycle$$Mutable.html" title="izumi.distage.model.definition.Lifecycle.Mutable"><code>Lifecycle.Mutable</code></a></li>
+  <li><a href="/latest/snapshot/api/izumi/distage/model/definition/Lifecycle$$MutableNoClose.html" title="izumi.distage.model.definition.Lifecycle.MutableNoClose"><code>Lifecycle.MutableNoClose</code></a></li>
+  <li><a href="/latest/snapshot/api/izumi/distage/model/definition/Lifecycle$$Self.html" title="izumi.distage.model.definition.Lifecycle.Self"><code>Lifecycle.Self</code></a></li>
+  <li><a href="/latest/snapshot/api/izumi/distage/model/definition/Lifecycle$$SelfNoClose.html" title="izumi.distage.model.definition.Lifecycle.SelfNoClose"><code>Lifecycle.SelfNoClose</code></a></li>
+  <li><a href="/latest/snapshot/api/izumi/distage/model/definition/Lifecycle$$NoClose.html" title="izumi.distage.model.definition.Lifecycle.NoClose"><code>Lifecycle.NoClose</code></a></li>
 </ul>
 <h2><a href="#out-of-the-box-typeclass-instances" name="out-of-the-box-typeclass-instances" class="anchor"><span class="anchor-link"></span></a>Out-of-the-box typeclass instances</h2>
 <p>Typeclass instances for popular typeclass hierarchies are included by default for the effect type in which <code>distage</code> is running.</p>
@@ -767,13 +767,13 @@ val catsEffectHello = polymorphicHelloWorld[cats.effect.IO]
 //val monixHello = polymorphicHelloWorld[monix.eval.Task]
 
 val zioHello = polymorphicHelloWorld[zio.IO[Throwable, _]]
-// zioHello: zio.ZIO[Any, Throwable, Unit] = zio.ZIO$CheckInterrupt@28952e2f
+// zioHello: zio.ZIO[Any, Throwable, Unit] = zio.ZIO$CheckInterrupt@24f649a7
 </code></pre>
-<p>See <a href="/latest/snapshot/api/izumi/distage/modules/DefaultModule.html"><code>DefaultModule</code></a> implicit for implementation details. For details on what exact components are available for each effect type, see <a href="/latest/snapshot/api/izumi/distage/modules/support/ZIOSupportModule.html">ZIOSupportModule</a>, <a href="/latest/snapshot/api/izumi/distage/modules/support/CatsIOSupportModule.html">CatsIOSupportModule</a>, <a href="/latest/snapshot/api/izumi/distage/modules/support/MonixSupportModule.html">MonixSupportModule</a>, <a href="/latest/snapshot/api/izumi/distage/modules/support/MonixBIOSupportModule.html">MonixBIOSupportModule</a>, <a href="/latest/snapshot/api/izumi/distage/modules/typeclass/ZIOCatsEffectInstancesModule.html">ZIOCatsEffectInstancesModule</a>, respectively.</p>
+<p>See <a href="/latest/snapshot/api/izumi/distage/modules/DefaultModule.html" title="izumi.distage.modules.DefaultModule"><code>`DefaultModule`</code></a> implicit for implementation details. For details on what exact components are available for each effect type, see <a href="/latest/snapshot/api/izumi/distage/modules/support/ZIOSupportModule.html" title="izumi.distage.modules.support.ZIOSupportModule"><code>ZIOSupportModule</code></a>, <a href="/latest/snapshot/api/izumi/distage/modules/support/CatsIOSupportModule.html" title="izumi.distage.modules.support.CatsIOSupportModule"><code>CatsIOSupportModule</code></a>, <a href="/latest/snapshot/api/izumi/distage/modules/support/MonixSupportModule.html" title="izumi.distage.modules.support.MonixSupportModule"><code>MonixSupportModule</code></a>, <a href="/latest/snapshot/api/izumi/distage/modules/support/MonixBIOSupportModule.html" title="izumi.distage.modules.support.MonixBIOSupportModule"><code>MonixBIOSupportModule</code></a>, <a href="/latest/snapshot/api/izumi/distage/modules/typeclass/ZIOCatsEffectInstancesModule.html" title="izumi.distage.modules.typeclass.ZIOCatsEffectInstancesModule"><code>ZIOCatsEffectInstancesModule</code></a>, respectively.</p>
 <p>DefaultModule occurs as an implicit parameter in <code>distage</code> entrypoints that require an effect type parameter, namely: <code>Injector[F]()</code> in <code>distage-core</code>, <a href="distage-framework.html#roles"><code>extends RoleAppMain[F]</code></a> and <a href="distage-framework.html#compile-time-checks"><code>extends PlanCheck.Main[F]</code></a> in <code>distage-framework</code> and <a href="distage-testkit.html"><code>extends Spec1[F]</code></a> in <code>distage-testkit</code>.</p>
 <h2><a href="#set-bindings" name="set-bindings" class="anchor"><span class="anchor-link"></span></a>Set Bindings</h2>
 <p>Set bindings are useful for implementing listeners, plugins, hooks, http routes, healthchecks, migrations, etc. Everywhere where a collection of components is required, a Set Binding is appropriate.</p>
-<p>To define a Set binding use <code>.many</code> and <code>.add</code> methods of the <a href="/latest/snapshot/api/izumi/distage/model/definition/ModuleDef.html">ModuleDef</a> DSL.</p>
+<p>To define a Set binding use <code>.many</code> and <code>.add</code> methods of the <a href="/latest/snapshot/api/izumi/distage/model/definition/ModuleDef.html" title="izumi.distage.model.definition.ModuleDef"><code>ModuleDef</code></a> DSL.</p>
 <p>As an example, we may declare multiple command handlers and use them to interpret user input in a REPL</p>
 <pre class="prettyprint"><code class="language-scala">import distage.ModuleDef
 
@@ -841,7 +841,7 @@ object AppModule extends ModuleDef {
 // wire the graph and get the app
 
 val app = Injector().produceGet[App](AppModule).unsafeGet()
-// app: App = repl.MdocSession$MdocApp26$App$Impl@51262f55
+// app: App = repl.MdocSession$MdocApp26$App$Impl@510c1b55
 
 // check how it works
 
@@ -991,7 +991,7 @@ val io = Injector[Task]()
         res2 &lt;- kv.get(&quot;apple&quot;)
       } yield res1 + res2
   }
-// io: Task[String] = zio.ZIO$CheckInterrupt@20d9cc1f
+// io: Task[String] = zio.ZIO$CheckInterrupt@63dc148b
 
 zio.Runtime.default.unsafeRun(io)
 // res38: String = pieipad
@@ -1043,7 +1043,7 @@ def module2 = new ModuleDef {
   make[X].fromHas(zioArgEnvCtor _)
 }
 </code></pre>
-<p><code>zio.Has</code> values are derived at compile-time by <a href="/latest/snapshot/api/izumi/distage/constructors/HasConstructor.html">HasConstructor</a> macro and can be summoned at need.</p>
+<p><code>zio.Has</code> values are derived at compile-time by <a href="/latest/snapshot/api/izumi/distage/constructors/HasConstructor.html" title="izumi.distage.constructors.HasConstructor"><code>HasConstructor</code></a> macro and can be summoned at need.</p>
 <p>Another example:</p>
 <pre class="prettyprint"><code class="language-scala">import distage.{Injector, ModuleDef}
 import zio.console.{putStrLn, Console}
@@ -1060,10 +1060,10 @@ trait World {
 // using service functions from everywhere
 
 val hello: RIO[Has[Hello], String] = RIO.accessM(_.get.hello)
-// hello: RIO[Has[Hello], String] = zio.ZIO$Read@2d09f347
+// hello: RIO[Has[Hello], String] = zio.ZIO$Read@8ec695b
 
 val world: RIO[Has[World], String] = RIO.accessM(_.get.world)
-// world: RIO[Has[World], String] = zio.ZIO$Read@38c460b5
+// world: RIO[Has[World], String] = zio.ZIO$Read@619877b2
 
 // service implementations
 
@@ -1075,7 +1075,7 @@ val makeHello = {
     putStrLn(&quot;Shutting down Enterprise Hellower&quot;).orDie
   )
 }
-// makeHello: zio.ZManaged[Console, java.io.IOException, AnyRef with Hello{val hello: zio.UIO[String]}] = zio.ZManaged$$anon$2@5a7466ef
+// makeHello: zio.ZManaged[Console, java.io.IOException, AnyRef with Hello{val hello: zio.UIO[String]}] = zio.ZManaged$$anon$2@1e372065
 
 val makeWorld = {
   for {
@@ -1084,7 +1084,7 @@ val makeWorld = {
     val world = counter.get.map(c =&gt; if (c &lt; 1) &quot;World&quot; else &quot;THE World&quot;)
   }
 }
-// makeWorld: zio.ZIO[Any, Nothing, AnyRef with World{val world: zio.ZIO[Any,Nothing,String]}] = zio.ZIO$FlatMap@3423e08a
+// makeWorld: zio.ZIO[Any, Nothing, AnyRef with World{val world: zio.ZIO[Any,Nothing,String]}] = zio.ZIO$FlatMap@1dcc0764
 
 // the main function
 
@@ -1095,7 +1095,7 @@ val turboFunctionalHelloWorld: RIO[Has[Hello] with Has[World] with Has[Console.S
     _     &lt;- putStrLn(s&quot;$hello $world&quot;)
   } yield ()
 }
-// turboFunctionalHelloWorld: RIO[Has[Hello] with Has[World] with Has[Console.Service], Unit] = zio.ZIO$FlatMap@5652ae82
+// turboFunctionalHelloWorld: RIO[Has[Hello] with Has[World] with Has[Console.Service], Unit] = zio.ZIO$FlatMap@76811337
 
 def module = new ModuleDef {
   make[Hello].fromHas(makeHello)
@@ -1105,7 +1105,7 @@ def module = new ModuleDef {
 
 val main = Injector[Task]()
   .produceRun[Unit](module)((_: Unit) =&gt; Task.unit)
-// main: Task[Unit] = zio.ZIO$CheckInterrupt@4d88ad35
+// main: Task[Unit] = zio.ZIO$CheckInterrupt@5486cfb2
 
 zio.Runtime.default.unsafeRun(main)
 // Creating Enterprise Hellower...
@@ -1130,11 +1130,11 @@ trait Depender[-R] {
 implicit val contra1: Contravariant[Dependee] = new Contravariant[Dependee] {
   def contramap[A, B](fa: Dependee[A])(f: B =&gt; A): Dependee[B] = new Dependee[B] { def x(y: String) = fa.x(y).provideSome(f) }
 }
-// contra1: Contravariant[Dependee] = repl.MdocSession$MdocApp41$$anon$25@3432f975
+// contra1: Contravariant[Dependee] = repl.MdocSession$MdocApp41$$anon$25@7395e94f
 implicit val contra2: Contravariant[Depender] = new Contravariant[Depender] {
   def contramap[A, B](fa: Depender[A])(f: B =&gt; A): Depender[B] = new Depender[B] { def y = fa.y.provideSome(f) }
 }
-// contra2: Contravariant[Depender] = repl.MdocSession$MdocApp41$$anon$27@1fbe78c9
+// contra2: Contravariant[Depender] = repl.MdocSession$MdocApp41$$anon$27@e1f277e
 
 type DependeeR = Has[Dependee[Any]]
 type DependerR = Has[Depender[Any]]
@@ -1180,7 +1180,7 @@ Injector()
 </code></pre>
 <h2><a href="#auto-traits" name="auto-traits" class="anchor"><span class="anchor-link"></span></a>Auto-Traits</h2>
 <p>distage can instantiate traits and structural types. All unimplemented fields in a trait, or a refinement are filled in from the object graph.</p>
-<p>Trait implementations are derived at compile-time by <a href="/latest/snapshot/api/izumi/distage/constructors/TraitConstructor.html">TraitConstructor</a> macro and can be summoned at need.</p>
+<p>Trait implementations are derived at compile-time by <a href="/latest/snapshot/api/izumi/distage/constructors/TraitConstructor.html" title="izumi.distage.constructors.TraitConstructor"><code>TraitConstructor</code></a> macro and can be summoned at need.</p>
 <p>If a suitable trait is specified as an implementation class for a binding, <code>TraitConstructor</code> will be used automatically:</p>
 <p>Example:</p>
 <pre class="prettyprint"><code class="language-scala">import distage.{ModuleDef, Id, Injector}
@@ -1254,7 +1254,7 @@ Injector().produceRun(module) {
 // res44: izumi.fundamentals.platform.functional.package.Identity[Int] = 3
 </code></pre>
 <h3><a href="#impl-annotation" name="impl-annotation" class="anchor"><span class="anchor-link"></span></a>@impl annotation</h3>
-<p>Abstract classes or traits without obvious concrete subclasses may hinder the readability of a codebase, to mitigate that you may use an optional <a href="/latest/snapshot/api/izumi/distage/model/definition/impl.html">@impl</a> documenting annotation to aid the reader in understanding your intention.</p>
+<p>Abstract classes or traits without obvious concrete subclasses may hinder the readability of a codebase, to mitigate that you may use an optional <a href="/latest/snapshot/api/izumi/distage/model/definition/impl.html" title="izumi.distage.model.definition.impl"><code>@impl</code></a> documenting annotation to aid the reader in understanding your intention.</p>
 <pre class="prettyprint"><code class="language-scala">import distage.impl
 
 @impl abstract class Impl(
@@ -1360,7 +1360,7 @@ Injector()
 // res48: izumi.fundamentals.platform.functional.package.Identity[Unit] = ()
 </code></pre>
 <p>You can use this feature to concisely provide non-Singleton semantics for some of your components.</p>
-<p>Factory implementations are derived at compile-time by <a href="/latest/snapshot/api/izumi/distage/constructors/FactoryConstructor.html">FactoryConstructor</a> macro and can be summoned at need.</p>
+<p>Factory implementations are derived at compile-time by <a href="/latest/snapshot/api/izumi/distage/constructors/FactoryConstructor.html" title="izumi.distage.constructors.FactoryConstructor"><code>FactoryConstructor</code></a> macro and can be summoned at need.</p>
 <h2><a href="#tagless-final-style" name="tagless-final-style" class="anchor"><span class="anchor-link"></span></a>Tagless Final Style</h2>
 <p>Tagless Final is one of the popular patterns for structuring purely-functional applications.</p>
 <p>Brief introduction to tagless final:</p>
@@ -1372,7 +1372,7 @@ Injector()
 <ul>
   <li>easy explicit overrides</li>
   <li>easy <a href="basics.html#effect-bindings">effectful instantiation</a> and <a href="basics.html#resource-bindings-lifecycle">resource management</a></li>
-  <li>extremely easy &amp; scalable <a href="distage-testkit.html#testkit">test</a> context setup due to the above</li>
+  <li>extremely easy &amp; scalable <a href="distage-testkit.html">test</a> context setup due to the above</li>
   <li>multiple different implementations for a type using disambiguation by <code>@Id</code></li>
 </ul>
 <p>For example, let&rsquo;s take <a href="http://frees.io/docs/core/handlers/#tagless-interpretation"><code>freestyle</code>&rsquo;s tagless example</a> and make it better by replacing dependencies on global <code>import</code>ed implementations with explicit modules.</p>
@@ -1411,7 +1411,7 @@ def ProgramModule[F[_]: TagK: Monad] = new ModuleDef {
   make[TaglessProgram[F]]
 }
 </code></pre>
-<p><a href="/latest/snapshot/api/izumi/reflect/TagK.html">TagK</a> is <code>distage</code>&rsquo;s analogue of <code>TypeTag</code> for higher-kinded types such as <code>F[_]</code>, it allows preserving type-information at runtime for type parameters. You&rsquo;ll need to add a <a href="/latest/snapshot/api/izumi/reflect/TagK.html">TagK</a> context bound to create a module parameterized by an abstract <code>F[_]</code>. To parameterize by non-higher-kinded types, use just <a href="/latest/snapshot/api/izumi/reflect/Tag.html">Tag</a>.</p>
+<p><a href="/latest/snapshot/api/izumi/reflect/TagK.html" title="izumi.reflect.TagK"><code>TagK</code></a> is <code>distage</code>&rsquo;s analogue of <code>TypeTag</code> for higher-kinded types such as <code>F[_]</code>, it allows preserving type-information at runtime for type parameters. You&rsquo;ll need to add a <a href="/latest/snapshot/api/izumi/reflect/TagK.html" title="izumi.reflect.TagK"><code>TagK</code></a> context bound to create a module parameterized by an abstract <code>F[_]</code>. To parameterize by non-higher-kinded types, use just <a href="/latest/snapshot/api/izumi/reflect/Tag.html" title="izumi.reflect.Tag"><code>Tag</code></a>.</p>
 <p>Now the interpreters for <code>Validation</code> and <code>Interaction</code>:</p>
 <pre class="prettyprint"><code class="language-scala">final class SyncValidation[F[_]](implicit F: Sync[F]) extends Validation[F] {
   def minSize(s: String, n: Int): F[Boolean] = F.delay(s.size &gt;= n)
@@ -1437,7 +1437,7 @@ def SyncProgram[F[_]: TagK: Sync] = ProgramModule[F] ++ SyncInterpreters[F]
 // create object graph Lifecycle
 
 val objectsLifecycle = Injector[IO]().produce(SyncProgram[IO], Roots.Everything)
-// objectsLifecycle: izumi.distage.model.definition.Lifecycle[IO, izumi.distage.model.Locator] = izumi.distage.model.definition.Lifecycle$$anon$8@5c5be302
+// objectsLifecycle: izumi.distage.model.definition.Lifecycle[IO, izumi.distage.model.Locator] = izumi.distage.model.definition.Lifecycle$$anon$8@70f98521
 
 // run
 
@@ -1453,7 +1453,7 @@ import zio.Runtime
 import zio.{Task, ZEnv}
 
 implicit val runtime: Runtime[ZEnv] = Runtime.global
-// runtime: Runtime[ZEnv] = zio.Runtime$$anon$3@54b21cb9
+// runtime: Runtime[ZEnv] = zio.Runtime$$anon$3@12e02fd3
 
 val ZIOProgram = ProgramModule[Task] ++ SyncInterpreters[Task]
 // ZIOProgram: izumi.distage.model.definition.Module = 
@@ -1489,7 +1489,7 @@ def chooseInterpreters(isDummy: Boolean) = {
 // execute
 
 chooseInterpreters(true)
-// res51: izumi.distage.model.definition.Lifecycle[[β$7$]zio.ZIO[zio.Has[Console.Service], Throwable, β$7$], TaglessProgram[[β$8$]zio.ZIO[zio.Has[Console.Service], Throwable, β$8$]]] = izumi.distage.model.definition.Lifecycle$$anon$7@7768ae0b
+// res51: izumi.distage.model.definition.Lifecycle[[β$7$]zio.ZIO[zio.Has[Console.Service], Throwable, β$7$], TaglessProgram[[β$8$]zio.ZIO[zio.Has[Console.Service], Throwable, β$8$]]] = izumi.distage.model.definition.Lifecycle$$anon$7@4e637351
 </code></pre>
 <h3><a href="#kind-polymorphism" name="kind-polymorphism" class="anchor"><span class="anchor-link"></span></a>Kind polymorphism</h3>
 <p>Modules can be polymorphic over arbitrary kinds - use <code>TagKK</code> to abstract over bifunctors:</p>
