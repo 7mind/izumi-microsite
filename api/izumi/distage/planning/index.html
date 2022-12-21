@@ -17,25 +17,6 @@ available for summoning</p><p>Usage:</p><pre><span class="kw">val</span> collect
   closeables.reverse.foreach(_.close())
 }</pre><p>Auto-Sets are NOT subject to Garbage Collection, they are assembled
 *after* garbage collection is done, as such they can't contain garbage by construction
-and they cannot be designated as GC root keys.</p><p>_ &lt;: T
-}}}
-available for summoning</p><p>Usage:</p><pre><span class="kw">val</span> collectCloseables = <span class="kw">new</span> AutoSetHook[AutoCloseable, AutoCloseable]
-
-<span class="kw">val</span> injector = Injector(<span class="kw">new</span> BootstrapModuleDef {
-  many[PlanningHook]
-    .add(collectCloseables)
-})</pre><p>Then, in any class created from <code>injector</code>:</p><pre><span class="kw">class</span> <span class="std">App</span>(allCloseables: <span class="std">Set</span>[AutoCloseable]) {
-  ...
-}</pre><p>These Auto-Sets can be used to implement custom lifetimes:</p><pre><span class="kw">val</span> locator = injector.produce(modules)
-
-<span class="kw">val</span> closeables = locator.get[<span class="std">Set</span>[AutoCloseable]]
-<span class="kw">try</span> { locator.get[<span class="std">App</span>].runMain() } <span class="kw">finally</span> {
-  <span class="cmt">// reverse closeables list, Auto-Sets preserve order, in the order of *initialization*</span>
-  <span class="cmt">// Therefore resources should closed in the *opposite order*</span>
-  <span class="cmt">// e.g. if C depends on B depends on A, create: A -&gt; B -&gt; C, close: C -&gt; B -&gt; A</span>
-  closeables.reverse.foreach(_.close())
-}</pre><p>Auto-Sets are NOT subject to Garbage Collection, they are assembled
-*after* garbage collection is done, as such they can't contain garbage by construction
 and they cannot be designated as GC root keys.
 </p></div></div></li><li class="indented0 " name="izumi.distage.planning.AutoSetModule" group="Ungrouped" fullComment="yes" data-isabs="true" visbl="pub"><a id="AutoSetModuleextendsBootstrapModuleDef" class="anchorToMember"></a><a id="AutoSetModule:AutoSetModule" class="anchorToMember"></a> <span class="permalink"><a href="../../../izumi/distage/planning/AutoSetModule.html" title="Permalink"><i class="material-icons"></i></a></span> <span class="modifier_kind"><span class="modifier">abstract </span> <span class="kind">class</span></span> <span class="symbol"><a href="AutoSetModule.html" title="Auto-Sets collect all bindings with static types of _implementations_ that are _ &lt;: T into a summonable Set[T]"><span class="name">AutoSetModule</span></a><span class="result"> extends <a href="../model/definition/BootstrapModuleDef.html" name="izumi.distage.model.definition.BootstrapModuleDef" id="izumi.distage.model.definition.BootstrapModuleDef" class="extype">BootstrapModuleDef</a></span></span><p class="shortcomment cmt">Auto-Sets collect all bindings with static types of _implementations_
 that are <code>_ &lt;: T</code> into a summonable <code>Set[T]</code>
