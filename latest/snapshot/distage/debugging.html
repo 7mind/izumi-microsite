@@ -135,7 +135,11 @@ data-md-source="github">
 
 </div>
 <ul>
-  <li><a href="../distage/index.html" class="page">distage: Staged Dependency Injection</a>
+  <li><a href="../glossary.html" class="page">Izumi Glossary</a></li>
+  <li><a href="../guidelines.html" class="page">Izumi Code Guidelines</a></li>
+  <li><a href="../bio/index.html" class="page">BIO Hierarchy</a></li>
+  <li><a href="../logstage/index.html" class="page">LogStage</a></li>
+  <li><a href="../distage/index.html" class="page">DIStage</a>
   <ul>
     <li><a href="../distage/basics.html" class="page">Overview</a></li>
     <li><a href="../distage/debugging.html" class="active page">Debugging</a></li>
@@ -145,16 +149,14 @@ data-md-source="github">
     <li><a href="../distage/distage-testkit.html" class="page">distage-testkit</a></li>
     <li><a href="../distage/reference.html" class="page">Syntax Reference</a></li>
   </ul></li>
-  <li><a href="../logstage/index.html" class="page">LogStage</a></li>
-  <li><a href="../bio/index.html" class="page">BIO Hierarchy</a></li>
-  <li><a href="../idealingua/index.html" class="page">IdeaLingua RPC/DML</a>
+  <li><a href="../idealingua/index.html" class="page">IdeaLingua</a>
   <ul>
     <li><a href="../idealingua/language-reference.html" class="page">Idealingua Language Reference</a></li>
     <li><a href="../idealingua/json.html" class="page">JSON Wire Format</a></li>
     <li><a href="../idealingua/cogen.html" class="page">Code generator reference</a></li>
     <li><a href="../idealingua/cogen-circe.html" class="page">Circe serialization reference</a></li>
   </ul></li>
-  <li><a href="../sbt/index.html" class="page">SBT Toolkit</a></li>
+  <li><a href="../sbt/index.html" class="page">SBT Notes</a></li>
   <li><a href="../manifesto/index.html" class="page">Productivity and challenges</a></li>
   <li><a href="../pper/index.html" class="page">PPER Pattern</a></li>
 </ul>
@@ -239,9 +241,9 @@ Injector[cats.effect.IO]().assert(badModule, Roots.target[A])
 // 
 //  - {type.repl.MdocSession::MdocApp0::A}
 // 
-// 	at izumi.distage.planning.solver.PlanVerifier$PlanVerifierResult.throwOnError(PlanVerifier.scala:438)
-// 	at izumi.distage.model.Injector.assert(Injector.scala:258)
-// 	at izumi.distage.model.Injector.assert$(Injector.scala:252)
+// 	at izumi.distage.planning.solver.PlanVerifier$PlanVerifierResult.throwOnError(PlanVerifier.scala:444)
+// 	at izumi.distage.model.Injector.assert(Injector.scala:265)
+// 	at izumi.distage.model.Injector.assert$(Injector.scala:259)
 // 	at izumi.distage.InjectorDefaultImpl.assert(InjectorDefaultImpl.scala:22)
 // 	at repl.MdocSession$MdocApp0$$anonfun$3.apply$mcV$sp(debugging.md:30)
 // 	at repl.MdocSession$MdocApp0$$anonfun$3.apply(debugging.md:30)
@@ -260,8 +262,8 @@ Injector[cats.effect.IO]().assert(goodModule, Roots.target[A])
 <p>You can print the output of <code>plan.render()</code> to get detailed info on what will happen during instantiation. The printout includes source and line numbers so your IDE can show you where the binding was defined!</p>
 <pre class="prettyprint"><code class="language-scala">import distage.PlannerInput
 
-val plan = Injector().plan(goodModule, Roots.target[A])
-// plan: izumi.distage.model.plan.Plan = 1: {effect.{type.MdocSession::MdocApp0::B}} (debugging.md:41) := value cats.effect.IO$Delay#-299493839
+val plan = Injector().plan(goodModule, Roots.target[A]).getOrThrow()
+// plan: izumi.distage.model.plan.Plan = 1: {effect.{type.MdocSession::MdocApp0::B}} (debugging.md:41) := value cats.effect.IO$Delay#2266603
 // 2: {type.MdocSession::MdocApp0::B} (debugging.md:41) := effect[λ %0 → cats.effect.IO[+0]]{effect.{type.MdocSession::MdocApp0::B}}
 // 3: {type.MdocSession::MdocApp0::A} (debugging.md:40) :=
 // 4:     call(π:Class(MdocSession::MdocApp0::B): MdocSession::MdocApp0::A[32m) {
@@ -269,7 +271,7 @@ val plan = Injector().plan(goodModule, Roots.target[A])
 // 6:     }
 
 println(plan.render())
-// 1: {effect.{type.MdocSession::MdocApp0::B}} (debugging.md:41) := value cats.effect.IO$Delay#-299493839
+// 1: {effect.{type.MdocSession::MdocApp0::B}} (debugging.md:41) := value cats.effect.IO$Delay#2266603
 // 2: {type.MdocSession::MdocApp0::B} (debugging.md:41) := effect[λ %0 → cats.effect.IO[+0]]{effect.{type.MdocSession::MdocApp0::B}}
 // 3: {type.MdocSession::MdocApp0::A} (debugging.md:40) :=
 // 4:     call(π:Class(MdocSession::MdocApp0::B): MdocSession::MdocApp0::A[32m) {
@@ -308,7 +310,7 @@ println(plan.renderDependees(DIKey[B]))
 <pre class="prettyprint"><code class="language-scala">import distage.{GraphDumpBootstrapModule, Injector}
 
 Injector(GraphDumpBootstrapModule)
-// res6: Injector[[A]izumi.fundamentals.platform.functional.package.Identity[A]] = izumi.distage.InjectorDefaultImpl@2e29719b
+// res6: Injector[[A]izumi.fundamentals.platform.functional.package.Identity[A]] = izumi.distage.InjectorDefaultImpl@5c213722
 </code></pre>
 <p>You&rsquo;ll need a <code>GraphViz</code> installation to render these files into a viewable PNG images:</p>
 <pre class="prettyprint"><code class="language-bash">dot -Tpng target/plan-last-nogc.gv -o out.png
