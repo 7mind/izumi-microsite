@@ -322,7 +322,7 @@ def HelloByeModule = new ModuleDef {
 <pre class="prettyprint"><code class="language-scala">import distage.{Activation, Injector, Roots}
 
 val injector = Injector[RIO[Console, _]]()
-// injector: Injector[[β$0$]zio.ZIO[zio.Has[Console.Service], Throwable, β$0$]] = izumi.distage.InjectorDefaultImpl@6b652b71
+// injector: Injector[[β$0$]zio.ZIO[zio.Has[Console.Service], Throwable, β$0$]] = izumi.distage.InjectorDefaultImpl@47b87160
 
 val plan = injector.plan(HelloByeModule, Activation.empty, Roots.target[HelloByeApp]).getOrThrow()
 // plan: izumi.distage.model.plan.Plan = 1: {type.MdocSession::MdocApp1::Greeter} (basics.md:84) := call(π:Class(): MdocSession::MdocApp1::PrintGreeter[32m) {}
@@ -340,7 +340,7 @@ val plan = injector.plan(HelloByeModule, Activation.empty, Roots.target[HelloBye
 // Interpret into a Lifecycle value
 
 val resource = injector.produce(plan)
-// resource: izumi.distage.model.definition.package.Lifecycle[[β$0$]zio.ZIO[zio.Has[Console.Service], Throwable, β$0$], izumi.distage.model.Locator] = izumi.functional.lifecycle.LifecycleMethodImpls$$anon$2@1366b8fd
+// resource: izumi.distage.model.definition.package.Lifecycle[[β$0$]zio.ZIO[zio.Has[Console.Service], Throwable, β$0$], izumi.distage.model.Locator] = izumi.functional.lifecycle.LifecycleMethodImpls$$anon$2@50f9d0c3
 
 // Use the object graph:
 // After `.use` exits, all objects will be deallocated,
@@ -350,7 +350,7 @@ val effect = resource.use {
   objects =&gt;
     objects.get[HelloByeApp].run
 }
-// effect: zio.ZIO[zio.Has[Console.Service], Throwable, Unit] = zio.ZIO$CheckInterrupt@3aed6107
+// effect: zio.ZIO[zio.Has[Console.Service], Throwable, Unit] = zio.ZIO$CheckInterrupt@60545227
 
 // Run the resulting program
 
@@ -608,14 +608,14 @@ val dbResource = Resource.make(
     println(&quot;Connecting to DB!&quot;)
     new DBConnection
 })(release = _ =&gt; IO(println(&quot;Disconnecting DB&quot;)))
-// dbResource: Resource[IO, DBConnection] = Allocate(cats.effect.kernel.Resource$$$Lambda$23262/0x00000008043585c8@69058d05)
+// dbResource: Resource[IO, DBConnection] = Allocate(cats.effect.kernel.Resource$$$Lambda$21712/0x00000008040ca210@448b4014)
 
 val mqResource = Resource.make(
   acquire = IO {
    println(&quot;Connecting to Message Queue!&quot;)
    new MessageQueueConnection
 })(release = _ =&gt; IO(println(&quot;Disconnecting Message Queue&quot;)))
-// mqResource: Resource[IO, MessageQueueConnection] = Allocate(cats.effect.kernel.Resource$$$Lambda$23262/0x00000008043585c8@2bf90df7)
+// mqResource: Resource[IO, MessageQueueConnection] = Allocate(cats.effect.kernel.Resource$$$Lambda$21712/0x00000008040ca210@40bc0a94)
 
 class MyApp(
   db: DBConnection,
@@ -639,7 +639,7 @@ val objectGraphResource = {
   Injector[IO]()
     .produce(module, Roots.target[MyApp])
 }
-// objectGraphResource: izumi.distage.model.definition.package.Lifecycle[IO, izumi.distage.model.Locator] = izumi.functional.lifecycle.LifecycleMethodImpls$$anon$2@dfef925
+// objectGraphResource: izumi.distage.model.definition.package.Lifecycle[IO, izumi.distage.model.Locator] = izumi.functional.lifecycle.LifecycleMethodImpls$$anon$2@5e5db588
 
 objectGraphResource
   .use(_.get[MyApp].run)
@@ -680,7 +680,7 @@ val closedInit = Injector()
       init
 }
 // true
-// closedInit: izumi.fundamentals.platform.functional.package.Identity[Init] = repl.MdocSession$MdocApp21$Init@5c4a54c4
+// closedInit: izumi.fundamentals.platform.functional.package.Identity[Init] = repl.MdocSession$MdocApp21$Init@1c5a010e
 
 println(closedInit.initialized)
 // false
@@ -769,7 +769,7 @@ val catsEffectHello = polymorphicHelloWorld[cats.effect.IO]
 //val monixHello = polymorphicHelloWorld[monix.eval.Task]
 
 val zioHello = polymorphicHelloWorld[zio.IO[Throwable, _]]
-// zioHello: zio.ZIO[Any, Throwable, Unit] = zio.ZIO$CheckInterrupt@19e287ed
+// zioHello: zio.ZIO[Any, Throwable, Unit] = zio.ZIO$CheckInterrupt@2cf6971
 </code></pre>
 <p>See <a href="/latest/snapshot/api/izumi/distage/modules/DefaultModule.html" title="izumi.distage.modules.DefaultModule"><code>`DefaultModule`</code></a> implicit for implementation details. For details on what exact components are available for each effect type, see <a href="/latest/snapshot/api/izumi/distage/modules/support/ZIOSupportModule.html" title="izumi.distage.modules.support.ZIOSupportModule"><code>ZIOSupportModule</code></a>, <a href="/latest/snapshot/api/izumi/distage/modules/support/CatsIOSupportModule.html" title="izumi.distage.modules.support.CatsIOSupportModule"><code>CatsIOSupportModule</code></a>, <a href="/latest/snapshot/api/izumi/distage/modules/support/MonixSupportModule.html" title="izumi.distage.modules.support.MonixSupportModule"><code>MonixSupportModule</code></a>, <a href="/latest/snapshot/api/izumi/distage/modules/support/MonixBIOSupportModule.html" title="izumi.distage.modules.support.MonixBIOSupportModule"><code>MonixBIOSupportModule</code></a>, <a href="/latest/snapshot/api/izumi/distage/modules/typeclass/ZIOCatsEffectInstancesModule.html" title="izumi.distage.modules.typeclass.ZIOCatsEffectInstancesModule"><code>ZIOCatsEffectInstancesModule</code></a>, respectively.</p>
 <p>DefaultModule occurs as an implicit parameter in <code>distage</code> entrypoints that require an effect type parameter, namely: <code>Injector[F]()</code> in <code>distage-core</code>, <a href="distage-framework.html#roles"><code>extends RoleAppMain[F]</code></a> and <a href="distage-framework.html#compile-time-checks"><code>extends PlanCheck.Main[F]</code></a> in <code>distage-framework</code> and <a href="distage-testkit.html"><code>extends Spec1[F]</code></a> in <code>distage-testkit</code>.</p>
@@ -843,7 +843,7 @@ object AppModule extends ModuleDef {
 // wire the graph and get the app
 
 val app = Injector().produceGet[App](AppModule).unsafeGet()
-// app: App = repl.MdocSession$MdocApp26$App$Impl@169b42d3
+// app: App = repl.MdocSession$MdocApp26$App$Impl@30143829
 
 // check how it works
 
@@ -993,7 +993,7 @@ val io = Injector[Task]()
         res2 &lt;- kv.get(&quot;apple&quot;)
       } yield res1 + res2
   }
-// io: Task[String] = zio.ZIO$CheckInterrupt@508e0c85
+// io: Task[String] = zio.ZIO$CheckInterrupt@5e713057
 
 zio.Runtime.default.unsafeRun(io)
 // res38: String = pieipad
@@ -1062,10 +1062,10 @@ trait World {
 // using service functions from everywhere
 
 val hello: RIO[Has[Hello], String] = RIO.accessM(_.get.hello)
-// hello: RIO[Has[Hello], String] = zio.ZIO$Read@5bf159c7
+// hello: RIO[Has[Hello], String] = zio.ZIO$Read@4ed0437a
 
 val world: RIO[Has[World], String] = RIO.accessM(_.get.world)
-// world: RIO[Has[World], String] = zio.ZIO$Read@51e4bf76
+// world: RIO[Has[World], String] = zio.ZIO$Read@11815ad6
 
 // service implementations
 
@@ -1077,7 +1077,7 @@ val makeHello = {
     putStrLn(&quot;Shutting down Enterprise Hellower&quot;).orDie
   )
 }
-// makeHello: zio.ZManaged[Console, java.io.IOException, AnyRef with Hello{val hello: zio.UIO[String]}] = zio.ZManaged$$anon$2@f98510
+// makeHello: zio.ZManaged[Console, java.io.IOException, AnyRef with Hello{val hello: zio.UIO[String]}] = zio.ZManaged$$anon$2@59eede4a
 
 val makeWorld = {
   for {
@@ -1086,7 +1086,7 @@ val makeWorld = {
     val world = counter.get.map(c =&gt; if (c &lt; 1) &quot;World&quot; else &quot;THE World&quot;)
   }
 }
-// makeWorld: zio.ZIO[Any, Nothing, AnyRef with World{val world: zio.ZIO[Any,Nothing,String]}] = zio.ZIO$FlatMap@20b34bae
+// makeWorld: zio.ZIO[Any, Nothing, AnyRef with World{val world: zio.ZIO[Any,Nothing,String]}] = zio.ZIO$FlatMap@ecaaea8
 
 // the main function
 
@@ -1097,7 +1097,7 @@ val turboFunctionalHelloWorld: RIO[Has[Hello] with Has[World] with Has[Console.S
     _     &lt;- putStrLn(s&quot;$hello $world&quot;)
   } yield ()
 }
-// turboFunctionalHelloWorld: RIO[Has[Hello] with Has[World] with Has[Console.Service], Unit] = zio.ZIO$FlatMap@715d011e
+// turboFunctionalHelloWorld: RIO[Has[Hello] with Has[World] with Has[Console.Service], Unit] = zio.ZIO$FlatMap@424de798
 
 def module = new ModuleDef {
   make[Hello].fromHas(makeHello)
@@ -1107,7 +1107,7 @@ def module = new ModuleDef {
 
 val main = Injector[Task]()
   .produceRun[Unit](module)((_: Unit) =&gt; Task.unit)
-// main: Task[Unit] = zio.ZIO$CheckInterrupt@5b61f4c
+// main: Task[Unit] = zio.ZIO$CheckInterrupt@598142ed
 
 zio.Runtime.default.unsafeRun(main)
 // Creating Enterprise Hellower...
@@ -1132,11 +1132,11 @@ trait Depender[-R] {
 implicit val contra1: Contravariant[Dependee] = new Contravariant[Dependee] {
   def contramap[A, B](fa: Dependee[A])(f: B =&gt; A): Dependee[B] = new Dependee[B] { def x(y: String) = fa.x(y).provideSome(f) }
 }
-// contra1: Contravariant[Dependee] = repl.MdocSession$MdocApp41$$anon$25@49abdbef
+// contra1: Contravariant[Dependee] = repl.MdocSession$MdocApp41$$anon$25@76b2db19
 implicit val contra2: Contravariant[Depender] = new Contravariant[Depender] {
   def contramap[A, B](fa: Depender[A])(f: B =&gt; A): Depender[B] = new Depender[B] { def y = fa.y.provideSome(f) }
 }
-// contra2: Contravariant[Depender] = repl.MdocSession$MdocApp41$$anon$27@737f074f
+// contra2: Contravariant[Depender] = repl.MdocSession$MdocApp41$$anon$27@2dd68489
 
 type DependeeR = Has[Dependee[Any]]
 type DependerR = Has[Depender[Any]]
@@ -1439,7 +1439,7 @@ def SyncProgram[F[_]: TagK: Sync] = ProgramModule[F] ++ SyncInterpreters[F]
 // create object graph Lifecycle
 
 val objectsLifecycle = Injector[IO]().produce(SyncProgram[IO], Roots.Everything)
-// objectsLifecycle: izumi.distage.model.definition.package.Lifecycle[IO, izumi.distage.model.Locator] = izumi.functional.lifecycle.LifecycleMethodImpls$$anon$2@6ab3adcf
+// objectsLifecycle: izumi.distage.model.definition.package.Lifecycle[IO, izumi.distage.model.Locator] = izumi.functional.lifecycle.LifecycleMethodImpls$$anon$2@ac78c
 
 // run
 
@@ -1455,7 +1455,7 @@ import zio.Runtime
 import zio.{Task, ZEnv}
 
 implicit val runtime: Runtime[ZEnv] = Runtime.global
-// runtime: Runtime[ZEnv] = zio.Runtime$$anon$3@5fca83aa
+// runtime: Runtime[ZEnv] = zio.Runtime$$anon$3@53cf7b4a
 
 val ZIOProgram = ProgramModule[Task] ++ SyncInterpreters[Task]
 // ZIOProgram: izumi.distage.model.definition.Module = 
@@ -1491,7 +1491,7 @@ def chooseInterpreters(isDummy: Boolean) = {
 // execute
 
 chooseInterpreters(true)
-// res51: izumi.distage.model.definition.package.Lifecycle[[β$7$]zio.ZIO[zio.Has[Console.Service], Throwable, β$7$], TaglessProgram[[β$8$]zio.ZIO[zio.Has[Console.Service], Throwable, β$8$]]] = izumi.functional.lifecycle.LifecycleMethodImpls$$anon$1@48a94f1f
+// res51: izumi.distage.model.definition.package.Lifecycle[[β$7$]zio.ZIO[zio.Has[Console.Service], Throwable, β$7$], TaglessProgram[[β$8$]zio.ZIO[zio.Has[Console.Service], Throwable, β$8$]]] = izumi.functional.lifecycle.LifecycleMethodImpls$$anon$1@33450839
 </code></pre>
 <h3><a href="#kind-polymorphism" name="kind-polymorphism" class="anchor"><span class="anchor-link"></span></a>Kind polymorphism</h3>
 <p>Modules can be polymorphic over arbitrary kinds - use <code>TagKK</code> to abstract over bifunctors:</p>

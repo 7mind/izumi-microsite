@@ -161,6 +161,18 @@ data-md-source="github">
   <li><a href="pper/index.html" class="page">PPER Pattern</a></li>
 </ul>
 <nav class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">Table of contents</label>
+<ul>
+  <li><a href="guidelines.html#izumi-code-guidelines" class="header">Izumi Code Guidelines</a>
+  <ul>
+    <li><a href="guidelines.html#general-workflow" class="header">General workflow</a></li>
+    <li><a href="guidelines.html#bio-tf-and-error-encoding" class="header">BIO, TF and error encoding</a></li>
+    <li><a href="guidelines.html#dual-test-tactic-and-tdd" class="header">Dual Test Tactic and TDD</a></li>
+    <li><a href="guidelines.html#data-modeling" class="header">Data modeling</a></li>
+    <li><a href="guidelines.html#integration-points" class="header">Integration points</a></li>
+    <li><a href="guidelines.html#inheritance" class="header">Inheritance</a></li>
+  </ul></li>
+</ul>
 </nav>
 
 </nav>
@@ -174,11 +186,172 @@ data-md-source="github">
 </div>
 </div>
 </div>
+<div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">Table of contents</label>
+<ul>
+  <li><a href="guidelines.html#izumi-code-guidelines" class="header">Izumi Code Guidelines</a>
+  <ul>
+    <li><a href="guidelines.html#general-workflow" class="header">General workflow</a></li>
+    <li><a href="guidelines.html#bio-tf-and-error-encoding" class="header">BIO, TF and error encoding</a></li>
+    <li><a href="guidelines.html#dual-test-tactic-and-tdd" class="header">Dual Test Tactic and TDD</a></li>
+    <li><a href="guidelines.html#data-modeling" class="header">Data modeling</a></li>
+    <li><a href="guidelines.html#integration-points" class="header">Integration points</a></li>
+    <li><a href="guidelines.html#inheritance" class="header">Inheritance</a></li>
+  </ul></li>
+</ul>
+</nav>
+
+</div>
+</div>
+</div>
 <div class="md-content">
 <article class="md-content__inner md-typeset">
 <div class="md-content__searchable">
-<h1><a href="#izumi-code-guidelines" name="izumi-code-guidelines" class="anchor"><span class="anchor-link"></span></a>Izumi Code Guidelines</h1><div class="callout warning "><div class="callout-title">TODO</div>
-<p>Sorry, this page is not ready yet</p></div>
+<h1><a href="#izumi-code-guidelines" name="izumi-code-guidelines" class="anchor"><span class="anchor-link"></span></a>Izumi Code Guidelines</h1>
+<h2><a href="#general-workflow" name="general-workflow" class="anchor"><span class="anchor-link"></span></a>General workflow</h2>
+<p>When we start working on a new component, generally we follow these steps:</p>
+<ol>
+  <li>Define external data model of the component, namely:</li>
+  <li>Inputs and outputs of the component methods, as <code>case</code> classes and <code>sealed</code> traits</li>
+  <li>Expected (domain) error hierarchies, as one <code>sealed trait</code> and <code>final case</code> classes inheriting it</li>
+  <li>We define abstract interface (<code>trait</code>) of the component,</li>
+  <li>We use an abstract bifunctor <code>F[+_, +_]</code> in order to encode method outputs</li>
+  <li>Methods which are not expected to fail should have <code>Nothing</code> in the error (left) branch of the bifunctor</li>
+  <li>It&rsquo;s okay to initially have <code>Nothing</code> everywhere and add specific error later, once we discover them</li>
+  <li>Don&rsquo;t try to encode all the possible errors, especially irrecoverable ones. E.g. it&rsquo;s pointless to encode <code>OutOfMemoryError</code> as a possible method result.  Only the expected domain errors should be encoded.</li>
+  <li>Create a stub implementation of the component. If the component is an integration point, its first implementation should be a fake</li>
+  <li>Use <code>BIO</code> typeclasses as <code>F</code> implementation, if the component is intended to be run under ZIO or another bifunctor, use <code>Either</code> otherwise</li>
+  <li>Try to use the minimal set of <code>BIO</code> typeclasses necessary for your component. It&rsquo;s fine to start by using <code>IO2</code> but you should remove unnecessary capabilites when possible.</li>
+  <li>Keep the stub implementation inside of the companion object of the component interface</li>
+  <li>Add distage bindings for the component and its implementation</li>
+  <li>Create a stub of an abstract test suite for the interface</li>
+  <li>Work on the test and the implementation (the fake or the business code) simultaneously until you have them functional</li>
+  <li>It&rsquo;s not very good but acceptable to use impure mutable fields in dummies instead of <code>Ref</code>s.</li>
+  <li>If the component is an integration point, start working on a real implementation</li>
+  <li>Add integration checks and their bindings</li>
+  <li>Add docker definitions and their bindings for managed scene if that&rsquo;s possible</li>
+</ol>
+<h3><a href="#example" name="example" class="anchor"><span class="anchor-link"></span></a>Example</h3>
+<pre class="prettyprint"><code class="language-scala">final case class User(props: Map[String, String])
+final case class IdentifiedUser(id: UUID, user: User)
+
+sealed trait DatabaseError
+final case class EntityNotFoundExists(id: UUID) extends DatabaseError
+
+trait DatabaseLayer[F[+_, +_]] {
+  def store(id: UUID, user: User): F[Nothing, Unit]
+  def get(id: UUID): F[EntityNotFoundExists, IdentifiedUser]
+}
+
+object DatabaseLayer {
+  final class DatabaseLayerDummyImpl[F[+_, +_] : IO2]() extends DatabaseLayer[F] {
+    private val content = scala.collection.mutable.HashMap.empty[UUID, IdentifiedUser]
+
+     def store(id: UUID, user: User): F[Nothing, Unit] = F.sync(content += IdentifiedUser(id, user))
+     def get(id: UUID): F[EntityNotFoundExists, IdentifiedUser] = F.fromOption(EntityNotFoundExists(id))(content.get(id))
+  }
+}
+
+final class DatabaseLayerPostgresImpl[F[+_, +_] : IO2]() extends DatabaseLayer[F] {
+  // ...
+}
+
+class DatabaseModule[F[+_, +_] : TagKK] extends PluginDef {
+  make[DatabaseLayer[F]].tagged(Repo.Dummy).from[DatabaseLayer.DatabaseLayerDummyImpl[F]]
+  make[DatabaseLayer[F]].tagged(Repo.Prod).from[DatabaseLayerPostgresImpl[F]]
+}
+
+class DatabaseLayerTest extends Spec2[zio.IO] {
+   override def config: TestConfig = super.config.copy(
+      pluginConfig = PluginConfig.const(new DatabaseModule[zio.IO])
+   )
+
+   &quot;database layer&quot; should {
+      &quot;store users&quot; in {
+         (db: DatabaseLayer[zio.IO]) =&gt;
+            for {
+              // ...
+            } yield {
+              assert(...)
+            }
+      }
+   }
+}
+</code></pre>
+<h2><a href="#bio-tf-and-error-encoding" name="bio-tf-and-error-encoding" class="anchor"><span class="anchor-link"></span></a>BIO, TF and error encoding</h2>
+<ol>
+  <li>Always use for-comprehension</li>
+  <li>Always use minimal possible set of BIO typeclasses</li>
+  <li>You can&rsquo;t do much with irrecoverable errors. Let them be logged and fail the computation</li>
+</ol>
+<h3><a href="#error-propagation" name="error-propagation" class="anchor"><span class="anchor-link"></span></a>Error propagation</h3>
+<p>If one component uses another, it either should propagate its errors or handle them. This makes things somehow inconvenient, especially on Scala 2 which has no support for union types.</p>
+<p>Essentially, on Scala 2 there is no perfect solution for error propagation.</p>
+<p>The most comprehensive solution would look like:</p>
+<pre class="prettyprint"><code class="language-scala">sealed trait DatabaseError
+final case class EntityNotFoundExists(id: UUID) extends DatabaseError
+
+sealed trait BusinessError
+sealed trait UserStoreMethodError {
+   this: BusinessError =&gt;
+}
+final case class UserInvalid(id: UUID) extends BusinessError with UserStoreMethodError
+final case class InheritedDatabaseError(error: DatabaseError) extends BusinessError with UserStoreMethodError
+
+trait BusinessLayer[F[+_, +_]] {
+   def validateAndStore(id: UUID, user: User): F[UserStoreMethodError, Unit]
+}
+</code></pre>
+<p>Essentially, this approach simulates the missing union types.</p>
+<p>It kinda breaks encapsulation, because the errors specific only to one particular component implementation are being propagated into the abstract interface. Also this approach, when followed strictly, is just way too verbose.</p>
+<p>It&rsquo;s possible to modify it by just logging dependency errors and returning generic failure branch:</p>
+<pre class="prettyprint"><code class="language-scala">sealed trait BusinessError
+sealed trait UserStoreMethodError {
+   this: BusinessError =&gt;
+}
+final case class UserInvalid(id: UUID) extends BusinessError with UserStoreMethodError
+// when we return this, we would have to log the details first
+final case class InheritedDatabaseError() extends BusinessError with UserStoreMethodError
+</code></pre>
+<p>In most of the cases you wouldn&rsquo;t want to create separate unions for every method (like <code>UserStoreMethodError</code>) and would just return the base failure (<code>BusinessError</code>) everywhere:</p>
+<pre class="prettyprint"><code class="language-scala">sealed trait BusinessError
+final case class UserInvalid(id: UUID) extends BusinessError
+final case class InheritedDatabaseError() extends BusinessError
+
+trait BusinessLayer[F[+_, +_]] {
+   def validateAndStore(id: UUID, user: User): F[BusinessError, Unit]
+}
+</code></pre>
+<p>It&rsquo;s tempting to use exceptions everywhere either explicitly encoded or just hidden in old bad Java manner. Don&rsquo;t do that. It&rsquo;s always possible to have errors encoded as values and, generally, it always pays back.</p>
+<p>Only use exceptions and try-catch blocks when you need to integrate with legacy third-party code.</p>
+<h2><a href="#dual-test-tactic-and-tdd" name="dual-test-tactic-and-tdd" class="anchor"><span class="anchor-link"></span></a>Dual Test Tactic and TDD</h2>
+<ol>
+  <li>When working on a dummy, don&rsquo;t try to replicate all the specificity of a real endpoint, unless that&rsquo;s really important. Dummies should be cheap. There is no point in simulating all the possible errors and conditions specific to real integration points.</li>
+  <li>Probably, you don&rsquo;t want to simulate database connection errors in a database layer dummy</li>
+  <li>Though, if you work on a UDP transport layer component, you might want to simulate packet loss in its dummy</li>
+  <li>Dual test tactic always pays back, always write dual tests for your integration points</li>
+  <li>With distage it&rsquo;s not expensive to have dual tests for your business logic. Do that too.</li>
+  <li>There is no reason to test all the possible combinations of production/dummy dependencies. Usually it&rsquo;s enough to have an all-production and an all-dummy test configuration.</li>
+</ol>
+<h2><a href="#data-modeling" name="data-modeling" class="anchor"><span class="anchor-link"></span></a>Data modeling</h2>
+<ol>
+  <li>Denormalize inputs and outputs. E.g. it&rsquo;s a common useful pattern to split &ldquo;raw&rdquo; &ldquo;unsaved&rdquo; entities and &ldquo;stored&rdquo; entities retrieved from the database</li>
+  <li>Make your models closed. All the classes should be <code>final</code>, all traits <code>sealed</code>.</li>
+  <li>Avoid storing untyped data (e.g. <code>JSON</code>) in your models at all costs</li>
+</ol>
+<h2><a href="#integration-points" name="integration-points" class="anchor"><span class="anchor-link"></span></a>Integration points</h2>
+<ol>
+  <li>Keep your integration points as dumb as possible, just wrap the APIs you integrate with</li>
+  <li>Generally, all the assertions, computations and decisions should happen in your business layer</li>
+</ol>
+<h2><a href="#inheritance" name="inheritance" class="anchor"><span class="anchor-link"></span></a>Inheritance</h2>
+<ol>
+  <li>There is very limited use of <code>class</code> inheritance. Usually one <code>class</code> shouldn&rsquo;t inherit from another.</li>
+  <li><code>abstract</code> classes might be useful but, generally, you should avoid having them too</li>
+</ol>
 </div>
 <div>
 <a href="https://github.com/7mind/izumi/tree/master/doc/microsite/target/mdoc/guidelines.md" title="Edit this page" class="md-source-file md-edit">
