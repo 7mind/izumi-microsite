@@ -135,7 +135,11 @@ data-md-source="github">
 
 </div>
 <ul>
-  <li><a href="../distage/index.html" class="page">distage: Staged Dependency Injection</a>
+  <li><a href="../glossary.html" class="page">Izumi Glossary</a></li>
+  <li><a href="../guidelines.html" class="page">Izumi Framework Best Practices</a></li>
+  <li><a href="../bio/index.html" class="page">BIO Hierarchy</a></li>
+  <li><a href="../logstage/index.html" class="page">LogStage</a></li>
+  <li><a href="../distage/index.html" class="page">DIStage</a>
   <ul>
     <li><a href="../distage/basics.html" class="page">Overview</a></li>
     <li><a href="../distage/debugging.html" class="page">Debugging</a></li>
@@ -145,16 +149,14 @@ data-md-source="github">
     <li><a href="../distage/distage-testkit.html" class="active page">distage-testkit</a></li>
     <li><a href="../distage/reference.html" class="page">Syntax Reference</a></li>
   </ul></li>
-  <li><a href="../logstage/index.html" class="page">LogStage</a></li>
-  <li><a href="../bio/index.html" class="page">BIO Hierarchy</a></li>
-  <li><a href="../idealingua/index.html" class="page">IdeaLingua RPC/DML</a>
+  <li><a href="../idealingua/index.html" class="page">IdeaLingua</a>
   <ul>
     <li><a href="../idealingua/language-reference.html" class="page">Idealingua Language Reference</a></li>
     <li><a href="../idealingua/json.html" class="page">JSON Wire Format</a></li>
     <li><a href="../idealingua/cogen.html" class="page">Code generator reference</a></li>
     <li><a href="../idealingua/cogen-circe.html" class="page">Circe serialization reference</a></li>
   </ul></li>
-  <li><a href="../sbt/index.html" class="page">SBT Toolkit</a></li>
+  <li><a href="../sbt/index.html" class="page">SBT Notes</a></li>
   <li><a href="../manifesto/index.html" class="page">Productivity and challenges</a></li>
   <li><a href="../pper/index.html" class="page">PPER Pattern</a></li>
 </ul>
@@ -180,7 +182,7 @@ data-md-source="github">
 <ul style="display: none">
 <li class="md-nav__item md-version" id="project.version">
 <label class="md-nav__link" for="__version">
-<i class="md-icon" title="Version">label_outline</i> 1.1.0-M15
+<i class="md-icon" title="Version">label_outline</i> 1.1.0-M17
 </label>
 </li>
 </ul>
@@ -432,10 +434,10 @@ class ScoreEffectsTest extends Test {
 <pre><code>ScoreEffectsTest:
 Config(10,256,10)
 Config(10,256,10)
-  - testkit operations with effects should support assertions outside of effect 
-- testkit operations with effects should support assertions outside of effect
   - testkit operations with effects should support assertions in effects 
 - testkit operations with effects should support assertions in effects
+  - testkit operations with effects should support assertions outside of effect 
+- testkit operations with effects should support assertions outside of effect
 
 
 </code></pre>
@@ -586,11 +588,11 @@ class ProdBonusServiceTest extends BonusServiceTest with ProdTest
 class DummyBonusServiceTest extends BonusServiceTest with DummyTest
 </code></pre>
 <pre><code>DummyBonusServiceTest:
+  - BonusService should increment by delta 
+- BonusService should increment by delta
 currentBonus = 10
   - BonusService should initially use default bonus as current 
 - BonusService should initially use default bonus as current
-  - BonusService should increment by delta 
-- BonusService should increment by delta
 
 
 </code></pre>
@@ -754,12 +756,12 @@ class NotUsingMemoTest extends DummyTest {
 <p>These two tests will run sequentially. There is no memoization configured for the dependencies. Each test case will acquire a fresh instance from the object graph. For our demonstration this results in a new <code>BonusService</code> instance for each test case.</p>
 <pre><code>NotUsingMemoTest:
 
- bonusService = repl.MdocSession$MdocApp$DummyBonusService$Impl@bb8fda6 
+ bonusService = repl.MdocSession$MdocApp$DummyBonusService$Impl@196e23aa 
 
   - Not memoizing BonusService should use a new instance in the first case 
 - Not memoizing BonusService should use a new instance in the first case
 
- bonusService = repl.MdocSession$MdocApp$DummyBonusService$Impl@7bd5e77c 
+ bonusService = repl.MdocSession$MdocApp$DummyBonusService$Impl@7829eeca 
 
   - Not memoizing BonusService should use a new instance in the second case 
 - Not memoizing BonusService should use a new instance in the second case
@@ -841,16 +843,16 @@ class AnotherUsingMemoTest extends DummyTest {
 <p>Both tests suites, all three test cases, will use same memoization environment and the same <code>bonusService</code> instance:</p>
 <pre><code>UsingMemoTest:
 
- bonusService = repl.MdocSession$MdocApp$DummyBonusService$Impl@c3ab2a3 
-
-
- bonusService = repl.MdocSession$MdocApp$DummyBonusService$Impl@c3ab2a3 
+ bonusService = repl.MdocSession$MdocApp$DummyBonusService$Impl@1d1aad9d 
 
 currentBonus = 10
+
+ bonusService = repl.MdocSession$MdocApp$DummyBonusService$Impl@1d1aad9d 
+
   - Memoizing BonusService should use a new instance in the first case 
 - Memoizing BonusService should use a new instance in the first case
 
- bonusService = repl.MdocSession$MdocApp$DummyBonusService$Impl@c3ab2a3 
+ bonusService = repl.MdocSession$MdocApp$DummyBonusService$Impl@1d1aad9d 
 
   - Memoizing BonusService should use the same instance in the second case 
 - Memoizing BonusService should use the same instance in the second case
@@ -1025,13 +1027,13 @@ abstract class LadderTest extends LeaderboardTest {
 </code></pre>
 </div>
 <div>
-<a href="https://github.com/7mind/izumi/tree/v1.1.0-M15/doc/microsite/target/mdoc/distage/distage-testkit.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/7mind/izumi/tree/v1.1.0-M17/doc/microsite/target/mdoc/distage/distage-testkit.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>
 <div class="print-only">
 <span class="md-source-file md-version">
-1.1.0-M15
+1.1.0-M17
 </span>
 </div>
 </article>
