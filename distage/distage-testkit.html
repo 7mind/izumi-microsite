@@ -182,7 +182,7 @@ data-md-source="github">
 <ul style="display: none">
 <li class="md-nav__item md-version" id="project.version">
 <label class="md-nav__link" for="__version">
-<i class="md-icon" title="Version">label_outline</i> 1.1.0-M23
+<i class="md-icon" title="Version">label_outline</i> 1.1.0-M24
 </label>
 </li>
 </ul>
@@ -280,7 +280,8 @@ data-md-source="github">
 <pre class="prettyprint"><code class="language-scala">package app
 
 import zio._
-import zio.console.{Console, putStrLn}
+import zio.managed._
+import zio.Console
 
 final case class Score(
   value: Int
@@ -303,14 +304,14 @@ object Score {
   def addStar(config: Config, score: Score) =
     score.copy(value = score.value + config.starValue)
 
-  def echoConfig(config: Config): RIO[Has[Console.Service], Config] =
+  def echoConfig(config: Config): Task[Config] =
     for {
-      _ &lt;- putStrLn(config.toString)
+      _ &lt;- Console.printLine(config.toString)
     } yield config
 
-  def addMango(config: Config, score: Score): RIO[Has[Console.Service] with Has[BonusService], Score] =
+  def addMango(config: Config, score: Score): RIO[BonusService, Score] =
     for {
-      bonusService &lt;- RIO.service[BonusService]
+      bonusService &lt;- ZIO.service[BonusService]
       currentBonus &lt;- bonusService.queryCurrentBonus
     } yield {
       val value = score.value + config.mangoValue + currentBonus
@@ -432,12 +433,10 @@ class ScoreEffectsTest extends Test {
 }
 </code></pre>
 <pre><code>ScoreEffectsTest:
-Config(10,256,10)
-  - testkit operations with effects should support assertions outside of effect 
-- testkit operations with effects should support assertions outside of effect
-Config(10,256,10)
   - testkit operations with effects should support assertions in effects 
 - testkit operations with effects should support assertions in effects
+  - testkit operations with effects should support assertions outside of effect 
+- testkit operations with effects should support assertions outside of effect
 
 
 </code></pre>
@@ -453,14 +452,14 @@ abstract class BonusServiceTest extends Test {
       for {
         bonusService &lt;- ZIO.service[BonusService]
         currentBonus &lt;- bonusService.queryCurrentBonus
-        _            &lt;- putStrLn(s&quot;currentBonus = $currentBonus&quot;)
+        _            &lt;- Console.printLine(s&quot;currentBonus = $currentBonus&quot;)
         _            &lt;- assertIO(currentBonus == defaultConfig.defaultBonus)
       } yield ()
     }
 
     &quot;increment by delta&quot; in {
       for {
-        delta        &lt;- zio.random.nextInt
+        delta        &lt;- zio.Random.nextInt
         bonusService &lt;- ZIO.service[BonusService]
         initialBonus &lt;- bonusService.queryCurrentBonus
         actualBonus  &lt;- bonusService.increaseCurrentBonus(delta)
@@ -472,7 +471,7 @@ abstract class BonusServiceTest extends Test {
   }
 }
 </code></pre>
-<p>The <a href="basics.html#zio-has-bindings">ZIO Has injection</a> support extends to the test cases, here we request two components implicitly using the ZIO environment:</p>
+<p>The <a href="basics.html#zio-environment-bindings">ZIO Has injection</a> support extends to the test cases, here we request two components implicitly using the ZIO environment:</p>
 <ul>
   <li><code>BonusService</code> - is requested by <code>ZIO.service[BonusService]</code></li>
   <li><code>zio.Random.Service</code> - is requested by <code>zio.random.nextInt</code></li>
@@ -501,10 +500,10 @@ object DummyBonusService {
     impl = new Impl(ref)
   } yield impl
 
-  val release: UIO[Unit] = UIO.unit
+  val release: UIO[Unit] = ZIO.unit
 
   val managed: TaskManaged[DummyBonusService.Impl] =
-    acquire.toManaged(_ =&gt; release)
+    acquire.toManagedWith(_ =&gt; release)
 }
 </code></pre>
 <p>This dummy implementation is useful for verification in both automated tests and functional prototypes.</p>
@@ -514,28 +513,28 @@ object DummyBonusService {
 object ProdBonusService {
 
   class Impl(
-    console: Console.Service,
+    console: Console,
     url: String,
   ) extends BonusService {
 
     override def queryCurrentBonus = for {
-      _ &lt;- console.putStrLn(s&quot;querying $url&quot;)
+      _ &lt;- console.printLine(s&quot;querying $url&quot;)
     } yield ???
 
     override def increaseCurrentBonus(delta: Int) = for {
-      _ &lt;- console.putStrLn(s&quot;post to $url&quot;)
+      _ &lt;- console.printLine(s&quot;post to $url&quot;)
     } yield ???
   }
 
-  val acquire: RIO[Has[Console.Service], ProdBonusService.Impl] = for {
-    console &lt;- ZIO.service[Console.Service]
+  val acquire: RIO[Console, ProdBonusService.Impl] = for {
+    console &lt;- ZIO.service[Console]
     impl      = new Impl(console, &quot;https://my-bonus-server/current-bonus.json&quot;)
   } yield impl
 
-  val release: UIO[Unit] = UIO.unit
+  val release: UIO[Unit] = ZIO.unit
 
-  val managed: RManaged[Has[Console.Service], ProdBonusService.Impl] =
-    acquire.toManaged(_ =&gt; release)
+  val managed: RManaged[Console, ProdBonusService.Impl] =
+    acquire.toManagedWith(_ =&gt; release)
 }
 </code></pre>
 <h4><a href="#pattern-dual-test-tactic" name="pattern-dual-test-tactic" class="anchor"><span class="anchor-link"></span></a>Pattern: Dual Test Tactic</h4>
@@ -552,15 +551,15 @@ import distage.StandardAxis.Repo
 
 object BonusServicePlugin extends PluginDef {
   make[BonusService]
-    .fromHas(DummyBonusService.managed)
+    .fromZEnv(DummyBonusService.managed)
     .tagged(Repo.Dummy)
 
   make[BonusService]
-    .fromHas(ProdBonusService.managed)
+    .fromZEnv(ProdBonusService.managed)
     .tagged(Repo.Prod)
 }
 </code></pre>
-<p>Here we used <a href="basics.html#zio-has-bindings">ZIO Has injection</a> <code>.fromHas</code> to supply the environment dependencies for <code>ProdBonusService.managed</code>, namely <code>Has[Console.Service]</code>. (Implementation for <code>Console.Service</code> is provided by default from <a href="/api/izumi/distage/modules/support/ZIOSupportModule.html" title="izumi.distage.modules.support.ZIOSupportModule"><code>ZIOSupportModule</code></a>) <code>.fromHas</code> can be used with <code>ZLayer</code>, <code>ZManaged</code> <code>ZIO</code> or any <code>F[-_, +_, +_]: Local3</code> (from <a href="../bio/index.html">BIO</a> typeclasses).</p>
+<p>Here we used <a href="basics.html#zio-environment-bindings">ZIO Has injection</a> <code>.fromZEnv</code> to supply the environment dependencies for <code>ProdBonusService.managed</code>, namely <code>Has[Console.Service]</code>. (Implementation for <code>Console.Service</code> is provided by default from <a href="/api/izumi/distage/modules/support/ZIOSupportModule.html" title="izumi.distage.modules.support.ZIOSupportModule"><code>ZIOSupportModule</code></a>) <code>.fromZEnv</code> can be used with <code>ZLayer</code>, <code>ZManaged</code> <code>ZIO</code> or any <code>F[-_, +_, +_]: Local3</code> (from <a href="../bio/index.html">BIO</a> typeclasses).</p>
 <p>Note that the <code>BonusServicePlugin</code> is not explicitly added to the <code>Test.config</code>: But, this <code>PluginDef</code> class is defined in the same package as the test, namely in <code>app</code>. By default the <code>pluginConfig</code> for the test will include the test&rsquo;s package, which will be scanned by <code>distage</code> for <code>PluginDef</code> instances.</p>
 <p>Continuing with the pattern, a trait will control which implementation is activated:</p>
 <pre class="prettyprint"><code class="language-scala">package app
@@ -588,11 +587,10 @@ class ProdBonusServiceTest extends BonusServiceTest with ProdTest
 class DummyBonusServiceTest extends BonusServiceTest with DummyTest
 </code></pre>
 <pre><code>DummyBonusServiceTest:
-currentBonus = 10
-  - BonusService should increment by delta 
-- BonusService should increment by delta
   - BonusService should initially use default bonus as current 
 - BonusService should initially use default bonus as current
+  - BonusService should increment by delta 
+- BonusService should increment by delta
 
 
 </code></pre>
@@ -622,9 +620,9 @@ currentBonus = 10
 </ul>
 <p>For <code>F[-_, +_, +_]</code>, it&rsquo;s same with <code>F[Any, _, _]</code>:</p>
 <ul>
-  <li><code>in { ???: F[zio.Has[C] with zio.Has[D], _, Unit] }</code>: The test case is an effect requiring an environment. The test  case will fail if the effect fails. The environment will be injected from the object graph.</li>
-  <li><code>in { ???: F[zio.Has[C] with zio.Has[D], _, Assertion] }</code>: The test case is an effect requiring an environment. The  test case will fail if the effect fails or produces a failure assertion. The environment will be injected from the  object graph.</li>
-  <li><code>in { (a: A, b: B) =&gt; ???: F[zio.Has[C] with zio.Has[D], _, Assertion] }</code>: The test case is a function producing an  effect requiring an environment. All of <code>a: A</code>, <code>b: B</code>, <code>Has[C]</code> and <code>Has[D]</code>  will be injected from the object graph.</li>
+  <li><code>in { ???: F[zio.ZEnvironment[C] with zio.ZEnvironment[D], _, Unit] }</code>: The test case is an effect requiring an environment. The test  case will fail if the effect fails. The environment will be injected from the object graph.</li>
+  <li><code>in { ???: F[zio.ZEnvironment[C] with zio.ZEnvironment[D], _, Assertion] }</code>: The test case is an effect requiring an environment. The  test case will fail if the effect fails or produces a failure assertion. The environment will be injected from the  object graph.</li>
+  <li><code>in { (a: A, b: B) =&gt; ???: F[zio.ZEnvironment[C] with zio.ZEnvironment[D], _, Assertion] }</code>: The test case is a function producing an  effect requiring an environment. All of <code>a: A</code>, <code>b: B</code>, <code>Has[C]</code> and <code>Has[D]</code>  will be injected from the object graph.</li>
 </ul>
 <p>Provided by trait <a href="/api/izumi/distage/testkit/scalatest/AssertZIO.html" title="izumi.distage.testkit.scalatest.AssertZIO"><code>AssertZIO</code></a>:</p>
 <ul>
@@ -725,11 +723,11 @@ class NotUsingMemoTest extends DummyTest {
 
   &quot;Not memoizing BonusService&quot; should {
     &quot;use a new instance in the first case&quot; in {
-      val delta = util.Random.nextInt()
-
       for {
+        delta        &lt;- zio.Random.nextInt
+
         bonusService &lt;- ZIO.service[BonusService]
-        _            &lt;- console.putStrLn(s&quot;\n bonusService = ${bonusService} \n&quot;)
+        _            &lt;- Console.printLine(s&quot;\n bonusService = ${bonusService} \n&quot;)
 
         // change the bonus service state
         currentBonus &lt;- bonusService.increaseCurrentBonus(delta)
@@ -742,7 +740,7 @@ class NotUsingMemoTest extends DummyTest {
     &quot;use a new instance in the second case&quot; in {
       for {
         bonusService &lt;- ZIO.service[BonusService]
-        _            &lt;- console.putStrLn(s&quot;\n bonusService = ${bonusService} \n&quot;)
+        _            &lt;- Console.printLine(s&quot;\n bonusService = ${bonusService} \n&quot;)
 
         currentBonus &lt;- bonusService.queryCurrentBonus
 
@@ -755,14 +753,8 @@ class NotUsingMemoTest extends DummyTest {
 </code></pre>
 <p>These two tests will run sequentially. There is no memoization configured for the dependencies. Each test case will acquire a fresh instance from the object graph. For our demonstration this results in a new <code>BonusService</code> instance for each test case.</p>
 <pre><code>NotUsingMemoTest:
-
- bonusService = repl.MdocSession$MdocApp$DummyBonusService$Impl@63ae58b 
-
   - Not memoizing BonusService should use a new instance in the first case 
 - Not memoizing BonusService should use a new instance in the first case
-
- bonusService = repl.MdocSession$MdocApp$DummyBonusService$Impl@e094719 
-
   - Not memoizing BonusService should use a new instance in the second case 
 - Not memoizing BonusService should use a new instance in the second case
 
@@ -787,7 +779,7 @@ class UsingMemoTest extends DummyTest {
     &quot;use a new instance in the first case&quot; in {
       for {
         bonusService &lt;- ZIO.service[BonusService]
-        _            &lt;- console.putStrLn(s&quot;\n bonusService = ${bonusService} \n&quot;)
+        _            &lt;- Console.printLine(s&quot;\n bonusService = ${bonusService} \n&quot;)
 
         // change the bonus service state
         currentBonus &lt;- bonusService.increaseCurrentBonus(delta)
@@ -800,7 +792,7 @@ class UsingMemoTest extends DummyTest {
     &quot;use the same instance in the second case&quot; in {
       for {
         bonusService &lt;- ZIO.service[BonusService]
-        _            &lt;- console.putStrLn(s&quot;\n bonusService = ${bonusService} \n&quot;)
+        _            &lt;- Console.printLine(s&quot;\n bonusService = ${bonusService} \n&quot;)
 
         currentBonus &lt;- bonusService.queryCurrentBonus
         expectedBonus = defaultConfig.defaultBonus + delta
@@ -832,9 +824,9 @@ class AnotherUsingMemoTest extends DummyTest {
     &quot;use the same instance&quot; in {
       for {
         bonusService &lt;- ZIO.service[BonusService]
-        _            &lt;- console.putStrLn(s&quot;\n bonusService = ${bonusService} \n&quot;)
+        _            &lt;- Console.printLine(s&quot;\n bonusService = ${bonusService} \n&quot;)
         currentBonus &lt;- bonusService.queryCurrentBonus
-        _            &lt;- console.putStrLn(s&quot;currentBonus = ${currentBonus}&quot;)
+        _            &lt;- Console.printLine(s&quot;currentBonus = ${currentBonus}&quot;)
       } yield ()
     }
   }
@@ -842,18 +834,8 @@ class AnotherUsingMemoTest extends DummyTest {
 </code></pre>
 <p>Both tests suites, all three test cases, will use same memoization environment and the same <code>bonusService</code> instance:</p>
 <pre><code>UsingMemoTest:
-
- bonusService = repl.MdocSession$MdocApp$DummyBonusService$Impl@11e40f77 
-
   - Memoizing BonusService should use a new instance in the first case 
 - Memoizing BonusService should use a new instance in the first case
-
- bonusService = repl.MdocSession$MdocApp$DummyBonusService$Impl@11e40f77 
-
-currentBonus = -1994944233
-
- bonusService = repl.MdocSession$MdocApp$DummyBonusService$Impl@11e40f77 
-
   - Memoizing BonusService should use the same instance in the second case 
 - Memoizing BonusService should use the same instance in the second case
 
@@ -994,7 +976,7 @@ abstract class LadderTest extends LeaderboardTest {
           assertIO(user1Rank &lt; user2Rank)
         } else if (score2 &gt; score1) {
           assertIO(user2Rank &lt; user1Rank)
-        } else IO.unit
+        } else ZIO.unit
       } yield ()
     }
 
@@ -1018,7 +1000,7 @@ abstract class LadderTest extends LeaderboardTest {
               assertIO(user1Rank &lt; user2Rank)
             } else if (score2 &gt; score1) {
               assertIO(user2Rank &lt; user1Rank)
-            } else IO.unit
+            } else ZIO.unit
           } yield ()
     }
   }
@@ -1027,13 +1009,13 @@ abstract class LadderTest extends LeaderboardTest {
 </code></pre>
 </div>
 <div>
-<a href="https://github.com/7mind/izumi/tree/v1.1.0-M23/doc/microsite/target/mdoc/distage/distage-testkit.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/7mind/izumi/tree/v1.1.0-M24/doc/microsite/target/mdoc/distage/distage-testkit.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>
 <div class="print-only">
 <span class="md-source-file md-version">
-1.1.0-M23
+1.1.0-M24
 </span>
 </div>
 </article>
