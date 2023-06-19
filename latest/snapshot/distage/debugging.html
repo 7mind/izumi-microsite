@@ -225,7 +225,7 @@ class B
 
 def badModule = new ModuleDef {
   make[A]
-  make[B].fromEffect(zio.Task { ??? })
+  make[B].fromEffect(zio.ZIO.attempt { ??? })
 }
 </code></pre>
 <pre class="prettyprint"><code class="language-scala">// the effect types are mismatched - `badModule` uses `zio.Task`, but we expect `cats.effect.IO`
@@ -260,10 +260,8 @@ Injector[cats.effect.IO]().assert(goodModule, Roots.target[A])
 </code></pre>
 <h3><a href="#pretty-printing-plans" name="pretty-printing-plans" class="anchor"><span class="anchor-link"></span></a>Pretty-printing plans</h3>
 <p>You can print the output of <code>plan.render()</code> to get detailed info on what will happen during instantiation. The printout includes source and line numbers so your IDE can show you where the binding was defined!</p>
-<pre class="prettyprint"><code class="language-scala">import distage.PlannerInput
-
-val plan = Injector().plan(goodModule, Roots.target[A]).getOrThrow()
-// plan: izumi.distage.model.plan.Plan = 1: {effect.{type.MdocSession::MdocApp0::B}} (debugging.md:41) := value cats.effect.IO$Delay#839891117
+<pre class="prettyprint"><code class="language-scala">val plan = Injector().plan(goodModule, Roots.target[A]).getOrThrow()
+// plan: izumi.distage.model.plan.Plan = 1: {effect.{type.MdocSession::MdocApp0::B}} (debugging.md:41) := value cats.effect.IO$Delay#-1048086871
 // 2: {type.MdocSession::MdocApp0::B} (debugging.md:41) := effect[λ %0 → cats.effect.IO[+0]]{effect.{type.MdocSession::MdocApp0::B}}
 // 3: {type.MdocSession::MdocApp0::A} (debugging.md:40) :=
 // 4:     call(π:Class(MdocSession::MdocApp0::B): MdocSession::MdocApp0::A[32m) {
@@ -271,7 +269,7 @@ val plan = Injector().plan(goodModule, Roots.target[A]).getOrThrow()
 // 6:     }
 
 println(plan.render())
-// 1: {effect.{type.MdocSession::MdocApp0::B}} (debugging.md:41) := value cats.effect.IO$Delay#839891117
+// 1: {effect.{type.MdocSession::MdocApp0::B}} (debugging.md:41) := value cats.effect.IO$Delay#-1048086871
 // 2: {type.MdocSession::MdocApp0::B} (debugging.md:41) := effect[λ %0 → cats.effect.IO[+0]]{effect.{type.MdocSession::MdocApp0::B}}
 // 3: {type.MdocSession::MdocApp0::A} (debugging.md:40) :=
 // 4:     call(π:Class(MdocSession::MdocApp0::B): MdocSession::MdocApp0::A[32m) {
@@ -310,7 +308,7 @@ println(plan.renderDependees(DIKey[B]))
 <pre class="prettyprint"><code class="language-scala">import distage.{GraphDumpBootstrapModule, Injector}
 
 Injector(GraphDumpBootstrapModule)
-// res6: Injector[[A]izumi.fundamentals.platform.functional.package.Identity[A]] = izumi.distage.InjectorDefaultImpl@7f40605c
+// res6: Injector[[A]izumi.fundamentals.platform.functional.package.Identity[A]] = izumi.distage.InjectorDefaultImpl@4079a276
 </code></pre>
 <p>You&rsquo;ll need a <code>GraphViz</code> installation to render these files into a viewable PNG images:</p>
 <pre class="prettyprint"><code class="language-bash">dot -Tpng target/plan-last-nogc.gv -o out.png
