@@ -471,7 +471,7 @@ abstract class BonusServiceTest extends Test {
   }
 }
 </code></pre>
-<p>The <a href="basics.html#zio-environment-bindings">ZIO Has injection</a> support extends to the test cases, here we request two components implicitly using the ZIO environment:</p>
+<p>The <a href="basics.html#zio-environment-bindings">ZIO Environment injection</a> support extends to the test cases, here we request two components implicitly using the ZIO environment:</p>
 <ul>
   <li><code>BonusService</code> - is requested by <code>ZIO.service[BonusService]</code></li>
   <li><code>zio.Random.Service</code> - is requested by <code>zio.random.nextInt</code></li>
@@ -539,7 +539,7 @@ object ProdBonusService {
 </code></pre>
 <h4><a href="#pattern-dual-test-tactic" name="pattern-dual-test-tactic" class="anchor"><span class="anchor-link"></span></a>Pattern: Dual Test Tactic</h4>
 <p>The testing of <code>BonusService</code> in our demonstration application will follow the Dual Test Tactic. See our blog post <a href="https://blog.7mind.io/constructive-test-taxonomy.html">Unit, Functional, Integration? You are doing it wrong</a> for a discussion of test taxonomy and the value of this tactic.</p>
-<p>A binding for the implementation of <code>BonusService</code> must be passed to <code>distage</code>, to be able to build a <code>Has[BonusService]</code> to inject into the <code>ZIO</code> environment of the test.</p>
+<p>A binding for the implementation of <code>BonusService</code> must be passed to <code>distage</code>, to be able to build a <code>zio.ZEnvironment[BonusService]</code> to inject into the <code>ZIO</code> environment of the test.</p>
 <p>But note that we have two implementations, to use both one option is to define separate modules for the dummy and production implementations. One module would be used by tests and the other only by production.</p>
 <p>However, this is not as declaring both implementations in our modules at the same time but with different activations.</p>
 <p>Our demonstration application will use the <a href="/latest/snapshot/api/izumi/distage/model/definition/StandardAxis$$Repo$.html" title="izumi.distage.model.definition.StandardAxis$$Repo"><code>StandardAxis.Repo</code></a> <code>Dummy</code> and <code>Prod</code> axis tags:</p>
@@ -551,15 +551,15 @@ import distage.StandardAxis.Repo
 
 object BonusServicePlugin extends PluginDef {
   make[BonusService]
-    .fromZEnv(DummyBonusService.managed)
+    .fromZManagedEnv(DummyBonusService.managed)
     .tagged(Repo.Dummy)
 
   make[BonusService]
-    .fromZEnv(ProdBonusService.managed)
+    .fromZManagedEnv(ProdBonusService.managed)
     .tagged(Repo.Prod)
 }
 </code></pre>
-<p>Here we used <a href="basics.html#zio-environment-bindings">ZIO Has injection</a> <code>.fromZEnv</code> to supply the environment dependencies for <code>ProdBonusService.managed</code>, namely <code>Has[Console.Service]</code>. (Implementation for <code>Console.Service</code> is provided by default from <a href="/latest/snapshot/api/izumi/distage/modules/support/ZIOSupportModule.html" title="izumi.distage.modules.support.ZIOSupportModule"><code>ZIOSupportModule</code></a>) <code>.fromZEnv</code> can be used with <code>ZLayer</code>, <code>ZManaged</code> <code>ZIO</code> or any <code>F[-_, +_, +_]: Local3</code> (from <a href="../bio/index.html">BIO</a> typeclasses).</p>
+<p>Here we used <a href="basics.html#zio-environment-bindings">ZIO Environment injection</a> <code>.fromZManagedEnv</code> to supply the environment dependencies for <code>ProdBonusService.managed</code>, namely <code>Console</code>. <code>.fromZIOEnv</code>+ methods can be used with <code>ZLayer</code>, <code>ZManaged</code> <code>ZIO</code> or <code>Lifecycle[ZIO[R, E, _], _]</code>.</p>
 <p>Note that the <code>BonusServicePlugin</code> is not explicitly added to the <code>Test.config</code>: But, this <code>PluginDef</code> class is defined in the same package as the test, namely in <code>app</code>. By default the <code>pluginConfig</code> for the test will include the test&rsquo;s package, which will be scanned by <code>distage</code> for <code>PluginDef</code> instances.</p>
 <p>Continuing with the pattern, a trait will control which implementation is activated:</p>
 <pre class="prettyprint"><code class="language-scala">package app
@@ -620,9 +620,9 @@ class DummyBonusServiceTest extends BonusServiceTest with DummyTest
 </ul>
 <p>For <code>F[-_, +_, +_]</code>, it&rsquo;s same with <code>F[Any, _, _]</code>:</p>
 <ul>
-  <li><code>in { ???: F[zio.ZEnvironment[C] with zio.ZEnvironment[D], _, Unit] }</code>: The test case is an effect requiring an environment. The test  case will fail if the effect fails. The environment will be injected from the object graph.</li>
-  <li><code>in { ???: F[zio.ZEnvironment[C] with zio.ZEnvironment[D], _, Assertion] }</code>: The test case is an effect requiring an environment. The  test case will fail if the effect fails or produces a failure assertion. The environment will be injected from the  object graph.</li>
-  <li><code>in { (a: A, b: B) =&gt; ???: F[zio.ZEnvironment[C] with zio.ZEnvironment[D], _, Assertion] }</code>: The test case is a function producing an  effect requiring an environment. All of <code>a: A</code>, <code>b: B</code>, <code>Has[C]</code> and <code>Has[D]</code>  will be injected from the object graph.</li>
+  <li><code>in { ???: ZIO[C with D, _, Unit] }</code>: The test case is an effect requiring an environment. The test  case will fail if the effect fails. The environment will be injected from the object graph.</li>
+  <li><code>in { ???: ZIO[C with D, _, Assertion] }</code>: The test case is an effect requiring an environment. The  test case will fail if the effect fails or produces a failure assertion. The environment will be injected from the  object graph.</li>
+  <li><code>in { (a: A, b: B) =&gt; ZIO[C with D, _, Assertion] }</code>: The test case is a function producing an  effect requiring an environment. All of <code>a: A</code>, <code>b: B</code>, <code>zio.ZEnvironment[C]</code> and <code>zio.ZEnvironment[D]</code>  will be injected from the object graph.</li>
 </ul>
 <p>Provided by trait <a href="/latest/snapshot/api/izumi/distage/testkit/scalatest/AssertZIO.html" title="izumi.distage.testkit.scalatest.AssertZIO"><code>AssertZIO</code></a>:</p>
 <ul>
