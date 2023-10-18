@@ -171,6 +171,7 @@ data-md-source="github">
     <li><a href="../bio/index.html#data-types" class="header">Data Types</a></li>
     <li><a href="../bio/index.html#misc-capabilities" class="header">Misc Capabilities</a></li>
     <li><a href="../bio/index.html#examples" class="header">Examples</a></li>
+    <li><a href="../bio/index.html#removal-of-trifunctor-hierarchy" class="header">Removal of trifunctor hierarchy</a></li>
   </ul></li>
 </ul>
 </nav>
@@ -200,6 +201,7 @@ data-md-source="github">
     <li><a href="../bio/index.html#data-types" class="header">Data Types</a></li>
     <li><a href="../bio/index.html#misc-capabilities" class="header">Misc Capabilities</a></li>
     <li><a href="../bio/index.html#examples" class="header">Examples</a></li>
+    <li><a href="../bio/index.html#removal-of-trifunctor-hierarchy" class="header">Removal of trifunctor hierarchy</a></li>
   </ul></li>
 </ul>
 </nav>
@@ -211,38 +213,24 @@ data-md-source="github">
 <article class="md-content__inner md-typeset">
 <div class="md-content__searchable">
 <h1><a href="#bio-hierarchy" name="bio-hierarchy" class="anchor"><span class="anchor-link"></span></a>BIO Hierarchy</h1>
-<p><strong>BIO</strong> is a set of typeclasses and algebras for programming in tagless final style using bifunctor or trifunctor effect types with variance.</p>
+<p><strong>BIO</strong> is a set of typeclasses and algebras for programming in tagless final style using bifunctor effect types with variance.</p>
 <p>Key syntactic features:</p>
 <ol>
   <li>Ergonomic <code>F</code> summoner that is a single point of entry to all methods in the hierarchy</li>
   <li>Import-less syntax. Syntax is automatically available whenever any typeclass from the hierarchy is imported, e.g. immediately after IDE auto-import.</li>
 </ol>
 <p>These syntactic features allow you to write in a low ceremony, IDE-friendly and newcomer-friendly style:</p>
-<pre class="prettyprint"><code class="language-scala">import izumi.functional.bio.{F, Monad2, MonadAsk3, Primitives2, Ref3}
+<pre class="prettyprint"><code class="language-scala">import izumi.functional.bio.{F, Monad2, Primitives2}
 
 def adder[F[+_, +_]: Monad2: Primitives2](i: Int): F[Nothing, Int] =
   F.mkRef(0)
    .flatMap(ref =&gt; ref.update(_ + i) *&gt; ref.get)
-
-// update ref from the environment and return result
-def adderEnv[F[-_, +_, +_]: MonadAsk3](i: Int): F[Ref3[F, Int], Nothing, Int] =
-  F.access {
-    ref =&gt;
-      for {
-        _   &lt;- ref.update(_ + i)
-        res &lt;- ref.get
-      } yield res
-  }
 </code></pre>
 <p>Key semantic features:</p>
 <ol>
   <li>Typed error handling with bifunctor effect types</li>
   <li>Automatic conversions to equivalent <code>cats.effect</code> instances using <code>import izumi.functional.bio.catz._</code></li>
-  <li>Automatic adaptation of trifunctor typeclasses to bifunctor typeclasses when required</li>
-  <li>No ambiguous implicit errors. It&rsquo;s legal to have both <code>Monad3</code> and <code>MonadAsk3</code> as constraints,  despite the fact that <code>MonadAsk3</code> provides a <code>Monad3</code>:  <code>scala
-import izumi.functional.bio.{Monad3, MonadAsk3}
-   def adderEnv[F[-_, +_, +_]: Monad3: MonadAsk3] // would still work
-</code></li>
+  <li>No ambiguous implicit errors. It&rsquo;s legal to have both <code>Monad2</code> and <code>Applicative2</code> as constraints,  despite the fact that <code>Monad2</code> provides an <code>Applicative2</code>.</li>
   <li>Primitive concurrent data structures: <code>Ref</code>, <code>Promise</code>, <code>Semaphore</code></li>
 </ol>
 <p>To use it, add <code>fundamentals-bio</code> library:</p>
@@ -258,7 +246,7 @@ scalacOptions += &quot;-Xsource:2.13&quot; // either this
 <pre class="prettyprint"><code class="language-scala">addCompilerPlugin(&quot;org.typelevel&quot; % &quot;kind-projector&quot; % &quot;0.13.2&quot; cross CrossVersion.full)
 </code></pre>
 <h2><a href="#overview" name="overview" class="anchor"><span class="anchor-link"></span></a>Overview</h2>
-<p>The following graphic shows the current <code>BIO</code> hierarchy. Note that all the trifunctor typeclasses ending in <code>*3</code> typeclasses have bifunctor counterparts ending in <code>*2</code>.</p>
+<p>The following graphic shows the current <code>BIO</code> hierarchy.</p>
 <p><img src="media/bio-relationship-hierarchy.svg" alt="BIO-relationship-hierarchy" /></p>
 <p><a href="media/bio-relationship-hierarchy.svg">(image)</a></p>
 <p>Auxiliary algebras:</p>
@@ -283,16 +271,19 @@ def loop[F[+_, +_]: Monad2]: F[Nothing, Nothing] = {
 <h2><a href="#cats-effect-compatibilty" name="cats-effect-compatibilty" class="anchor"><span class="anchor-link"></span></a>cats-effect compatibilty</h2>
 <p>Import <code>izumi.functional.bio.catz._</code> for shim compatibilty with cats-effect. You can run <code>http4s</code> and all the other cats-effect libraries with just BIO typeclasses, without requiring any cats-effect typeclasses.</p>
 <h2><a href="#data-types" name="data-types" class="anchor"><span class="anchor-link"></span></a>Data Types</h2>
-<p><code>Ref2/3</code>, <code>Promise2/3</code> and <code>Semaphore2/3</code> provide basic concurrent mutable state primitives. They require a <code>Primitives2/3</code> capability to create. With <code>Primitiives*[F]</code> in implicit scope, use <code>F.mkRef</code>/<code>F.mkPromise</code>/<code>F.mkSemaphore</code> respectively. (See also example at top of the page)</p>
+<p><code>Ref2</code>, <code>Promise2</code> and <code>Semaphore2</code> provide basic concurrent mutable state primitives. They require a <code>Primitives2</code> capability to create. With <code>Primitiives2[F]</code> in implicit scope, use <code>F.mkRef</code>/<code>F.mkPromise</code>/<code>F.mkSemaphore</code> respectively. (See also example at top of the page)</p>
 <p><code>Free</code> monad, as well as <code>FreeError</code> and <code>FreePanic</code> provide building blocks for DSLs when combined with a DSL describing functor.</p>
 <p><code>Morphism1/2/3</code> provide unboxed natural transformations for functors with 1,2,3-arity respectively, with <code>Isomorphism1/2/3</code> modeling two-way transformations.</p>
 <h2><a href="#misc-capabilities" name="misc-capabilities" class="anchor"><span class="anchor-link"></span></a>Misc Capabilities</h2>
 <p><code>Clock1/2/3</code> gives access to current time.</p>
 <p><code>Entropy1/2/3</code> models random numbers.</p>
-<p><code>UnsafeRun2/3</code> allows executing effects (it is required for conversion to cats&rsquo; <code>ConcurrentEffect</code> which also allows unsafe running)</p>
+<p><code>UnsafeRun2</code> allows executing effects (it is required for conversion to cats&rsquo; <code>ConcurrentEffect</code> which also allows unsafe running)</p>
 <h2><a href="#examples" name="examples" class="anchor"><span class="anchor-link"></span></a>Examples</h2>
 <p><a href="https://github.com/7mind/distage-example">distage-example</a> is a full example application written in Tagless Final Style using BIO typeclasses.</p>
 <p>You may also find a video walkthrough of using BIO on Youtube by <a href="https://www.youtube.com/watch?v=ZdGK1uedAE0&t=580s">DevInsideYou — Tagless Final with BIO</a></p>
+<h2><a href="#removal-of-trifunctor-hierarchy" name="removal-of-trifunctor-hierarchy" class="anchor"><span class="anchor-link"></span></a>Removal of trifunctor hierarchy</h2>
+<p>Since version 1.2.0 the trifunctor hierarchy has been removed, due to the fact that since ZIO version 2.0 they cannot be implemented for ZIO and also because of lack of use.</p>
+<p>See details in <a href="https://github.com/7mind/izumi/issues/2026">https://github.com/7mind/izumi/issues/2026</a></p>
 </div>
 <div>
 <a href="https://github.com/7mind/izumi/tree/master/doc/microsite/target/mdoc/bio/00_bio.md" title="Edit this page" class="md-source-file md-edit">
