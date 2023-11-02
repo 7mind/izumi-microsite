@@ -182,7 +182,7 @@ data-md-source="github">
 <ul style="display: none">
 <li class="md-nav__item md-version" id="project.version">
 <label class="md-nav__link" for="__version">
-<i class="md-icon" title="Version">label_outline</i> 1.1.0
+<i class="md-icon" title="Version">label_outline</i> 1.2.0
 </label>
 </li>
 </ul>
@@ -258,7 +258,7 @@ data-md-source="github">
       <li>No effect type - <a href="/api/izumi/distage/testkit/scalatest/SpecIdentity.html" title="izumi.distage.testkit.scalatest.SpecIdentity"><code>`SpecIdentity`</code></a></li>
       <li><code>F[_]</code> - <a href="/api/izumi/distage/testkit/scalatest/Spec1.html" title="izumi.distage.testkit.scalatest.Spec1"><code>`Spec1[F]`</code></a>, for monofunctors (<code>cats.effect.IO</code>  , <code>monix</code>)</li>
       <li><code>F[+_, +_]</code> - <a href="/api/izumi/distage/testkit/scalatest/Spec2.html" title="izumi.distage.testkit.scalatest.Spec2"><code>`Spec2[F]`</code></a>, for bifunctors (<code>ZIO</code>, <code>monix-bio</code>)</li>
-      <li><code>F[-_, +_, +_]</code> - <a href="/api/izumi/distage/testkit/scalatest/Spec3.html" title="izumi.distage.testkit.scalatest.Spec3"><code>`Spec3[F]`</code></a> for trifunctors (<code>ZIO</code>)</li>
+      <li><code>ZIO[-R, +E, +A]</code> - <a href="/api/izumi/distage/testkit/scalatest/SpecZIO.html" title="izumi.distage.testkit.scalatest.SpecZIO"><code>`SpecZIO`</code></a> for <code>ZIO</code> with environment support in tests</li>
     </ul>
   </li>
   <li>Override <code>def config: TestConfig</code> to customize the <a href="/api/izumi/distage/testkit/TestConfig.html" title="izumi.distage.testkit.TestConfig"><code>`TestConfig`</code></a></li>
@@ -268,7 +268,7 @@ data-md-source="github">
       <li>No effect type / <code>Identity</code> -  <a href="/api/izumi/distage/testkit/services/scalatest/dstest/DistageAbstractScalatestSpec$$LowPriorityIdentityOverloads.html" title="izumi.distage.testkit.services.scalatest.dstest.DistageAbstractScalatestSpec.LowPriorityIdentityOverloads"><code>`in`</code></a></li>
       <li><a href="/api/izumi/distage/testkit/services/scalatest/dstest/DistageAbstractScalatestSpec$$DSWordSpecStringWrapper.html" title="izumi.distage.testkit.services.scalatest.dstest.DistageAbstractScalatestSpec.DSWordSpecStringWrapper"><code>`in` for `F[_]`</code></a></li>
       <li><a href="/api/izumi/distage/testkit/services/scalatest/dstest/DistageAbstractScalatestSpec$$DSWordSpecStringWrapper2.html" title="izumi.distage.testkit.services.scalatest.dstest.DistageAbstractScalatestSpec.DSWordSpecStringWrapper2"><code>`in` for `F[+_, +_]`</code></a></li>
-      <li><a href="/api/izumi/distage/testkit/services/scalatest/dstest/DistageAbstractScalatestSpec$$DSWordSpecStringWrapper3.html" title="izumi.distage.testkit.services.scalatest.dstest.DistageAbstractScalatestSpec.DSWordSpecStringWrapper3"><code>`in` for `F[-_, +_, +_]`</code></a></li>
+      <li><a href="/api/izumi/distage/testkit/services/scalatest/dstest/DistageAbstractScalatestSpec$$DSWordSpecStringWrapperZIO.html" title="izumi.distage.testkit.services.scalatest.dstest.DistageAbstractScalatestSpec.DSWordSpecStringWrapperZIO"><code>`in` for `ZIO[-R, +E, +A]`</code></a></li>
       <li>Test cases dependent on injectables: <a href="/api/izumi/distage/model/providers/Functoid.html" title="izumi.distage.model.providers.Functoid"><code>`Functoid`</code></a></li>
     </ul>
   </li>
@@ -326,17 +326,17 @@ object Score {
   <li>No effect type, imperative usage - <a href="/api/izumi/distage/testkit/scalatest/SpecIdentity.html" title="izumi.distage.testkit.scalatest.SpecIdentity"><code>`SpecIdentity`</code></a></li>
   <li><code>F[_]</code> - <a href="/api/izumi/distage/testkit/scalatest/Spec1.html" title="izumi.distage.testkit.scalatest.Spec1"><code>`Spec1[F]`</code></a></li>
   <li><code>F[+_, +_]</code> - <a href="/api/izumi/distage/testkit/scalatest/Spec2.html" title="izumi.distage.testkit.scalatest.Spec2"><code>`Spec2[F]`</code></a></li>
-  <li><code>F[-_, +_, +_]</code> - <a href="/api/izumi/distage/testkit/scalatest/Spec3.html" title="izumi.distage.testkit.scalatest.Spec3"><code>`Spec3[F]`</code></a></li>
+  <li><code>ZIO[-R, +E, +A]</code> - <a href="/api/izumi/distage/testkit/scalatest/SpecZIO.html" title="izumi.distage.testkit.scalatest.SpecZIO"><code>`SpecZIO`</code></a></li>
 </ul>
-<p>The effect monad is expected to support sync and async effects. <code>distage-testkit</code> provides this support for <code>Identity</code> , <code>monix</code>, <code>monix-bio</code>, <code>ZIO</code>, and monads wth instances of <code>cats-effect</code> or <a href="../bio/index.html">BIO</a> typeclasses. For our demonstration application, the tests will use the <code>ZIO[-R, +E, +A]</code> effect type. This means we&rsquo;ll be using <code>Spec3[ZIO]</code> for the test suite base class.</p>
+<p>The effect monad is expected to support sync and async effects. <code>distage-testkit</code> provides this support for <code>Identity</code> , <code>monix</code>, <code>monix-bio</code>, <code>ZIO</code>, and monads wth instances of <code>cats-effect</code> or <a href="../bio/index.html">BIO</a> typeclasses. For our demonstration application, the tests will use the <code>ZIO[-R, +E, +A]</code> effect type. This means we&rsquo;ll be using <code>SpecZIO</code> for the test suite base class.</p>
 <p>The default config (<code>super.config</code>) has <code>pluginConfig</code>, which by default will scan the package the test is defined in for defined Plugin modules. See the <a href="distage-framework.html#plugins"><code>distage-extension-plugins</code></a> documentation for more information. For our demonstration the module will be provided using explicit <code>moduleOverrides</code> instead of classpath scanning, like so:</p>
 <pre class="prettyprint"><code class="language-scala">package app
 
 import com.typesafe.config.ConfigFactory
 import distage.ModuleDef
-import izumi.distage.testkit.scalatest.{AssertZIO, Spec3}
+import izumi.distage.testkit.scalatest.{AssertZIO, SpecZIO}
 
-abstract class Test extends Spec3[ZIO] with AssertZIO {
+abstract class Test extends SpecZIO with AssertZIO {
   val defaultConfig = Config(
     starValue = 10,
     mangoValue = 256,
@@ -393,9 +393,9 @@ class ScoreSimpleTest extends Test {
 }
 </code></pre>
 <pre><code>ScoreSimpleTest:
+- Score should increase by config star value
   - Score should increase by config star value from DI 
 - Score should increase by config star value from DI
-- Score should increase by config star value
 
 
 </code></pre>
@@ -405,7 +405,7 @@ class ScoreSimpleTest extends Test {
 <ul>
   <li><code>Spec1</code>: <code>F[_]</code></li>
   <li><code>Spec2</code>: <code>F[Throwable, _]</code></li>
-  <li><code>Spec3</code>: <code>F[Any, Throwable, _]</code></li>
+  <li><code>SpecZIO</code>: <code>ZIO[R, Any, _]</code></li>
 </ul>
 <p>With our demonstration application we&rsquo;ll use this to verify the <code>Score.echoConfig</code> method. The <code>Config</code> required is from the <code>distage</code> object graph defined in <code>moduleOverrides</code>. By using a function with a <code>Config</code> argument in <code>in</code>, the required argument will be injected by <code>distage-testkit</code>.</p>
 <pre class="prettyprint"><code class="language-scala">package app
@@ -441,7 +441,7 @@ class ScoreEffectsTest extends Test {
 
 </code></pre>
 <h4><a href="#assertions-with-effects-with-environments" name="assertions-with-effects-with-environments" class="anchor"><span class="anchor-link"></span></a>Assertions with Effects with Environments</h4>
-<p><a href="/api/izumi/distage/testkit/services/scalatest/dstest/DistageAbstractScalatestSpec$$DSWordSpecStringWrapper3.html" title="izumi.distage.testkit.services.scalatest.dstest.DistageAbstractScalatestSpec.DSWordSpecStringWrapper3"><code>The `in` method for `F[_, _, _]` effect types</code></a> supports injection of environments from the object graph in addition to simple assertions and assertions with effects.</p>
+<p><a href="/api/izumi/distage/testkit/services/scalatest/dstest/DistageAbstractScalatestSpec$$DSWordSpecStringWrapperZIO.html" title="izumi.distage.testkit.services.scalatest.dstest.DistageAbstractScalatestSpec.DSWordSpecStringWrapperZIO"><code>The `in` method for `ZIO`</code></a> supports injection of environments from the object graph in addition to simple assertions and assertions with effects.</p>
 <p>A test that verifies the <code>BonusService</code> in our demonstration would be:</p>
 <pre class="prettyprint"><code class="language-scala">package app
 
@@ -471,7 +471,7 @@ abstract class BonusServiceTest extends Test {
   }
 }
 </code></pre>
-<p>The <a href="basics.html#zio-environment-bindings">ZIO Has injection</a> support extends to the test cases, here we request two components implicitly using the ZIO environment:</p>
+<p>The <a href="basics.html#zio-environment-bindings">ZIO Environment injection</a> support extends to the test cases, here we request two components implicitly using the ZIO environment:</p>
 <ul>
   <li><code>BonusService</code> - is requested by <code>ZIO.service[BonusService]</code></li>
   <li><code>zio.Random.Service</code> - is requested by <code>zio.random.nextInt</code></li>
@@ -539,7 +539,7 @@ object ProdBonusService {
 </code></pre>
 <h4><a href="#pattern-dual-test-tactic" name="pattern-dual-test-tactic" class="anchor"><span class="anchor-link"></span></a>Pattern: Dual Test Tactic</h4>
 <p>The testing of <code>BonusService</code> in our demonstration application will follow the Dual Test Tactic. See our blog post <a href="https://blog.7mind.io/constructive-test-taxonomy.html">Unit, Functional, Integration? You are doing it wrong</a> for a discussion of test taxonomy and the value of this tactic.</p>
-<p>A binding for the implementation of <code>BonusService</code> must be passed to <code>distage</code>, to be able to build a <code>Has[BonusService]</code> to inject into the <code>ZIO</code> environment of the test.</p>
+<p>A binding for the implementation of <code>BonusService</code> must be passed to <code>distage</code>, to be able to build a <code>zio.ZEnvironment[BonusService]</code> to inject into the <code>ZIO</code> environment of the test.</p>
 <p>But note that we have two implementations, to use both one option is to define separate modules for the dummy and production implementations. One module would be used by tests and the other only by production.</p>
 <p>However, this is not as declaring both implementations in our modules at the same time but with different activations.</p>
 <p>Our demonstration application will use the <a href="/api/izumi/distage/model/definition/StandardAxis$$Repo$.html" title="izumi.distage.model.definition.StandardAxis$$Repo"><code>StandardAxis.Repo</code></a> <code>Dummy</code> and <code>Prod</code> axis tags:</p>
@@ -551,15 +551,15 @@ import distage.StandardAxis.Repo
 
 object BonusServicePlugin extends PluginDef {
   make[BonusService]
-    .fromZEnv(DummyBonusService.managed)
+    .fromZManagedEnv(DummyBonusService.managed)
     .tagged(Repo.Dummy)
 
   make[BonusService]
-    .fromZEnv(ProdBonusService.managed)
+    .fromZManagedEnv(ProdBonusService.managed)
     .tagged(Repo.Prod)
 }
 </code></pre>
-<p>Here we used <a href="basics.html#zio-environment-bindings">ZIO Has injection</a> <code>.fromZEnv</code> to supply the environment dependencies for <code>ProdBonusService.managed</code>, namely <code>Has[Console.Service]</code>. (Implementation for <code>Console.Service</code> is provided by default from <a href="/api/izumi/distage/modules/support/ZIOSupportModule.html" title="izumi.distage.modules.support.ZIOSupportModule"><code>ZIOSupportModule</code></a>) <code>.fromZEnv</code> can be used with <code>ZLayer</code>, <code>ZManaged</code> <code>ZIO</code> or any <code>F[-_, +_, +_]: Local3</code> (from <a href="../bio/index.html">BIO</a> typeclasses).</p>
+<p>Here we used <a href="basics.html#zio-environment-bindings">ZIO Environment injection</a> <code>.fromZManagedEnv</code> to supply the environment dependencies for <code>ProdBonusService.managed</code>, namely <code>Console</code>. <code>.fromZIOEnv</code>+ methods can be used with <code>ZLayer</code>, <code>ZManaged</code> <code>ZIO</code> or <code>Lifecycle[ZIO[R, E, _], _]</code>.</p>
 <p>Note that the <code>BonusServicePlugin</code> is not explicitly added to the <code>Test.config</code>: But, this <code>PluginDef</code> class is defined in the same package as the test, namely in <code>app</code>. By default the <code>pluginConfig</code> for the test will include the test&rsquo;s package, which will be scanned by <code>distage</code> for <code>PluginDef</code> instances.</p>
 <p>Continuing with the pattern, a trait will control which implementation is activated:</p>
 <pre class="prettyprint"><code class="language-scala">package app
@@ -620,9 +620,9 @@ class DummyBonusServiceTest extends BonusServiceTest with DummyTest
 </ul>
 <p>For <code>F[-_, +_, +_]</code>, it&rsquo;s same with <code>F[Any, _, _]</code>:</p>
 <ul>
-  <li><code>in { ???: F[zio.ZEnvironment[C] with zio.ZEnvironment[D], _, Unit] }</code>: The test case is an effect requiring an environment. The test  case will fail if the effect fails. The environment will be injected from the object graph.</li>
-  <li><code>in { ???: F[zio.ZEnvironment[C] with zio.ZEnvironment[D], _, Assertion] }</code>: The test case is an effect requiring an environment. The  test case will fail if the effect fails or produces a failure assertion. The environment will be injected from the  object graph.</li>
-  <li><code>in { (a: A, b: B) =&gt; ???: F[zio.ZEnvironment[C] with zio.ZEnvironment[D], _, Assertion] }</code>: The test case is a function producing an  effect requiring an environment. All of <code>a: A</code>, <code>b: B</code>, <code>Has[C]</code> and <code>Has[D]</code>  will be injected from the object graph.</li>
+  <li><code>in { ???: ZIO[C with D, _, Unit] }</code>: The test case is an effect requiring an environment. The test  case will fail if the effect fails. The environment will be injected from the object graph.</li>
+  <li><code>in { ???: ZIO[C with D, _, Assertion] }</code>: The test case is an effect requiring an environment. The  test case will fail if the effect fails or produces a failure assertion. The environment will be injected from the  object graph.</li>
+  <li><code>in { (a: A, b: B) =&gt; ZIO[C with D, _, Assertion] }</code>: The test case is a function producing an  effect requiring an environment. All of <code>a: A</code>, <code>b: B</code>, <code>zio.ZEnvironment[C]</code> and <code>zio.ZEnvironment[D]</code>  will be injected from the object graph.</li>
 </ul>
 <p>Provided by trait <a href="/api/izumi/distage/testkit/scalatest/AssertZIO.html" title="izumi.distage.testkit.scalatest.AssertZIO"><code>AssertZIO</code></a>:</p>
 <ul>
@@ -683,7 +683,7 @@ class DummyBonusServiceTest extends BonusServiceTest with DummyTest
 <p>Nested memoization levels allow more and better sharing of heavy components among test suites. With previous strategy of single-level memoization environments, any change in <code>TestConfig</code> that forces a new memoization environment would cause every single memoized component to be recreated in a new environment.</p>
 <p>With new strategy, the memoization environment may be manually partitioned into levels and if a change in <code>TestConfig</code> does not cause a divergence at one of the levels, the nested levels may then fully reuse the object sub-graph of all parent levels that do not diverge.</p>
 <p>For clarity, the memoization tree structure is printed before test runs. For example, a memoization tree of a project with the following test suites:</p>
-<pre class="prettyprint"><code class="language-scala">class SameLevel_1_WithActivationsOverride extends Spec3[ZIO] {
+<pre class="prettyprint"><code class="language-scala">class SameLevel_1_WithActivationsOverride extends SpecZIO {
   override protected def config: TestConfig = {
     super.config.copy(
         memoizationRoots = Map(
@@ -901,13 +901,13 @@ for each test case
 import distage.StandardAxis.{Scene, Repo}
 import distage.plugins.PluginConfig
 import izumi.distage.testkit.TestConfig
-import izumi.distage.testkit.scalatest.{AssertZIO, Spec3}
+import izumi.distage.testkit.scalatest.{AssertZIO, SpecZIO}
 import leaderboard.model.{Score, UserId}
 import leaderboard.repo.{Ladder, Profiles}
 import leaderboard.zioenv.{ladder, rnd}
 import zio.{ZIO, IO}
 
-abstract class LeaderboardTest extends Spec3[ZIO] with AssertZIO {
+abstract class LeaderboardTest extends SpecZIO with AssertZIO {
   override def config = TestConfig(
     pluginConfig = PluginConfig.cached(packagesEnabled = Seq(&quot;leaderboard.plugins&quot;)),
     moduleOverrides = new ModuleDef {
@@ -1009,13 +1009,13 @@ abstract class LadderTest extends LeaderboardTest {
 </code></pre>
 </div>
 <div>
-<a href="https://github.com/7mind/izumi/tree/v1.1.0/doc/microsite/target/mdoc/distage/distage-testkit.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/7mind/izumi/tree/v1.2.0/doc/microsite/target/mdoc/distage/distage-testkit.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>
 <div class="print-only">
 <span class="md-source-file md-version">
-1.1.0
+1.2.0
 </span>
 </div>
 </article>
