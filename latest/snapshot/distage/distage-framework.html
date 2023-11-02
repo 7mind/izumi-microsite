@@ -209,7 +209,11 @@ data-md-source="github">
 <h1><a href="#distage-framework" name="distage-framework" class="anchor"><span class="anchor-link"></span></a>distage-framework</h1>
 <div class="toc ">
 <ul>
-  <li><a href="../distage/distage-framework.html#roles" class="header">Roles</a></li>
+  <li><a href="../distage/distage-framework.html#roles" class="header">Roles</a>
+  <ul>
+    <li><a href="../distage/distage-framework.html#inspecting-components-in-repl" class="header">Inspecting components in REPL</a></li>
+    <li><a href="../distage/distage-framework.html#bundled-roles" class="header">Bundled roles</a></li>
+  </ul></li>
   <li><a href="../distage/distage-framework.html#compile-time-checks" class="header">Compile-time checks</a>
   <ul>
     <li><a href="../distage/distage-framework.html#checking-default-config" class="header">Checking default config</a></li>
@@ -286,7 +290,27 @@ I 2020-12-14T10:00:16.263           (distage-framework.md:43)  ….App0.ExampleR
 I 2020-12-14T10:00:16.267       (RoleAppEntrypoint.scala:106)  ….R.I.r.1.loggedTask.104.105 [ 944:run-main-1          ] phase=late Task finished: task=repl.MdocSession$App0$ExampleRoleTask@76b7592c
 </code></pre>
 <p>Only the components required by the specified roles will be created, everything else will be pruned. (see: <a href="advanced-features.html#dependency-pruning">Dependency Pruning</a>)</p>
-<p><a href="/latest/snapshot/api/izumi/distage/roles/bundled/BundledRolesModule.html" title="izumi.distage.roles.bundled.BundledRolesModule"><code>BundledRolesModule</code></a> contains two example roles:</p>
+<p>Further reading:</p>
+<ul>
+  <li><a href="https://github.com/7mind/distage-example">distage-example</a> - Example web service using roles</li>
+  <li><a href="https://github.com/7mind/slides/blob/master/02-roles/roles.pdf">Roles: a viable alternative to Microservices and Monoliths</a></li>
+</ul>
+<h3><a href="#inspecting-components-in-repl" name="inspecting-components-in-repl" class="anchor"><span class="anchor-link"></span></a>Inspecting components in REPL</h3>
+<p>Use <code>.replLocator</code> method of a <code>RoleAppMain</code> to obtain an object graph of the application inspectable in the REPL:</p>
+<pre class="prettyprint"><code class="language-scala">import izumi.functional.bio.UnsafeRun2
+
+val runner = UnsafeRun2.createZIO()
+// runner: UnsafeRun2.ZIORunner[Any] = izumi.functional.bio.UnsafeRun2$ZIORunner@12aae7eb
+
+val objects = runner.unsafeRun(ExampleLauncher.replLocator(&quot;:exampletask&quot;))
+// objects: izumi.distage.model.Locator = izumi.distage.LocatorDefaultImpl@6f62d53b
+
+// inspecting a component inside the application
+val logger = objects.get[LogIO[UIO]]
+// logger: LogIO[UIO] = logstage.LogIO$$anon$1@78a1cf5d
+</code></pre>
+<h3><a href="#bundled-roles" name="bundled-roles" class="anchor"><span class="anchor-link"></span></a>Bundled roles</h3>
+<p><a href="/latest/snapshot/api/izumi/distage/roles/bundled/BundledRolesModule.html" title="izumi.distage.roles.bundled.BundledRolesModule"><code>BundledRolesModule</code></a> contains two bundled roles:</p>
 <ul>
   <li><a href="/latest/snapshot/api/izumi/distage/roles/bundled/Help.html" title="izumi.distage.roles.bundled.Help"><code>Help</code></a> - prints help message when launched <code>./launcher :help</code></li>
   <li><a href="/latest/snapshot/api/izumi/distage/roles/bundled/ConfigWriter.html" title="izumi.distage.roles.bundled.ConfigWriter"><code>ConfigWriter</code></a> - writes reference config into files, split by  roles (includes only parts of the config used by the application)</li>
@@ -300,11 +324,6 @@ object RolesPlugin extends PluginDef {
   include(BundledRolesModule[Task](version = &quot;1.0&quot;))
 }
 </code></pre>
-<p>Further reading:</p>
-<ul>
-  <li><a href="https://github.com/7mind/distage-example">distage-example</a> - Example web service using roles</li>
-  <li><a href="https://github.com/7mind/slides/blob/master/02-roles/roles.pdf">Roles: a viable alternative to Microservices and Monoliths</a></li>
-</ul>
 <h2><a href="#compile-time-checks" name="compile-time-checks" class="anchor"><span class="anchor-link"></span></a>Compile-time checks</h2>
 <p>To use compile-time checks, add <code>distage-framework</code> library:</p><dl class="dependency"><dt>sbt</dt><dd><pre class="prettyprint"><code class="language-scala">libraryDependencies += "io.7mind.izumi" %% "distage-framework" % "1.1.1-SNAPSHOT"</code></pre></dd></dl>
 <p>The easiest way to add full compile-time safety to your application is to add an object inheriting <a href="/latest/snapshot/api/izumi/distage/framework/PlanCheck$.html" title="izumi.distage.framework.PlanCheck"><code>PlanCheck</code></a><a href="/latest/snapshot/api/izumi/distage/framework/PlanCheck$$Main.html" title="izumi.distage.framework.PlanCheck.Main"><code>.Main</code></a> in __ test scope__ of the same module where you define your <a href="/latest/snapshot/api/izumi/distage/roles/RoleAppMain.html" title="izumi.distage.roles.RoleAppMain"><code>Role Launcher</code></a></p>
@@ -403,10 +422,10 @@ val module = new ConfigModuleDef {
   ))
 }
 // module: AnyRef with ConfigModuleDef = 
-// make[{type.repl.MdocSession::MdocApp4::OtherConf@other}].from(call(ƒ:izumi.distage.config.codec.AbstractDIConfigReader$$Lambda$25367/0x0000000804ca0240@7a1b2223(izumi.distage.config.model.AppConfig): repl.MdocSession::MdocApp4::OtherConf)).tagged(Set(ConfTag(conf))) ((distage-framework.md:176))
-// make[{type.repl.MdocSession::MdocApp4::Conf}].from(call(ƒ:izumi.distage.config.codec.AbstractDIConfigReader$$Lambda$25367/0x0000000804ca0240@6c17413b(izumi.distage.config.model.AppConfig): repl.MdocSession::MdocApp4::Conf)).tagged(Set(ConfTag(conf))) ((distage-framework.md:175))
-// make[{type.izumi.distage.config.model.AppConfig}].from(call(ƒ:&lt;function0&gt;(): izumi.distage.config.model.AppConfig)) ((distage-framework.md:179))
-// make[{type.repl.MdocSession::MdocApp4::ConfigPrinter}].from(call(π:Class(repl.MdocSession::MdocApp4::Conf, repl.MdocSession::MdocApp4::OtherConf): repl.MdocSession::MdocApp4::ConfigPrinter)) ((distage-framework.md:172))
+// make[{type.repl.MdocSession::MdocApp4::Conf}].from(call(ƒ:izumi.distage.config.codec.AbstractDIConfigReader$$Lambda$25444/0x0000000804cc9328@5558c89d(izumi.distage.config.model.AppConfig): repl.MdocSession::MdocApp4::Conf)).tagged(Set(ConfTag(conf))) ((distage-framework.md:190))
+// make[{type.repl.MdocSession::MdocApp4::OtherConf@other}].from(call(ƒ:izumi.distage.config.codec.AbstractDIConfigReader$$Lambda$25444/0x0000000804cc9328@41f601eb(izumi.distage.config.model.AppConfig): repl.MdocSession::MdocApp4::OtherConf)).tagged(Set(ConfTag(conf))) ((distage-framework.md:191))
+// make[{type.repl.MdocSession::MdocApp4::ConfigPrinter}].from(call(π:Class(repl.MdocSession::MdocApp4::Conf, repl.MdocSession::MdocApp4::OtherConf): repl.MdocSession::MdocApp4::ConfigPrinter)) ((distage-framework.md:187))
+// make[{type.izumi.distage.config.model.AppConfig}].from(call(ƒ:&lt;function0&gt;(): izumi.distage.config.model.AppConfig)) ((distage-framework.md:194))
 
 Injector().produceRun(module) {
   configPrinter: ConfigPrinter =&gt;
