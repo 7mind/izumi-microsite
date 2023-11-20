@@ -300,14 +300,14 @@ I 2020-12-14T10:00:16.267       (RoleAppEntrypoint.scala:106)  ….R.I.r.1.logge
 <pre class="prettyprint"><code class="language-scala">import izumi.functional.bio.UnsafeRun2
 
 val runner = UnsafeRun2.createZIO()
-// runner: UnsafeRun2.ZIORunner[Any] = izumi.functional.bio.UnsafeRun2$ZIORunner@593e2627
+// runner: UnsafeRun2.ZIORunner[Any] = izumi.functional.bio.UnsafeRun2$ZIORunner@3d8885
 
 val objects = runner.unsafeRun(ExampleLauncher.replLocator(&quot;:exampletask&quot;))
-// objects: izumi.distage.model.Locator = izumi.distage.LocatorDefaultImpl@1e7f9984
+// objects: izumi.distage.model.Locator = izumi.distage.LocatorDefaultImpl@5787608a
 
 // inspecting a component inside the application
 val logger = objects.get[LogIO[UIO]]
-// logger: LogIO[UIO] = logstage.LogIO$$anon$1@6fe341b3
+// logger: LogIO[UIO] = logstage.LogIO$$anon$1@18725d7c
 </code></pre>
 <h3><a href="#bundled-roles" name="bundled-roles" class="anchor"><span class="anchor-link"></span></a>Bundled roles</h3>
 <p><a href="/latest/snapshot/api/izumi/distage/roles/bundled/BundledRolesModule.html" title="izumi.distage.roles.bundled.BundledRolesModule"><code>BundledRolesModule</code></a> contains two bundled roles:</p>
@@ -411,7 +411,7 @@ val module = new ConfigModuleDef {
   makeConfig[OtherConf](&quot;conf&quot;).named(&quot;other&quot;)
 
   // add config instance
-  make[AppConfig].from(AppConfig(
+  make[AppConfig].from(AppConfig.provided(
     ConfigFactory.parseString(
       &quot;&quot;&quot;conf {
         |  name = &quot;John&quot;
@@ -423,9 +423,9 @@ val module = new ConfigModuleDef {
 }
 // module: AnyRef with ConfigModuleDef = 
 // make[{type.izumi.distage.config.model.AppConfig}].from(call(ƒ:&lt;function0&gt;(): izumi.distage.config.model.AppConfig)) ((distage-framework.md:194))
+// make[{type.repl.MdocSession::MdocApp4::OtherConf@other}].from(call(ƒ:izumi.distage.config.codec.AbstractDIConfigReader$$Lambda$25434/0x0000000804e629c8@3dd7d45d(izumi.distage.config.model.AppConfig): repl.MdocSession::MdocApp4::OtherConf)).tagged(Set(ConfTag(conf))) ((distage-framework.md:191))
 // make[{type.repl.MdocSession::MdocApp4::ConfigPrinter}].from(call(π:Class(repl.MdocSession::MdocApp4::Conf, repl.MdocSession::MdocApp4::OtherConf): repl.MdocSession::MdocApp4::ConfigPrinter)) ((distage-framework.md:187))
-// make[{type.repl.MdocSession::MdocApp4::Conf}].from(call(ƒ:izumi.distage.config.codec.AbstractDIConfigReader$$Lambda$25364/0x0000000804d6b430@bfc05e7(izumi.distage.config.model.AppConfig): repl.MdocSession::MdocApp4::Conf)).tagged(Set(ConfTag(conf))) ((distage-framework.md:190))
-// make[{type.repl.MdocSession::MdocApp4::OtherConf@other}].from(call(ƒ:izumi.distage.config.codec.AbstractDIConfigReader$$Lambda$25364/0x0000000804d6b430@45d2fa94(izumi.distage.config.model.AppConfig): repl.MdocSession::MdocApp4::OtherConf)).tagged(Set(ConfTag(conf))) ((distage-framework.md:191))
+// make[{type.repl.MdocSession::MdocApp4::Conf}].from(call(ƒ:izumi.distage.config.codec.AbstractDIConfigReader$$Lambda$25434/0x0000000804e629c8@65027b1a(izumi.distage.config.model.AppConfig): repl.MdocSession::MdocApp4::Conf)).tagged(Set(ConfTag(conf))) ((distage-framework.md:190))
 
 Injector().produceRun(module) {
   configPrinter: ConfigPrinter =&gt;
