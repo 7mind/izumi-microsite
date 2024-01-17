@@ -182,7 +182,7 @@ data-md-source="github">
 <ul style="display: none">
 <li class="md-nav__item md-version" id="project.version">
 <label class="md-nav__link" for="__version">
-<i class="md-icon" title="Version">label_outline</i> 1.2.3
+<i class="md-icon" title="Version">label_outline</i> 1.2.4
 </label>
 </li>
 </ul>
@@ -250,7 +250,7 @@ data-md-source="github">
 </ul>
 </div>
 <h3><a href="#quick-start" name="quick-start" class="anchor"><span class="anchor-link"></span></a>Quick Start</h3>
-<p><code>distage-testkit</code> simplifies pragmatic purely-functional program testing providing <code>Spec*</code> <a href="https://www.scalatest.org/">ScalaTest</a> base classes for any existing Scala effect type with kind <code>F[_]</code>, <code>F[+_, +_]</code>, <code>F[-_, +_, +_]</code> or <code>Identity</code>. <code>Spec</code>s provide an interface similar to ScalaTest&rsquo;s <a href="http://doc.scalatest.org/3.1.0/org/scalatest/wordspec/AnyWordSpec.html"><code>WordSpec</code></a>, however <code>distage-testkit</code> adds additional capabilities such as: first class support for effect types; dependency injection; and parallel execution.</p>
+<p><code>distage-testkit</code> simplifies pragmatic purely-functional program testing providing <code>Spec*</code> <a href="https://www.scalatest.org/">ScalaTest</a> base classes for any existing Scala effect type with kind <code>F[_]</code>, <code>F[+_, +_]</code>, <code>ZIO[-R, +E, +A]</code> or <code>Identity</code>. <code>Spec</code>s provide an interface similar to ScalaTest&rsquo;s <a href="http://doc.scalatest.org/3.1.0/org/scalatest/wordspec/AnyWordSpec.html"><code>WordSpec</code></a>, however <code>distage-testkit</code> adds additional capabilities such as: first class support for effect types; dependency injection; and parallel execution.</p>
 <p>Usage of <code>distage-testkit</code> generally follows these steps:</p>
 <ol>
   <li>Extend a base class corresponding to the effect type:
@@ -393,9 +393,9 @@ class ScoreSimpleTest extends Test {
 }
 </code></pre>
 <pre><code>ScoreSimpleTest:
+- Score should increase by config star value
   - Score should increase by config star value from DI 
 - Score should increase by config star value from DI
-- Score should increase by config star value
 
 
 </code></pre>
@@ -618,11 +618,11 @@ class DummyBonusServiceTest extends BonusServiceTest with DummyTest
   <li><code>in { (a: A, b: B) =&gt; ???: F[Unit] }</code>: The test case is a function returning an effect to be executed. The <code>a</code> and <code>b</code>  will be injected from the object graph. The test case will fail if the effect fails.</li>
   <li><code>in { (a: A, b: B) =&gt; ???: F[Assertion] }</code>: The test case is a function returning an effect to be executed. The <code>a</code>  and <code>b</code> will be injected from the object graph. The test case will fail if the effect fails or produces a failure  assertion.</li>
 </ul>
-<p>For <code>F[-_, +_, +_]</code>, it&rsquo;s same with <code>F[Any, _, _]</code>:</p>
+<p>For <code>ZIO[-R, +E, +A]</code> in <code>SpecZIO</code>:</p>
 <ul>
   <li><code>in { ???: ZIO[C with D, _, Unit] }</code>: The test case is an effect requiring an environment. The test  case will fail if the effect fails. The environment will be injected from the object graph.</li>
   <li><code>in { ???: ZIO[C with D, _, Assertion] }</code>: The test case is an effect requiring an environment. The  test case will fail if the effect fails or produces a failure assertion. The environment will be injected from the  object graph.</li>
-  <li><code>in { (a: A, b: B) =&gt; ZIO[C with D, _, Assertion] }</code>: The test case is a function producing an  effect requiring an environment. All of <code>a: A</code>, <code>b: B</code>, <code>zio.ZEnvironment[C]</code> and <code>zio.ZEnvironment[D]</code>  will be injected from the object graph.</li>
+  <li><code>in { (a: A, b: B) =&gt; ZIO[C with D, _, Assertion] }</code>: The test case is a function producing an  effect requiring an environment. All of <code>a: A</code>, <code>b: B</code>, and <code>zio.ZEnvironment[C with D]</code>  will be injected from the object graph.</li>
 </ul>
 <p>Provided by trait <a href="/api/izumi/distage/testkit/scalatest/AssertZIO.html" title="izumi.distage.testkit.scalatest.AssertZIO"><code>AssertZIO</code></a>:</p>
 <ul>
@@ -1009,13 +1009,13 @@ abstract class LadderTest extends LeaderboardTest {
 </code></pre>
 </div>
 <div>
-<a href="https://github.com/7mind/izumi/tree/v1.2.3/doc/microsite/target/mdoc/distage/distage-testkit.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/7mind/izumi/tree/v1.2.4/doc/microsite/target/mdoc/distage/distage-testkit.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>
 <div class="print-only">
 <span class="md-source-file md-version">
-1.2.3
+1.2.4
 </span>
 </div>
 </article>
