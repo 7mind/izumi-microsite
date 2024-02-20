@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="x-ua-compatible" content="ie=edge">
 <meta name="description" content="microsite">
-<meta name="generator" content="Paradox, paradox-material-theme=0.6.0, mkdocs-material=3.0.3">
+<meta name="generator" content="Paradox, paradox-material-theme=0.7.0, mkdocs-material=3.0.3">
 
 <meta name="lang:clipboard.copy" content="Copy to clipboard">
 <meta name="lang:clipboard.copied" content="Copied to clipboard">
@@ -248,7 +248,7 @@ data-md-source="github">
 import scala.util.Random
 
 val logger = IzLogger()
-// logger: IzLogger = izumi.logstage.api.IzLogger@141cd7e
+// logger: IzLogger = izumi.logstage.api.IzLogger@87dc71c
 
 val justAnArg = &quot;example&quot;
 // justAnArg: String = example
@@ -268,9 +268,9 @@ logger.warn(s&quot;Invisible argument: ${Random.nextInt() -&gt; &quot;random num
 // add following fields to all messages printed by a new logger value
 
 val ctxLogger = logger(&quot;userId&quot; -&gt; &quot;user@google.com&quot;, &quot;company&quot; -&gt; &quot;acme&quot;)
-// ctxLogger: IzLogger = izumi.logstage.api.IzLogger@107623bd
+// ctxLogger: IzLogger = izumi.logstage.api.IzLogger@175edc6c
 val delta = Random.nextInt(1000)
-// delta: Int = 206
+// delta: Int = 326
 
 ctxLogger.info(s&quot;Processing time: $delta&quot;)
 </code></pre>
@@ -304,17 +304,17 @@ ctxLogger.info(s&quot;Processing time: $delta&quot;)
 import logstage.circe.LogstageCirceRenderingPolicy
 
 val textSink = ConsoleSink.text(colored = true)
-// textSink: ConsoleSink = izumi.logstage.sink.ConsoleSink$ColoredConsoleSink$@e34b34
+// textSink: ConsoleSink = izumi.logstage.sink.ConsoleSink$ColoredConsoleSink$@5dfa3126
 val jsonSink = ConsoleSink(LogstageCirceRenderingPolicy(prettyPrint = true))
-// jsonSink: ConsoleSink = izumi.logstage.sink.ConsoleSink@3076c799
+// jsonSink: ConsoleSink = izumi.logstage.sink.ConsoleSink@1227fe76
 
 val sinks = List(jsonSink, textSink)
-// sinks: List[ConsoleSink] = List(izumi.logstage.sink.ConsoleSink@3076c799, izumi.logstage.sink.ConsoleSink$ColoredConsoleSink$@e34b34)
+// sinks: List[ConsoleSink] = List(izumi.logstage.sink.ConsoleSink@1227fe76, izumi.logstage.sink.ConsoleSink$ColoredConsoleSink$@5dfa3126)
 
 val logger: IzLogger = IzLogger(Trace, sinks)
-// logger: IzLogger = izumi.logstage.api.IzLogger@3fd3d6d4
+// logger: IzLogger = izumi.logstage.api.IzLogger@74048e09
 val contextLogger: IzLogger = logger(&quot;key&quot; -&gt; &quot;value&quot;)
-// contextLogger: IzLogger = izumi.logstage.api.IzLogger@1e196158
+// contextLogger: IzLogger = izumi.logstage.api.IzLogger@15589159
 
 logger.info(&quot;Hey&quot;)
 
@@ -326,10 +326,10 @@ contextLogger.info(&quot;Hey&quot;)
 import cats.effect.IO
 
 val logger = IzLogger()
-// logger: IzLogger = izumi.logstage.api.IzLogger@4393344
+// logger: IzLogger = izumi.logstage.api.IzLogger@19a7e1d5
 
 val log = LogIO.fromLogger[IO](logger)
-// log: LogIO[IO] = logstage.LogIO$$anon$1@540ba920
+// log: LogIO[IO] = logstage.LogIO$$anon$1@7d21a576
 
 log.info(s&quot;Hey! I&#39;m logging with ${log}stage!&quot;).unsafeRunSync()(cats.effect.unsafe.IORuntime.global)
 </code></pre>
@@ -376,15 +376,15 @@ import zio.{URIO, ZEnvironment}
 val fn: URIO[LogZIO, Unit] = {
   log.info(s&quot;I&#39;m logging with ${log}stage!&quot;)
 }
-// fn: URIO[LogZIO, Unit] = OnSuccess(logstage.LogZIO.LogZIOImpl.log(LogZIO.scala:35),Sync(logstage.LogZIO.LogZIOImpl.log(LogZIO.scala:35),zio.ZIO$ServiceWithZIOPartiallyApplied$$$Lambda$22555/0x00000008045d7540@2f56655),zio.ZIO$$$Lambda$22430/0x000000080457b9c8@6563d11)
+// fn: URIO[LogZIO, Unit] = OnSuccess(logstage.LogZIO.LogZIOImpl.log(LogZIO.scala:35),Sync(logstage.LogZIO.LogZIOImpl.log(LogZIO.scala:35),zio.ZIO$ServiceWithZIOPartiallyApplied$$$Lambda$22470/0x00000008045dec80@34de68d9),zio.ZIO$$$Lambda$22345/0x0000000804582fd0@2a1a45bc)
 
 val logger: LogZIO = LogIO3.fromLogger(IzLogger())
-// logger: LogZIO = logstage.LogIO$$anon$1@23b175a9
+// logger: LogZIO = logstage.LogIO$$anon$1@647adc8d
 
 import izumi.functional.bio.UnsafeRun2
 
 val runtime = UnsafeRun2.createZIO()
-// runtime: UnsafeRun2.ZIORunner[Any] = izumi.functional.bio.UnsafeRun2$ZIORunner@7677c326
+// runtime: UnsafeRun2.ZIORunner[Any] = izumi.functional.bio.UnsafeRun2$ZIORunner@35794b02
 
 runtime.unsafeRun {
   fn.provideEnvironment(ZEnvironment(logger))
@@ -393,7 +393,7 @@ runtime.unsafeRun {
 <h3><a href="#adding-fiberid-to-log-messages" name="adding-fiberid-to-log-messages" class="anchor"><span class="anchor-link"></span></a>Adding FiberId to log messages</h3>
 <p><code>LogZIO.withFiberId</code> provides a <code>LogIO</code> instance that logs the current ZIO <code>FiberId</code> in addition to the JVM thread id:</p>
 <pre class="prettyprint"><code class="language-scala">val logger: LogZIO = LogZIO.withFiberId(IzLogger())
-// logger: LogZIO = logstage.LogZIO$$anon$1@3b996dbf
+// logger: LogZIO = logstage.LogZIO$$anon$1@1376ad31
 
 runtime.unsafeRun {
   fn.provideEnvironment(ZEnvironment(logger))
@@ -472,7 +472,7 @@ import logstage.ConsoleSink
 import logstage.circe.LogstageCirceRenderingPolicy
 
 val logger = IzStrictLogger(sink = ConsoleSink(LogstageCirceRenderingPolicy()))
-// logger: IzStrictLogger = izumi.logstage.api.strict.IzStrictLogger@12f77357
+// logger: IzStrictLogger = izumi.logstage.api.strict.IzStrictLogger@54298726
 
 logger.info(s&quot;Got ${KV(&quot;key&quot;, 7) -&gt; &quot;KeyValue&quot;}&quot;)
 </code></pre>
@@ -483,7 +483,7 @@ logger.info(s&quot;Got ${KV(&quot;key&quot;, 7) -&gt; &quot;KeyValue&quot;}&quot
 import izumi.logstage.api.routing.StaticLogRouter
 
 val myLogger = IzLogger()
-// myLogger: IzLogger = izumi.logstage.api.IzLogger@3a43509d
+// myLogger: IzLogger = izumi.logstage.api.IzLogger@6685a79a
 
 // configure SLF4j to use the same router that `myLogger` uses
 StaticLogRouter.instance.setup(myLogger.router)
@@ -558,7 +558,7 @@ DIStage
 Powered by
 <a href="https://github.com/lightbend/paradox">Paradox</a>
 and
-<a href="https://jonas.github.io/paradox-material-theme/">Paradox Material Theme</a>
+<a href="https://sbt.github.io/sbt-paradox-material-theme/">Paradox Material Theme</a>
 
 </div>
 </div>
