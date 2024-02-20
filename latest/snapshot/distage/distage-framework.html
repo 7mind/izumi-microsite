@@ -300,14 +300,14 @@ I 2020-12-14T10:00:16.267       (RoleAppEntrypoint.scala:106)  ….R.I.r.1.logge
 <pre class="prettyprint"><code class="language-scala">import izumi.functional.bio.UnsafeRun2
 
 val runner = UnsafeRun2.createZIO()
-// runner: UnsafeRun2.ZIORunner[Any] = izumi.functional.bio.UnsafeRun2$ZIORunner@54bcbad4
+// runner: UnsafeRun2.ZIORunner[Any] = izumi.functional.bio.UnsafeRun2$ZIORunner@5efbbdbc
 
 val objects = runner.unsafeRun(ExampleLauncher.replLocator(&quot;:exampletask&quot;))
-// objects: izumi.distage.model.Locator = izumi.distage.LocatorDefaultImpl@4c0a37b
+// objects: izumi.distage.model.Locator = izumi.distage.LocatorDefaultImpl@4cb33afe
 
 // inspecting a component inside the application
 val logger = objects.get[LogIO[UIO]]
-// logger: LogIO[UIO] = logstage.LogIO$$anon$1@72eebc01
+// logger: LogIO[UIO] = logstage.LogIO$$anon$1@46e95237
 </code></pre>
 <h3><a href="#bundled-roles" name="bundled-roles" class="anchor"><span class="anchor-link"></span></a>Bundled roles</h3>
 <p><a href="/latest/snapshot/api/izumi/distage/roles/bundled/BundledRolesModule.html" title="izumi.distage.roles.bundled.BundledRolesModule"><code>BundledRolesModule</code></a> contains two bundled roles:</p>
@@ -422,17 +422,17 @@ val module = new ConfigModuleDef {
   ))
 }
 // module: AnyRef with ConfigModuleDef = 
-// make[{type.repl.MdocSession::MdocApp4::Conf}].from(call(ƒ:izumi.distage.config.codec.AbstractDIConfigReader$$Lambda$23998/0x0000000804aa7348@744ff544(izumi.distage.config.model.AppConfig): repl.MdocSession::MdocApp4::Conf)).tagged(Set(ConfTag(conf))) ((distage-framework.md:190))
-// make[{type.repl.MdocSession::MdocApp4::ConfigPrinter}].from(call(π:Class(repl.MdocSession::MdocApp4::Conf, repl.MdocSession::MdocApp4::OtherConf): repl.MdocSession::MdocApp4::ConfigPrinter)) ((distage-framework.md:187))
+// make[{type.repl.MdocSession::MdocApp4::OtherConf@other}].from(call(ƒ:izumi.distage.config.codec.AbstractDIConfigReader$$Lambda$23989/0x0000000804a831f0@166cbabb(izumi.distage.config.model.AppConfig): repl.MdocSession::MdocApp4::OtherConf)).tagged(Set(ConfTag(conf))) ((distage-framework.md:191))
+// make[{type.repl.MdocSession::MdocApp4::Conf}].from(call(ƒ:izumi.distage.config.codec.AbstractDIConfigReader$$Lambda$23989/0x0000000804a831f0@56a816d7(izumi.distage.config.model.AppConfig): repl.MdocSession::MdocApp4::Conf)).tagged(Set(ConfTag(conf))) ((distage-framework.md:190))
 // make[{type.izumi.distage.config.model.AppConfig}].from(call(ƒ:&lt;function0&gt;(): izumi.distage.config.model.AppConfig)) ((distage-framework.md:194))
-// make[{type.repl.MdocSession::MdocApp4::OtherConf@other}].from(call(ƒ:izumi.distage.config.codec.AbstractDIConfigReader$$Lambda$23998/0x0000000804aa7348@290001fa(izumi.distage.config.model.AppConfig): repl.MdocSession::MdocApp4::OtherConf)).tagged(Set(ConfTag(conf))) ((distage-framework.md:191))
+// make[{type.repl.MdocSession::MdocApp4::ConfigPrinter}].from(call(π:Class(repl.MdocSession::MdocApp4::Conf, repl.MdocSession::MdocApp4::OtherConf): repl.MdocSession::MdocApp4::ConfigPrinter)) ((distage-framework.md:187))
 
 Injector().produceRun(module) {
   configPrinter: ConfigPrinter =&gt;
     configPrinter.print()
 }
 // name: John, age: 33, other: true
-// res5: izumi.fundamentals.platform.functional.package.Identity[Unit] = ()
+// res5: distage.package.Identity[Unit] = ()
 </code></pre>
 <p>Automatic derivation of config codecs is based on <a href="https://github.com/pureconfig/pureconfig">pureconfig-magnolia</a>.</p>
 <p>When a given type already has custom <code>pureconfig.ConfigReader</code> instances in implicit scope, they will be used, otherwise they will be derived automatically.</p>
@@ -505,7 +505,7 @@ Injector()
   .produceGet[PetStoreController](appModule)
   .use(_.run())
 // PetStoreController: running!
-// res9: izumi.fundamentals.platform.functional.package.Identity[Unit] = ()
+// res9: distage.package.Identity[Unit] = ()
 </code></pre>
 <h3><a href="#compile-time-scanning" name="compile-time-scanning" class="anchor"><span class="anchor-link"></span></a>Compile-time scanning</h3>
 <p>Plugin scan can be performed at compile-time, this is mainly useful for deployment on platforms with reduced runtime reflection capabilities compared to the JVM, such as Graal Native Image, Scala.js and Scala Native. Use <a href="/latest/snapshot/api/izumi/distage/plugins/PluginConfig$.html#compileTime" title="izumi.distage.plugins.PluginConfig"><code>PluginConfig.compileTime</code></a> to perform a compile-time scan.</p>
