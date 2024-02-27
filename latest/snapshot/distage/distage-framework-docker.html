@@ -348,7 +348,7 @@ object DistageFrameworkModules extends ModuleDef {
   }
 
   Injector[IO]().produceRun(applicationModules) {
-    container: PostgresDocker.Container =&gt;
+    (container: PostgresDocker.Container) =&gt;
       val port = container.availablePorts.first(PostgresDocker.primaryPort)
       IO(println(s&quot;postgres is available on port ${port}&quot;))
   }
@@ -470,7 +470,7 @@ object TransactorFromConfigModule extends ModuleDef {
 <p>An integration test would use a module that provides the <code>PostgresServerConfig</code> from a <code>PostgresDocker.Container</code>:</p>
 <pre class="prettyprint"><code class="language-scala">object PostgresUsingDockerModule extends ModuleDef {
   make[PostgresServerConfig].from {
-    container: PostgresDocker.Container =&gt; {
+    (container: PostgresDocker.Container) =&gt; {
       val knownAddress = container.availablePorts.first(PostgresDocker.primaryPort)
       PostgresServerConfig(
         host     = knownAddress.hostString,
@@ -507,7 +507,7 @@ class PostgresExampleAppIntegrationTest extends Spec1[IO] with AssertCIO {
   &quot;distage docker&quot; should {
 
     &quot;support integration tests using containers&quot; in {
-      app: PostgresExampleApp =&gt;
+      (app: PostgresExampleApp) =&gt;
         for {
           v &lt;- app.plusOne(1)
           _ &lt;- assertIO(v == 2)
@@ -528,7 +528,7 @@ class PostgresExampleAppIntegrationTest extends Spec1[IO] with AssertCIO {
   }
 
   Injector[IO]().produceRun(applicationModules) {
-    app: PostgresExampleApp =&gt;
+    (app: PostgresExampleApp) =&gt;
       app.run
   }
 }
@@ -673,12 +673,12 @@ class CustomDockerConfigExampleModule[F[_]: TagK] extends ModuleDef {
   )
 
   &quot;distage docker&quot; should {
-    &quot;provide a fresh container resource&quot; in { c: PostgresDocker.Container =&gt;
+    &quot;provide a fresh container resource&quot; in { (c: PostgresDocker.Container) =&gt;
       val port = c.availablePorts.first(PostgresDocker.primaryPort)
       IO(println(s&quot;port ${port}&quot;))
     }
 
-    &quot;provide the same resource&quot; in { c: PostgresDocker.Container =&gt;
+    &quot;provide the same resource&quot; in { (c: PostgresDocker.Container) =&gt;
       val port = c.availablePorts.first(PostgresDocker.primaryPort)
       IO(println(s&quot;port ${port}&quot;))
     }

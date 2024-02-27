@@ -332,7 +332,6 @@ object Score {
 <p>The default config (<code>super.config</code>) has <code>pluginConfig</code>, which by default will scan the package the test is defined in for defined Plugin modules. See the <a href="distage-framework.html#plugins"><code>distage-extension-plugins</code></a> documentation for more information. For our demonstration the module will be provided using explicit <code>moduleOverrides</code> instead of classpath scanning, like so:</p>
 <pre class="prettyprint"><code class="language-scala">package app
 
-import com.typesafe.config.ConfigFactory
 import distage.ModuleDef
 import izumi.distage.testkit.scalatest.{AssertZIO, SpecZIO}
 
@@ -383,7 +382,7 @@ class ScoreSimpleTest extends Test {
 
     // Use `Config` from the module in the `Test` class above
     &quot;increase by config star value from DI&quot; in {
-      config: Config =&gt;
+      (config: Config) =&gt;
         val expected = Score(defaultConfig.starValue)
         val actual = Score.addStar(config, Score.zero)
         assert(actual == expected)
@@ -393,9 +392,9 @@ class ScoreSimpleTest extends Test {
 }
 </code></pre>
 <pre><code>ScoreSimpleTest:
+- Score should increase by config star value
   - Score should increase by config star value from DI 
 - Score should increase by config star value from DI
-- Score should increase by config star value
 
 
 </code></pre>
@@ -982,7 +981,7 @@ abstract class LadderTest extends LeaderboardTest {
 
     // you can also mix arguments and env at the same time
     &quot;assign a higher position in the list to a higher score 2&quot; in {
-      ladder: Ladder[IO] =&gt;
+      (ladder: Ladder[IO]) =&gt;
           for {
             user1  &lt;- rnd[UserId]
             score1 &lt;- rnd[Score]
