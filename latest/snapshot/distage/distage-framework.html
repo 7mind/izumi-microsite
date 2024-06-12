@@ -219,6 +219,7 @@ data-md-source="github">
     <li><a href="../distage/distage-framework.html#checking-default-config" class="header">Checking default config</a></li>
     <li><a href="../distage/distage-framework.html#using-with-distage-teskit" class="header">Using with <code>distage-teskit</code></a></li>
     <li><a href="../distage/distage-framework.html#checking-distage-core-apps" class="header">Checking <code>distage-core</code> apps</a></li>
+    <li><a href="../distage/distage-framework.html#adding-custom-checks" class="header">Adding custom checks</a></li>
     <li><a href="../distage/distage-framework.html#low-level-apis" class="header">Low-Level APIs</a></li>
     <li><a href="../distage/distage-framework.html#scala-2-12" class="header">Scala 2.12</a></li>
   </ul></li>
@@ -300,14 +301,14 @@ I 2020-12-14T10:00:16.267       (RoleAppEntrypoint.scala:106)  ….R.I.r.1.logge
 <pre class="prettyprint"><code class="language-scala">import izumi.functional.bio.UnsafeRun2
 
 val runner = UnsafeRun2.createZIO()
-// runner: UnsafeRun2.ZIORunner[Any] = izumi.functional.bio.UnsafeRun2$ZIORunner@5d9b5097
+// runner: UnsafeRun2.ZIORunner[Any] = izumi.functional.bio.UnsafeRun2$ZIORunner@484fa4a3
 
 val objects = runner.unsafeRun(ExampleLauncher.replLocator(&quot;:exampletask&quot;))
-// objects: izumi.distage.model.Locator = izumi.distage.LocatorDefaultImpl@a6ab2c2
+// objects: izumi.distage.model.Locator = izumi.distage.LocatorDefaultImpl@7841f39d
 
 // inspecting a component inside the application
 val logger = objects.get[LogIO[UIO]]
-// logger: LogIO[UIO] = logstage.LogIO$$anon$1@1cf2bb0e
+// logger: LogIO[UIO] = logstage.LogIO$$anon$1@709859de
 </code></pre>
 <h3><a href="#bundled-roles" name="bundled-roles" class="anchor"><span class="anchor-link"></span></a>Bundled roles</h3>
 <p><a href="/latest/snapshot/api/izumi/distage/roles/bundled/BundledRolesModule.html" title="izumi.distage.roles.bundled.BundledRolesModule"><code>BundledRolesModule</code></a> contains two bundled roles:</p>
@@ -354,6 +355,55 @@ object WiringCheck extends SpecWiring(
 </code></pre>
 <h3><a href="#checking-distage-core-apps" name="checking-distage-core-apps" class="anchor"><span class="anchor-link"></span></a>Checking <code>distage-core</code> apps</h3>
 <p><code>distage-framework</code>&rsquo;s Role-based applications are checkable out of the box, but applications assembled directly via <code>distage-core</code>&rsquo;s <code>distage.Injector</code> APIs must implement the <a href="/latest/snapshot/api/izumi/distage/framework/CheckableApp.html" title="izumi.distage.framework.CheckableApp"><code>CheckableApp</code></a> trait to provide all the data necessary for the checks. You may use <a href="/latest/snapshot/api/izumi/distage/framework/CoreCheckableAppSimple.html" title="izumi.distage.framework.CoreCheckableAppSimple"><code>CoreCheckableAppSimple</code></a> implementation for applications definable by a single collection of modules.</p>
+<h3><a href="#adding-custom-checks" name="adding-custom-checks" class="anchor"><span class="anchor-link"></span></a>Adding custom checks</h3>
+<p>You may add your own custom checks that will be executed at compile-time by overriding <code>customCheck</code> method of <a href="/latest/snapshot/api/izumi/distage/framework/CheckableApp.html" title="izumi.distage.framework.CheckableApp"><code>CheckableApp</code></a> or its subtypes <a href="/latest/snapshot/api/izumi/distage/roles/RoleAppMain.html" title="izumi.distage.roles.RoleAppMain"><code>RoleAppMain</code></a> or <a href="/latest/snapshot/api/izumi/distage/framework/CoreCheckableAppSimple.html" title="izumi.distage.framework.CoreCheckableAppSimple"><code>CoreCheckableAppSimple</code></a>.</p>
+<p>For example, you could check that all components that have types with names that contain &ldquo;Required&rdquo; – such as <code>make[RequiredInt].from(RequiredInt(5))</code> – are used by other components and fail otherwise:</p>
+<pre class="prettyprint"><code class="language-scala">import distage.{DIKey, PlanVerifier}
+import distage.PlanVerifier.PlanVerifierResult
+import izumi.distage.framework.model.PlanCheckInput
+import izumi.distage.model.planning.AxisPoint
+import izumi.distage.plugins.PluginConfig
+import izumi.distage.roles.RoleAppMain
+import izumi.fundamentals.collections.nonempty.NESet
+
+object CustomCheckLauncher extends RoleAppMain.LauncherCats[cats.effect.IO] {
+
+  // test that all bindings with types that have &#39;Required&#39;
+  // in their name are used in the application
+  override def customCheck(
+    planVerifier: PlanVerifier,
+    excludedActivations: Set[NESet[AxisPoint]],
+    checkConfig: Boolean,
+    planCheckInput: PlanCheckInput[AppEffectType],
+  ): PlanVerifierResult = {
+    val usedKeys = planVerifier.traceReachables(
+      planCheckInput.module,
+      planCheckInput.roots,
+      planCheckInput.providedKeys,
+      excludedActivations,
+    )
+    val requiredKeys = planCheckInput.module.keys.filter {
+      // filter out any set elements (to remove weak set elements)
+      case _: DIKey.SetElementKey =&gt; false
+      case anyKey =&gt; anyKey.tpe.tag.shortName.contains(&quot;Required&quot;)
+    }
+    val unused = requiredKeys -- usedKeys
+    if (unused.nonEmpty) {
+      throw new RuntimeException(
+        s&quot;&quot;&quot;Custom check failed, found unused Required bindings:
+           |  ${unused.map(_.tpe.tag.repr).mkString(&quot;, &quot;)}&quot;&quot;&quot;.stripMargin
+      )
+    } else {
+      PlanVerifierResult.empty
+    }
+  }
+
+  override def pluginConfig = PluginConfig.cached(
+    packagesEnabled = Seq(&quot;com.example.custom&quot;)
+  )
+
+}
+</code></pre>
 <h3><a href="#low-level-apis" name="low-level-apis" class="anchor"><span class="anchor-link"></span></a>Low-Level APIs</h3>
 <p><a href="/latest/snapshot/api/izumi/distage/framework/PlanCheckMaterializer.html" title="izumi.distage.framework.PlanCheckMaterializer"><code>PlanCheckMaterializer</code></a>, <a href="/latest/snapshot/api/izumi/distage/plugins/ForcedRecompilationToken.html" title="izumi.distage.plugins.ForcedRecompilationToken"><code>ForcedRecompilationToken</code></a> and <a href="/latest/snapshot/api/izumi/distage/framework/PlanCheck$$runtime$.html" title="izumi.distage.framework.PlanCheck$$runtime"><code>PlanCheck.runtime</code></a> provide the low-level APIs behind <code>distage</code> compile-time checks, they can be used to wrap the capability in other APIs or implement similar functionality.</p>
 <p><a href="/latest/snapshot/api/izumi/distage/planning/solver/PlanVerifier.html" title="izumi.distage.planning.solver.PlanVerifier"><code>PlanVerifier</code></a> hosts the multi-graph traversal doing the actual checking and can be invoked at runtime or in macro. It can also be invoked using <code>Injector#assert</code> and <code>Injector#verify</code> methods.</p>
@@ -422,17 +472,17 @@ val module = new ConfigModuleDef {
   ))
 }
 // module: AnyRef with ConfigModuleDef = 
-// make[{type.repl.MdocSession::MdocApp4::ConfigPrinter}].from(call(π:Class(repl.MdocSession::MdocApp4::Conf, repl.MdocSession::MdocApp4::OtherConf): repl.MdocSession::MdocApp4::ConfigPrinter)) ((distage-framework.md:187))
-// make[{type.repl.MdocSession::MdocApp4::OtherConf@other}].from(call(ƒ:izumi.distage.config.codec.AbstractDIConfigReader$$Lambda$25886/0x00007f48cc0ea778@3294fc1f(izumi.distage.config.model.AppConfig): repl.MdocSession::MdocApp4::OtherConf)).tagged(Set(ConfTag(conf))) ((distage-framework.md:191))
-// make[{type.izumi.distage.config.model.AppConfig}].from(call(ƒ:&lt;function0&gt;(): izumi.distage.config.model.AppConfig)) ((distage-framework.md:194))
-// make[{type.repl.MdocSession::MdocApp4::Conf}].from(call(ƒ:izumi.distage.config.codec.AbstractDIConfigReader$$Lambda$25886/0x00007f48cc0ea778@8f54328(izumi.distage.config.model.AppConfig): repl.MdocSession::MdocApp4::Conf)).tagged(Set(ConfTag(conf))) ((distage-framework.md:190))
+// make[{type.repl.MdocSession::MdocApp5::OtherConf@other}].from(call(ƒ:izumi.distage.config.codec.AbstractDIConfigReader$$Lambda$25935/0x00007f62bfe66210@4c76375d(izumi.distage.config.model.AppConfig): repl.MdocSession::MdocApp5::OtherConf)).tagged(Set(ConfTag(conf))) ((distage-framework.md:257))
+// make[{type.repl.MdocSession::MdocApp5::Conf}].from(call(ƒ:izumi.distage.config.codec.AbstractDIConfigReader$$Lambda$25935/0x00007f62bfe66210@79556654(izumi.distage.config.model.AppConfig): repl.MdocSession::MdocApp5::Conf)).tagged(Set(ConfTag(conf))) ((distage-framework.md:256))
+// make[{type.repl.MdocSession::MdocApp5::ConfigPrinter}].from(call(π:Class(repl.MdocSession::MdocApp5::Conf, repl.MdocSession::MdocApp5::OtherConf): repl.MdocSession::MdocApp5::ConfigPrinter)) ((distage-framework.md:253))
+// make[{type.izumi.distage.config.model.AppConfig}].from(call(ƒ:&lt;function0&gt;(): izumi.distage.config.model.AppConfig)) ((distage-framework.md:260))
 
 Injector().produceRun(module) {
   (configPrinter: ConfigPrinter) =&gt;
     configPrinter.print()
 }
 // name: John, age: 33, other: true
-// res5: distage.package.Identity[Unit] = ()
+// res6: distage.package.Identity[Unit] = ()
 </code></pre>
 <p>Automatic derivation of config codecs is based on <a href="https://github.com/pureconfig/pureconfig">pureconfig-magnolia</a>.</p>
 <p>When a given type already has custom <code>pureconfig.ConfigReader</code> instances in implicit scope, they will be used, otherwise they will be derived automatically.</p>
@@ -505,7 +555,7 @@ Injector()
   .produceGet[PetStoreController](appModule)
   .use(_.run())
 // PetStoreController: running!
-// res9: distage.package.Identity[Unit] = ()
+// res10: distage.package.Identity[Unit] = ()
 </code></pre>
 <h3><a href="#compile-time-scanning" name="compile-time-scanning" class="anchor"><span class="anchor-link"></span></a>Compile-time scanning</h3>
 <p>Plugin scan can be performed at compile-time, this is mainly useful for deployment on platforms with reduced runtime reflection capabilities compared to the JVM, such as Graal Native Image, Scala.js and Scala Native. Use <a href="/latest/snapshot/api/izumi/distage/plugins/PluginConfig$.html#compileTime" title="izumi.distage.plugins.PluginConfig"><code>PluginConfig.compileTime</code></a> to perform a compile-time scan.</p>
