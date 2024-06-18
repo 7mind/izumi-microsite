@@ -261,15 +261,15 @@ def module = new ModuleDef {
 val objects = Injector().produce(module, Roots.target[A]).unsafeGet()
 // B!
 // A!
-// objects: distage.package.Identity[izumi.distage.model.Locator] = izumi.distage.LocatorDefaultImpl@4a15413c
+// objects: distage.package.Identity[izumi.distage.model.Locator] = izumi.distage.LocatorDefaultImpl@36ce964a
 
 // A and B are in the object graph
 
 objects.find[A]
-// res1: Option[A] = Some(repl.MdocSession$MdocApp0$A@48bdfdf6)
+// res1: Option[A] = Some(repl.MdocSession$MdocApp0$A@1b6ce24e)
 
 objects.find[B]
-// res2: Option[B] = Some(repl.MdocSession$MdocApp0$B@4b79cfd2)
+// res2: Option[B] = Some(repl.MdocSession$MdocApp0$B@6d354c0)
 
 // C is missing
 
@@ -286,10 +286,10 @@ val objects = Injector().produce(module, Roots.target[A]).unsafeGet()
 // C!
 // B!
 // A!
-// objects: Identity[Locator] = izumi.distage.LocatorDefaultImpl@3545d379
+// objects: Identity[Locator] = izumi.distage.LocatorDefaultImpl@42b0c652
 
 objects.find[C]
-// res5: Option[C] = Some(repl.MdocSession$MdocApp4$C@5539684c)
+// res5: Option[C] = Some(repl.MdocSession$MdocApp4$C@e6488)
 </code></pre>
 <h3><a href="#circular-dependencies-support" name="circular-dependencies-support" class="anchor"><span class="anchor-link"></span></a>Circular Dependencies Support</h3>
 <p><code>distage</code> automatically resolves arbitrary circular dependencies, including self-references:</p>
@@ -306,7 +306,7 @@ def module = new ModuleDef {
 }
 
 val objects = Injector().produce(module, Roots(DIKey[A], DIKey[C])).unsafeGet()
-// objects: distage.package.Identity[izumi.distage.model.Locator] = izumi.distage.LocatorDefaultImpl@72cc7d50
+// objects: distage.package.Identity[izumi.distage.model.Locator] = izumi.distage.LocatorDefaultImpl@7c8c8855
 
 objects.get[A] eq objects.get[B].a
 // res7: Boolean = true
@@ -321,7 +321,7 @@ objects.get[C] eq objects.get[C].c
 <p>The above strategy depends on <code>distage-core-proxy-bytebuddy</code> module and is enabled by default.</p>
 <p>If you want to disable it, use <code>NoProxies</code> bootstrap configuration:</p>
 <pre class="prettyprint"><code class="language-scala">Injector.NoProxies()
-// res10: Injector[distage.package.Identity] = izumi.distage.InjectorDefaultImpl@774e3b84
+// res10: Injector[distage.package.Identity] = izumi.distage.InjectorDefaultImpl@6065b650
 </code></pre>
 <p>Proxies are not supported on Scala.js.</p>
 <h4><a href="#manual-resolution-with-by-name-parameters" name="manual-resolution-with-by-name-parameters" class="anchor"><span class="anchor-link"></span></a>Manual Resolution with by-name parameters</h4>
@@ -351,7 +351,7 @@ def module = new ModuleDef {
 val locator = Injector.NoProxies()
   .produce(module, Roots(DIKey[A], DIKey[C]))
   .unsafeGet()
-// locator: distage.package.Identity[izumi.distage.model.Locator] = izumi.distage.LocatorDefaultImpl@6c8bf00f
+// locator: distage.package.Identity[izumi.distage.model.Locator] = izumi.distage.LocatorDefaultImpl@24a36e58
 
 assert(locator.get[A].b eq locator.get[B])
 
@@ -394,7 +394,7 @@ val roots = Roots.target[Set[Elem]]
 
 val objects = Injector().produce(module, roots).unsafeGet()
 // Strong constructed
-// objects: distage.package.Identity[izumi.distage.model.Locator] = izumi.distage.LocatorDefaultImpl@726e8eda
+// objects: distage.package.Identity[izumi.distage.model.Locator] = izumi.distage.LocatorDefaultImpl@57fa6460
 
 // Strong is around
 
@@ -420,17 +420,17 @@ objects.get[Set[Elem]]
 val objects = Injector().produce(module, roots).unsafeGet()
 // Weak constructed
 // Strong constructed
-// objects: distage.package.Identity[izumi.distage.model.Locator] = izumi.distage.LocatorDefaultImpl@63d94b3a
+// objects: distage.package.Identity[izumi.distage.model.Locator] = izumi.distage.LocatorDefaultImpl@4fac80ea
 
 // Weak is around
 
 objects.find[Weak]
-// res20: Option[Weak] = Some(repl.MdocSession$MdocApp19$Weak@654dcede)
+// res20: Option[Weak] = Some(repl.MdocSession$MdocApp19$Weak@2367879)
 
 // both Strong and Weak are in the Set
 
 objects.get[Set[Elem]]
-// res21: Set[Elem] = Set(repl.MdocSession$MdocApp19$Weak@654dcede, repl.MdocSession$MdocApp19$Strong@567541f0)
+// res21: Set[Elem] = Set(repl.MdocSession$MdocApp19$Weak@2367879, repl.MdocSession$MdocApp19$Strong@3dd817c9)
 </code></pre>
 <h3><a href="#auto-sets" name="auto-sets" class="anchor"><span class="anchor-link"></span></a>Auto-Sets</h3>
 <p>AutoSet <a href="/latest/snapshot/api/izumi/distage/model/Planner.html" title="izumi.distage.model.Planner"><code>Planner</code></a> Hooks can traverse the plan and collect all future objects that match a predicate.</p>
@@ -493,20 +493,20 @@ def module = new ModuleDef {
 }
 
 val objects = Injector().produce(module, Roots(DIKey[A], DIKey[B], DIKey[C])).unsafeGet()
-// objects: distage.package.Identity[izumi.distage.model.Locator] = izumi.distage.LocatorDefaultImpl@50eb0dba
+// objects: distage.package.Identity[izumi.distage.model.Locator] = izumi.distage.LocatorDefaultImpl@3985bd76
 
 // A took C from the object graph
 
 objects.get[A].c
-// res26: C = repl.MdocSession$MdocApp25$C@6ec2ebf3
+// res26: C = repl.MdocSession$MdocApp25$C@17e8a34b
 
 // this C is the same C as in this `objects` value
 
 val thisC = objects.get[C]
-// thisC: C = repl.MdocSession$MdocApp25$C@6ec2ebf3
+// thisC: C = repl.MdocSession$MdocApp25$C@17e8a34b
 
 val thatC = objects.get[A].c
-// thatC: C = repl.MdocSession$MdocApp25$C@6ec2ebf3
+// thatC: C = repl.MdocSession$MdocApp25$C@17e8a34b
 
 assert(thisC == thatC)
 </code></pre>
@@ -536,7 +536,7 @@ val bindings: ModuleBase = plan.definition
 <h4><a href="#injector-inheritance" name="injector-inheritance" class="anchor"><span class="anchor-link"></span></a>Injector inheritance</h4>
 <p>You may run a new planning cycle, inheriting the instances from an existing <code>Locator</code> into your new object subgraph:</p>
 <pre class="prettyprint"><code class="language-scala">val childInjector = Injector.inherit(objects)
-// childInjector: Injector[[A]izumi.fundamentals.platform.functional.package.Identity[A]] = izumi.distage.InjectorDefaultImpl@70d40ae9
+// childInjector: Injector[[A]izumi.fundamentals.platform.functional.package.Identity[A]] = izumi.distage.InjectorDefaultImpl@bc8189d
 
 class Printer(a: A, b: B, c: C) {
   def printEm(): Unit =
@@ -546,7 +546,7 @@ class Printer(a: A, b: B, c: C) {
 childInjector.produceRun(new ModuleDef { make[Printer] }) {
   (_: Printer).printEm()
 }
-// I&#39;ve got A=repl.MdocSession$MdocApp25$A@320c70f6, B=repl.MdocSession$MdocApp25$B@5af6177e, C=repl.MdocSession$MdocApp25$C@6ec2ebf3, all here!
+// I&#39;ve got A=repl.MdocSession$MdocApp25$A@1f8de28e, B=repl.MdocSession$MdocApp25$B@280d2ee9, C=repl.MdocSession$MdocApp25$C@17e8a34b, all here!
 // res28: izumi.fundamentals.platform.functional.package.Identity[Unit] = ()
 </code></pre>
 <p>It&rsquo;s safe, performance-wise, to run <code>Injector</code> to create nested graphs – <code>Injector</code> is extremely fast.</p>
@@ -565,7 +565,7 @@ val input = PlannerInput(module, Activation.empty, Roots.target[InjectionInfo])
 // make[{type.repl.MdocSession::MdocApp29::InjectionInfo}].from(call(π:Constructor(izumi.distage.model.PlannerInput): repl.MdocSession::MdocApp29::InjectionInfo)) ((advanced-features.md:410)),Activation(Map()),Of(NESet({type.repl.MdocSession::MdocApp29::InjectionInfo})))
 
 val injectionInfo = Injector().produce(input).unsafeGet().get[InjectionInfo]
-// injectionInfo: InjectionInfo = repl.MdocSession$MdocApp29$InjectionInfo@2df8d976
+// injectionInfo: InjectionInfo = repl.MdocSession$MdocApp29$InjectionInfo@13ccedc0
 
 // the PlannerInput in `InjectionInfo` is the same as `input`
 
@@ -580,7 +580,7 @@ class Path {
   class A
 }
 val path = new Path
-// path: Path = repl.MdocSession$MdocApp31$Path@7fa84f5f
+// path: Path = repl.MdocSession$MdocApp31$Path@2d19fe9a
 
 def module = new ModuleDef {
   make[path.A]
@@ -589,7 +589,7 @@ def module = new ModuleDef {
 Injector()
   .produce(module, Roots.Everything)
   .use(_.get[path.A])
-// res32: distage.package.Identity[path.A] = repl.MdocSession$MdocApp31$Path$A@25fbda90
+// res32: distage.package.Identity[path.A] = repl.MdocSession$MdocApp31$Path$A@235d316b
 </code></pre>
 <p>Since version <code>0.10</code>, support for types with a non-value prefix (type projections) <a href="https://github.com/7mind/izumi/issues/764">has been dropped</a>.</p>
 <p>However, there&rsquo;s a gotcha with value prefixes, when seen by distage they&rsquo;re based on the <strong>literal variable name</strong> of the prefix, not the full type information available to the compiler, therefore the following usage, a simple rename, will fail:</p>
@@ -598,9 +598,9 @@ Injector()
 }
 
 val path1 = new Path
-// path1: Path = repl.MdocSession$MdocApp31$Path@75280f84
+// path1: Path = repl.MdocSession$MdocApp31$Path@689ac96d
 val path2 = new Path
-// path2: Path = repl.MdocSession$MdocApp31$Path@1e704b3e
+// path2: Path = repl.MdocSession$MdocApp31$Path@1c4c9b53
 </code></pre>
 <pre class="prettyprint"><code class="language-scala">Try {
   Injector().produceRun(pathModule(path1) ++ pathModule(path2)) {
@@ -623,15 +623,15 @@ def pathModule[A: Tag: ClassConstructor](p: Path.Aux[A]) = new ModuleDef {
 }
 
 val path1 = new Path
-// path1: Path = repl.MdocSession$MdocApp34$Path@231f3d18
+// path1: Path = repl.MdocSession$MdocApp34$Path@7ec34b6e
 val path2 = new Path
-// path2: Path = repl.MdocSession$MdocApp34$Path@584b4cb1
+// path2: Path = repl.MdocSession$MdocApp34$Path@34dfebb4
 
 Injector().produceRun(pathModule(path1) ++ pathModule(path2)) {
   (p1a: path1.A, p2a: path2.A) =&gt;
     println((p1a, p2a))
 }
-// (repl.MdocSession$MdocApp34$Path$A@146cffac,repl.MdocSession$MdocApp34$Path$A@2db38206)
+// (repl.MdocSession$MdocApp34$Path$A@291fb840,repl.MdocSession$MdocApp34$Path$A@3b0a6f6b)
 // res35: distage.package.Identity[Unit] = ()
 </code></pre>
 <p>Now the example works, because the <code>A</code> type inside <code>pathModule(path1)</code> is <code>path1.A</code> and for <code>pathModule(path2)</code> it&rsquo;s <code>path2.A</code>, which matches their subsequent spelling in <code>(p1a: path1.A, p2a: path2.A) =&gt;</code> in <code>produceRun</code></p>
