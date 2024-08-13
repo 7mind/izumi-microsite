@@ -301,14 +301,21 @@ I 2020-12-14T10:00:16.267       (RoleAppEntrypoint.scala:106)  ….R.I.r.1.logge
 <pre class="prettyprint"><code class="language-scala">import izumi.functional.bio.UnsafeRun2
 
 val runner = UnsafeRun2.createZIO()
-// runner: UnsafeRun2.ZIORunner[Any] = izumi.functional.bio.UnsafeRun2$ZIORunner@5a65e64b
+// runner: UnsafeRun2.ZIORunner[Any] = izumi.functional.bio.UnsafeRun2$ZIORunner@b0bfddc
 
 val objects = runner.unsafeRun(ExampleLauncher.replLocator(&quot;:exampletask&quot;))
-// objects: izumi.distage.model.Locator = izumi.distage.LocatorDefaultImpl@419f539a
+// objects: izumi.distage.model.Locator = Locator izumi.distage.LocatorDefaultImpl@57a2e8de with 3 parent(s)
+//   with exposed keys:  
+//      - {type.Async2[=λ %1:0,%1:1 → ZIO[-Any,+1:0,+1:1]]}
+//      - {type.IO2[=λ %0,%1 → ZIO[-Any,+0,+1]]}
+//      - {type.SyncSafe1[=λ %0 → ZIO[-Any,+Nothing,+0]]}
+//      - {type.LogIO[=λ %1 → ZIO[-Any,+Nothing,+1]]}
+//      - {type.MdocSession::MdocApp0::ExampleRoleTask}
+//   with confined keys:  ø
 
 // inspecting a component inside the application
 val logger = objects.get[LogIO[UIO]]
-// logger: LogIO[UIO] = logstage.LogIO$$anon$1@197572e8
+// logger: LogIO[UIO] = logstage.LogIO$$anon$1@5ca63d0a
 </code></pre>
 <h3><a href="#bundled-roles" name="bundled-roles" class="anchor"><span class="anchor-link"></span></a>Bundled roles</h3>
 <p><a href="/latest/snapshot/api/izumi/distage/roles/bundled/BundledRolesModule.html" title="izumi.distage.roles.bundled.BundledRolesModule"><code>BundledRolesModule</code></a> contains two bundled roles:</p>
@@ -472,12 +479,12 @@ val module = new ConfigModuleDef {
   ))
 }
 // module: AnyRef with ConfigModuleDef = 
-// make[{type.repl.MdocSession::MdocApp5::Conf}].from(call(ƒ:izumi.distage.config.codec.AbstractDIConfigReader$$Lambda$26318/0x00007ffa97d82570@1fc769e8(izumi.distage.config.model.AppConfig): repl.MdocSession::MdocApp5::Conf)).tagged(Set(ConfTag(conf,izumi.distage.config.codec.AbstractDIConfigReader$$Lambda$26318/0x00007ffa97d82570@1fc769e8,Class repl.MdocSession.MdocApp5.Conf with fields   
+// make[{type.izumi.distage.config.model.AppConfig}].from(call(ƒ:&lt;function0&gt;(): izumi.distage.config.model.AppConfig)) ((distage-framework.md:260))
+// make[{type.repl.MdocSession::MdocApp5::ConfigPrinter}].from(call(π:Constructor(repl.MdocSession::MdocApp5::Conf, repl.MdocSession::MdocApp5::OtherConf): repl.MdocSession::MdocApp5::ConfigPrinter)) ((distage-framework.md:253))
+// make[{type.repl.MdocSession::MdocApp5::Conf}].from(call(ƒ:izumi.distage.config.codec.AbstractDIConfigReader$$Lambda$26344/0x00007f0357db7220@6cf52c41(izumi.distage.config.model.AppConfig): repl.MdocSession::MdocApp5::Conf)).tagged(Set(ConfTag(conf,izumi.distage.config.codec.AbstractDIConfigReader$$Lambda$26344/0x00007f0357db7220@6cf52c41,Class repl.MdocSession.MdocApp5.Conf with fields   
 //    - name: TBasic(TString)
 //    - age: TBasic(TInt)))) ((distage-framework.md:256))
-// make[{type.repl.MdocSession::MdocApp5::ConfigPrinter}].from(call(π:Constructor(repl.MdocSession::MdocApp5::Conf, repl.MdocSession::MdocApp5::OtherConf): repl.MdocSession::MdocApp5::ConfigPrinter)) ((distage-framework.md:253))
-// make[{type.izumi.distage.config.model.AppConfig}].from(call(ƒ:&lt;function0&gt;(): izumi.distage.config.model.AppConfig)) ((distage-framework.md:260))
-// make[{type.repl.MdocSession::MdocApp5::OtherConf@other}].from(call(ƒ:izumi.distage.config.codec.AbstractDIConfigReader$$Lambda$26318/0x00007ffa97d82570@2a5bb3be(izumi.distage.config.model.AppConfig): repl.MdocSession::MdocApp5::OtherConf)).tagged(Set(ConfTag(conf,izumi.distage.config.codec.AbstractDIConfigReader$$Lambda$26318/0x00007ffa97d82570@2a5bb3be,Class repl.MdocSession.MdocApp5.OtherConf with fields   
+// make[{type.repl.MdocSession::MdocApp5::OtherConf@other}].from(call(ƒ:izumi.distage.config.codec.AbstractDIConfigReader$$Lambda$26344/0x00007f0357db7220@b57883f(izumi.distage.config.model.AppConfig): repl.MdocSession::MdocApp5::OtherConf)).tagged(Set(ConfTag(conf,izumi.distage.config.codec.AbstractDIConfigReader$$Lambda$26344/0x00007f0357db7220@b57883f,Class repl.MdocSession.MdocApp5.OtherConf with fields   
 //    - other: TBasic(TBoolean)))) ((distage-framework.md:257))
 
 Injector().produceRun(module) {
