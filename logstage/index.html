@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="x-ua-compatible" content="ie=edge">
 <meta name="description" content="microsite">
-<meta name="generator" content="Paradox, paradox-material-theme=0.6.0, mkdocs-material=3.0.3">
+<meta name="generator" content="Paradox, paradox-material-theme=0.7.0, mkdocs-material=3.0.3">
 
 <meta name="lang:clipboard.copy" content="Copy to clipboard">
 <meta name="lang:clipboard.copied" content="Copied to clipboard">
@@ -182,7 +182,7 @@ data-md-source="github">
 <ul style="display: none">
 <li class="md-nav__item md-version" id="project.version">
 <label class="md-nav__link" for="__version">
-<i class="md-icon" title="Version">label_outline</i> 1.2.5
+<i class="md-icon" title="Version">label_outline</i> 1.2.16
 </label>
 </li>
 </ul>
@@ -226,20 +226,21 @@ data-md-source="github">
   <li>Console, File and SLF4J sinks included, File sink supports log rotation,</li>
   <li>Human-readable output and JSON output included,</li>
   <li>Method-level logging granularity. Can configure methods <code>com.example.Service.start</code> and <code>com.example.Service.doSomething</code> independently,</li>
-  <li>Slf4J adapters: route legacy Slf4J logs into LogStage router</li>
+  <li>Line-level logging granularity. Can configure select lines <code>com.example.Service:24,25</code> independently,</li>
+  <li>Slf4J and JUL adapters: route legacy Slf4J logs into LogStage router</li>
 </ol>
 <h2><a href="#dependencies" name="dependencies" class="anchor"><span class="anchor-link"></span></a>Dependencies</h2>
 <pre class="prettyprint"><code class="language-scala">libraryDependencies ++= Seq(
   // LogStage core library
-  &quot;io.7mind.izumi&quot; %% &quot;logstage-core&quot; % &quot;1.2.5&quot;,
+  &quot;io.7mind.izumi&quot; %% &quot;logstage-core&quot; % &quot;1.2.16&quot;,
   // Json output
-  &quot;io.7mind.izumi&quot; %% &quot;logstage-rendering-circe&quot; % &quot;1.2.5&quot;,
+  &quot;io.7mind.izumi&quot; %% &quot;logstage-rendering-circe&quot; % &quot;1.2.16&quot;,
   // Router from Slf4j to LogStage
-  &quot;io.7mind.izumi&quot; %% &quot;logstage-adapter-slf4j&quot; % &quot;1.2.5&quot;,
+  &quot;io.7mind.izumi&quot; %% &quot;logstage-adapter-slf4j&quot; % &quot;1.2.16&quot;,
   // LogStage integration with DIStage
-  &quot;io.7mind.izumi&quot; %% &quot;distage-extension-logstage&quot; % &quot;1.2.5&quot;,
+  &quot;io.7mind.izumi&quot; %% &quot;distage-extension-logstage&quot; % &quot;1.2.16&quot;,
   // Router from LogStage to Slf4J
-  &quot;io.7mind.izumi&quot; %% &quot;logstage-sink-slf4j &quot; % &quot;1.2.5&quot;,
+  &quot;io.7mind.izumi&quot; %% &quot;logstage-sink-slf4j &quot; % &quot;1.2.16&quot;,
 )
 </code></pre>
 <h2><a href="#overview" name="overview" class="anchor"><span class="anchor-link"></span></a>Overview</h2>
@@ -248,7 +249,7 @@ data-md-source="github">
 import scala.util.Random
 
 val logger = IzLogger()
-// logger: IzLogger = izumi.logstage.api.IzLogger@5ad05499
+// logger: IzLogger = izumi.logstage.api.IzLogger@4b99c89a
 
 val justAnArg = &quot;example&quot;
 // justAnArg: String = example
@@ -268,9 +269,9 @@ logger.warn(s&quot;Invisible argument: ${Random.nextInt() -&gt; &quot;random num
 // add following fields to all messages printed by a new logger value
 
 val ctxLogger = logger(&quot;userId&quot; -&gt; &quot;user@google.com&quot;, &quot;company&quot; -&gt; &quot;acme&quot;)
-// ctxLogger: IzLogger = izumi.logstage.api.IzLogger@4aea51ae
+// ctxLogger: IzLogger = izumi.logstage.api.IzLogger@e9b5f8d
 val delta = Random.nextInt(1000)
-// delta: Int = 988
+// delta: Int = 163
 
 ctxLogger.info(s&quot;Processing time: $delta&quot;)
 </code></pre>
@@ -304,17 +305,17 @@ ctxLogger.info(s&quot;Processing time: $delta&quot;)
 import logstage.circe.LogstageCirceRenderingPolicy
 
 val textSink = ConsoleSink.text(colored = true)
-// textSink: ConsoleSink = izumi.logstage.sink.ConsoleSink$ColoredConsoleSink$@1ae693ce
+// textSink: ConsoleSink = izumi.logstage.sink.ConsoleSink$ColoredConsoleSink$@3f5f3541
 val jsonSink = ConsoleSink(LogstageCirceRenderingPolicy(prettyPrint = true))
-// jsonSink: ConsoleSink = izumi.logstage.sink.ConsoleSink@3bc79f13
+// jsonSink: ConsoleSink = izumi.logstage.sink.ConsoleSink@24794959
 
 val sinks = List(jsonSink, textSink)
-// sinks: List[ConsoleSink] = List(izumi.logstage.sink.ConsoleSink@3bc79f13, izumi.logstage.sink.ConsoleSink$ColoredConsoleSink$@1ae693ce)
+// sinks: List[ConsoleSink] = List(izumi.logstage.sink.ConsoleSink@24794959, izumi.logstage.sink.ConsoleSink$ColoredConsoleSink$@3f5f3541)
 
 val logger: IzLogger = IzLogger(Trace, sinks)
-// logger: IzLogger = izumi.logstage.api.IzLogger@636b706e
+// logger: IzLogger = izumi.logstage.api.IzLogger@4e689edb
 val contextLogger: IzLogger = logger(&quot;key&quot; -&gt; &quot;value&quot;)
-// contextLogger: IzLogger = izumi.logstage.api.IzLogger@7b942a8c
+// contextLogger: IzLogger = izumi.logstage.api.IzLogger@1e7c6bdf
 
 logger.info(&quot;Hey&quot;)
 
@@ -326,10 +327,10 @@ contextLogger.info(&quot;Hey&quot;)
 import cats.effect.IO
 
 val logger = IzLogger()
-// logger: IzLogger = izumi.logstage.api.IzLogger@55c2bed3
+// logger: IzLogger = izumi.logstage.api.IzLogger@746c5699
 
 val log = LogIO.fromLogger[IO](logger)
-// log: LogIO[IO] = logstage.LogIO$$anon$1@7e02c7c8
+// log: LogIO[IO] = logstage.LogIO$$anon$1@18794564
 
 log.info(s&quot;Hey! I&#39;m logging with ${log}stage!&quot;).unsafeRunSync()(cats.effect.unsafe.IORuntime.global)
 </code></pre>
@@ -376,15 +377,15 @@ import zio.{URIO, ZEnvironment}
 val fn: URIO[LogZIO, Unit] = {
   log.info(s&quot;I&#39;m logging with ${log}stage!&quot;)
 }
-// fn: URIO[LogZIO, Unit] = OnSuccess(logstage.LogZIO.LogZIOImpl.log(LogZIO.scala:35),Sync(logstage.LogZIO.LogZIOImpl.log(LogZIO.scala:35),zio.ZIO$ServiceWithZIOPartiallyApplied$$$Lambda$24035/0x000000080484f448@52fa8c7f),zio.ZIO$$$Lambda$23905/0x0000000802e86970@67ebec1c)
+// fn: URIO[LogZIO, Unit] = Stateful(logstage.LogZIO.LogZIOImpl.log(LogZIO.scala:35),zio.FiberRef$unsafe$$anon$2$$Lambda/0x00007fff8361eb78@40db98fc)
 
 val logger: LogZIO = LogIO3.fromLogger(IzLogger())
-// logger: LogZIO = logstage.LogIO$$anon$1@6aaa6e4e
+// logger: LogZIO = logstage.LogIO$$anon$1@61c61bcc
 
 import izumi.functional.bio.UnsafeRun2
 
 val runtime = UnsafeRun2.createZIO()
-// runtime: UnsafeRun2.ZIORunner[Any] = izumi.functional.bio.UnsafeRun2$ZIORunner@30b0f9dd
+// runtime: UnsafeRun2.ZIORunner[Any] = izumi.functional.bio.UnsafeRun2$ZIORunner@2cfce0c2
 
 runtime.unsafeRun {
   fn.provideEnvironment(ZEnvironment(logger))
@@ -393,7 +394,7 @@ runtime.unsafeRun {
 <h3><a href="#adding-fiberid-to-log-messages" name="adding-fiberid-to-log-messages" class="anchor"><span class="anchor-link"></span></a>Adding FiberId to log messages</h3>
 <p><code>LogZIO.withFiberId</code> provides a <code>LogIO</code> instance that logs the current ZIO <code>FiberId</code> in addition to the JVM thread id:</p>
 <pre class="prettyprint"><code class="language-scala">val logger: LogZIO = LogZIO.withFiberId(IzLogger())
-// logger: LogZIO = logstage.LogZIO$$anon$1@70c4ed3e
+// logger: LogZIO = logstage.LogZIO$$anon$1@6b9180bb
 
 runtime.unsafeRun {
   fn.provideEnvironment(ZEnvironment(logger))
@@ -472,7 +473,7 @@ import logstage.ConsoleSink
 import logstage.circe.LogstageCirceRenderingPolicy
 
 val logger = IzStrictLogger(sink = ConsoleSink(LogstageCirceRenderingPolicy()))
-// logger: IzStrictLogger = izumi.logstage.api.strict.IzStrictLogger@76db0e2d
+// logger: IzStrictLogger = izumi.logstage.api.strict.IzStrictLogger@dbc7217
 
 logger.info(s&quot;Got ${KV(&quot;key&quot;, 7) -&gt; &quot;KeyValue&quot;}&quot;)
 </code></pre>
@@ -483,7 +484,7 @@ logger.info(s&quot;Got ${KV(&quot;key&quot;, 7) -&gt; &quot;KeyValue&quot;}&quot
 import izumi.logstage.api.routing.StaticLogRouter
 
 val myLogger = IzLogger()
-// myLogger: IzLogger = izumi.logstage.api.IzLogger@4fbad6a6
+// myLogger: IzLogger = izumi.logstage.api.IzLogger@6d38e936
 
 // configure SLF4j to use the same router that `myLogger` uses
 StaticLogRouter.instance.setup(myLogger.router)
@@ -505,13 +506,13 @@ SLF4JBridgeHandler.install()
 </code></pre>
 </div>
 <div>
-<a href="https://github.com/7mind/izumi/tree/v1.2.5/doc/microsite/target/mdoc/logstage/00_logstage.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/7mind/izumi/tree/v1.2.16/doc/microsite/target/mdoc/logstage/00_logstage.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>
 <div class="print-only">
 <span class="md-source-file md-version">
-1.2.5
+1.2.16
 </span>
 </div>
 </article>
@@ -558,7 +559,7 @@ DIStage
 Powered by
 <a href="https://github.com/lightbend/paradox">Paradox</a>
 and
-<a href="https://jonas.github.io/paradox-material-theme/">Paradox Material Theme</a>
+<a href="https://sbt.github.io/sbt-paradox-material-theme/">Paradox Material Theme</a>
 
 </div>
 </div>
