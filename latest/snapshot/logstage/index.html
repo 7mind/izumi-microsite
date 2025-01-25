@@ -249,7 +249,7 @@ data-md-source="github">
 import scala.util.Random
 
 val logger = IzLogger()
-// logger: IzLogger = izumi.logstage.api.IzLogger@53cbb5f7
+// logger: IzLogger = izumi.logstage.api.IzLogger@114b2df1
 
 val justAnArg = &quot;example&quot;
 // justAnArg: String = example
@@ -269,9 +269,9 @@ logger.warn(s&quot;Invisible argument: ${Random.nextInt() -&gt; &quot;random num
 // add following fields to all messages printed by a new logger value
 
 val ctxLogger = logger(&quot;userId&quot; -&gt; &quot;user@google.com&quot;, &quot;company&quot; -&gt; &quot;acme&quot;)
-// ctxLogger: IzLogger = izumi.logstage.api.IzLogger@16c931ea
+// ctxLogger: IzLogger = izumi.logstage.api.IzLogger@5449b1bc
 val delta = Random.nextInt(1000)
-// delta: Int = 201
+// delta: Int = 235
 
 ctxLogger.info(s&quot;Processing time: $delta&quot;)
 </code></pre>
@@ -305,17 +305,17 @@ ctxLogger.info(s&quot;Processing time: $delta&quot;)
 import logstage.circe.LogstageCirceRenderingPolicy
 
 val textSink = ConsoleSink.text(colored = true)
-// textSink: ConsoleSink = izumi.logstage.sink.ConsoleSink$ColoredConsoleSink$@27958119
+// textSink: ConsoleSink = izumi.logstage.sink.ConsoleSink$ColoredConsoleSink$@65d74357
 val jsonSink = ConsoleSink(LogstageCirceRenderingPolicy(prettyPrint = true))
-// jsonSink: ConsoleSink = izumi.logstage.sink.ConsoleSink@4cacda8e
+// jsonSink: ConsoleSink = izumi.logstage.sink.ConsoleSink@6e02a72d
 
 val sinks = List(jsonSink, textSink)
-// sinks: List[ConsoleSink] = List(izumi.logstage.sink.ConsoleSink@4cacda8e, izumi.logstage.sink.ConsoleSink$ColoredConsoleSink$@27958119)
+// sinks: List[ConsoleSink] = List(izumi.logstage.sink.ConsoleSink@6e02a72d, izumi.logstage.sink.ConsoleSink$ColoredConsoleSink$@65d74357)
 
 val logger: IzLogger = IzLogger(Trace, sinks)
-// logger: IzLogger = izumi.logstage.api.IzLogger@464c9c66
+// logger: IzLogger = izumi.logstage.api.IzLogger@33854b80
 val contextLogger: IzLogger = logger(&quot;key&quot; -&gt; &quot;value&quot;)
-// contextLogger: IzLogger = izumi.logstage.api.IzLogger@372f001c
+// contextLogger: IzLogger = izumi.logstage.api.IzLogger@7b322c5b
 
 logger.info(&quot;Hey&quot;)
 
@@ -327,10 +327,10 @@ contextLogger.info(&quot;Hey&quot;)
 import cats.effect.IO
 
 val logger = IzLogger()
-// logger: IzLogger = izumi.logstage.api.IzLogger@3fb83a1a
+// logger: IzLogger = izumi.logstage.api.IzLogger@1d048efe
 
 val log = LogIO.fromLogger[IO](logger)
-// log: LogIO[IO] = logstage.LogIO$$anon$1@3f3cc3f3
+// log: LogIO[IO] = logstage.LogIO$$anon$1@16ac5f24
 
 log.info(s&quot;Hey! I&#39;m logging with ${log}stage!&quot;).unsafeRunSync()(cats.effect.unsafe.IORuntime.global)
 </code></pre>
@@ -377,15 +377,15 @@ import zio.{URIO, ZEnvironment}
 val fn: URIO[LogZIO, Unit] = {
   log.info(s&quot;I&#39;m logging with ${log}stage!&quot;)
 }
-// fn: URIO[LogZIO, Unit] = Stateful(logstage.LogZIO.LogZIOImpl.log(LogZIO.scala:35),zio.FiberRef$unsafe$$anon$2$$Lambda/0x00007fff7b2c8680@1b0a7713)
+// fn: URIO[LogZIO, Unit] = Stateful(logstage.LogZIO.LogZIOImpl.log(LogZIO.scala:35),zio.FiberRef$unsafe$$anon$2$$Lambda/0x00007fff7b2a33c8@22d0b558)
 
 val logger: LogZIO = LogIO3.fromLogger(IzLogger())
-// logger: LogZIO = logstage.LogIO$$anon$1@30c2bee2
+// logger: LogZIO = logstage.LogIO$$anon$1@8c1050e
 
 import izumi.functional.bio.UnsafeRun2
 
 val runtime = UnsafeRun2.createZIO()
-// runtime: UnsafeRun2.ZIORunner[Any] = izumi.functional.bio.UnsafeRun2$ZIORunner@6c63dedb
+// runtime: UnsafeRun2.ZIORunner[Any] = izumi.functional.bio.UnsafeRun2$ZIORunner@71ee78ea
 
 runtime.unsafeRun {
   fn.provideEnvironment(ZEnvironment(logger))
@@ -394,7 +394,7 @@ runtime.unsafeRun {
 <h3><a href="#adding-fiberid-to-log-messages" name="adding-fiberid-to-log-messages" class="anchor"><span class="anchor-link"></span></a>Adding FiberId to log messages</h3>
 <p><code>LogZIO.withFiberId</code> provides a <code>LogIO</code> instance that logs the current ZIO <code>FiberId</code> in addition to the JVM thread id:</p>
 <pre class="prettyprint"><code class="language-scala">val logger: LogZIO = LogZIO.withFiberId(IzLogger())
-// logger: LogZIO = logstage.LogZIO$$anon$1@6e9a7996
+// logger: LogZIO = logstage.LogZIO$$anon$1@66d94145
 
 runtime.unsafeRun {
   fn.provideEnvironment(ZEnvironment(logger))
@@ -473,7 +473,7 @@ import logstage.ConsoleSink
 import logstage.circe.LogstageCirceRenderingPolicy
 
 val logger = IzStrictLogger(sink = ConsoleSink(LogstageCirceRenderingPolicy()))
-// logger: IzStrictLogger = izumi.logstage.api.strict.IzStrictLogger@f6de48a
+// logger: IzStrictLogger = izumi.logstage.api.strict.IzStrictLogger@6fb48129
 
 logger.info(s&quot;Got ${KV(&quot;key&quot;, 7) -&gt; &quot;KeyValue&quot;}&quot;)
 </code></pre>
@@ -484,7 +484,7 @@ logger.info(s&quot;Got ${KV(&quot;key&quot;, 7) -&gt; &quot;KeyValue&quot;}&quot
 import izumi.logstage.api.routing.StaticLogRouter
 
 val myLogger = IzLogger()
-// myLogger: IzLogger = izumi.logstage.api.IzLogger@c619a48
+// myLogger: IzLogger = izumi.logstage.api.IzLogger@326342fd
 
 // configure SLF4j to use the same router that `myLogger` uses
 StaticLogRouter.instance.setup(myLogger.router)
