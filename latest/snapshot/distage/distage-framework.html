@@ -301,10 +301,10 @@ I 2020-12-14T10:00:16.267       (RoleAppEntrypoint.scala:106)  ….R.I.r.1.logge
 <pre class="prettyprint"><code class="language-scala">import izumi.functional.bio.UnsafeRun2
 
 val runner = UnsafeRun2.createZIO()
-// runner: UnsafeRun2.ZIORunner[Any] = izumi.functional.bio.UnsafeRun2$ZIORunner@203dad80
+// runner: UnsafeRun2.ZIORunner[Any] = izumi.functional.bio.UnsafeRun2$ZIORunner@19923b65
 
 val objects = runner.unsafeRun(ExampleLauncher.replLocator(&quot;:exampletask&quot;))
-// objects: izumi.distage.model.Locator = Locator izumi.distage.LocatorDefaultImpl@7ac89123 with 3 parent(s)
+// objects: izumi.distage.model.Locator = Locator izumi.distage.LocatorDefaultImpl@2065aca with 3 parent(s)
 //   with exposed keys:  
 //      - {type.Async2[=λ %1:0,%1:1 → ZIO[-Any,+1:0,+1:1]]}
 //      - {type.IO2[=λ %0,%1 → ZIO[-Any,+0,+1]]}
@@ -315,7 +315,7 @@ val objects = runner.unsafeRun(ExampleLauncher.replLocator(&quot;:exampletask&qu
 
 // inspecting a component inside the application
 val logger = objects.get[LogIO[UIO]]
-// logger: LogIO[UIO] = logstage.LogIO$$anon$1@3b6b9b3c
+// logger: LogIO[UIO] = logstage.LogIO$$anon$1@62569cec
 </code></pre>
 <h3><a href="#bundled-roles" name="bundled-roles" class="anchor"><span class="anchor-link"></span></a>Bundled roles</h3>
 <p><a href="/latest/snapshot/api/izumi/distage/roles/bundled/BundledRolesModule.html" title="izumi.distage.roles.bundled.BundledRolesModule"><code>BundledRolesModule</code></a> contains two bundled roles:</p>
@@ -326,10 +326,11 @@ val logger = objects.get[LogIO[UIO]]
 <p>Use <code>include</code> to add it to your application:</p>
 <pre class="prettyprint"><code class="language-scala">import izumi.distage.plugins.PluginDef
 import izumi.distage.roles.bundled.BundledRolesModule
+import izumi.fundamentals.platform.versions.Version
 import zio.Task
 
 object RolesPlugin extends PluginDef {
-  include(BundledRolesModule[Task](version = &quot;1.0&quot;))
+  include(BundledRolesModule[Task](Version.parse(&quot;1.0&quot;)))
 }
 </code></pre>
 <h2><a href="#compile-time-checks" name="compile-time-checks" class="anchor"><span class="anchor-link"></span></a>Compile-time checks</h2>
@@ -479,13 +480,13 @@ val module = new ConfigModuleDef {
   ))
 }
 // module: AnyRef with ConfigModuleDef = 
-// make[{type.repl.MdocSession.MdocApp5.OtherConf@other}].from(call(ƒ:izumi.distage.config.codec.AbstractDIConfigReader$$Lambda/0x00007fff838d9ea8@6e5b28bf(izumi.distage.config.model.AppConfig): repl.MdocSession::MdocApp5::OtherConf)).tagged(Set(ConfTag(conf,izumi.distage.config.codec.AbstractDIConfigReader$$Lambda/0x00007fff838d9ea8@6e5b28bf,Class repl.MdocSession.MdocApp5.OtherConf with fields   
-//    - other: TBasic(TBoolean)))) (BindingOrigin((distage-framework.md:257)))
-// make[{type.repl.MdocSession.MdocApp5.ConfigPrinter}].from(call(π:Constructor(repl.MdocSession::MdocApp5::Conf, repl.MdocSession::MdocApp5::OtherConf): repl.MdocSession::MdocApp5::ConfigPrinter)) (BindingOrigin((distage-framework.md:253)))
-// make[{type.repl.MdocSession.MdocApp5.Conf}].from(call(ƒ:izumi.distage.config.codec.AbstractDIConfigReader$$Lambda/0x00007fff838d9ea8@185a700b(izumi.distage.config.model.AppConfig): repl.MdocSession::MdocApp5::Conf)).tagged(Set(ConfTag(conf,izumi.distage.config.codec.AbstractDIConfigReader$$Lambda/0x00007fff838d9ea8@185a700b,Class repl.MdocSession.MdocApp5.Conf with fields   
+// make[{type.repl.MdocSession.MdocApp5.OtherConf@other}].from(call(ƒ:izumi.distage.config.codec.AbstractDIConfigReader$$Lambda/0x00007fff838ff410@31844270(izumi.distage.config.model.AppConfig): repl.MdocSession::MdocApp5::OtherConf)).tagged(Set(ConfTag(conf,izumi.distage.config.codec.AbstractDIConfigReader$$Lambda/0x00007fff838ff410@31844270,Class repl.MdocSession.MdocApp5.OtherConf with fields   
+//    - other: TBasic(TBoolean)))) (BindingOrigin((distage-framework.md:260)))
+// make[{type.repl.MdocSession.MdocApp5.ConfigPrinter}].from(call(π:Constructor(repl.MdocSession::MdocApp5::Conf, repl.MdocSession::MdocApp5::OtherConf): repl.MdocSession::MdocApp5::ConfigPrinter)) (BindingOrigin((distage-framework.md:256)))
+// make[{type.izumi.distage.config.model.AppConfig}].from(call(ƒ:&lt;function0&gt;(): izumi.distage.config.model.AppConfig)) (BindingOrigin((distage-framework.md:263)))
+// make[{type.repl.MdocSession.MdocApp5.Conf}].from(call(ƒ:izumi.distage.config.codec.AbstractDIConfigReader$$Lambda/0x00007fff838ff410@5974f578(izumi.distage.config.model.AppConfig): repl.MdocSession::MdocApp5::Conf)).tagged(Set(ConfTag(conf,izumi.distage.config.codec.AbstractDIConfigReader$$Lambda/0x00007fff838ff410@5974f578,Class repl.MdocSession.MdocApp5.Conf with fields   
 //    - name: TBasic(TString)
-//    - age: TBasic(TInt)))) (BindingOrigin((distage-framework.md:256)))
-// make[{type.izumi.distage.config.model.AppConfig}].from(call(ƒ:&lt;function0&gt;(): izumi.distage.config.model.AppConfig)) (BindingOrigin((distage-framework.md:260)))
+//    - age: TBasic(TInt)))) (BindingOrigin((distage-framework.md:259)))
 
 Injector().produceRun(module) {
   (configPrinter: ConfigPrinter) =&gt;
