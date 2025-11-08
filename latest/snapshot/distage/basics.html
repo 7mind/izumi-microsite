@@ -341,7 +341,7 @@ def HelloByeModule = new ModuleDef {
 <pre class="prettyprint"><code class="language-scala">import distage.{Activation, Injector, Roots}
 
 val injector = Injector[Task]()
-// injector: Injector[Task] = izumi.distage.InjectorDefaultImpl@3c49a68
+// injector: Injector[Task] = izumi.distage.InjectorDefaultImpl@7981edda
 
 val plan = injector.plan(HelloByeModule, Roots.target[HelloByeApp], Activation.empty).getOrThrow()
 // plan: izumi.distage.model.plan.Plan = 1: {type.MdocSession::MdocApp1::Greeter} BindingOrigin((basics.md:84)) := call(π:Constructor(): MdocSession::MdocApp1::PrintGreeter[32m) {}
@@ -359,7 +359,7 @@ val plan = injector.plan(HelloByeModule, Roots.target[HelloByeApp], Activation.e
 // Interpret into a Lifecycle value
 
 val resource = injector.produce(plan)
-// resource: izumi.distage.model.definition.package.Lifecycle[Task, izumi.distage.model.Locator] = izumi.functional.lifecycle.LifecycleMethodImpls$$anon$2@194f30f5
+// resource: izumi.distage.model.definition.package.Lifecycle[Task, izumi.distage.model.Locator] = izumi.functional.lifecycle.LifecycleMethodImpls$$anon$2@265370cf
 
 // Use the object graph:
 // After `.use` exits, all objects will be deallocated,
@@ -369,12 +369,12 @@ val effect = resource.use {
   objects =&gt;
     objects.get[HelloByeApp].run
 }
-// effect: Task[Unit] = DynamicNoBox(izumi.functional.quasi.QuasiPrimitivesFromBIO.bracket(QuasiIO.scala:368),1,zio.ZIO$Release$$Lambda/0x00007fff833a1c48@6dea2ef2)
+// effect: Task[Unit] = DynamicNoBox(izumi.functional.quasi.QuasiPrimitivesFromBIO.bracket(QuasiIO.scala:368),1,zio.ZIO$Release$$Lambda/0x00007fff8336b280@a6d7c9)
 
 // Run the resulting program
 
 val runner = UnsafeRun2.createZIO()
-// runner: UnsafeRun2.ZIORunner[Any] = izumi.functional.bio.UnsafeRun2$ZIORunner@4dc99570
+// runner: UnsafeRun2.ZIORunner[Any] = izumi.functional.bio.UnsafeRun2$ZIORunner@11b7e223
 
 runner.unsafeRun(effect)
 // What&#39;s your name?
@@ -639,14 +639,14 @@ val dbResource = Resource.make(
     println(&quot;Connecting to DB!&quot;)
     new DBConnection
 })(release = _ =&gt; IO(println(&quot;Disconnecting DB&quot;)))
-// dbResource: Resource[IO, DBConnection] = Allocate(cats.effect.kernel.Resource$$$Lambda/0x00007fff834739b8@145735c2)
+// dbResource: Resource[IO, DBConnection] = Allocate(cats.effect.kernel.Resource$$$Lambda/0x00007fff83440000@1a6e6565)
 
 val mqResource = Resource.make(
   acquire = IO {
    println(&quot;Connecting to Message Queue!&quot;)
    new MessageQueueConnection
 })(release = _ =&gt; IO(println(&quot;Disconnecting Message Queue&quot;)))
-// mqResource: Resource[IO, MessageQueueConnection] = Allocate(cats.effect.kernel.Resource$$$Lambda/0x00007fff834739b8@69a98686)
+// mqResource: Resource[IO, MessageQueueConnection] = Allocate(cats.effect.kernel.Resource$$$Lambda/0x00007fff83440000@361fab76)
 
 class MyApp(
   db: DBConnection,
@@ -670,7 +670,7 @@ val objectGraphResource = {
   Injector[IO]()
     .produce(module, Roots.target[MyApp])
 }
-// objectGraphResource: izumi.distage.model.definition.package.Lifecycle[IO, izumi.distage.model.Locator] = izumi.functional.lifecycle.LifecycleMethodImpls$$anon$2@358d6e3c
+// objectGraphResource: izumi.distage.model.definition.package.Lifecycle[IO, izumi.distage.model.Locator] = izumi.functional.lifecycle.LifecycleMethodImpls$$anon$2@2503eb4c
 
 objectGraphResource
   .use(_.get[MyApp].run)
@@ -711,7 +711,7 @@ val closedInit = Injector()
       init
 }
 // true
-// closedInit: distage.package.Identity[Init] = repl.MdocSession$MdocApp21$Init@6ec27505
+// closedInit: distage.package.Identity[Init] = repl.MdocSession$MdocApp21$Init@15fd4e3a
 
 println(closedInit.initialized)
 // false
@@ -815,7 +815,7 @@ val catsEffectHello = polymorphicHelloWorld[cats.effect.IO]
 //val monixHello = polymorphicHelloWorld[monix.eval.Task]
 
 val zioHello = polymorphicHelloWorld[zio.IO[Throwable, _]]
-// zioHello: zio.ZIO[Any, Throwable, Unit] = DynamicNoBox(izumi.functional.quasi.QuasiPrimitivesFromBIO.bracket(QuasiIO.scala:368),1,zio.ZIO$Release$$Lambda/0x00007fff833a1c48@3d8ab5c2)
+// zioHello: zio.ZIO[Any, Throwable, Unit] = DynamicNoBox(izumi.functional.quasi.QuasiPrimitivesFromBIO.bracket(QuasiIO.scala:368),1,zio.ZIO$Release$$Lambda/0x00007fff8336b280@4d41eb7d)
 
 //val monixBioHello = polymorphicHelloWorld[monix.bio.IO[Throwable, _]]
 </code></pre>
@@ -891,7 +891,7 @@ object AppModule extends ModuleDef {
 // wire the graph and get the app
 
 val app = Injector().produceGet[App](AppModule).unsafeGet()
-// app: App = repl.MdocSession$MdocApp26$App$Impl@77b41397
+// app: App = repl.MdocSession$MdocApp26$App$Impl@76dad85f
 
 // check how it works
 
@@ -995,7 +995,7 @@ Injector().produceRun(axisIncrement, Activation(Mode -&gt; Mode.Prod))((currentI
 // res36: Int = 2
 </code></pre>
 <h2><a href="#effect-bindings" name="effect-bindings" class="anchor"><span class="anchor-link"></span></a>Effect Bindings</h2>
-<p>Sometimes we want to effectfully create a component, but the resulting component or data does not need to be deallocated. An example might be a global <code>Semaphore</code> to limit the parallelism of the entire application based on configuration, or a test implementation of some service made with <code>Ref</code>s.</p>
+<p>Sometimes we want to effectfully create a component, but the resulting component does not need to be deallocated. An example might be a global <code>Semaphore</code> to limit the parallelism of the entire application based on configuration, or a test implementation of some service made with <code>Ref</code>s.</p>
 <p>In these cases we can use <code>.fromEffect</code> to create a value using an effectful constructor.</p>
 <p>Example with a <code>Ref</code>-based Tagless Final <code>KVStore</code>:</p>
 <pre class="prettyprint"><code class="language-scala">import distage.{Injector, ModuleDef}
@@ -1041,12 +1041,12 @@ val io = Injector[Task]()
         res2 &lt;- kv.get(&quot;apple&quot;)
       } yield res1 + res2
   }
-// io: Task[String] = DynamicNoBox(izumi.functional.quasi.QuasiPrimitivesFromBIO.bracket(QuasiIO.scala:368),1,zio.ZIO$Release$$Lambda/0x00007fff833a1c48@4e91c4fc)
+// io: Task[String] = DynamicNoBox(izumi.functional.quasi.QuasiPrimitivesFromBIO.bracket(QuasiIO.scala:368),1,zio.ZIO$Release$$Lambda/0x00007fff8336b280@3e5681db)
 
 import izumi.functional.bio.UnsafeRun2
 
 val runtime = UnsafeRun2.createZIO()
-// runtime: UnsafeRun2.ZIORunner[Any] = izumi.functional.bio.UnsafeRun2$ZIORunner@13dcf327
+// runtime: UnsafeRun2.ZIORunner[Any] = izumi.functional.bio.UnsafeRun2$ZIORunner@2403f68d
 
 runtime.unsafeRun(io)
 // res38: String = pieipad
@@ -1115,10 +1115,10 @@ trait World {
 // using service functions from everywhere
 
 val hello: URIO[Hello, String] = ZIO.serviceWithZIO(_.hello)
-// hello: URIO[Hello, String] = Stateful(repl.MdocSession.MdocApp39.hello(basics.md:921),zio.FiberRef$unsafe$PatchFiber$$Lambda/0x00007fff833ea438@18589ee7)
+// hello: URIO[Hello, String] = Stateful(repl.MdocSession.MdocApp39.hello(basics.md:921),zio.FiberRef$unsafe$PatchFiber$$Lambda/0x00007fff833b3c40@5c4fd5e0)
 
 val world: URIO[World, String] = ZIO.serviceWithZIO(_.world)
-// world: URIO[World, String] = Stateful(repl.MdocSession.MdocApp39.world(basics.md:924),zio.FiberRef$unsafe$PatchFiber$$Lambda/0x00007fff833ea438@ebf6d28)
+// world: URIO[World, String] = Stateful(repl.MdocSession.MdocApp39.world(basics.md:924),zio.FiberRef$unsafe$PatchFiber$$Lambda/0x00007fff833b3c40@22c19e5e)
 
 // service implementations
 
@@ -1131,7 +1131,7 @@ val makeHello = {
     val hello = ZIO.succeed(&quot;Hello&quot;)
   }
 }
-// makeHello: ZIO[Any with Any with zio.Scope, java.io.IOException, AnyRef with Hello{val hello: zio.ZIO[Any,Nothing,String]}] = FlatMap(repl.MdocSession.MdocApp39.makeHello(basics.md:929),DynamicNoBox(repl.MdocSession.MdocApp39.makeHello(basics.md:931),1,zio.ZIO$$Lambda/0x00007fff834d8680@383e73a0),zio.ZIO$$Lambda/0x00007fff8340d890@744a368f)
+// makeHello: ZIO[Any with Any with zio.Scope, java.io.IOException, AnyRef with Hello{val hello: zio.ZIO[Any,Nothing,String]}] = FlatMap(repl.MdocSession.MdocApp39.makeHello(basics.md:929),DynamicNoBox(repl.MdocSession.MdocApp39.makeHello(basics.md:931),1,zio.ZIO$$Lambda/0x00007fff834a0970@31725150),zio.ZIO$$Lambda/0x00007fff833d6f88@1eb4b861)
 
 val makeWorld = {
   for {
@@ -1140,7 +1140,7 @@ val makeWorld = {
     val world = counter.get.map(c =&gt; if (c &lt; 1) &quot;World&quot; else &quot;THE World&quot;)
   }
 }
-// makeWorld: ZIO[Any, Nothing, AnyRef with World{val world: zio.ZIO[Any,Nothing,String]}] = FlatMap(repl.MdocSession.MdocApp39.makeWorld(basics.md:940),Sync(repl.MdocSession.MdocApp39.makeWorld(basics.md:940),zio.Ref$$$Lambda/0x00007fff834cd708@514b6673),zio.ZIO$$Lambda/0x00007fff8340d890@7490cc9b)
+// makeWorld: ZIO[Any, Nothing, AnyRef with World{val world: zio.ZIO[Any,Nothing,String]}] = FlatMap(repl.MdocSession.MdocApp39.makeWorld(basics.md:940),Sync(repl.MdocSession.MdocApp39.makeWorld(basics.md:940),zio.Ref$$$Lambda/0x00007fff83499878@26290663),zio.ZIO$$Lambda/0x00007fff833d6f88@1de5c577)
 
 // the main function
 
@@ -1151,7 +1151,7 @@ val turboFunctionalHelloWorld: RIO[Hello with World, Unit] = {
     _     &lt;- Console.print(s&quot;$hello $world&quot;)
   } yield ()
 }
-// turboFunctionalHelloWorld: RIO[Hello with World, Unit] = FlatMap(repl.MdocSession.MdocApp39.turboFunctionalHelloWorld(basics.md:949),Stateful(repl.MdocSession.MdocApp39.hello(basics.md:921),zio.FiberRef$unsafe$PatchFiber$$Lambda/0x00007fff833ea438@18589ee7),&lt;function1&gt;)
+// turboFunctionalHelloWorld: RIO[Hello with World, Unit] = FlatMap(repl.MdocSession.MdocApp39.turboFunctionalHelloWorld(basics.md:949),Stateful(repl.MdocSession.MdocApp39.hello(basics.md:921),zio.FiberRef$unsafe$PatchFiber$$Lambda/0x00007fff833b3c40@5c4fd5e0),&lt;function1&gt;)
 
 def module = new ModuleDef {
   make[Hello].fromZIOEnv(makeHello)
@@ -1161,12 +1161,12 @@ def module = new ModuleDef {
 
 val main = Injector[Task]()
   .produceRun[Unit](module)((_: Unit) =&gt; ZIO.unit)
-// main: Task[Unit] = DynamicNoBox(izumi.functional.quasi.QuasiPrimitivesFromBIO.bracket(QuasiIO.scala:368),1,zio.ZIO$Release$$Lambda/0x00007fff833a1c48@36ef8f57)
+// main: Task[Unit] = DynamicNoBox(izumi.functional.quasi.QuasiPrimitivesFromBIO.bracket(QuasiIO.scala:368),1,zio.ZIO$Release$$Lambda/0x00007fff8336b280@538cf7fd)
 
 import izumi.functional.bio.UnsafeRun2
 
 val runtime = UnsafeRun2.createZIO()
-// runtime: UnsafeRun2.ZIORunner[Any] = izumi.functional.bio.UnsafeRun2$ZIORunner@30fa64a
+// runtime: UnsafeRun2.ZIORunner[Any] = izumi.functional.bio.UnsafeRun2$ZIORunner@3c9d2823
 
 runtime.unsafeRun(main)
 // Creating Enterprise Hellower...
@@ -1365,17 +1365,36 @@ Injector()
 // res46: distage.package.Identity[Unit] = ()
 </code></pre>
 <h2><a href="#subcontexts" name="subcontexts" class="anchor"><span class="anchor-link"></span></a>Subcontexts</h2>
-<p>Sometimes multiple components depend on the same piece of data that appears locally, after all the components were already wired. This data may need to be passed around repeatedly, possibly across the entire application. To do this, we may have to add an argument to most methods of an application, or have to use a Reader monad everywhere.</p>
+<p>Sometimes multiple components depend on the same value that appears locally, after all the components were already wired. This value may need to be passed around repeatedly, possibly across the entire application. To do this, we may have to add an argument to most methods of an application, or have to use a Reader monad everywhere.</p>
 <p>For example, we could be adding distributed tracing to our application - after getting a RequestId from a request, we may need to carry it everywhere to add it to logs and metrics.</p>
-<p>Ideally, instead of adding the same argument to our methods, we&rsquo;d want to just move that argument data out to the class constructor - passing the argument just once during the construction of a class. However, we&rsquo;d lose the ability to automatically wire our objects, since we can only get a RequestId from a request, it&rsquo;s not available when we initially wire our object graph.</p>
-<p>Since 1.2.0 this problem is addressed in distage using <code>Subcontext</code>s - using them we can define a wireable sub-graph of our components that depend on local data unavailable during wiring, but that we can then finish wiring once we pass them the data.</p>
-<p>Starting with a graph that has no local dependencies:</p>
-<pre class="prettyprint"><code class="language-scala">import izumi.functional.bio.IO2
+<p>Ideally, instead of adding the same argument to our methods, we&rsquo;d want to just move that argument out to the class constructor - passing the argument just once during the construction of a class. However, we&rsquo;d lose the ability to automatically wire our objects, since we can only get a RequestId from a request, it&rsquo;s not available when we initially wire our object graph.</p>
+<p>Since 1.2.0 this problem is addressed in distage using <code>Subcontext</code> - with Subcontexts we can define a sub-graph of components that depend on local values unavailable during wiring, but that can be fully wired once we obtain the values.</p>
+<p>Starting with components that require a local dependency, <code>RequestId</code>, in method arguments:</p>
+<pre class="prettyprint"><code class="language-scala">import izumi.functional.bio.{Error2, F, IO2}
 import distage.{ModuleDef, Subcontext, TagKK}
 
-class PetStoreBusinessLogic[F[+_, +_]] {
+class PetStoreRepository[F[+_, +_]] {
   // requestId is a method parameter
-  def buyPetLogic(requestId: RequestId, petId: PetId, payment: Int): F[Throwable, Pet] = ???
+  def findPet(requestId: RequestId, petId: PetId): F[Nothing, Option[Pet]] = ???
+  def removePet(requestId: RequestId, petId: PetId): F[Nothing, Boolean] = ???
+}
+
+class PetStoreBusinessLogic[F[+_, +_]: Error2](
+  petStoreRepository: PetStoreRepository[F]
+) {
+  def buyPet(requestId: RequestId, petId: PetId, payment: Int): F[Throwable, Pet] = {
+    petStoreRepository.findPet(requestId, petId).flatMap {
+      case Some(pet) if payment &lt; pet.price =&gt;
+        F.fail(new RuntimeException(&quot;Insufficient funds&quot;))
+      case Some(pet) =&gt;
+        for {
+          removed &lt;- petStoreRepository.removePet(requestId, petId)
+          _       &lt;- F.when(!removed)(F.fail(new RuntimeException(&quot;No such pet&quot;)))
+        } yield pet
+      case None =&gt;
+        F.fail(new RuntimeException(&quot;No such pet&quot;))
+    }
+  }
 }
 
 def module1[F[+_, +_]: TagKK] = new ModuleDef {
@@ -1388,20 +1407,36 @@ def module1[F[+_, +_]: TagKK] = new ModuleDef {
 class PetStoreAPIHandler[F[+_, +_]: IO2](
   petStoreBusinessLogic: PetStoreBusinessLogic[F]
 ) {
-  def buyPet(petId: PetId, payment: Int): F[Throwable, Pet] = {
-    petStoreBusinessLogic.buyPetLogic(RequestId(), petId, payment)
+  def buyPetAPI(petId: PetId, payment: Int): F[Throwable, Pet] = {
+    F.suspend {
+      val requestId = RequestId()
+      petStoreBusinessLogic.buyPet(RequestId(), petId, payment)
+    }
   }
 }
 </code></pre>
-<p>We use <code>makeSubcontext</code> to delineate a portion of the graph that requires a <code>RequestId</code> to be wired:</p>
-<pre class="prettyprint"><code class="language-scala">class PetStoreBusinessLogic[F[+_, +_]](
+<p>We&rsquo;ll now change <code>RequestId</code> from method to class argument and use <code>makeSubcontext</code> to define a dynamic sub-graph for components that require a <code>RequestId</code>:</p>
+<pre class="prettyprint"><code class="language-scala">class PetStoreBusinessLogic[F[+_, +_]: Error2](
   // requestId is a now a class parameter
-  requestId: RequestId
+  requestId: RequestId,
+  petStoreRepository: PetStoreRepository[F]
 ) {
-  def buyPetLogic(petId: PetId, payment: Int): F[Throwable, Pet] = ???
+  def buyPet(petId: PetId, payment: Int): F[Throwable, Pet] = {
+    petStoreRepository.findPet(requestId, petId).flatMap {
+      case Some(pet) if payment &lt; pet.price =&gt;
+        F.fail(new RuntimeException(&quot;Insufficient funds&quot;))
+      case Some(pet) =&gt;
+        for {
+          removed &lt;- petStoreRepository.removePet(requestId, petId)
+          _       &lt;- F.when(!removed)(F.fail(new RuntimeException(&quot;No such pet&quot;)))
+        } yield pet
+      case None =&gt;
+        F.fail(new RuntimeException(&quot;No such pet&quot;))
+    }
+  }
 }
 
-def module2[F[+_, +_] : TagKK] = new ModuleDef {
+def module2[F[+_, +_]: TagKK] = new ModuleDef {
   make[PetStoreAPIHandler[F]]
 
   makeSubcontext[PetStoreBusinessLogic[F]]
@@ -1413,19 +1448,21 @@ def module2[F[+_, +_] : TagKK] = new ModuleDef {
 }
 
 class PetStoreAPIHandler[F[+_, +_]: IO2: TagKK](
-  petStoreBusinessLogic: Subcontext[PetStoreBusinessLogic[F]]
+  petStoreBusinessLogicSubcontext: Subcontext[PetStoreBusinessLogic[F]]
 ) {
-  def buyPet(petId: PetId, payment: Int): F[Throwable, Pet] = {
-    // we have to pass the parameter and create the component now, since it&#39;s not already wired.
-    petStoreBusinessLogic
-      .provide[RequestId](RequestId())
+  def buyPetAPI(petId: PetId, payment: Int): F[Throwable, Pet] = {
+    // we have to create PetStoreBusinessLogic by passing the RequestId, since we didn&#39;t receive a constructed instance
+    val requestId = RequestId()
+    petStoreBusinessLogicSubcontext
+      .provide[RequestId](requestId)
       .produceRun {
-        _.buyPetLogic(petId, payment)
+        (businessLogic: PetStoreBusinessLogic[F]) =&gt;
+          businessLogic.buyPet(petId, payment)
       }
   }
 }
 </code></pre>
-<p>We managed to move RequestId from a method parameter that polluted every method signature, to a class parameter, that we pass to the subgraph just once - when the RequestId is generated.</p>
+<p>We successfully removed RequestId from method signatures, and we now have to pass it only once to create the Subcontext.</p>
 <p>Full example:</p>
 <pre class="prettyprint"><code class="language-scala">import distage.{Injector, Lifecycle, ModuleDef, Subcontext, TagKK}
 import izumi.functional.bio.{Error2, F, IO2, Monad2, Primitives2}
@@ -1449,37 +1486,35 @@ final case class Pet(name: String, species: String, price: Int)
 final class PetStoreAPIHandler[F[+_, +_]: IO2: TagKK](
   petStoreBusinessLogic: Subcontext[PetStoreBusinessLogic[F]]
 ) {
-  def buyPet(petId: PetId, payment: Int): F[TransactionFailure, Pet] = {
+  def buyPetAPI(petId: PetId, payment: Int): F[TransactionFailure, Pet] = {
     for {
       requestId &lt;- F.sync(RequestId(UUID.randomUUID()))
-      pet &lt;- petStoreBusinessLogic
-              .provide[RequestId](requestId)
-              .produce[F[Throwable, _]]()
-              .mapK[F[Throwable, _], F[TransactionFailure, _]](Morphism1(_.orTerminate))
-              .use {
-                component =&gt;
-                  component.buyPetLogic(petId, payment)
-              }
+      businessLogicLifecycle =
+        petStoreBusinessLogic
+          .provide[RequestId](requestId)
+          .produce[F[Throwable, _]]()
+          .mapK[F[Throwable, _], F[TransactionFailure, _]](Morphism1(_.orTerminate))
+      pet &lt;- businessLogicLifecycle.use(_.buyPet(petId, payment))
     } yield pet
   }
 }
 
 final class PetStoreBusinessLogic[F[+_, +_]: Error2](
   requestId: RequestId,
-  petStoreReposistory: PetStoreReposistory[F],
+  petStoreRepository: PetStoreRepository[F],
   log: LogIO2[F],
 ) {
   private val contextLog = log.withCustomContext(&quot;requestId&quot; -&gt; requestId)
 
-  def buyPetLogic(petId: PetId, payment: Int): F[TransactionFailure, Pet] = {
+  def buyPet(petId: PetId, payment: Int): F[TransactionFailure, Pet] = {
     for {
-      pet &lt;- petStoreReposistory.findPet(petId).fromOption(TransactionFailure.NoSuchPet)
+      pet &lt;- petStoreRepository.findPet(petId).fromOption(TransactionFailure.NoSuchPet)
       _   &lt;- if (payment &lt; pet.price) {
           contextLog.error(s&quot;Insufficient $payment, couldn&#39;t afford ${pet.price}&quot;) *&gt;
           F.fail(TransactionFailure.InsufficientFunds)
         } else {
           for {
-            result &lt;- petStoreReposistory.removePet(petId)
+            result &lt;- petStoreRepository.removePet(petId)
             _      &lt;- F.when(!result)(F.fail(TransactionFailure.NoSuchPet))
             _      &lt;- contextLog.info(s&quot;Successfully bought $pet with $petId for $payment! ${payment - pet.price -&gt; &quot;overpaid&quot;}&quot;)
           } yield ()
@@ -1488,17 +1523,17 @@ final class PetStoreBusinessLogic[F[+_, +_]: Error2](
   }
 }
 
-trait PetStoreReposistory[F[+_, +_]] {
+trait PetStoreRepository[F[+_, +_]] {
   def findPet(petId: PetId): F[Nothing, Option[Pet]]
   def removePet(petId: PetId): F[Nothing, Boolean]
 }
-object PetStoreReposistory {
+object PetStoreRepository {
   final class Impl[F[+_, +_]: Monad2: Primitives2](
     requestId: RequestId,
     log: LogIO2[F],
-  ) extends Lifecycle.LiftF[F[Nothing, _], PetStoreReposistory[F]](for {
+  ) extends Lifecycle.LiftF[F[Nothing, _], PetStoreRepository[F]](for {
     state &lt;- F.mkRef(Pets.builtinPetMap)
-  } yield new PetStoreReposistory[F] {
+  } yield new PetStoreRepository[F] {
     private val contextLog = log(&quot;requestId&quot; -&gt; requestId)
 
     override def findPet(petId: PetId): F[Nothing, Option[Pet]] = {
@@ -1535,46 +1570,46 @@ object Pets {
   )
 }
 
-object Module extends ModuleDef {
-  include(module[zio.IO])
+def module[F[+_, +_]: TagKK] = new ModuleDef {
+  make[PetStoreAPIHandler[F]]
 
-  def module[F[+_, +_]: TagKK] = new ModuleDef {
-    make[PetStoreAPIHandler[F]]
+  make[IzLogger].from(IzLogger())
+  include(LogIO2Module[F]())
 
-    make[IzLogger].from(IzLogger())
-    include(LogIO2Module[F]())
-
-    makeSubcontext[PetStoreBusinessLogic[F]]
-      .withSubmodule(new ModuleDef {
-        make[PetStoreReposistory[F]].fromResource[PetStoreReposistory.Impl[F]]
-        make[PetStoreBusinessLogic[F]]
-      })
-      .localDependency[RequestId]
-  }
+  makeSubcontext[PetStoreBusinessLogic[F]]
+    .withSubmodule(new ModuleDef {
+      make[PetStoreRepository[F]].fromResource[PetStoreRepository.Impl[F]]
+      make[PetStoreBusinessLogic[F]]
+    })
+    .localDependency[RequestId]
 }
 
 import izumi.functional.bio.UnsafeRun2
 
 val runner = UnsafeRun2.createZIO()
-// runner: UnsafeRun2.ZIORunner[Any] = izumi.functional.bio.UnsafeRun2$ZIORunner@5155a05e
+// runner: UnsafeRun2.ZIORunner[Any] = izumi.functional.bio.UnsafeRun2$ZIORunner@2afa6afb
 
 val result = runner.unsafeRun {
   Injector[zio.Task]()
-    .produceRun(Module) {
-      (p: PetStoreAPIHandler[zio.IO]) =&gt;
-        p.buyPet(Pets.arnoldId, 100).attempt
+    .produceRun(module[zio.IO]) {
+      (petStoreAPI: PetStoreAPIHandler[zio.IO]) =&gt;
+        petStoreAPI.buyPetAPI(Pets.arnoldId, 100).attempt
     }
 }
-// I 2025-11-07T13:08:34.530 (basics.md:1401)  …PetStoreReposistory.findPet [612:Thread-190] requestId=RequestId(9aa4d851-45ad-486d-9c73-4d108a68211b) Looking up pet_id=PetId(c8b2ae08-1982-4ce4-b215-4128f62d63c7)
-// I 2025-11-07T13:08:34.547 (basics.md:1403)  …P.I.1.1.P.findPet.1401.1402 [612:Thread-190] requestId=RequestId(9aa4d851-45ad-486d-9c73-4d108a68211b) Got maybe_pet=Some(Pet(Arnold,Dog,99))
-// I 2025-11-07T13:08:34.556 (basics.md:1410)  …eReposistory.removePet.1409 [612:Thread-190] requestId=RequestId(9aa4d851-45ad-486d-9c73-4d108a68211b) Tried to remove pet_id=PetId(c8b2ae08-1982-4ce4-b215-4128f62d63c7), success=true
-// I 2025-11-07T13:08:34.563 (basics.md:1376)  r.M.M.P.b.1368.1374.1375 [612:Thread-190] requestId=RequestId(9aa4d851-45ad-486d-9c73-4d108a68211b) Successfully bought pet=Pet(Arnold,Dog,99) with pet_id=PetId(c8b2ae08-1982-4ce4-b215-4128f62d63c7) for payment=100! overpaid=1
+// I 2025-11-08T02:12:09.733 (basics.md:1434)  ….PetStoreRepository.findPet [609:Thread-190] requestId=RequestId(6e1b4ee4-c34e-44bb-997e-dff76aa12cea) 
+//     Looking up pet_id=PetId(7c2462e7-4741-4d6d-83c5-4f974292fd7d)
+// I 2025-11-08T02:12:09.747 (basics.md:1436)  …P.I.1.1.P.findPet.1434.1435 [609:Thread-190] requestId=RequestId(6e1b4ee4-c34e-44bb-997e-dff76aa12cea) 
+//     Got maybe_pet=Some(Pet(Arnold,Dog,99))
+// I 2025-11-08T02:12:09.756 (basics.md:1443)  …reRepository.removePet.1442 [609:Thread-190] requestId=RequestId(6e1b4ee4-c34e-44bb-997e-dff76aa12cea) 
+//     Tried to remove pet_id=PetId(7c2462e7-4741-4d6d-83c5-4f974292fd7d), success=true
+// I 2025-11-08T02:12:09.764 (basics.md:1409)  r.M.M.P.b.1401.1407.1408 [609:Thread-190] requestId=RequestId(6e1b4ee4-c34e-44bb-997e-dff76aa12cea) 
+//     Successfully bought pet=Pet(Arnold,Dog,99) with pet_id=PetId(7c2462e7-4741-4d6d-83c5-4f974292fd7d) for payment=100! overpaid=1
 // result: Either[TransactionFailure, Pet] = Right(
 //   value = Pet(name = &quot;Arnold&quot;, species = &quot;Dog&quot;, price = 99)
 // )
 </code></pre>
-<p>Using subcontexts is more efficient than <a href="advanced-features.html#depending-on-locator">nesting Injectors</a> manually, since subcontexts are planned ahead of time - there&rsquo;s no planning step for subcontexts, only execution step.</p>
-<p>Note: When your subcontext&rsquo;s submodule only contains one binding, you may be able to achieve the same result using an <a href="basics.html#auto-factories">Auto-Factory</a> instead.</p>
+<p>Subcontexts are more efficient than <a href="advanced-features.html#depending-on-locator">nested Injectors</a>, since subcontexts are planned ahead of time - there&rsquo;s no additional planning step for subcontexts after initial wiring, only an execution step.</p>
+<p>Note: If your Subcontext module contains only one binding, you can just replace it with an <a href="basics.html#auto-factories">Auto-Factory</a>.</p>
 <ul>
   <li><a href="https://matrix.to/#/!fjiBThWZrkChOzTruT:gitter.im/$PxWlZnbRyGICEgi8y5HT5m-Z111EeJu9PFt906_6iFw?via=gitter.im&via=matrix.org&via=matrix.freyachat.eu">Gitter discussion: Subcontexts implement what .NET calls Transient or Request scope</a></li>
 </ul>
@@ -1597,7 +1632,7 @@ val result = runner.unsafeRun {
 <pre class="prettyprint"><code class="language-scala">import cats.Monad
 import cats.effect.{Sync, IO}
 import cats.syntax.all._
-import distage.{Injector, Lifecycle, Locator, Module, ModuleDef, Roots, Tag, TagK, TagKK}
+import distage.{Injector, Lifecycle, Locator, Module, ModuleDef, Roots, Tag, TagK}
 
 trait Validation[F[_]] {
   def minSize(s: String, n: Int): F[Boolean]
@@ -1654,7 +1689,7 @@ def SyncProgram[F[_]: TagK]: Module = ProgramModule[F] ++ SyncInterpreters[F]
 val objectsLifecycle: Lifecycle[IO, Locator] = {
   Injector[IO]().produce(SyncProgram[IO], Roots.target[TaglessProgram[IO]])
 }
-// objectsLifecycle: Lifecycle[IO, Locator] = izumi.functional.lifecycle.LifecycleMethodImpls$$anon$2@4bc6453a
+// objectsLifecycle: Lifecycle[IO, Locator] = izumi.functional.lifecycle.LifecycleMethodImpls$$anon$2@6b7587d6
 
 // run
 
@@ -1702,17 +1737,19 @@ def chooseInterpreters(isDummy: Boolean): Lifecycle[Task, TaglessProgram[Task]] 
 import izumi.functional.bio.UnsafeRun2
 
 val runner: UnsafeRun2[zio.IO] = UnsafeRun2.createZIO()
-// runner: UnsafeRun2[zio.package.IO] = izumi.functional.bio.UnsafeRun2$ZIORunner@644df38c
+// runner: UnsafeRun2[zio.package.IO] = izumi.functional.bio.UnsafeRun2$ZIORunner@c2f972d
 
 val zioEffect: Task[Unit] = chooseInterpreters(isDummy = true).use(_.run)
-// zioEffect: Task[Unit] = DynamicNoBox(izumi.functional.quasi.QuasiPrimitivesFromBIO.bracket(QuasiIO.scala:368),1,zio.ZIO$Release$$Lambda/0x00007fff833a1c48@3a394c7c)
+// zioEffect: Task[Unit] = DynamicNoBox(izumi.functional.quasi.QuasiPrimitivesFromBIO.bracket(QuasiIO.scala:368),1,zio.ZIO$Release$$Lambda/0x00007fff8336b280@6a56f7aa)
 
 runner.unsafeRun(zioEffect)
 // awesomesauce!
 </code></pre>
 <h3><a href="#kind-polymorphism" name="kind-polymorphism" class="anchor"><span class="anchor-link"></span></a>Kind polymorphism</h3>
 <p>Modules can be polymorphic over arbitrary kinds - use <code>TagKK</code> to abstract over bifunctors:</p>
-<pre class="prettyprint"><code class="language-scala">class BifunctorIOModule[F[_, _]: TagKK] extends ModuleDef
+<pre class="prettyprint"><code class="language-scala">import distage.TagKK
+
+class BifunctorIOModule[F[_, _]: TagKK] extends ModuleDef
 </code></pre>
 <p>Or use <code>Tag.auto.T</code> to abstract over any kind:</p>
 <pre class="prettyprint"><code class="language-scala">class MonadTransformerModule[F[_[_], _]: Tag.auto.T] extends ModuleDef
