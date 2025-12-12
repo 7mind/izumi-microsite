@@ -279,17 +279,17 @@ scalacOptions += &quot;-Yretain-trees&quot;
 <p>If you&rsquo;re using Scala <code>2.12</code> you <strong>must</strong> enable <code>-Ypartial-unification</code> and either <code>-Xsource:2.13</code> or <code>-Xsource:3</code> for this library to work correctly:</p>
 <pre class="prettyprint"><code class="language-scala">// REQUIRED options for Scala 2.12
 scalacOptions += &quot;-Ypartial-unification&quot;
-scalacOptions += &quot;-Xsource:3&quot; // or &quot;-Xsource:2.13&quot; if absolutely necessary
+scalacOptions += &quot;-Xsource:3&quot; // or at least &quot;-Xsource:2.13&quot;
 </code></pre>
-<p>Additionally, some source examples in this document use <a href="https://docs.scala-lang.org/scala3/guides/migration/plugin-kind-projector.html">underscore syntax for type lambdas</a> which you can enable with the following options:</p>
-<pre class="prettyprint"><code class="language-scala">// For Scala 2
+<p>Additionally, all source examples in this document use <a href="https://docs.scala-lang.org/scala3/guides/migration/plugin-kind-projector.html">underscore syntax for type lambdas</a> which you can enable with the following options:</p>
+<pre class="prettyprint"><code class="language-scala">// For Scala 3
+scalacOptions += &quot;-Xkind-projector:underscores&quot; // or &quot;-Ykind-projector:underscores&quot; on old versions
+
+// For Scala 2
 scalacOptions += &quot;-P:kind-projector:underscore-placeholders&quot;
 scalacOptions += &quot;-Xsource:3&quot;
 
 addCompilerPlugin(&quot;org.typelevel&quot; % &quot;kind-projector&quot; % &quot;0.13.3&quot; cross CrossVersion.full)
-
-// For Scala 3
-scalacOptions += &quot;-Ykind-projector:underscores&quot;
 </code></pre>
 <h3><a href="#hello-world-example" name="hello-world-example" class="anchor"><span class="anchor-link"></span></a>Hello World example</h3>
 <p>Suppose we have an abstract <code>Greeter</code> component, and some other components that depend on it:</p>
@@ -341,7 +341,7 @@ def HelloByeModule = new ModuleDef {
 <pre class="prettyprint"><code class="language-scala">import distage.{Activation, Injector, Roots}
 
 val injector = Injector[Task]()
-// injector: Injector[Task] = izumi.distage.InjectorDefaultImpl@6bfb4d1d
+// injector: Injector[Task] = izumi.distage.InjectorDefaultImpl@34e0f059
 
 val plan = injector.plan(HelloByeModule, Roots.target[HelloByeApp], Activation.empty).getOrThrow()
 // plan: izumi.distage.model.plan.Plan = 1: {type.MdocSession::MdocApp1::Greeter} BindingOrigin((basics.md:84)) := call(π:Constructor(): MdocSession::MdocApp1::PrintGreeter[32m) {}
@@ -359,7 +359,7 @@ val plan = injector.plan(HelloByeModule, Roots.target[HelloByeApp], Activation.e
 // Interpret into a Lifecycle value
 
 val resource = injector.produce(plan)
-// resource: izumi.distage.model.definition.package.Lifecycle[Task, izumi.distage.model.Locator] = izumi.functional.lifecycle.LifecycleMethodImpls$$anon$2@148095cf
+// resource: izumi.distage.model.definition.package.Lifecycle[Task, izumi.distage.model.Locator] = izumi.functional.lifecycle.LifecycleMethodImpls$$anon$2@14010e23
 
 // Use the object graph:
 // After `.use` exits, all objects will be deallocated,
@@ -369,12 +369,12 @@ val effect = resource.use {
   objects =&gt;
     objects.get[HelloByeApp].run
 }
-// effect: Task[Unit] = DynamicNoBox(izumi.functional.quasi.QuasiPrimitivesFromBIO.bracket(QuasiIO.scala:368),1,zio.ZIO$Release$$Lambda/0x00007fff6861e1b8@2a627030)
+// effect: Task[Unit] = DynamicNoBox(izumi.functional.quasi.QuasiPrimitivesFromBIO.bracket(QuasiIO.scala:368),1,zio.ZIO$Release$$Lambda/0x00007fff676a94b0@4cee1c8f)
 
 // Run the resulting program
 
 val runner = UnsafeRun2.createZIO()
-// runner: UnsafeRun2.ZIORunner[Any] = izumi.functional.bio.UnsafeRun2$ZIORunner@4e120ee7
+// runner: UnsafeRun2.ZIORunner[Any] = izumi.functional.bio.UnsafeRun2$ZIORunner@193e10c
 
 runner.unsafeRun(effect)
 // What&#39;s your name?
@@ -639,14 +639,14 @@ val dbResource = Resource.make(
     println(&quot;Connecting to DB!&quot;)
     new DBConnection
 })(release = _ =&gt; IO(println(&quot;Disconnecting DB&quot;)))
-// dbResource: Resource[IO, DBConnection] = Allocate(cats.effect.kernel.Resource$$$Lambda/0x00007fff6746f2d8@d874bfc)
+// dbResource: Resource[IO, DBConnection] = Allocate(cats.effect.kernel.Resource$$$Lambda/0x00007fff68612018@6a8bf726)
 
 val mqResource = Resource.make(
   acquire = IO {
    println(&quot;Connecting to Message Queue!&quot;)
    new MessageQueueConnection
 })(release = _ =&gt; IO(println(&quot;Disconnecting Message Queue&quot;)))
-// mqResource: Resource[IO, MessageQueueConnection] = Allocate(cats.effect.kernel.Resource$$$Lambda/0x00007fff6746f2d8@3d160b5b)
+// mqResource: Resource[IO, MessageQueueConnection] = Allocate(cats.effect.kernel.Resource$$$Lambda/0x00007fff68612018@14502f50)
 
 class MyApp(
   db: DBConnection,
@@ -670,7 +670,7 @@ val objectGraphResource = {
   Injector[IO]()
     .produce(module, Roots.target[MyApp])
 }
-// objectGraphResource: izumi.distage.model.definition.package.Lifecycle[IO, izumi.distage.model.Locator] = izumi.functional.lifecycle.LifecycleMethodImpls$$anon$2@1ad2c23b
+// objectGraphResource: izumi.distage.model.definition.package.Lifecycle[IO, izumi.distage.model.Locator] = izumi.functional.lifecycle.LifecycleMethodImpls$$anon$2@7dd89465
 
 objectGraphResource
   .use(_.get[MyApp].run)
@@ -711,7 +711,7 @@ val closedInit = Injector()
       init
 }
 // true
-// closedInit: Init = repl.MdocSession$MdocApp21$Init@132f8f2
+// closedInit: Init = repl.MdocSession$MdocApp21$Init@5f2c3f4c
 
 println(closedInit.initialized)
 // false
@@ -815,7 +815,7 @@ val catsEffectHello = polymorphicHelloWorld[cats.effect.IO]
 //val monixHello = polymorphicHelloWorld[monix.eval.Task]
 
 val zioHello = polymorphicHelloWorld[zio.IO[Throwable, _]]
-// zioHello: zio.ZIO[Any, Throwable, Unit] = DynamicNoBox(izumi.functional.quasi.QuasiPrimitivesFromBIO.bracket(QuasiIO.scala:368),1,zio.ZIO$Release$$Lambda/0x00007fff6861e1b8@c09658)
+// zioHello: zio.ZIO[Any, Throwable, Unit] = DynamicNoBox(izumi.functional.quasi.QuasiPrimitivesFromBIO.bracket(QuasiIO.scala:368),1,zio.ZIO$Release$$Lambda/0x00007fff676a94b0@621eff30)
 
 //val monixBioHello = polymorphicHelloWorld[monix.bio.IO[Throwable, _]]
 </code></pre>
@@ -891,7 +891,7 @@ object AppModule extends ModuleDef {
 // wire the graph and get the app
 
 val app = Injector().produceGet[App](AppModule).unsafeGet()
-// app: App = repl.MdocSession$MdocApp26$App$Impl@4eaa8d19
+// app: App = repl.MdocSession$MdocApp26$App$Impl@1b89ef0c
 
 // check how it works
 
@@ -1041,12 +1041,12 @@ val io = Injector[Task]()
         res2 &lt;- kv.get(&quot;apple&quot;)
       } yield res1 + res2
   }
-// io: Task[String] = DynamicNoBox(izumi.functional.quasi.QuasiPrimitivesFromBIO.bracket(QuasiIO.scala:368),1,zio.ZIO$Release$$Lambda/0x00007fff6861e1b8@29b77e9a)
+// io: Task[String] = DynamicNoBox(izumi.functional.quasi.QuasiPrimitivesFromBIO.bracket(QuasiIO.scala:368),1,zio.ZIO$Release$$Lambda/0x00007fff676a94b0@209e4226)
 
 import izumi.functional.bio.UnsafeRun2
 
 val runtime = UnsafeRun2.createZIO()
-// runtime: UnsafeRun2.ZIORunner[Any] = izumi.functional.bio.UnsafeRun2$ZIORunner@592a3849
+// runtime: UnsafeRun2.ZIORunner[Any] = izumi.functional.bio.UnsafeRun2$ZIORunner@69a123
 
 runtime.unsafeRun(io)
 // res38: String = pieipad
@@ -1115,10 +1115,10 @@ trait World {
 // using service functions from everywhere
 
 val hello: URIO[Hello, String] = ZIO.serviceWithZIO(_.hello)
-// hello: URIO[Hello, String] = Stateful(repl.MdocSession.MdocApp39.hello(basics.md:921),zio.FiberRef$unsafe$PatchFiber$$Lambda/0x00007fff686670e0@40fb45d0)
+// hello: URIO[Hello, String] = Stateful(repl.MdocSession.MdocApp39.hello(basics.md:921),zio.FiberRef$unsafe$PatchFiber$$Lambda/0x00007fff675e78a8@307d305d)
 
 val world: URIO[World, String] = ZIO.serviceWithZIO(_.world)
-// world: URIO[World, String] = Stateful(repl.MdocSession.MdocApp39.world(basics.md:924),zio.FiberRef$unsafe$PatchFiber$$Lambda/0x00007fff686670e0@28dfe042)
+// world: URIO[World, String] = Stateful(repl.MdocSession.MdocApp39.world(basics.md:924),zio.FiberRef$unsafe$PatchFiber$$Lambda/0x00007fff675e78a8@32de09f5)
 
 // service implementations
 
@@ -1131,7 +1131,7 @@ val makeHello = {
     val hello = ZIO.succeed(&quot;Hello&quot;)
   }
 }
-// makeHello: ZIO[Any with Any with zio.Scope, java.io.IOException, AnyRef with Hello{val hello: zio.ZIO[Any,Nothing,String]}] = FlatMap(repl.MdocSession.MdocApp39.makeHello(basics.md:929),DynamicNoBox(repl.MdocSession.MdocApp39.makeHello(basics.md:931),1,zio.ZIO$$Lambda/0x00007fff676ac000@705b3007),zio.ZIO$$Lambda/0x00007fff6868ac08@4a40015)
+// makeHello: ZIO[Any with Any with zio.Scope, java.io.IOException, AnyRef with Hello{val hello: zio.ZIO[Any,Nothing,String]}] = FlatMap(repl.MdocSession.MdocApp39.makeHello(basics.md:929),DynamicNoBox(repl.MdocSession.MdocApp39.makeHello(basics.md:931),1,zio.ZIO$$Lambda/0x00007fff6866fa38@37e3c4d4),zio.ZIO$$Lambda/0x00007fff67449f00@227a0cef)
 
 val makeWorld = {
   for {
@@ -1140,7 +1140,7 @@ val makeWorld = {
     val world = counter.get.map(c =&gt; if (c &lt; 1) &quot;World&quot; else &quot;THE World&quot;)
   }
 }
-// makeWorld: ZIO[Any, Nothing, AnyRef with World{val world: zio.ZIO[Any,Nothing,String]}] = FlatMap(repl.MdocSession.MdocApp39.makeWorld(basics.md:940),Sync(repl.MdocSession.MdocApp39.makeWorld(basics.md:940),zio.Ref$$$Lambda/0x00007fff676a0e68@76e725b4),zio.ZIO$$Lambda/0x00007fff6868ac08@52e727d5)
+// makeWorld: ZIO[Any, Nothing, AnyRef with World{val world: zio.ZIO[Any,Nothing,String]}] = FlatMap(repl.MdocSession.MdocApp39.makeWorld(basics.md:940),Sync(repl.MdocSession.MdocApp39.makeWorld(basics.md:940),zio.Ref$$$Lambda/0x00007fff6866ca80@5dc96abe),zio.ZIO$$Lambda/0x00007fff67449f00@2f26089c)
 
 // the main function
 
@@ -1151,7 +1151,7 @@ val turboFunctionalHelloWorld: RIO[Hello with World, Unit] = {
     _     &lt;- Console.print(s&quot;$hello $world&quot;)
   } yield ()
 }
-// turboFunctionalHelloWorld: RIO[Hello with World, Unit] = FlatMap(repl.MdocSession.MdocApp39.turboFunctionalHelloWorld(basics.md:949),Stateful(repl.MdocSession.MdocApp39.hello(basics.md:921),zio.FiberRef$unsafe$PatchFiber$$Lambda/0x00007fff686670e0@40fb45d0),&lt;function1&gt;)
+// turboFunctionalHelloWorld: RIO[Hello with World, Unit] = FlatMap(repl.MdocSession.MdocApp39.turboFunctionalHelloWorld(basics.md:949),Stateful(repl.MdocSession.MdocApp39.hello(basics.md:921),zio.FiberRef$unsafe$PatchFiber$$Lambda/0x00007fff675e78a8@307d305d),&lt;function1&gt;)
 
 def module = new ModuleDef {
   make[Hello].fromZIOEnv(makeHello)
@@ -1161,12 +1161,12 @@ def module = new ModuleDef {
 
 val main = Injector[Task]()
   .produceRun[Unit](module)((_: Unit) =&gt; ZIO.unit)
-// main: Task[Unit] = DynamicNoBox(izumi.functional.quasi.QuasiPrimitivesFromBIO.bracket(QuasiIO.scala:368),1,zio.ZIO$Release$$Lambda/0x00007fff6861e1b8@681dfbe9)
+// main: Task[Unit] = DynamicNoBox(izumi.functional.quasi.QuasiPrimitivesFromBIO.bracket(QuasiIO.scala:368),1,zio.ZIO$Release$$Lambda/0x00007fff676a94b0@5ca0bb93)
 
 import izumi.functional.bio.UnsafeRun2
 
 val runtime = UnsafeRun2.createZIO()
-// runtime: UnsafeRun2.ZIORunner[Any] = izumi.functional.bio.UnsafeRun2$ZIORunner@7488dd2a
+// runtime: UnsafeRun2.ZIORunner[Any] = izumi.functional.bio.UnsafeRun2$ZIORunner@5337bce1
 
 runtime.unsafeRun(main)
 // Creating Enterprise Hellower...
@@ -1438,7 +1438,7 @@ class PetStoreAPIHandler[F[+_, +_]: IO2](
 def module2[F[+_, +_]: TagKK] = new ModuleDef {
   make[PetStoreAPIHandler[F]]
 
-  makeSubcontext[PetStoreBusinessLogic[F]]
+  makeSubcontext[F[Throwable, _], PetStoreBusinessLogic[F]]
     .withSubmodule(new ModuleDef {
       make[PetStoreRepository[F]]
       make[PetStoreBusinessLogic[F]]
@@ -1447,7 +1447,7 @@ def module2[F[+_, +_]: TagKK] = new ModuleDef {
 }
 
 class PetStoreAPIHandler[F[+_, +_]: IO2: TagKK](
-  petStoreBusinessLogicSubcontext: Subcontext[PetStoreBusinessLogic[F]]
+  petStoreBusinessLogicSubcontext: Subcontext[F[Throwable, _], PetStoreBusinessLogic[F]]
 ) {
   def buyPetAPI(petId: PetId, payment: Int): F[Throwable, Pet] = {
     // we have to create PetStoreBusinessLogic by passing the RequestId, since we didn&#39;t receive a constructed instance
@@ -1483,17 +1483,16 @@ object TransactionFailure {
 final case class Pet(name: String, species: String, price: Int)
 
 final class PetStoreAPIHandler[F[+_, +_]: IO2: TagKK](
-  petStoreBusinessLogic: Subcontext[PetStoreBusinessLogic[F]]
+  petStoreBusinessLogic: Subcontext[F[Throwable, _], PetStoreBusinessLogic[F]]
 ) {
-  def buyPetAPI(petId: PetId, payment: Int): F[TransactionFailure, Pet] = {
+  def buyPetAPI(petId: PetId, payment: Int): F[Throwable, Either[TransactionFailure, Pet]] = {
     for {
       requestId &lt;- F.sync(RequestId(UUID.randomUUID()))
       businessLogicLifecycle =
         petStoreBusinessLogic
           .provide[RequestId](requestId)
-          .produce[F[Throwable, _]]()
-          .mapK[F[Throwable, _], F[TransactionFailure, _]](Morphism1(_.orTerminate))
-      pet &lt;- businessLogicLifecycle.use(_.buyPet(petId, payment))
+          .produce()
+      pet &lt;- businessLogicLifecycle.use(_.buyPet(petId, payment).attempt)
     } yield pet
   }
 }
@@ -1575,7 +1574,7 @@ def module[F[+_, +_]: TagKK] = new ModuleDef {
   make[IzLogger].from(IzLogger())
   include(LogIO2Module[F]())
 
-  makeSubcontext[PetStoreBusinessLogic[F]]
+  makeSubcontext[F[Throwable, _], PetStoreBusinessLogic[F]]
     .withSubmodule(new ModuleDef {
       make[PetStoreRepository[F]].fromResource[PetStoreRepository.Impl[F]]
       make[PetStoreBusinessLogic[F]]
@@ -1586,23 +1585,23 @@ def module[F[+_, +_]: TagKK] = new ModuleDef {
 import izumi.functional.bio.UnsafeRun2
 
 val runner = UnsafeRun2.createZIO()
-// runner: UnsafeRun2.ZIORunner[Any] = izumi.functional.bio.UnsafeRun2$ZIORunner@56be4535
+// runner: UnsafeRun2.ZIORunner[Any] = izumi.functional.bio.UnsafeRun2$ZIORunner@60a2ce94
 
 val result = runner.unsafeRun {
   Injector[zio.Task]()
     .produceRun(module[zio.IO]) {
       (petStoreAPI: PetStoreAPIHandler[zio.IO]) =&gt;
-        petStoreAPI.buyPetAPI(Pets.arnoldId, 100).attempt
+        petStoreAPI.buyPetAPI(Pets.arnoldId, 100)
     }
 }
-// I 2025-12-12T20:49:24.861 (basics.md:1434)  ….PetStoreRepository.findPet [621:Thread-189] requestId=RequestId(cd89a292-d963-4cd1-b094-57304d9336d7) 
-//     Looking up pet_id=PetId(f7490d33-3485-4a04-add3-6e30d076c46a)
-// I 2025-12-12T20:49:24.877 (basics.md:1436)  …P.I.1.1.P.findPet.1434.1435 [621:Thread-189] requestId=RequestId(cd89a292-d963-4cd1-b094-57304d9336d7) 
+// I 2025-12-12T21:44:47.189 (basics.md:1433)  ….PetStoreRepository.findPet [617:Thread-188] requestId=RequestId(0e514321-dbac-434a-ab8f-c6a958057ab3) 
+//     Looking up pet_id=PetId(ea9c6bcb-3e73-4fa8-a2b2-bf9cb9be5a9b)
+// I 2025-12-12T21:44:47.201 (basics.md:1435)  …P.I.1.1.P.findPet.1433.1434 [617:Thread-188] requestId=RequestId(0e514321-dbac-434a-ab8f-c6a958057ab3) 
 //     Got maybe_pet=Some(Pet(Arnold,Dog,99))
-// I 2025-12-12T20:49:24.885 (basics.md:1443)  …reRepository.removePet.1442 [621:Thread-189] requestId=RequestId(cd89a292-d963-4cd1-b094-57304d9336d7) 
-//     Tried to remove pet_id=PetId(f7490d33-3485-4a04-add3-6e30d076c46a), success=true
-// I 2025-12-12T20:49:24.892 (basics.md:1409)  r.M.M.P.b.1401.1407.1408 [621:Thread-189] requestId=RequestId(cd89a292-d963-4cd1-b094-57304d9336d7) 
-//     Successfully bought pet=Pet(Arnold,Dog,99) with pet_id=PetId(f7490d33-3485-4a04-add3-6e30d076c46a) for payment=100! overpaid=1
+// I 2025-12-12T21:44:47.209 (basics.md:1442)  …reRepository.removePet.1441 [617:Thread-188] requestId=RequestId(0e514321-dbac-434a-ab8f-c6a958057ab3) 
+//     Tried to remove pet_id=PetId(ea9c6bcb-3e73-4fa8-a2b2-bf9cb9be5a9b), success=true
+// I 2025-12-12T21:44:47.215 (basics.md:1408)  r.M.M.P.b.1400.1406.1407 [617:Thread-188] requestId=RequestId(0e514321-dbac-434a-ab8f-c6a958057ab3) 
+//     Successfully bought pet=Pet(Arnold,Dog,99) with pet_id=PetId(ea9c6bcb-3e73-4fa8-a2b2-bf9cb9be5a9b) for payment=100! overpaid=1
 // result: Either[TransactionFailure, Pet] = Right(
 //   value = Pet(name = &quot;Arnold&quot;, species = &quot;Dog&quot;, price = 99)
 // )
@@ -1688,7 +1687,7 @@ def SyncProgram[F[_]: TagK]: Module = ProgramModule[F] ++ SyncInterpreters[F]
 val objectsLifecycle: Lifecycle[IO, Locator] = {
   Injector[IO]().produce(SyncProgram[IO], Roots.target[TaglessProgram[IO]])
 }
-// objectsLifecycle: Lifecycle[IO, Locator] = izumi.functional.lifecycle.LifecycleMethodImpls$$anon$2@105414f4
+// objectsLifecycle: Lifecycle[IO, Locator] = izumi.functional.lifecycle.LifecycleMethodImpls$$anon$2@54c5a075
 
 // run
 
@@ -1736,10 +1735,10 @@ def chooseInterpreters(isDummy: Boolean): Lifecycle[Task, TaglessProgram[Task]] 
 import izumi.functional.bio.UnsafeRun2
 
 val runner: UnsafeRun2[zio.IO] = UnsafeRun2.createZIO()
-// runner: UnsafeRun2[zio.package.IO] = izumi.functional.bio.UnsafeRun2$ZIORunner@da4cece
+// runner: UnsafeRun2[zio.package.IO] = izumi.functional.bio.UnsafeRun2$ZIORunner@6f520d0f
 
 val zioEffect: Task[Unit] = chooseInterpreters(isDummy = true).use(_.run)
-// zioEffect: Task[Unit] = DynamicNoBox(izumi.functional.quasi.QuasiPrimitivesFromBIO.bracket(QuasiIO.scala:368),1,zio.ZIO$Release$$Lambda/0x00007fff6861e1b8@2708a567)
+// zioEffect: Task[Unit] = DynamicNoBox(izumi.functional.quasi.QuasiPrimitivesFromBIO.bracket(QuasiIO.scala:368),1,zio.ZIO$Release$$Lambda/0x00007fff676a94b0@3e0a255f)
 
 runner.unsafeRun(zioEffect)
 // awesomesauce!
