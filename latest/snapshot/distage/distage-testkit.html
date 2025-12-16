@@ -393,9 +393,11 @@ class ScoreSimpleTest extends Test {
 }
 </code></pre>
 <pre><code>ScoreSimpleTest:
+- Score should increase by config star value
+!!!suite level completed 0 SuiteId(repl.MdocSession$MdocApp$$anon$3) trying to set status
+!!! suite status set for SuiteId(repl.MdocSession$MdocApp$$anon$3)
   - Score should increase by config star value from DI 
 - Score should increase by config star value from DI
-- Score should increase by config star value
 
 
 </code></pre>
@@ -434,10 +436,12 @@ class ScoreEffectsTest extends Test {
 </code></pre>
 <pre><code>ScoreEffectsTest:
 Config(10,256,10)
-  - testkit operations with effects should support assertions in effects 
-- testkit operations with effects should support assertions in effects
   - testkit operations with effects should support assertions outside of effect 
 - testkit operations with effects should support assertions outside of effect
+  - testkit operations with effects should support assertions in effects 
+- testkit operations with effects should support assertions in effects
+!!!suite level completed 0 SuiteId(repl.MdocSession$MdocApp$$anon$4) trying to set status
+!!! suite status set for SuiteId(repl.MdocSession$MdocApp$$anon$4)
 
 
 </code></pre>
@@ -588,10 +592,13 @@ class ProdBonusServiceTest extends BonusServiceTest with ProdTest
 class DummyBonusServiceTest extends BonusServiceTest with DummyTest
 </code></pre>
 <pre><code>DummyBonusServiceTest:
-  - BonusService should initially use default bonus as current 
-- BonusService should initially use default bonus as current
+currentBonus = 10
   - BonusService should increment by delta 
 - BonusService should increment by delta
+  - BonusService should initially use default bonus as current 
+- BonusService should initially use default bonus as current
+!!!suite level completed 0 SuiteId(repl.MdocSession$MdocApp$$anon$5) trying to set status
+!!! suite status set for SuiteId(repl.MdocSession$MdocApp$$anon$5)
 
 
 </code></pre>
@@ -760,10 +767,18 @@ class NotUsingMemoTest extends DummyTest {
 </code></pre>
 <p>These two tests will run sequentially. There is no memoization configured for the dependencies. Each test case will acquire a fresh instance from the object graph. For our demonstration this results in a new <code>BonusService</code> instance for each test case.</p>
 <pre><code>NotUsingMemoTest:
+
+ bonusService = repl.MdocSession$MdocApp$DummyBonusService$Impl@66c9c6d6 
+
   - Not memoizing BonusService should use a new instance in the first case 
 - Not memoizing BonusService should use a new instance in the first case
+
+ bonusService = repl.MdocSession$MdocApp$DummyBonusService$Impl@62f65ed7 
+
   - Not memoizing BonusService should use a new instance in the second case 
 - Not memoizing BonusService should use a new instance in the second case
+!!!suite level completed 0 SuiteId(repl.MdocSession$MdocApp$$anon$6) trying to set status
+!!! suite status set for SuiteId(repl.MdocSession$MdocApp$$anon$6)
 
 
 </code></pre>
@@ -841,8 +856,22 @@ class AnotherUsingMemoTest extends DummyTest {
 </code></pre>
 <p>Both tests suites, all three test cases, will use same memoization environment and the same <code>bonusService</code> instance:</p>
 <pre><code>UsingMemoTest:
+
+ bonusService = repl.MdocSession$MdocApp$DummyBonusService$Impl@27f4cced 
+
+
+ bonusService = repl.MdocSession$MdocApp$DummyBonusService$Impl@27f4cced 
+
   - Memoizing BonusService should use a new instance in the first case 
 - Memoizing BonusService should use a new instance in the first case
+currentBonus = -244417350
+!!!suite level completed 1 SuiteId(repl.MdocSession$MdocApp$$anon$8) trying to set status
+!!! suite status set for SuiteId(repl.MdocSession$MdocApp$$anon$8)
+
+ bonusService = repl.MdocSession$MdocApp$DummyBonusService$Impl@27f4cced 
+
+!!!suite level completed 1 SuiteId(repl.MdocSession$MdocApp$$anon$7) trying to set status
+!!! suite status set for SuiteId(repl.MdocSession$MdocApp$$anon$7)
   - Memoizing BonusService should use the same instance in the second case 
 - Memoizing BonusService should use the same instance in the second case
 
@@ -876,7 +905,7 @@ for each test case
 <p>This feature therefore allows you to selectively run only the fast in-memory tests that have no external dependencies by shutting down the docker daemon (or another source of external dependencies).</p>
 <p>Integration checks are executed only in <code>distage-testkit</code> tests and <code>distage-framework</code> <a href="distage-framework.html#roles">roles</a>.</p>
 <h3><a href="#customization" name="customization" class="anchor"><span class="anchor-link"></span></a>Customization</h3>
-<p><code>TestTreeRunner[F]</code> component may be overridden in test module (TestConfig <code>.pluginConfig</code> and/or <code>.moduleOverrides</code>) to use a custom test execution strategy</p>
+<p><a href="/latest/snapshot/api/izumi/distage/testkit/runner/impl/TestTreeRunner.html" title="izumi.distage.testkit.runner.impl.TestTreeRunner"><code>`TestTreeRunner`</code></a> component may be overridden in test module (TestConfig <code>.pluginConfig</code> and/or <code>.moduleOverrides</code>) to use a custom test execution strategy. This also applies to all dependencies of TestTreeRunner - <a href="/latest/snapshot/api/izumi/distage/testkit/runner/impl/IndividualTestRunner.html" title="izumi.distage.testkit.runner.impl.IndividualTestRunner"><code>`IndividualTestRunner`</code></a>, as well as all content of <a href="/latest/snapshot/api/izumi/distage/testkit/runner/impl/TestRuntimeModule.html" title="izumi.distage.testkit.runner.impl.TestRuntimeModule"><code>`TestRuntimeModule`</code></a></p>
 <h3><a href="#references" name="references" class="anchor"><span class="anchor-link"></span></a>References</h3>
 <ul>
   <li><a href="https://github.com/7mind/distage-example">distage Example Project</a> project shows how to use <code>distage</code>, <code>distage-testkit</code> &amp; <code>distage-framework-docker</code></li>

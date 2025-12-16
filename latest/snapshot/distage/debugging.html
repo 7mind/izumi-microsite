@@ -242,8 +242,8 @@ Injector[cats.effect.IO]().assert(badModule, Roots.target[A])
 //  - {type.repl.MdocSession.MdocApp0.A}
 // 
 // 	at izumi.distage.planning.solver.PlanVerifier$PlanVerifierResult.throwOnError(PlanVerifier.scala:308)
-// 	at izumi.distage.model.Injector.assert(Injector.scala:270)
-// 	at izumi.distage.model.Injector.assert$(Injector.scala:264)
+// 	at izumi.distage.model.Injector.assert(Injector.scala:275)
+// 	at izumi.distage.model.Injector.assert$(Injector.scala:269)
 // 	at izumi.distage.InjectorDefaultImpl.assert(InjectorDefaultImpl.scala:23)
 // 	at repl.MdocSession$MdocApp0$$anonfun$3.apply$mcV$sp(debugging.md:30)
 // 	at repl.MdocSession$MdocApp0$$anonfun$3.apply(debugging.md:30)
@@ -261,7 +261,7 @@ Injector[cats.effect.IO]().assert(goodModule, Roots.target[A])
 <h3><a href="#pretty-printing-plans" name="pretty-printing-plans" class="anchor"><span class="anchor-link"></span></a>Pretty-printing plans</h3>
 <p>You can print the output of <code>plan.render()</code> to get detailed info on what will happen during instantiation. The printout includes source and line numbers so your IDE can show you where the binding was defined!</p>
 <pre class="prettyprint"><code class="language-scala">val plan = Injector().plan(goodModule, Roots.target[A]).getOrThrow()
-// plan: izumi.distage.model.plan.Plan = 1: {effect.{type.MdocSession::MdocApp0::B}} BindingOrigin((debugging.md:41)) := value cats.effect.IO$Delay#-1126002338
+// plan: izumi.distage.model.plan.Plan = 1: {effect.{type.MdocSession::MdocApp0::B}} BindingOrigin((debugging.md:41)) := value cats.effect.IO$Delay#233594661
 // 2: {type.MdocSession::MdocApp0::B} BindingOrigin((debugging.md:41)) := effect[λ %0 → cats.effect.IO[+0]]{effect.{type.MdocSession::MdocApp0::B}}
 // 3: {type.MdocSession::MdocApp0::A} BindingOrigin((debugging.md:40)) :=
 // 4:     call(π:Constructor(MdocSession::MdocApp0::B): MdocSession::MdocApp0::A[32m) {
@@ -269,7 +269,7 @@ Injector[cats.effect.IO]().assert(goodModule, Roots.target[A])
 // 6:     }
 
 println(plan.render())
-// 1: {effect.{type.MdocSession::MdocApp0::B}} BindingOrigin((debugging.md:41)) := value cats.effect.IO$Delay#-1126002338
+// 1: {effect.{type.MdocSession::MdocApp0::B}} BindingOrigin((debugging.md:41)) := value cats.effect.IO$Delay#233594661
 // 2: {type.MdocSession::MdocApp0::B} BindingOrigin((debugging.md:41)) := effect[λ %0 → cats.effect.IO[+0]]{effect.{type.MdocSession::MdocApp0::B}}
 // 3: {type.MdocSession::MdocApp0::A} BindingOrigin((debugging.md:40)) :=
 // 4:     call(π:Constructor(MdocSession::MdocApp0::B): MdocSession::MdocApp0::A[32m) {
@@ -307,8 +307,8 @@ println(plan.renderDependees(DIKey[B]))
 <p>Add <code>GraphDumpBootstrapModule</code> to your <code>Injector</code>&rsquo;s configuration to enable writing GraphViz files with a graphical representation of <code>distage.Plan</code>. Data will be saved to <code>./target/plan-last-full.gv</code> and <code>./target/plan-last-nogc.gv</code> in the current working directory.</p>
 <pre class="prettyprint"><code class="language-scala">import distage.{GraphDumpBootstrapModule, Injector}
 
-Injector(GraphDumpBootstrapModule)
-// res6: Injector[[A]izumi.fundamentals.platform.functional.package.Identity[A]] = izumi.distage.InjectorDefaultImpl@347f2cd7
+Injector(bootstrapOverrides = Seq(GraphDumpBootstrapModule))
+// res6: Injector[[A]izumi.fundamentals.platform.functional.package.Identity[A]] = izumi.distage.InjectorDefaultImpl@3faf3111
 </code></pre>
 <p>You&rsquo;ll need a <code>GraphViz</code> installation to render these files into a viewable PNG images:</p>
 <pre class="prettyprint"><code class="language-bash">dot -Tpng target/plan-last-nogc.gv -o out.png
