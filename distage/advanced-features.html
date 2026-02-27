@@ -180,7 +180,7 @@ data-md-source="github">
 <ul style="display: none">
 <li class="md-nav__item md-version" id="project.version">
 <label class="md-nav__link" for="__version">
-<i class="md-icon" title="Version">label_outline</i> 1.2.23
+<i class="md-icon" title="Version">label_outline</i> 1.2.24
 </label>
 </li>
 </ul>
@@ -269,7 +269,7 @@ def module = new ModuleDef {
 val objects = Injector().produce(module, Roots.target[A]).unsafeGet()
 // B!
 // A!
-// objects: distage.package.Identity[izumi.distage.model.Locator] = Locator izumi.distage.LocatorDefaultImpl@622e9a32 with 2 parent(s)
+// objects: distage.package.Identity[izumi.distage.model.Locator] = Locator izumi.distage.LocatorDefaultImpl@59f6209b with 2 parent(s)
 //   with exposed keys:  
 //      - {type.MdocSession::MdocApp0::B}
 //      - {type.MdocSession::MdocApp0::A}
@@ -278,10 +278,10 @@ val objects = Injector().produce(module, Roots.target[A]).unsafeGet()
 // A and B are in the object graph
 
 objects.find[A]
-// res1: Option[A] = Some(repl.MdocSession$MdocApp0$A@5a9e6465)
+// res1: Option[A] = Some(repl.MdocSession$MdocApp0$A@1292bd96)
 
 objects.find[B]
-// res2: Option[B] = Some(repl.MdocSession$MdocApp0$B@65bfe228)
+// res2: Option[B] = Some(repl.MdocSession$MdocApp0$B@d1b4d16)
 
 // C is missing
 
@@ -298,7 +298,7 @@ val objects = Injector().produce(module, Roots.target[A]).unsafeGet()
 // C!
 // B!
 // A!
-// objects: Identity[Locator] = Locator izumi.distage.LocatorDefaultImpl@608085aa with 2 parent(s)
+// objects: Identity[Locator] = Locator izumi.distage.LocatorDefaultImpl@4aacb0b6 with 2 parent(s)
 //   with exposed keys:  
 //      - {type.MdocSession::MdocApp4::C}
 //      - {type.MdocSession::MdocApp4::B}
@@ -306,7 +306,7 @@ val objects = Injector().produce(module, Roots.target[A]).unsafeGet()
 //   with confined keys:  ø
 
 objects.find[C]
-// res5: Option[C] = Some(repl.MdocSession$MdocApp4$C@5e69e8d8)
+// res5: Option[C] = Some(repl.MdocSession$MdocApp4$C@13f3a234)
 </code></pre>
 <h3><a href="#circular-dependencies-support" name="circular-dependencies-support" class="anchor"><span class="anchor-link"></span></a>Circular Dependencies Support</h3>
 <p><code>distage</code> automatically resolves arbitrary circular dependencies, including self-references:</p>
@@ -323,7 +323,7 @@ def module = new ModuleDef {
 }
 
 val objects = Injector().produce(module, Roots(DIKey[A], DIKey[C])).unsafeGet()
-// objects: distage.package.Identity[izumi.distage.model.Locator] = Locator izumi.distage.LocatorDefaultImpl@2e952038 with 2 parent(s)
+// objects: distage.package.Identity[izumi.distage.model.Locator] = Locator izumi.distage.LocatorDefaultImpl@7b51efc8 with 2 parent(s)
 //   with exposed keys:  
 //      - {type.MdocSession::MdocApp6::B}
 //      - {proxyref.{type.MdocSession::MdocApp6::B}}
@@ -347,7 +347,7 @@ objects.get[C] eq objects.get[C].c
 <p>The above strategy depends on <code>distage-core-proxy-bytebuddy</code> module and is enabled by default.</p>
 <p>If you want to disable it, use <code>NoProxies</code> bootstrap configuration:</p>
 <pre class="prettyprint"><code class="language-scala">Injector.NoProxies()
-// res10: Injector[distage.package.Identity] = izumi.distage.InjectorDefaultImpl@c348404
+// res10: Injector[distage.package.Identity] = izumi.distage.InjectorDefaultImpl@21869377
 </code></pre>
 <p>Proxies are not supported on Scala.js.</p>
 <h4><a href="#manual-resolution-with-by-name-parameters" name="manual-resolution-with-by-name-parameters" class="anchor"><span class="anchor-link"></span></a>Manual Resolution with by-name parameters</h4>
@@ -377,7 +377,7 @@ def module = new ModuleDef {
 val locator = Injector.NoProxies()
   .produce(module, Roots(DIKey[A], DIKey[C]))
   .unsafeGet()
-// locator: distage.package.Identity[izumi.distage.model.Locator] = Locator izumi.distage.LocatorDefaultImpl@59d96e2f with 2 parent(s)
+// locator: distage.package.Identity[izumi.distage.model.Locator] = Locator izumi.distage.LocatorDefaultImpl@6a0439d4 with 2 parent(s)
 //   with exposed keys:  
 //      - {type.MdocSession::MdocApp11::B}
 //      - {proxyref.{type.MdocSession::MdocApp11::B}}
@@ -429,7 +429,7 @@ val roots = Roots.target[Set[Elem]]
 
 val objects = Injector().produce(module, roots).unsafeGet()
 // Strong constructed
-// objects: distage.package.Identity[izumi.distage.model.Locator] = Locator izumi.distage.LocatorDefaultImpl@16e8e6bb with 2 parent(s)
+// objects: distage.package.Identity[izumi.distage.model.Locator] = Locator izumi.distage.LocatorDefaultImpl@3b65c3f1 with 2 parent(s)
 //   with exposed keys:  
 //      - {type.MdocSession::MdocApp15::Strong}
 //      - {set.{type.Set[=MdocSession::MdocApp15::Elem]}/{type.MdocSession::MdocApp15::Strong}#impl:72492860}
@@ -460,7 +460,7 @@ objects.get[Set[Elem]]
 val objects = Injector().produce(module, roots).unsafeGet()
 // Weak constructed
 // Strong constructed
-// objects: distage.package.Identity[izumi.distage.model.Locator] = Locator izumi.distage.LocatorDefaultImpl@2a27b20 with 2 parent(s)
+// objects: distage.package.Identity[izumi.distage.model.Locator] = Locator izumi.distage.LocatorDefaultImpl@53ab6441 with 2 parent(s)
 //   with exposed keys:  
 //      - {type.MdocSession::MdocApp19::Weak}
 //      - {type.MdocSession::MdocApp19::Strong}
@@ -472,12 +472,12 @@ val objects = Injector().produce(module, roots).unsafeGet()
 // Weak is around
 
 objects.find[Weak]
-// res20: Option[Weak] = Some(repl.MdocSession$MdocApp19$Weak@7445c270)
+// res20: Option[Weak] = Some(repl.MdocSession$MdocApp19$Weak@2573b467)
 
 // both Strong and Weak are in the Set
 
 objects.get[Set[Elem]]
-// res21: Set[Elem] = Set(repl.MdocSession$MdocApp19$Weak@7445c270, repl.MdocSession$MdocApp19$Strong@357cbe56)
+// res21: Set[Elem] = Set(repl.MdocSession$MdocApp19$Weak@2573b467, repl.MdocSession$MdocApp19$Strong@1e6e07f3)
 </code></pre>
 <h3><a href="#auto-sets" name="auto-sets" class="anchor"><span class="anchor-link"></span></a>Auto-Sets</h3>
 <p>AutoSet <a href="/api/izumi/distage/model/Planner.html" title="izumi.distage.model.Planner"><code>Planner</code></a> Hooks can traverse the plan and collect all future objects that match a predicate.</p>
@@ -541,7 +541,7 @@ def module = new ModuleDef {
 }
 
 val objects = Injector().produce(module, Roots(DIKey[A], DIKey[B], DIKey[C])).unsafeGet()
-// objects: distage.package.Identity[izumi.distage.model.Locator] = Locator izumi.distage.LocatorDefaultImpl@527a8d5e with 2 parent(s)
+// objects: distage.package.Identity[izumi.distage.model.Locator] = Locator izumi.distage.LocatorDefaultImpl@489cd67c with 2 parent(s)
 //   with exposed keys:  
 //      - {type.MdocSession::MdocApp25::B}
 //      - {type.MdocSession::MdocApp25::C}
@@ -551,15 +551,15 @@ val objects = Injector().produce(module, Roots(DIKey[A], DIKey[B], DIKey[C])).un
 // A took C from the object graph
 
 objects.get[A].c
-// res26: C = repl.MdocSession$MdocApp25$C@3aa3170f
+// res26: C = repl.MdocSession$MdocApp25$C@57fc0a9d
 
 // this C is the same C as in this `objects` value
 
 val thisC = objects.get[C]
-// thisC: C = repl.MdocSession$MdocApp25$C@3aa3170f
+// thisC: C = repl.MdocSession$MdocApp25$C@57fc0a9d
 
 val thatC = objects.get[A].c
-// thatC: C = repl.MdocSession$MdocApp25$C@3aa3170f
+// thatC: C = repl.MdocSession$MdocApp25$C@57fc0a9d
 
 assert(thisC == thatC)
 </code></pre>
@@ -589,7 +589,7 @@ val bindings: ModuleBase = plan.definition
 <h4><a href="#injector-inheritance" name="injector-inheritance" class="anchor"><span class="anchor-link"></span></a>Injector inheritance</h4>
 <p>You may run a new planning cycle, inheriting the instances from an existing <code>Locator</code> into your new object subgraph:</p>
 <pre class="prettyprint"><code class="language-scala">val childInjector = Injector.inherit(objects)
-// childInjector: Injector[[A]izumi.fundamentals.platform.functional.package.Identity[A]] = izumi.distage.InjectorDefaultImpl@20cfa43f
+// childInjector: Injector[[A]izumi.fundamentals.platform.functional.package.Identity[A]] = izumi.distage.InjectorDefaultImpl@76744be5
 
 class Printer(a: A, b: B, c: C) {
   def printEm(): Unit =
@@ -599,7 +599,7 @@ class Printer(a: A, b: B, c: C) {
 childInjector.produceRun(new ModuleDef { make[Printer] }) {
   (_: Printer).printEm()
 }
-// I&#39;ve got A=repl.MdocSession$MdocApp25$A@44f481c, B=repl.MdocSession$MdocApp25$B@4649ebab, C=repl.MdocSession$MdocApp25$C@3aa3170f, all here!
+// I&#39;ve got A=repl.MdocSession$MdocApp25$A@7b2f07c8, B=repl.MdocSession$MdocApp25$B@1cbb2164, C=repl.MdocSession$MdocApp25$C@57fc0a9d, all here!
 // res28: izumi.fundamentals.platform.functional.package.Identity[Unit] = ()
 </code></pre>
 <p>It&rsquo;s safe, performance-wise, to run <code>Injector</code> to create nested graphs – <code>Injector</code> is extremely fast.</p>
@@ -618,7 +618,7 @@ val input = PlannerInput(module, Roots.target[InjectionInfo], Activation.empty)
 // make[{type.repl.MdocSession.MdocApp29.InjectionInfo}].from(call(π:Constructor(izumi.distage.model.PlannerInput): repl.MdocSession::MdocApp29::InjectionInfo)) (BindingOrigin((advanced-features.md:410))),Of(NESet({type.repl.MdocSession.MdocApp29.InjectionInfo})),Activation(Map()),PublicByDefault)
 
 val injectionInfo = Injector().produce(input).unsafeGet().get[InjectionInfo]
-// injectionInfo: InjectionInfo = repl.MdocSession$MdocApp29$InjectionInfo@4a99b48b
+// injectionInfo: InjectionInfo = repl.MdocSession$MdocApp29$InjectionInfo@7f7e5ccf
 
 // the PlannerInput in `InjectionInfo` is the same as `input`
 
@@ -633,7 +633,7 @@ class Path {
   class A
 }
 val path = new Path
-// path: Path = repl.MdocSession$MdocApp31$Path@2c597c90
+// path: Path = repl.MdocSession$MdocApp31$Path@684db817
 
 def module = new ModuleDef {
   make[path.A]
@@ -642,7 +642,7 @@ def module = new ModuleDef {
 Injector()
   .produce(module, Roots.Everything)
   .use(_.get[path.A])
-// res32: distage.package.Identity[path.A] = repl.MdocSession$MdocApp31$Path$A@87e8233
+// res32: distage.package.Identity[path.A] = repl.MdocSession$MdocApp31$Path$A@50159049
 </code></pre>
 <p>Since version <code>0.10</code>, support for types with a non-value prefix (type projections) <a href="https://github.com/7mind/izumi/issues/764">has been dropped</a>.</p>
 <p>However, there&rsquo;s a gotcha with value prefixes, when seen by distage they&rsquo;re based on the <strong>literal variable name</strong> of the prefix, not the full type information available to the compiler, therefore the following usage, a simple rename, will fail:</p>
@@ -651,9 +651,9 @@ Injector()
 }
 
 val path1 = new Path
-// path1: Path = repl.MdocSession$MdocApp31$Path@77597d63
+// path1: Path = repl.MdocSession$MdocApp31$Path@27737b8b
 val path2 = new Path
-// path2: Path = repl.MdocSession$MdocApp31$Path@15430f39
+// path2: Path = repl.MdocSession$MdocApp31$Path@78d433b2
 </code></pre>
 <pre class="prettyprint"><code class="language-scala">Try {
   Injector().produceRun(pathModule(path1) ++ pathModule(path2)) {
@@ -676,15 +676,15 @@ def pathModule[A: Tag: ClassConstructor](p: Path.Aux[A]) = new ModuleDef {
 }
 
 val path1 = new Path
-// path1: Path = repl.MdocSession$MdocApp34$Path@6ceb2a81
+// path1: Path = repl.MdocSession$MdocApp34$Path@13c53558
 val path2 = new Path
-// path2: Path = repl.MdocSession$MdocApp34$Path@1d4d3fa3
+// path2: Path = repl.MdocSession$MdocApp34$Path@2786af0f
 
 Injector().produceRun(pathModule(path1) ++ pathModule(path2)) {
   (p1a: path1.A, p2a: path2.A) =&gt;
     println((p1a, p2a))
 }
-// (repl.MdocSession$MdocApp34$Path$Inner@103b6afe,repl.MdocSession$MdocApp34$Path$Inner@47bfd24a)
+// (repl.MdocSession$MdocApp34$Path$Inner@25b0c1b8,repl.MdocSession$MdocApp34$Path$Inner@6a5cfb8)
 // res35: distage.package.Identity[Unit] = ()
 </code></pre>
 <p>Now the example works, because the <code>A</code> type inside <code>pathModule(path1)</code> is <code>path1.A</code> and for <code>pathModule(path2)</code> it&rsquo;s <code>path2.A</code>, which matches their subsequent spelling in <code>(p1a: path1.A, p2a: path2.A) =&gt;</code> in <code>produceRun</code></p>
@@ -708,7 +708,7 @@ val input = PlannerInput.everything(module).withLocatorPrivacy(LocatorPrivacy.Pu
 // make[{type.repl.MdocSession.MdocApp36.B}].from(call(π:Constructor(): repl.MdocSession::MdocApp36::B)).tagged(Set(Confined)) (BindingOrigin((advanced-features.md:542)))
 // make[{type.repl.MdocSession.MdocApp36.A}].from(call(π:Constructor(): repl.MdocSession::MdocApp36::A)) (BindingOrigin((advanced-features.md:541))),Everything,Activation(Map()),PublicByDefault)
 val mainLocator = Injector().produce(Injector().planUnsafe(input)).unsafeGet()
-// mainLocator: distage.package.Identity[izumi.distage.model.Locator] = Locator izumi.distage.LocatorDefaultImpl@69d37ecb with 2 parent(s)
+// mainLocator: distage.package.Identity[izumi.distage.model.Locator] = Locator izumi.distage.LocatorDefaultImpl@2675b3e6 with 2 parent(s)
 //   with exposed keys:  
 //      - {type.InjectorFactory}
 //      - {type.PlannerInput}
@@ -731,7 +731,7 @@ val mainLocator = Injector().produce(Injector().planUnsafe(input)).unsafeGet()
 //      - {type.MdocSession::MdocApp36::B}
 
 val inheritedInjector = Injector.inherit(mainLocator)
-// inheritedInjector: Injector[[A]izumi.fundamentals.platform.functional.package.Identity[A]] = izumi.distage.InjectorDefaultImpl@5c1f4e3e
+// inheritedInjector: Injector[[A]izumi.fundamentals.platform.functional.package.Identity[A]] = izumi.distage.InjectorDefaultImpl@7b2e9b8f
 
 def module2 = new ModuleDef {
   make[C]
@@ -740,7 +740,7 @@ val input2 = PlannerInput.everything(module2)
 // input2: PlannerInput = PlannerInput(
 // make[{type.repl.MdocSession.MdocApp36.C}].from(call(π:Constructor(): repl.MdocSession::MdocApp36::C)) (BindingOrigin((advanced-features.md:556))),Everything,Activation(Map()),PublicByDefault)
 val inheritedLocator = inheritedInjector.produce(inheritedInjector.planUnsafe(input2)).unsafeGet()
-// inheritedLocator: izumi.fundamentals.platform.functional.package.Identity[izumi.distage.model.Locator] = Locator izumi.distage.LocatorDefaultImpl@2f3a8fef with 3 parent(s)
+// inheritedLocator: izumi.fundamentals.platform.functional.package.Identity[izumi.distage.model.Locator] = Locator izumi.distage.LocatorDefaultImpl@7f1a4ab3 with 3 parent(s)
 //   with exposed keys:  
 //      - {type.InjectorFactory}
 //      - {type.PlannerInput}
@@ -776,7 +776,7 @@ val input = PlannerInput.everything(module).withLocatorPrivacy(LocatorPrivacy.Pr
 // make[{type.repl.MdocSession.MdocApp40.A}].from(call(π:Constructor(): repl.MdocSession::MdocApp40::A)) (BindingOrigin((advanced-features.md:594))),Everything,Activation(Map()),PrivateByDefault)
 
 val mainLocator = Injector().produce(Injector().planUnsafe(input)).unsafeGet()
-// mainLocator: distage.package.Identity[izumi.distage.model.Locator] = Locator izumi.distage.LocatorDefaultImpl@26f3bd64 with 2 parent(s)
+// mainLocator: distage.package.Identity[izumi.distage.model.Locator] = Locator izumi.distage.LocatorDefaultImpl@311cf155 with 2 parent(s)
 //   with exposed keys:  
 //      - {type.MdocSession::MdocApp40::B}
 //   with confined keys:  
@@ -799,7 +799,7 @@ val mainLocator = Injector().produce(Injector().planUnsafe(input)).unsafeGet()
 //      - {type.Bootloader}
 
 val inheritedInjector = Injector.inherit(mainLocator)
-// inheritedInjector: Injector[[A]izumi.fundamentals.platform.functional.package.Identity[A]] = izumi.distage.InjectorDefaultImpl@2d5b7d83
+// inheritedInjector: Injector[[A]izumi.fundamentals.platform.functional.package.Identity[A]] = izumi.distage.InjectorDefaultImpl@50182139
 
 def module2 = new ModuleDef {
   make[C]
@@ -808,7 +808,7 @@ val input2 = PlannerInput.everything(module2)
 // input2: PlannerInput = PlannerInput(
 // make[{type.repl.MdocSession.MdocApp40.C}].from(call(π:Constructor(): repl.MdocSession::MdocApp40::C)) (BindingOrigin((advanced-features.md:609))),Everything,Activation(Map()),PublicByDefault)
 val inheritedLocator = inheritedInjector.produce(inheritedInjector.planUnsafe(input2)).unsafeGet()
-// inheritedLocator: izumi.fundamentals.platform.functional.package.Identity[izumi.distage.model.Locator] = Locator izumi.distage.LocatorDefaultImpl@6ee3b22e with 3 parent(s)
+// inheritedLocator: izumi.fundamentals.platform.functional.package.Identity[izumi.distage.model.Locator] = Locator izumi.distage.LocatorDefaultImpl@47300f6f with 3 parent(s)
 //   with exposed keys:  
 //      - {type.InjectorFactory}
 //      - {type.PlannerInput}
@@ -844,13 +844,13 @@ val input = PlannerInput.target[A](module).withLocatorPrivacy(LocatorPrivacy.Pub
 // make[{type.repl.MdocSession.MdocApp44.B}].from(call(π:Constructor(): repl.MdocSession::MdocApp44::B)) (BindingOrigin((advanced-features.md:648))),Of(NESet({type.repl.MdocSession.MdocApp44.A})),Activation(Map()),PublicRoots)
 
 val mainLocator = Injector().produce(Injector().planUnsafe(input)).unsafeGet()
-// mainLocator: distage.package.Identity[izumi.distage.model.Locator] = Locator izumi.distage.LocatorDefaultImpl@1d58096 with 2 parent(s)
+// mainLocator: distage.package.Identity[izumi.distage.model.Locator] = Locator izumi.distage.LocatorDefaultImpl@29ac771d with 2 parent(s)
 //   with exposed keys:  
 //      - {type.MdocSession::MdocApp44::A}
 //   with confined keys:  ø
 
 val inheritedInjector = Injector.inherit(mainLocator)
-// inheritedInjector: Injector[[A]izumi.fundamentals.platform.functional.package.Identity[A]] = izumi.distage.InjectorDefaultImpl@3589bb37
+// inheritedInjector: Injector[[A]izumi.fundamentals.platform.functional.package.Identity[A]] = izumi.distage.InjectorDefaultImpl@76e5c0c8
 
 def module2 = new ModuleDef {
   make[C]
@@ -859,7 +859,7 @@ val input2 = PlannerInput.everything(module2)
 // input2: PlannerInput = PlannerInput(
 // make[{type.repl.MdocSession.MdocApp44.C}].from(call(π:Constructor(): repl.MdocSession::MdocApp44::C)) (BindingOrigin((advanced-features.md:662))),Everything,Activation(Map()),PublicByDefault)
 val inheritedLocator = inheritedInjector.produce(inheritedInjector.planUnsafe(input2)).unsafeGet()
-// inheritedLocator: izumi.fundamentals.platform.functional.package.Identity[izumi.distage.model.Locator] = Locator izumi.distage.LocatorDefaultImpl@43b37c87 with 3 parent(s)
+// inheritedLocator: izumi.fundamentals.platform.functional.package.Identity[izumi.distage.model.Locator] = Locator izumi.distage.LocatorDefaultImpl@4066ad5e with 3 parent(s)
 //   with exposed keys:  
 //      - {type.InjectorFactory}
 //      - {type.PlannerInput}
@@ -878,13 +878,13 @@ assert(inheritedLocator.find[B].isEmpty)
 </code></pre>
 </div>
 <div>
-<a href="https://github.com/7mind/izumi/tree/v1.2.23/doc/microsite/target/mdoc/distage/advanced-features.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/7mind/izumi/tree/v1.2.24/doc/microsite/target/mdoc/distage/advanced-features.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>
 <div class="print-only">
 <span class="md-source-file md-version">
-1.2.23
+1.2.24
 </span>
 </div>
 </article>
