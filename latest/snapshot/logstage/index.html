@@ -174,6 +174,8 @@ data-md-source="github">
     <li><a href="../logstage/index.html#custom-json-rendering-with-logstagecodec" class="header">Custom JSON rendering with LogstageCodec</a></li>
     <li><a href="../logstage/index.html#slf4j-router" class="header">SLF4J Router</a></li>
     <li><a href="../logstage/index.html#jul-java-util-logging-support" class="header">JUL (<code>java.util.logging</code>) support</a></li>
+    <li><a href="../logstage/index.html#adaptive-log-routers" class="header">Adaptive log routers</a></li>
+    <li><a href="../logstage/index.html#rich-formatter-for-logs" class="header">Rich formatter for logs</a></li>
   </ul></li>
 </ul>
 </nav>
@@ -206,6 +208,8 @@ data-md-source="github">
     <li><a href="../logstage/index.html#custom-json-rendering-with-logstagecodec" class="header">Custom JSON rendering with LogstageCodec</a></li>
     <li><a href="../logstage/index.html#slf4j-router" class="header">SLF4J Router</a></li>
     <li><a href="../logstage/index.html#jul-java-util-logging-support" class="header">JUL (<code>java.util.logging</code>) support</a></li>
+    <li><a href="../logstage/index.html#adaptive-log-routers" class="header">Adaptive log routers</a></li>
+    <li><a href="../logstage/index.html#rich-formatter-for-logs" class="header">Rich formatter for logs</a></li>
   </ul></li>
 </ul>
 </nav>
@@ -249,7 +253,7 @@ data-md-source="github">
 import scala.util.Random
 
 val logger = IzLogger()
-// logger: IzLogger = izumi.logstage.api.IzLogger@5e64cc32
+// logger: IzLogger = izumi.logstage.api.IzLogger@45e0f483
 
 val justAnArg = &quot;example&quot;
 // justAnArg: String = example
@@ -269,9 +273,9 @@ logger.warn(s&quot;Invisible argument: ${Random.nextInt() -&gt; &quot;random num
 // add following fields to all messages printed by a new logger value
 
 val ctxLogger = logger(&quot;userId&quot; -&gt; &quot;user@google.com&quot;, &quot;company&quot; -&gt; &quot;acme&quot;)
-// ctxLogger: IzLogger = izumi.logstage.api.IzLogger@1b66599a
+// ctxLogger: IzLogger = izumi.logstage.api.IzLogger@e2625b
 val delta = Random.nextInt(1000)
-// delta: Int = 336
+// delta: Int = 931
 
 ctxLogger.info(s&quot;Processing time: $delta&quot;)
 </code></pre>
@@ -328,17 +332,17 @@ ctxLogger.info(s&quot;Processing time: $delta&quot;)
 import logstage.circe.LogstageCirceRenderingPolicy
 
 val textSink = ConsoleSink.text(colored = true)
-// textSink: ConsoleSink = izumi.logstage.sink.ConsoleSink$ColoredConsoleSink$@2ab7c3b7
+// textSink: ConsoleSink = izumi.logstage.sink.ConsoleSink$ColoredConsoleSink$@312867ca
 val jsonSink = ConsoleSink(LogstageCirceRenderingPolicy(prettyPrint = true))
-// jsonSink: ConsoleSink = izumi.logstage.sink.ConsoleSink@8291
+// jsonSink: ConsoleSink = izumi.logstage.sink.ConsoleSink@6ca771a1
 
 val sinks = List(jsonSink, textSink)
-// sinks: List[ConsoleSink] = List(izumi.logstage.sink.ConsoleSink@8291, izumi.logstage.sink.ConsoleSink$ColoredConsoleSink$@2ab7c3b7)
+// sinks: List[ConsoleSink] = List(izumi.logstage.sink.ConsoleSink@6ca771a1, izumi.logstage.sink.ConsoleSink$ColoredConsoleSink$@312867ca)
 
 val logger: IzLogger = IzLogger(Trace, sinks)
-// logger: IzLogger = izumi.logstage.api.IzLogger@31b61c8e
+// logger: IzLogger = izumi.logstage.api.IzLogger@2f2c8c4e
 val contextLogger: IzLogger = logger(&quot;key&quot; -&gt; &quot;value&quot;)
-// contextLogger: IzLogger = izumi.logstage.api.IzLogger@69d7c83e
+// contextLogger: IzLogger = izumi.logstage.api.IzLogger@161deb60
 
 logger.info(&quot;Hey&quot;)
 
@@ -350,10 +354,10 @@ contextLogger.info(&quot;Hey&quot;)
 import cats.effect.IO
 
 val logger = IzLogger()
-// logger: IzLogger = izumi.logstage.api.IzLogger@59744513
+// logger: IzLogger = izumi.logstage.api.IzLogger@77ab79b6
 
 val log = LogIO.fromLogger[IO](logger)
-// log: LogIO[IO] = logstage.LogIO$$anon$1@79a0829d
+// log: LogIO[IO] = logstage.LogIO$$anon$1@523272f4
 
 log.info(s&quot;Hey! I&#39;m logging with ${log}stage!&quot;).unsafeRunSync()(cats.effect.unsafe.IORuntime.global)
 </code></pre>
@@ -400,15 +404,15 @@ import zio.{URIO, ZEnvironment}
 val fn: URIO[LogZIO, Unit] = {
   log.info(s&quot;I&#39;m logging with ${log}stage!&quot;)
 }
-// fn: URIO[LogZIO, Unit] = Stateful(logstage.LogZIO.LogZIOImpl.log(LogZIO.scala:34),zio.FiberRef$unsafe$PatchFiber$$Lambda/0x00007fff6879c570@445363e9)
+// fn: URIO[LogZIO, Unit] = Stateful(logstage.LogZIO.LogZIOImpl.log(LogZIO.scala:34),zio.FiberRef$unsafe$PatchFiber$$Lambda/0x00007fff685702c0@6a9f423a)
 
 val logger: LogZIO = LogIO3.fromLogger(IzLogger())
-// logger: LogZIO = logstage.LogIO$$anon$1@347031d8
+// logger: LogZIO = logstage.LogIO$$anon$1@4f23bd62
 
 import izumi.functional.bio.UnsafeRun2
 
 val runtime = UnsafeRun2.createZIO()
-// runtime: UnsafeRun2.ZIORunner[Any] = izumi.functional.bio.UnsafeRun2$ZIORunner@2e70f853
+// runtime: UnsafeRun2.ZIORunner[Any] = izumi.functional.bio.UnsafeRun2$ZIORunner@6155d61c
 
 runtime.unsafeRun {
   fn.provideEnvironment(ZEnvironment(logger))
@@ -417,7 +421,7 @@ runtime.unsafeRun {
 <h3><a href="#adding-fiberid-to-log-messages" name="adding-fiberid-to-log-messages" class="anchor"><span class="anchor-link"></span></a>Adding FiberId to log messages</h3>
 <p><code>LogZIO.withFiberId</code> provides a <code>LogIO</code> instance that logs the current ZIO <code>FiberId</code> in addition to the JVM thread id:</p>
 <pre class="prettyprint"><code class="language-scala">val logger: LogZIO = LogZIO.withFiberId(IzLogger())
-// logger: LogZIO = logstage.LogZIO$$anon$1@55f1f740
+// logger: LogZIO = logstage.LogZIO$$anon$1@721b56f5
 
 runtime.unsafeRun {
   fn.provideEnvironment(ZEnvironment(logger))
@@ -496,7 +500,7 @@ import logstage.ConsoleSink
 import logstage.circe.LogstageCirceRenderingPolicy
 
 val logger = IzStrictLogger(sink = ConsoleSink(LogstageCirceRenderingPolicy()))
-// logger: IzStrictLogger = izumi.logstage.api.strict.IzStrictLogger@26e5dace
+// logger: IzStrictLogger = izumi.logstage.api.strict.IzStrictLogger@74432c25
 
 logger.info(s&quot;Got ${KV(&quot;key&quot;, 7) -&gt; &quot;KeyValue&quot;}&quot;)
 </code></pre>
@@ -507,7 +511,7 @@ logger.info(s&quot;Got ${KV(&quot;key&quot;, 7) -&gt; &quot;KeyValue&quot;}&quot
 import izumi.logstage.api.routing.StaticLogRouter
 
 val myLogger = IzLogger()
-// myLogger: IzLogger = izumi.logstage.api.IzLogger@38e04b49
+// myLogger: IzLogger = izumi.logstage.api.IzLogger@792929f2
 
 // configure SLF4j to use the same router that `myLogger` uses
 StaticLogRouter.instance.setup(myLogger.router)
@@ -527,6 +531,38 @@ bridge.installOnly()
 <pre class="prettyprint"><code class="language-scala">SLF4JBridgeHandler.removeHandlersForRootLogger()
 SLF4JBridgeHandler.install()
 </code></pre>
+<h2><a href="#adaptive-log-routers" name="adaptive-log-routers" class="anchor"><span class="anchor-link"></span></a>Adaptive log routers</h2>
+<p>Adaptive routers let you register named sink groups and then pick the target sinks per log entry. Use <code>makeAdaptive</code> method, to pass sinks in form of <code>Map[String, Seq[LogSink]]</code>. Then you can use the key to select the desired sinks:</p>
+<pre class="prettyprint"><code class="language-scala">val router = ConfigurableLogRouter.makeAdaptive(
+  sinksRoutes = Map(
+    &quot;file&quot; -&gt; Seq(fileSink),
+    &quot;console&quot; -&gt; Seq(consoleSink)
+  )
+)
+val logger = IzLogger(router)
+
+logger.infoTo(&quot;file&quot;)(&quot;test log to file&quot;)
+logger.infoTo(&quot;console&quot;)(&quot;test log to console&quot;)
+</code></pre>
+<h2><a href="#rich-formatter-for-logs" name="rich-formatter-for-logs" class="anchor"><span class="anchor-link"></span></a>Rich formatter for logs</h2>
+<p><code>Rich</code> rendering lets you embed lightweight markup tags in log messages and map them to ANSI styles, so you can highlight parts of the output with colors and text decorations. For now, there are such tags available:</p>
+<ul>
+  <li><code>&lt;b&gt;</code>, <code>&lt;bold&gt;</code></li>
+  <li><code>&lt;i&gt;</code>, <code>&lt;italic&gt;</code></li>
+  <li><code>&lt;u&gt;</code>, <code>&lt;underlined&gt;</code></li>
+  <li><code>&lt;r&gt;</code>, <code>&lt;reversed&gt;</code></li>
+  <li><code>&lt;color:black&gt;</code>, <code>&lt;color:red&gt;</code>, <code>&lt;color:green&gt;</code>, <code>&lt;color:yellow&gt;</code>, <code>&lt;color:blue&gt;</code>,  <code>&lt;color:magenta&gt;</code>, <code>&lt;color:cyan&gt;</code>, <code>&lt;color:white&gt;</code></li>
+  <li><code>&lt;c:%custom_tag_name%&gt;</code></li>
+</ul>
+<p>Custom tags allows you to make short versions for complex styles. For example: <code>&lt;b&gt;&lt;color:red&gt;</code> =&gt; <code>&lt;c:important&gt;</code> To declare custom tags, you need to pass them in form of map, when configuring sink:</p>
+<pre class="prettyprint"><code class="language-scala">val router = ConfigurableLogRouter(
+  sink = new RichConsoleSink(Map(&quot;important&quot; -&gt; Seq(Bold, ColorTag(&quot;red&quot;))))
+)
+val logger = IzLogger(router)
+
+logger.info(&quot;This is &lt;b&gt; bold &lt;/b&gt; and &lt;i&gt; italic &lt;/i&gt; and &lt;u&gt; underlined &lt;/u&gt; and &lt;r&gt; reversed &lt;/r&gt; text!&quot;)
+</code></pre>
+<img alt="logstage-sample-output-rich-format" src="media/00-logstage-sample-output-rich-format.png" height="128"/>
 </div>
 <div>
 <a href="https://github.com/7mind/izumi/tree/master/doc/microsite/target/mdoc/logstage/00_logstage.md" title="Edit this page" class="md-source-file md-edit">
