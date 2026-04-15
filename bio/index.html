@@ -141,7 +141,7 @@ data-md-source="github">
   <li><a href="../logstage/index.html" class="page">LogStage</a></li>
   <li><a href="../distage/index.html" class="page">DIStage</a>
   <ul>
-    <li><a href="../distage/basics.html" class="page">Overview</a></li>
+    <li><a href="../distage/basics.html" class="page">Basics</a></li>
     <li><a href="../distage/debugging.html" class="page">Debugging</a></li>
     <li><a href="../distage/advanced-features.html" class="page">Advanced Features</a></li>
     <li><a href="../distage/distage-framework.html" class="page">distage-framework</a></li>
@@ -180,7 +180,7 @@ data-md-source="github">
 <ul style="display: none">
 <li class="md-nav__item md-version" id="project.version">
 <label class="md-nav__link" for="__version">
-<i class="md-icon" title="Version">label_outline</i> 1.2.25
+<i class="md-icon" title="Version">label_outline</i> 1.3.0-M1
 </label>
 </li>
 </ul>
@@ -216,15 +216,19 @@ data-md-source="github">
 <p><strong>BIO</strong> is a set of typeclasses and algebras for programming in tagless final style using bifunctor effect types with variance.</p>
 <p>Key syntactic features:</p>
 <ol>
-  <li>Ergonomic <code>F</code> summoner that is a single point of entry to all methods in the hierarchy</li>
+  <li>Universal summoner <code>F</code> is a single point of entry for all methods in the hierarchy</li>
   <li>Import-less syntax. Syntax is automatically available whenever any typeclass from the hierarchy is imported, e.g. immediately after IDE auto-import.</li>
 </ol>
 <p>These syntactic features allow you to write in a low ceremony, IDE-friendly and newcomer-friendly style:</p>
 <pre class="prettyprint"><code class="language-scala">import izumi.functional.bio.{F, Monad2, Primitives2}
 
-def adder[F[+_, +_]: Monad2: Primitives2](i: Int): F[Nothing, Int] =
-  F.mkRef(0)
-   .flatMap(ref =&gt; ref.update(_ + i) *&gt; ref.get)
+def adder[F[+_, +_]: Monad2: Primitives2](i: Int): F[Nothing, Int] = {
+  for { // map and flatMap extension methods are available automatically by importing Monad2
+    ref &lt;- F.mkRef(i) // mkRef method is available from Primitives2
+    _   &lt;- ref.update(_ + i)
+    res &lt;- ref.get
+  } yield res
+}
 </code></pre>
 <p>Key semantic features:</p>
 <ol>
@@ -234,7 +238,7 @@ def adder[F[+_, +_]: Monad2: Primitives2](i: Int): F[Nothing, Int] =
   <li>Primitive concurrent data structures: <code>Ref</code>, <code>Promise</code>, <code>Semaphore</code></li>
 </ol>
 <p>To use it, add <code>fundamentals-bio</code> library:</p>
-<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;io.7mind.izumi&quot; %% &quot;fundamentals-bio&quot; % &quot;1.2.25&quot;
+<pre class="prettyprint"><code class="language-scala">libraryDependencies += &quot;io.7mind.izumi&quot; %% &quot;fundamentals-bio&quot; % &quot;1.3.0-M1&quot;
 </code></pre>
 <p>If you&rsquo;re using Scala <code>2.12</code> you <strong>must</strong> enable <code>-Ypartial-unification</code> and either <code>-Xsource:2.13</code> or <code>-Xsource:3</code> for this library to work correctly:</p>
 <pre class="prettyprint"><code class="language-scala">// REQUIRED options for Scala 2.12
@@ -256,17 +260,36 @@ scalacOptions += &quot;-Xsource:2.13&quot; // either this
 <p><img src="media/bio-hierarchy.svg" alt="BIO-inheritance-hierarchy" /></p>
 <p><a href="media/bio-hierarchy.svg">(image)</a></p>
 <h2><a href="#syntax-implicit-punning" name="syntax-implicit-punning" class="anchor"><span class="anchor-link"></span></a>Syntax, Implicit Punning</h2>
-<p>All implicit syntax in BIO is available automatically without wildcard imports with the help of so-called &ldquo;implicit punning&rdquo;, as in the following example:</p>
-<pre class="prettyprint"><code class="language-scala">import izumi.functional.bio.Monad2
+<p>All implicit syntax in BIO is available automatically without wildcard imports with the help of so-called &ldquo;implicit punning&rdquo;.</p>
+<p>Before (cats-effect):</p>
+<pre class="prettyprint"><code class="language-scala reset:mdoc:to-string">import cats.effect.{Ref, Sync}
 
-def loop[F[+_, +_]: Monad2]: F[Nothing, Nothing] = {
-  val unitEffect: F[Nothing, Unit] = Monad2[F].unit
-  unitEffect.flatMap(_ =&gt; loop)
+// have to import syntax extensions in every file for for-comprehensions to work
+import cats.syntax.all._
+
+def adder[F[_]: Sync](i: Int): F[Int] = {
+  for {
+    ref &lt;- Ref.of(i)
+    _   &lt;- ref.update(_ + i)
+    res &lt;- ref.get
+  } yield res
 }
 </code></pre>
-<p>Note: a <code>.flatMap</code> method is available on the <code>unitEffect</code> value of an abstract type parameter <code>F</code>, even though we did not import any syntax implicits using a wildcard import.</p>
-<p>The <code>flatMap</code> method was added by the implicit punning on the <code>Monad2</code> name.  In short, implicit punning just means that instead of creating a companion object for a type with the same name as the type, we create &ldquo;companion&rdquo; implicit conversions with the same name. So that whenever you import the type, you are also always importing the syntax-providing implicit conversions.</p>
-<p>This happens to be a great fit for Tagless Final Style, since nearly all TF code will import the names of the used typeclasses.</p>
+<p>After (BIO):</p>
+<pre class="prettyprint"><code class="language-scala reset:mdoc:to-string">// for-comprehensions work just by auto-importing Monad2 through the IDE
+import izumi.functional.bio.{Monad2, Primitives2}
+
+def adder[F[+_, +_]: Monad2: Primitives2](i: Int): F[Nothing, Int] = {
+  for {
+    ref &lt;- F.mkRef(i) // typing `F.` lets IDE show all available TF methods
+    _   &lt;- ref.update(_ + i)
+    res &lt;- ref.get
+  } yield res
+}
+</code></pre>
+<p>Note: a <code>.flatMap</code> and <code>.map</code> methods that enable for-comprehensions are available even though we did not import any syntax implicits using a wildcard import.</p>
+<p>The <code>flatMap</code> method was added by the implicit punning on the <code>Monad2</code> name. Implicit punning is implemented by eschewing a companion object for a type and replacing it with &ldquo;companion&rdquo; implicit conversions with the same name as the type. That way whenever you import the type, you also always import the syntax-providing implicit conversions.</p>
+<p>This happens to be a great fit for Tagless Final Style, since nearly all TF code will import the names of the typeclasses used to add them to context bounds on <code>F</code> parameter.</p>
 <p>Implicit Punning for typeclass syntax relieves the programmer from having to manually import syntax implicits in every file in their codebase.</p>
 <h2><a href="#cats-effect-compatibilty" name="cats-effect-compatibilty" class="anchor"><span class="anchor-link"></span></a>cats-effect compatibilty</h2>
 <p>Import <code>izumi.functional.bio.catz._</code> for shim compatibilty with cats-effect. You can run <code>http4s</code> and all the other cats-effect libraries with just BIO typeclasses, without requiring any cats-effect typeclasses.</p>
@@ -286,13 +309,13 @@ def loop[F[+_, +_]: Monad2]: F[Nothing, Nothing] = {
 <p>See details in <a href="https://github.com/7mind/izumi/issues/2026">https://github.com/7mind/izumi/issues/2026</a></p>
 </div>
 <div>
-<a href="https://github.com/7mind/izumi/tree/v1.2.25/doc/microsite/target/mdoc/bio/00_bio.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/7mind/izumi/tree/v1.3.0-M1/doc/microsite/target/mdoc/bio/00_bio.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>
 <div class="print-only">
 <span class="md-source-file md-version">
-1.2.25
+1.3.0-M1
 </span>
 </div>
 </article>

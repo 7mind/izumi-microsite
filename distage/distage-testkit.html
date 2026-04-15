@@ -141,7 +141,7 @@ data-md-source="github">
   <li><a href="../logstage/index.html" class="page">LogStage</a></li>
   <li><a href="../distage/index.html" class="page">DIStage</a>
   <ul>
-    <li><a href="../distage/basics.html" class="page">Overview</a></li>
+    <li><a href="../distage/basics.html" class="page">Basics</a></li>
     <li><a href="../distage/debugging.html" class="page">Debugging</a></li>
     <li><a href="../distage/advanced-features.html" class="page">Advanced Features</a></li>
     <li><a href="../distage/distage-framework.html" class="page">distage-framework</a></li>
@@ -170,8 +170,8 @@ data-md-source="github">
     <li><a href="../distage/distage-testkit.html#syntax-reference" class="header">Syntax Reference</a></li>
     <li><a href="../distage/distage-testkit.html#execution-order" class="header">Execution Order</a></li>
     <li><a href="../distage/distage-testkit.html#resource-reuse-memoization" class="header">Resource Reuse - Memoization</a></li>
-    <li><a href="../distage/distage-testkit.html#forced-roots" class="header">Forced Roots</a></li>
     <li><a href="../distage/distage-testkit.html#test-selection" class="header">Test Selection</a></li>
+    <li><a href="../distage/distage-testkit.html#customization" class="header">Customization</a></li>
     <li><a href="../distage/distage-testkit.html#references" class="header">References</a></li>
     <li><a href="../distage/distage-testkit.html#extended-example" class="header">Extended Example</a></li>
   </ul></li>
@@ -182,7 +182,7 @@ data-md-source="github">
 <ul style="display: none">
 <li class="md-nav__item md-version" id="project.version">
 <label class="md-nav__link" for="__version">
-<i class="md-icon" title="Version">label_outline</i> 1.2.25
+<i class="md-icon" title="Version">label_outline</i> 1.3.0-M1
 </label>
 </li>
 </ul>
@@ -202,8 +202,8 @@ data-md-source="github">
     <li><a href="../distage/distage-testkit.html#syntax-reference" class="header">Syntax Reference</a></li>
     <li><a href="../distage/distage-testkit.html#execution-order" class="header">Execution Order</a></li>
     <li><a href="../distage/distage-testkit.html#resource-reuse-memoization" class="header">Resource Reuse - Memoization</a></li>
-    <li><a href="../distage/distage-testkit.html#forced-roots" class="header">Forced Roots</a></li>
     <li><a href="../distage/distage-testkit.html#test-selection" class="header">Test Selection</a></li>
+    <li><a href="../distage/distage-testkit.html#customization" class="header">Customization</a></li>
     <li><a href="../distage/distage-testkit.html#references" class="header">References</a></li>
     <li><a href="../distage/distage-testkit.html#extended-example" class="header">Extended Example</a></li>
   </ul></li>
@@ -237,14 +237,15 @@ data-md-source="github">
   <ul>
     <li><a href="../distage/distage-testkit.html#memoization-environments" class="header">Memoization Environments</a></li>
     <li><a href="../distage/distage-testkit.html#memoization-levels" class="header">Memoization Levels</a></li>
+    <li><a href="../distage/distage-testkit.html#forced-roots" class="header">Forced Roots</a></li>
     <li><a href="../distage/distage-testkit.html#examples" class="header">Examples</a></li>
     <li><a href="../distage/distage-testkit.html#pseudocode" class="header">Pseudocode</a></li>
   </ul></li>
-  <li><a href="../distage/distage-testkit.html#forced-roots" class="header">Forced Roots</a></li>
   <li><a href="../distage/distage-testkit.html#test-selection" class="header">Test Selection</a>
   <ul>
     <li><a href="../distage/distage-testkit.html#using-integrationcheck" class="header">Using <code>IntegrationCheck</code></a></li>
   </ul></li>
+  <li><a href="../distage/distage-testkit.html#customization" class="header">Customization</a></li>
   <li><a href="../distage/distage-testkit.html#references" class="header">References</a></li>
   <li><a href="../distage/distage-testkit.html#extended-example" class="header">Extended Example</a></li>
 </ul>
@@ -392,9 +393,9 @@ class ScoreSimpleTest extends Test {
 }
 </code></pre>
 <pre><code>ScoreSimpleTest:
+- Score should increase by config star value
   - Score should increase by config star value from DI 
 - Score should increase by config star value from DI
-- Score should increase by config star value
 
 
 </code></pre>
@@ -432,11 +433,10 @@ class ScoreEffectsTest extends Test {
 }
 </code></pre>
 <pre><code>ScoreEffectsTest:
-Config(10,256,10)
-  - testkit operations with effects should support assertions outside of effect 
-- testkit operations with effects should support assertions outside of effect
   - testkit operations with effects should support assertions in effects 
 - testkit operations with effects should support assertions in effects
+  - testkit operations with effects should support assertions outside of effect 
+- testkit operations with effects should support assertions outside of effect
 
 
 </code></pre>
@@ -587,7 +587,6 @@ class ProdBonusServiceTest extends BonusServiceTest with ProdTest
 class DummyBonusServiceTest extends BonusServiceTest with DummyTest
 </code></pre>
 <pre><code>DummyBonusServiceTest:
-currentBonus = 10
   - BonusService should initially use default bonus as current 
 - BonusService should initially use default bonus as current
   - BonusService should increment by delta 
@@ -709,6 +708,12 @@ class SameLevel_1_2_WithAdditionalLevel3 extends SameLevel_1_WithActivationsOver
 <p><img src="media/memoization-tree.png" alt="Memoization Tree Log during tests" /></p>
 <p>Technical note: divergence of memoization levels is calculated based on equality of <a href="debugging.html#pretty-printing-plans">recipes of future object graphs</a>, not equality of allocated/existing object graphs.</p>
 <p>Note: <a href="https://github.com/7mind/izumi/issues/1188">original github ticket</a></p>
+<h4><a href="#forced-roots" name="forced-roots" class="anchor"><span class="anchor-link"></span></a>Forced Roots</h4>
+<p><code>forcedRoots</code> field of <code>TestConfig</code> specifies components to synthetically add to the dependencies of every test within this test suite / memoization environment.</p>
+<p>If forced root components are not memoized, they will be acquired and released for each test case.</p>
+<p>If memoized, they will be acquired and released once, before all and after all the tests within this memoization environment.</p>
+<p>They provide an alternative to ScalaTest&rsquo;s native <code>beforeEach/beforeAll</code> that can use functional effects instead of mutability (However, <code>All</code> here includes the entire memoization environment, not the enclosing test suite)</p>
+<p>Forced roots may be configured per-activation / combination of activations, e.g. you may force postgres table setup to happen only in test environments with <code>Repo -&gt; Repo.Prod</code> activation.</p>
 <h4><a href="#examples" name="examples" class="anchor"><span class="anchor-link"></span></a>Examples</h4>
 <p>The first example will acquire the <code>BonusService</code> for each test case. This will not use memoization.</p>
 <pre class="prettyprint"><code class="language-scala">package app
@@ -754,14 +759,8 @@ class NotUsingMemoTest extends DummyTest {
 </code></pre>
 <p>These two tests will run sequentially. There is no memoization configured for the dependencies. Each test case will acquire a fresh instance from the object graph. For our demonstration this results in a new <code>BonusService</code> instance for each test case.</p>
 <pre><code>NotUsingMemoTest:
-
- bonusService = repl.MdocSession$MdocApp$DummyBonusService$Impl@397fe7e3 
-
   - Not memoizing BonusService should use a new instance in the first case 
 - Not memoizing BonusService should use a new instance in the first case
-
- bonusService = repl.MdocSession$MdocApp$DummyBonusService$Impl@7c7d7ea8 
-
   - Not memoizing BonusService should use a new instance in the second case 
 - Not memoizing BonusService should use a new instance in the second case
 
@@ -841,17 +840,11 @@ class AnotherUsingMemoTest extends DummyTest {
 </code></pre>
 <p>Both tests suites, all three test cases, will use same memoization environment and the same <code>bonusService</code> instance:</p>
 <pre><code>UsingMemoTest:
-
- bonusService = repl.MdocSession$MdocApp$DummyBonusService$Impl@739196a0 
-
-
- bonusService = repl.MdocSession$MdocApp$DummyBonusService$Impl@739196a0 
-
 currentBonus = 10
   - Memoizing BonusService should use a new instance in the first case 
 - Memoizing BonusService should use a new instance in the first case
 
- bonusService = repl.MdocSession$MdocApp$DummyBonusService$Impl@739196a0 
+ bonusService = repl.MdocSession$MdocApp$DummyBonusService$Impl@2604d27d 
 
   - Memoizing BonusService should use the same instance in the second case 
 - Memoizing BonusService should use the same instance in the second case
@@ -866,7 +859,7 @@ AnotherUsingMemoTest:
 <h4><a href="#pseudocode" name="pseudocode" class="anchor"><span class="anchor-link"></span></a>Pseudocode</h4>
 <p>Suppose that the lookup of an instance for a component uses a hypothetical function <code>lookup(graph, type and tag)</code>. This function is memoized using storage specific to the current memoization environment. This memoization environment is uniquely defined by the test config options above. This would have pseudocode like:</p>
 <pre><code>rootComponents = planRoots(memoizationRoots, activation, forcedRoots, ...)
-memoizationEnvironment = getOrCreate(rootComponents)
+memoizationEnvironment = create(rootComponents, testPlans)
 memoizationStore = memoizationEnvironment.store
 ...
 for each test case
@@ -877,22 +870,16 @@ for each test case
       instance = memoizationStore.lookup(component)
     else
       instance = acquireComponent(component)
-      if (component is in memoizationRoot paths)
-        memoizationStore.add(component, instance)
     ...
 </code></pre>
-<h3><a href="#forced-roots" name="forced-roots" class="anchor"><span class="anchor-link"></span></a>Forced Roots</h3>
-<p><code>forcedRoots</code> field of <code>TestConfig</code> specifies components to synthetically add to the dependencies of every test within this test suite / memoization environment.</p>
-<p>If forced root components are not memoized, they will be acquired and released for each test case.</p>
-<p>If memoized, they will be acquired and released once, before all and after all the tests within this memoization environment.</p>
-<p>They provide an alternative to ScalaTest&rsquo;s native <code>beforeEach/beforeAll</code> that can use functional effects instead of mutability (However, <code>All</code> here includes the entire memoization environment, not the enclosing test suite)</p>
-<p>Forced roots may be configured per-activation / combination of activations, e.g. you may force postgres table setup to happen only in test environments with <code>Repo -&gt; Repo.Prod</code> activation.</p>
 <h3><a href="#test-selection" name="test-selection" class="anchor"><span class="anchor-link"></span></a>Test Selection</h3>
 <h4><a href="#using-integrationcheck" name="using-integrationcheck" class="anchor"><span class="anchor-link"></span></a>Using <code>IntegrationCheck</code></h4>
 <p>Implementation classes that inherit from <a href="/api/izumi/distage/model/provisioning/IntegrationCheck.html" title="izumi.distage.model.provisioning.IntegrationCheck"><code>`izumi.distage.model.provisioning.IntegrationCheck`</code></a> will have their <code>resourceCheck()</code> method called before the test instantiation to check if external test dependencies — such as Docker containers in <a href="distage-framework-docker.html">distage-framework-docker</a> — are available for the test (or for the role when in main scope).</p>
 <p>If not, the test will be canceled/ignored.</p>
 <p>This feature therefore allows you to selectively run only the fast in-memory tests that have no external dependencies by shutting down the docker daemon (or another source of external dependencies).</p>
 <p>Integration checks are executed only in <code>distage-testkit</code> tests and <code>distage-framework</code> <a href="distage-framework.html#roles">roles</a>.</p>
+<h3><a href="#customization" name="customization" class="anchor"><span class="anchor-link"></span></a>Customization</h3>
+<p><a href="/api/izumi/distage/testkit/runner/impl/TestTreeRunner.html" title="izumi.distage.testkit.runner.impl.TestTreeRunner"><code>`TestTreeRunner`</code></a> component may be overridden in test module (TestConfig <code>.pluginConfig</code> and/or <code>.moduleOverrides</code>) to use a custom test execution strategy. This also applies to all dependencies of TestTreeRunner - <a href="/api/izumi/distage/testkit/runner/impl/IndividualTestRunner.html" title="izumi.distage.testkit.runner.impl.IndividualTestRunner"><code>`IndividualTestRunner`</code></a>, as well as all content of <a href="/api/izumi/distage/testkit/runner/impl/TestRuntimeModule.html" title="izumi.distage.testkit.runner.impl.TestRuntimeModule"><code>`TestRuntimeModule`</code></a></p>
 <h3><a href="#references" name="references" class="anchor"><span class="anchor-link"></span></a>References</h3>
 <ul>
   <li><a href="https://github.com/7mind/distage-example">distage Example Project</a> project shows how to use <code>distage</code>, <code>distage-testkit</code> &amp; <code>distage-framework-docker</code></li>
@@ -1026,13 +1013,13 @@ abstract class LadderTest extends LeaderboardTest {
 </code></pre>
 </div>
 <div>
-<a href="https://github.com/7mind/izumi/tree/v1.2.25/doc/microsite/target/mdoc/distage/distage-testkit.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/7mind/izumi/tree/v1.3.0-M1/doc/microsite/target/mdoc/distage/distage-testkit.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>
 <div class="print-only">
 <span class="md-source-file md-version">
-1.2.25
+1.3.0-M1
 </span>
 </div>
 </article>
