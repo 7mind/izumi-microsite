@@ -33,6 +33,123 @@ code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}
 <link rel="stylesheet" href="../assets/fonts/font-awesome.css">
 <link rel="stylesheet" href="../assets/fonts/material-icons.css">
 <link rel="stylesheet" href="../assets/stylesheets/paradox-material-theme.css">
+<link rel="stylesheet"
+id="darkreader-css"
+href="../assets/stylesheets/darkreader.css"
+media="not (prefers-color-scheme: light)">
+<script>
+/* Synchronous: runs after the <link> is parsed but before the browser
+* applies its rules to the painted DOM, so adjusting media here
+* eliminates any flash-of-wrong-theme on repeat visits. */
+(function () {
+var link = document.getElementById("darkreader-css");
+if (!link) return;
+var stored = null;
+try { stored = localStorage.getItem("izumi-color-scheme"); } catch (e) {}
+/* "light" => disable (force original white theme).
+* Anything else (including null) => force dark, overriding the OS
+* preference. This makes dark the JS-on default for everyone. */
+link.media = (stored === "light") ? "not all" : "all";
+})();
+</script>
+<style>
+/* Theme-toggle layout (see partials/header.st).
+*
+* .md-flex is `display: table` upstream — its children are table-cells
+* whose heights contribute to the row's height. The title cell on
+* sub-pages uses absolute-positioned .md-header-nav__topic spans (each
+* line-height: 4.8rem), which need the row to be at least 4.8rem tall
+* to render fully. So at wide widths we KEEP the table layout intact:
+* the toggle goes in its own .md-flex__cell sibling, no flex on cells.
+*
+* Wide (>=60em): source-cell sits to the right of search (DOM order),
+* with the toggle-cell after it. The default Material rule gives
+* .md-header-nav__source `width: 23rem` and the github link doesn't
+* fill that — the toggle's own cell appears just after, in line.
+*
+* Narrow (<60em): we switch the row to flex (with overrides for the
+* cell display modes) so we can use `order: 1` on the search cell to
+* push it past source-cell + toggle-cell. The source segment, which
+* is normally display:none here, is reshown as icon-only by hiding
+* .md-source__repository.
+*/
+.md-scheme-switch {
+/* The button reuses .md-header-nav__button for padding/cursor.
+* Override font-family — without this, .md-icon (which our button
+* also has) forces "Material Icons" font, which has no ☀ glyph at
+* U+2600 and renders an empty/tofu placeholder. */
+background: transparent;
+border: 0;
+font-family: inherit;
+/* Smaller than the 2.4rem pictographic Material Icons baseline because
+* Roboto's ☀ glyph fills its em-box more densely than icon fonts;
+* 1.8rem visually matches the search/github icons next to it. */
+font-size: 1.8rem;
+line-height: 1;
+color: inherit;
+}
+@media only screen and (max-width: 59.9375em) {
+/* Switch the row to flex so we can reorder via `order`. Force the
+* row's height to match .md-header (4.8rem upstream) so the title
+* cell — whose .md-header-nav__topic children are position:absolute
+* with line-height 4.8rem — has room. Without min-height the row
+* collapses to the icon buttons' ~4rem and topics overflow downward
+* on sub-pages. */
+.md-flex {
+display: flex;
+align-items: stretch;
+min-height: 4.8rem;
+}
+.md-flex__cell {
+display: flex;
+align-items: center;
+width: auto;
+/* Belt-and-suspenders: also pin min-height on each cell so they
+* are guaranteed to provide the 4.8rem the absolute-positioned
+* .md-header-nav__topic spans need on sub-pages, regardless of
+* how align-items: stretch propagates from the container. */
+min-height: 4.8rem;
+}
+.md-flex__cell--stretch {
+flex: 1 1 0;
+min-width: 0;
+}
+.md-flex__ellipsis {
+display: block;
+flex: 1 1 0;
+min-width: 0;
+overflow: hidden;
+text-overflow: ellipsis;
+white-space: nowrap;
+/* The title element has no in-flow content (topics are absolute),
+* so it would collapse to height 0 without an explicit size. The
+* absolute topics position relative to the cell, but giving the
+* title 100% of cell height keeps any cascade/inheritance that
+* depends on title's own box happy. */
+height: 4.8rem;
+}
+.md-header-nav__search-cell {
+order: 1;
+}
+/* Show github source as icon-only. */
+.md-header-nav__source-cell .md-header-nav__source {
+display: flex;
+width: auto;
+max-width: none;
+margin: 0;
+padding: 0;
+}
+.md-header-nav__source-cell .md-source {
+padding: 0;
+height: auto;
+line-height: 1;
+}
+.md-header-nav__source-cell .md-source__repository,
+.md-header-nav__source-cell .md-source__facts {
+display: none;
+}
+}
+</style>
 </head>
 <body
 >
@@ -60,7 +177,7 @@ distage-framework
 </span>
 </div>
 </div>
-<div class="md-flex__cell md-flex__cell--shrink">
+<div class="md-flex__cell md-flex__cell--shrink md-header-nav__search-cell">
 <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
 <div class="md-search" data-md-component="search" role="dialog">
 <label class="md-search__overlay" for="__search"></label>
@@ -84,7 +201,7 @@ Type to start searching
 </div>
 
 </div>
-<div class="md-flex__cell md-flex__cell--shrink">
+<div class="md-flex__cell md-flex__cell--shrink md-header-nav__source-cell">
 <div class="md-header-nav__source">
 <a href="https://github.com/7mind/izumi"
 title="Go to repository"
@@ -99,6 +216,12 @@ data-md-source="github">
 </a>
 
 </div>
+</div>
+<div class="md-flex__cell md-flex__cell--shrink md-header-nav__toggle-cell">
+<button id="scheme-switch"
+class="md-icon md-header-nav__button md-scheme-switch"
+type="button"
+aria-label="Toggle color scheme">☀</button>
 </div>
 </div>
 </nav>
@@ -302,10 +425,10 @@ I 2020-12-14T10:00:16.267       (RoleAppEntrypoint.scala:106)  ….R.I.r.1.logge
 <pre class="prettyprint"><code class="language-scala">import izumi.functional.bio.UnsafeRun2
 
 val runner = UnsafeRun2.createZIO()
-// runner: UnsafeRun2.ZIORunner[Any] = izumi.functional.bio.UnsafeRun2$ZIORunner@11a59f75
+// runner: UnsafeRun2.ZIORunner[Any] = izumi.functional.bio.UnsafeRun2$ZIORunner@5b5c84ae
 
 val objects = runner.unsafeRun(ExampleLauncher.replLocator(&quot;:exampletask&quot;))
-// objects: izumi.distage.model.Locator = Locator izumi.distage.LocatorDefaultImpl@11e895a with 3 parent(s)
+// objects: izumi.distage.model.Locator = Locator izumi.distage.LocatorDefaultImpl@7c3c19ea with 3 parent(s)
 //   with exposed keys:  
 //      - {type.Async2[=λ %1:0,%1:1 → ZIO[-Any,+1:0,+1:1]]}
 //      - {type.IO2[=λ %0,%1 → ZIO[-Any,+0,+1]]}
@@ -316,7 +439,7 @@ val objects = runner.unsafeRun(ExampleLauncher.replLocator(&quot;:exampletask&qu
 
 // inspecting a component inside the application
 val logger = objects.get[LogIO[UIO]]
-// logger: LogIO[UIO] = logstage.LogIO$$anon$1@69626b3
+// logger: LogIO[UIO] = logstage.LogIO$$anon$1@4df1112c
 </code></pre>
 <h3><a href="#bundled-roles" name="bundled-roles" class="anchor"><span class="anchor-link"></span></a>Bundled roles</h3>
 <p><a href="/latest/snapshot/api/izumi/distage/roles/bundled/BundledRolesModule.html" title="izumi.distage.roles.bundled.BundledRolesModule"><code>BundledRolesModule</code></a> contains two bundled roles:</p>
@@ -481,13 +604,13 @@ val module = new ConfigModuleDef {
   ))
 }
 // module: AnyRef with ConfigModuleDef = 
-// make[{type.repl.MdocSession.MdocApp5.Conf}].from(call(ƒ:izumi.distage.config.codec.DIConfigReader$$Lambda/0x00007fff676b1b28@1393590f(izumi.distage.config.model.AppConfig): repl.MdocSession::MdocApp5::Conf)).tagged(Set(ConfTag(conf,izumi.distage.config.codec.DIConfigReader$$Lambda/0x00007fff676b1b28@1393590f,Class repl.MdocSession.MdocApp5.Conf with fields   
+// make[{type.izumi.distage.config.model.AppConfig}].from(call(ƒ:&lt;function0&gt;(): izumi.distage.config.model.AppConfig)) (BindingOrigin((distage-framework.md:263)))
+// make[{type.repl.MdocSession.MdocApp5.Conf}].from(call(ƒ:izumi.distage.config.codec.DIConfigReader$$Lambda/0x00007fff68ba8bf8@7de94b86(izumi.distage.config.model.AppConfig): repl.MdocSession::MdocApp5::Conf)).tagged(Set(ConfTag(conf,izumi.distage.config.codec.DIConfigReader$$Lambda/0x00007fff68ba8bf8@7de94b86,Class repl.MdocSession.MdocApp5.Conf with fields   
 //    - name: TBasic(TString)
 //    - age: TBasic(TInt)))) (BindingOrigin((distage-framework.md:259)))
-// make[{type.repl.MdocSession.MdocApp5.OtherConf@other}].from(call(ƒ:izumi.distage.config.codec.DIConfigReader$$Lambda/0x00007fff676b1b28@3fe103(izumi.distage.config.model.AppConfig): repl.MdocSession::MdocApp5::OtherConf)).tagged(Set(ConfTag(conf,izumi.distage.config.codec.DIConfigReader$$Lambda/0x00007fff676b1b28@3fe103,Class repl.MdocSession.MdocApp5.OtherConf with fields   
-//    - other: TBasic(TBoolean)))) (BindingOrigin((distage-framework.md:260)))
 // make[{type.repl.MdocSession.MdocApp5.ConfigPrinter}].from(call(π:Constructor(repl.MdocSession::MdocApp5::Conf, repl.MdocSession::MdocApp5::OtherConf): repl.MdocSession::MdocApp5::ConfigPrinter)) (BindingOrigin((distage-framework.md:256)))
-// make[{type.izumi.distage.config.model.AppConfig}].from(call(ƒ:&lt;function0&gt;(): izumi.distage.config.model.AppConfig)) (BindingOrigin((distage-framework.md:263)))
+// make[{type.repl.MdocSession.MdocApp5.OtherConf@other}].from(call(ƒ:izumi.distage.config.codec.DIConfigReader$$Lambda/0x00007fff68ba8bf8@6f84702d(izumi.distage.config.model.AppConfig): repl.MdocSession::MdocApp5::OtherConf)).tagged(Set(ConfTag(conf,izumi.distage.config.codec.DIConfigReader$$Lambda/0x00007fff68ba8bf8@6f84702d,Class repl.MdocSession.MdocApp5.OtherConf with fields   
+//    - other: TBasic(TBoolean)))) (BindingOrigin((distage-framework.md:260)))
 
 Injector().produceRun(module) {
   (configPrinter: ConfigPrinter) =&gt;
@@ -675,5 +798,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 window.prettyPrint && prettyPrint();
 });
 </script>
+<script src="../assets/javascripts/scheme-switch.js"></script>
 </body>
 </html>
