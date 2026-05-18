@@ -33,6 +33,123 @@ code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}
 <link rel="stylesheet" href="assets/fonts/font-awesome.css">
 <link rel="stylesheet" href="assets/fonts/material-icons.css">
 <link rel="stylesheet" href="assets/stylesheets/paradox-material-theme.css">
+<link rel="stylesheet"
+id="darkreader-css"
+href="assets/stylesheets/darkreader.css"
+media="not (prefers-color-scheme: light)">
+<script>
+/* Synchronous: runs after the <link> is parsed but before the browser
+* applies its rules to the painted DOM, so adjusting media here
+* eliminates any flash-of-wrong-theme on repeat visits. */
+(function () {
+var link = document.getElementById("darkreader-css");
+if (!link) return;
+var stored = null;
+try { stored = localStorage.getItem("izumi-color-scheme"); } catch (e) {}
+/* "light" => disable (force original white theme).
+* Anything else (including null) => force dark, overriding the OS
+* preference. This makes dark the JS-on default for everyone. */
+link.media = (stored === "light") ? "not all" : "all";
+})();
+</script>
+<style>
+/* Theme-toggle layout (see partials/header.st).
+*
+* .md-flex is `display: table` upstream — its children are table-cells
+* whose heights contribute to the row's height. The title cell on
+* sub-pages uses absolute-positioned .md-header-nav__topic spans (each
+* line-height: 4.8rem), which need the row to be at least 4.8rem tall
+* to render fully. So at wide widths we KEEP the table layout intact:
+* the toggle goes in its own .md-flex__cell sibling, no flex on cells.
+*
+* Wide (>=60em): source-cell sits to the right of search (DOM order),
+* with the toggle-cell after it. The default Material rule gives
+* .md-header-nav__source `width: 23rem` and the github link doesn't
+* fill that — the toggle's own cell appears just after, in line.
+*
+* Narrow (<60em): we switch the row to flex (with overrides for the
+* cell display modes) so we can use `order: 1` on the search cell to
+* push it past source-cell + toggle-cell. The source segment, which
+* is normally display:none here, is reshown as icon-only by hiding
+* .md-source__repository.
+*/
+.md-scheme-switch {
+/* The button reuses .md-header-nav__button for padding/cursor.
+* Override font-family — without this, .md-icon (which our button
+* also has) forces "Material Icons" font, which has no ☀ glyph at
+* U+2600 and renders an empty/tofu placeholder. */
+background: transparent;
+border: 0;
+font-family: inherit;
+/* Smaller than the 2.4rem pictographic Material Icons baseline because
+* Roboto's ☀ glyph fills its em-box more densely than icon fonts;
+* 1.8rem visually matches the search/github icons next to it. */
+font-size: 1.8rem;
+line-height: 1;
+color: inherit;
+}
+@media only screen and (max-width: 59.9375em) {
+/* Switch the row to flex so we can reorder via `order`. Force the
+* row's height to match .md-header (4.8rem upstream) so the title
+* cell — whose .md-header-nav__topic children are position:absolute
+* with line-height 4.8rem — has room. Without min-height the row
+* collapses to the icon buttons' ~4rem and topics overflow downward
+* on sub-pages. */
+.md-flex {
+display: flex;
+align-items: stretch;
+min-height: 4.8rem;
+}
+.md-flex__cell {
+display: flex;
+align-items: center;
+width: auto;
+/* Belt-and-suspenders: also pin min-height on each cell so they
+* are guaranteed to provide the 4.8rem the absolute-positioned
+* .md-header-nav__topic spans need on sub-pages, regardless of
+* how align-items: stretch propagates from the container. */
+min-height: 4.8rem;
+}
+.md-flex__cell--stretch {
+flex: 1 1 0;
+min-width: 0;
+}
+.md-flex__ellipsis {
+display: block;
+flex: 1 1 0;
+min-width: 0;
+overflow: hidden;
+text-overflow: ellipsis;
+white-space: nowrap;
+/* The title element has no in-flow content (topics are absolute),
+* so it would collapse to height 0 without an explicit size. The
+* absolute topics position relative to the cell, but giving the
+* title 100% of cell height keeps any cascade/inheritance that
+* depends on title's own box happy. */
+height: 4.8rem;
+}
+.md-header-nav__search-cell {
+order: 1;
+}
+/* Show github source as icon-only. */
+.md-header-nav__source-cell .md-header-nav__source {
+display: flex;
+width: auto;
+max-width: none;
+margin: 0;
+padding: 0;
+}
+.md-header-nav__source-cell .md-source {
+padding: 0;
+height: auto;
+line-height: 1;
+}
+.md-header-nav__source-cell .md-source__repository,
+.md-header-nav__source-cell .md-source__facts {
+display: none;
+}
+}
+</style>
 </head>
 <body
 >
@@ -55,7 +172,7 @@ code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}
 Izumi Project
 </div>
 </div>
-<div class="md-flex__cell md-flex__cell--shrink">
+<div class="md-flex__cell md-flex__cell--shrink md-header-nav__search-cell">
 <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
 <div class="md-search" data-md-component="search" role="dialog">
 <label class="md-search__overlay" for="__search"></label>
@@ -79,7 +196,7 @@ Type to start searching
 </div>
 
 </div>
-<div class="md-flex__cell md-flex__cell--shrink">
+<div class="md-flex__cell md-flex__cell--shrink md-header-nav__source-cell">
 <div class="md-header-nav__source">
 <a href="https://github.com/7mind/izumi"
 title="Go to repository"
@@ -94,6 +211,12 @@ data-md-source="github">
 </a>
 
 </div>
+</div>
+<div class="md-flex__cell md-flex__cell--shrink md-header-nav__toggle-cell">
+<button id="scheme-switch"
+class="md-icon md-header-nav__button md-scheme-switch"
+type="button"
+aria-label="Toggle color scheme">☀</button>
 </div>
 </div>
 </nav>
@@ -173,7 +296,7 @@ data-md-source="github">
 <ul style="display: none">
 <li class="md-nav__item md-version" id="project.version">
 <label class="md-nav__link" for="__version">
-<i class="md-icon" title="Version">label_outline</i> 1.3.0-M1
+<i class="md-icon" title="Version">label_outline</i> 1.3.0-M2
 </label>
 </li>
 </ul>
@@ -222,26 +345,26 @@ data-md-source="github">
 <p>To use, add the following into <code>build.sbt</code>,</p>
 <pre class="prettyprint"><code class="language-scala">libraryDependencies ++= Seq(
   // distage core library
-  &quot;io.7mind.izumi&quot; %% &quot;distage-core&quot; % &quot;1.3.0-M1&quot;,
+  &quot;io.7mind.izumi&quot; %% &quot;distage-core&quot; % &quot;1.3.0-M2&quot;,
   // distage-testkit for ScalaTest
-  &quot;io.7mind.izumi&quot; %% &quot;distage-testkit-scalatest&quot; % &quot;1.3.0-M1&quot; % Test,
+  &quot;io.7mind.izumi&quot; %% &quot;distage-testkit-scalatest&quot; % &quot;1.3.0-M2&quot; % Test,
   // distage-framework: Roles, Entrypoints, Effect modules
-  &quot;io.7mind.izumi&quot; %% &quot;distage-framework&quot; % &quot;1.3.0-M1&quot;,
+  &quot;io.7mind.izumi&quot; %% &quot;distage-framework&quot; % &quot;1.3.0-M2&quot;,
   // Typesafe Config support
-  &quot;io.7mind.izumi&quot; %% &quot;distage-extension-config&quot; % &quot;1.3.0-M1&quot;,
+  &quot;io.7mind.izumi&quot; %% &quot;distage-extension-config&quot; % &quot;1.3.0-M2&quot;,
   // Classpath discovery support
-  &quot;io.7mind.izumi&quot; %% &quot;distage-extension-plugins&quot; % &quot;1.3.0-M1&quot;,
+  &quot;io.7mind.izumi&quot; %% &quot;distage-extension-plugins&quot; % &quot;1.3.0-M2&quot;,
   // LogStage integration with DIStage
-  &quot;io.7mind.izumi&quot; %% &quot;distage-extension-logstage&quot; % &quot;1.3.0-M1&quot;,
+  &quot;io.7mind.izumi&quot; %% &quot;distage-extension-logstage&quot; % &quot;1.3.0-M2&quot;,
 
   // LogStage core library
-  &quot;io.7mind.izumi&quot; %% &quot;logstage-core&quot; % &quot;1.3.0-M1&quot;,
+  &quot;io.7mind.izumi&quot; %% &quot;logstage-core&quot; % &quot;1.3.0-M2&quot;,
   // Write logs as JSON
-  &quot;io.7mind.izumi&quot; %% &quot;logstage-rendering-circe&quot; % &quot;1.3.0-M1&quot;,
+  &quot;io.7mind.izumi&quot; %% &quot;logstage-rendering-circe&quot; % &quot;1.3.0-M2&quot;,
   // Route Slf4J logs to LogStage
-  &quot;io.7mind.izumi&quot; %% &quot;logstage-adapter-slf4j&quot; % &quot;1.3.0-M1&quot;,
+  &quot;io.7mind.izumi&quot; %% &quot;logstage-adapter-slf4j&quot; % &quot;1.3.0-M2&quot;,
   // Route LogStage logs to Slf4J
-  &quot;io.7mind.izumi&quot; %% &quot;logstage-sink-slf4j&quot; % &quot;1.3.0-M1&quot;,
+  &quot;io.7mind.izumi&quot; %% &quot;logstage-sink-slf4j&quot; % &quot;1.3.0-M2&quot;,
 
 )
 </code></pre>
@@ -294,6 +417,7 @@ data-md-source="github">
   <ul>
     <li><a href="glossary.html#izumi-specific-terms" class="header">Izumi-specific terms</a></li>
     <li><a href="glossary.html#izumi-overloaded-terms" class="header">Izumi-overloaded terms</a></li>
+    <li><a href="glossary.html#terms-used-by-izumi" class="header">Terms used by Izumi</a></li>
     <li><a href="glossary.html#terms-elaborated-by-izumi" class="header">Terms elaborated by Izumi</a></li>
   </ul></li>
   <li><a href="guidelines.html" class="page">Izumi Framework Best Practices</a>
@@ -321,7 +445,7 @@ data-md-source="github">
     <li><a href="logstage/index.html#overview" class="header">Overview</a></li>
     <li><a href="logstage/index.html#syntax-reference" class="header">Syntax Reference</a></li>
     <li><a href="logstage/index.html#basic-setup" class="header">Basic setup</a></li>
-    <li><a href="logstage/index.html#log-algebras" class="header">Log algebras</a></li>
+    <li><a href="logstage/index.html#logio" class="header">LogIO</a></li>
     <li><a href="logstage/index.html#zio-environment-support" class="header">ZIO environment support</a></li>
     <li><a href="logstage/index.html#custom-json-rendering-with-logstagecodec" class="header">Custom JSON rendering with LogstageCodec</a></li>
     <li><a href="logstage/index.html#slf4j-router" class="header">SLF4J Router</a></li>
@@ -367,13 +491,13 @@ data-md-source="github">
 </div>
 </div>
 <div>
-<a href="https://github.com/7mind/izumi/tree/v1.3.0-M1/doc/microsite/target/mdoc/izumi.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/7mind/izumi/tree/v1.3.0-M2/doc/microsite/target/mdoc/izumi.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>
 <div class="print-only">
 <span class="md-source-file md-version">
-1.3.0-M1
+1.3.0-M2
 </span>
 </div>
 </article>
@@ -425,5 +549,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 window.prettyPrint && prettyPrint();
 });
 </script>
+<script src="assets/javascripts/scheme-switch.js"></script>
 </body>
 </html>

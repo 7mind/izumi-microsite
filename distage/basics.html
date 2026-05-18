@@ -33,6 +33,123 @@ code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}
 <link rel="stylesheet" href="../assets/fonts/font-awesome.css">
 <link rel="stylesheet" href="../assets/fonts/material-icons.css">
 <link rel="stylesheet" href="../assets/stylesheets/paradox-material-theme.css">
+<link rel="stylesheet"
+id="darkreader-css"
+href="../assets/stylesheets/darkreader.css"
+media="not (prefers-color-scheme: light)">
+<script>
+/* Synchronous: runs after the <link> is parsed but before the browser
+* applies its rules to the painted DOM, so adjusting media here
+* eliminates any flash-of-wrong-theme on repeat visits. */
+(function () {
+var link = document.getElementById("darkreader-css");
+if (!link) return;
+var stored = null;
+try { stored = localStorage.getItem("izumi-color-scheme"); } catch (e) {}
+/* "light" => disable (force original white theme).
+* Anything else (including null) => force dark, overriding the OS
+* preference. This makes dark the JS-on default for everyone. */
+link.media = (stored === "light") ? "not all" : "all";
+})();
+</script>
+<style>
+/* Theme-toggle layout (see partials/header.st).
+*
+* .md-flex is `display: table` upstream — its children are table-cells
+* whose heights contribute to the row's height. The title cell on
+* sub-pages uses absolute-positioned .md-header-nav__topic spans (each
+* line-height: 4.8rem), which need the row to be at least 4.8rem tall
+* to render fully. So at wide widths we KEEP the table layout intact:
+* the toggle goes in its own .md-flex__cell sibling, no flex on cells.
+*
+* Wide (>=60em): source-cell sits to the right of search (DOM order),
+* with the toggle-cell after it. The default Material rule gives
+* .md-header-nav__source `width: 23rem` and the github link doesn't
+* fill that — the toggle's own cell appears just after, in line.
+*
+* Narrow (<60em): we switch the row to flex (with overrides for the
+* cell display modes) so we can use `order: 1` on the search cell to
+* push it past source-cell + toggle-cell. The source segment, which
+* is normally display:none here, is reshown as icon-only by hiding
+* .md-source__repository.
+*/
+.md-scheme-switch {
+/* The button reuses .md-header-nav__button for padding/cursor.
+* Override font-family — without this, .md-icon (which our button
+* also has) forces "Material Icons" font, which has no ☀ glyph at
+* U+2600 and renders an empty/tofu placeholder. */
+background: transparent;
+border: 0;
+font-family: inherit;
+/* Smaller than the 2.4rem pictographic Material Icons baseline because
+* Roboto's ☀ glyph fills its em-box more densely than icon fonts;
+* 1.8rem visually matches the search/github icons next to it. */
+font-size: 1.8rem;
+line-height: 1;
+color: inherit;
+}
+@media only screen and (max-width: 59.9375em) {
+/* Switch the row to flex so we can reorder via `order`. Force the
+* row's height to match .md-header (4.8rem upstream) so the title
+* cell — whose .md-header-nav__topic children are position:absolute
+* with line-height 4.8rem — has room. Without min-height the row
+* collapses to the icon buttons' ~4rem and topics overflow downward
+* on sub-pages. */
+.md-flex {
+display: flex;
+align-items: stretch;
+min-height: 4.8rem;
+}
+.md-flex__cell {
+display: flex;
+align-items: center;
+width: auto;
+/* Belt-and-suspenders: also pin min-height on each cell so they
+* are guaranteed to provide the 4.8rem the absolute-positioned
+* .md-header-nav__topic spans need on sub-pages, regardless of
+* how align-items: stretch propagates from the container. */
+min-height: 4.8rem;
+}
+.md-flex__cell--stretch {
+flex: 1 1 0;
+min-width: 0;
+}
+.md-flex__ellipsis {
+display: block;
+flex: 1 1 0;
+min-width: 0;
+overflow: hidden;
+text-overflow: ellipsis;
+white-space: nowrap;
+/* The title element has no in-flow content (topics are absolute),
+* so it would collapse to height 0 without an explicit size. The
+* absolute topics position relative to the cell, but giving the
+* title 100% of cell height keeps any cascade/inheritance that
+* depends on title's own box happy. */
+height: 4.8rem;
+}
+.md-header-nav__search-cell {
+order: 1;
+}
+/* Show github source as icon-only. */
+.md-header-nav__source-cell .md-header-nav__source {
+display: flex;
+width: auto;
+max-width: none;
+margin: 0;
+padding: 0;
+}
+.md-header-nav__source-cell .md-source {
+padding: 0;
+height: auto;
+line-height: 1;
+}
+.md-header-nav__source-cell .md-source__repository,
+.md-header-nav__source-cell .md-source__facts {
+display: none;
+}
+}
+</style>
 </head>
 <body
 >
@@ -60,7 +177,7 @@ Basics
 </span>
 </div>
 </div>
-<div class="md-flex__cell md-flex__cell--shrink">
+<div class="md-flex__cell md-flex__cell--shrink md-header-nav__search-cell">
 <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
 <div class="md-search" data-md-component="search" role="dialog">
 <label class="md-search__overlay" for="__search"></label>
@@ -84,7 +201,7 @@ Type to start searching
 </div>
 
 </div>
-<div class="md-flex__cell md-flex__cell--shrink">
+<div class="md-flex__cell md-flex__cell--shrink md-header-nav__source-cell">
 <div class="md-header-nav__source">
 <a href="https://github.com/7mind/izumi"
 title="Go to repository"
@@ -99,6 +216,12 @@ data-md-source="github">
 </a>
 
 </div>
+</div>
+<div class="md-flex__cell md-flex__cell--shrink md-header-nav__toggle-cell">
+<button id="scheme-switch"
+class="md-icon md-header-nav__button md-scheme-switch"
+type="button"
+aria-label="Toggle color scheme">☀</button>
 </div>
 </div>
 </nav>
@@ -187,7 +310,7 @@ data-md-source="github">
 <ul style="display: none">
 <li class="md-nav__item md-version" id="project.version">
 <label class="md-nav__link" for="__version">
-<i class="md-icon" title="Version">label_outline</i> 1.3.0-M1
+<i class="md-icon" title="Version">label_outline</i> 1.3.0-M2
 </label>
 </li>
 </ul>
@@ -271,7 +394,7 @@ data-md-source="github">
 </div>
 <h2><a href="#quick-start" name="quick-start" class="anchor"><span class="anchor-link"></span></a>Quick Start</h2>
 <h3><a href="#dependencies" name="dependencies" class="anchor"><span class="anchor-link"></span></a>Dependencies</h3>
-<p>Add the <code>distage-core</code> library:</p><dl class="dependency"><dt>sbt</dt><dd><pre class="prettyprint"><code class="language-scala">libraryDependencies += "io.7mind.izumi" %% "distage-core" % "1.3.0-M1"</code></pre></dd></dl>
+<p>Add the <code>distage-core</code> library:</p><dl class="dependency"><dt>sbt</dt><dd><pre class="prettyprint"><code class="language-scala">libraryDependencies += "io.7mind.izumi" %% "distage-core" % "1.3.0-M2"</code></pre></dd></dl>
 <p>If you&rsquo;re using Scala 3 you <strong>must</strong> enable <code>-Yretain-trees</code> for this library to work correctly:</p>
 <pre class="prettyprint"><code class="language-scala">// REQUIRED option for Scala 3
 scalacOptions += &quot;-Yretain-trees&quot;
@@ -341,7 +464,7 @@ def HelloByeModule = new ModuleDef {
 <pre class="prettyprint"><code class="language-scala">import distage.{Activation, Injector, Roots}
 
 val injector = Injector[Task]()
-// injector: Injector[Task] = izumi.distage.InjectorDefaultImpl@6ce42617
+// injector: Injector[Task] = izumi.distage.InjectorDefaultImpl@2ca24936
 
 val plan = injector.plan(HelloByeModule, Roots.target[HelloByeApp], Activation.empty).getOrThrow()
 // plan: izumi.distage.model.plan.Plan = 1: {type.MdocSession::MdocApp1::Greeter} BindingOrigin((basics.md:84)) := call(π:Constructor(): MdocSession::MdocApp1::PrintGreeter[32m) {}
@@ -359,7 +482,7 @@ val plan = injector.plan(HelloByeModule, Roots.target[HelloByeApp], Activation.e
 // Interpret into a Lifecycle value
 
 val resource = injector.produce(plan)
-// resource: izumi.distage.model.definition.package.Lifecycle[Task, izumi.distage.model.Locator] = izumi.functional.lifecycle.LifecycleMethodImpls$$anon$2@2c4cfd38
+// resource: izumi.distage.model.definition.package.Lifecycle[Task, izumi.distage.model.Locator] = izumi.functional.lifecycle.LifecycleMethodImpls$$anon$2@3d300f03
 
 // Use the object graph:
 // After `.use` exits, all objects will be deallocated,
@@ -369,12 +492,12 @@ val effect = resource.use {
   objects =&gt;
     objects.get[HelloByeApp].run
 }
-// effect: Task[Unit] = DynamicNoBox(izumi.functional.quasi.QuasiPrimitivesFromBIO.bracket(QuasiIO.scala:384),1,zio.ZIO$Release$$Lambda/0x00007fff67880de8@7f4a9e68)
+// effect: Task[Unit] = DynamicNoBox(izumi.functional.quasi.QuasiPrimitivesFromBIO.bracket(QuasiIO.scala:384),1,zio.ZIO$Release$$Lambda/0x00007fff7b843508@7c7bcb09)
 
 // Run the resulting program
 
 val runner = UnsafeRun2.createZIO()
-// runner: UnsafeRun2.ZIORunner[Any] = izumi.functional.bio.UnsafeRun2$ZIORunner@c268138
+// runner: UnsafeRun2.ZIORunner[Any] = izumi.functional.bio.UnsafeRun2$ZIORunner@3395a292
 
 runner.unsafeRun(effect)
 // What&#39;s your name?
@@ -639,14 +762,14 @@ val dbResource = Resource.make(
     println(&quot;Connecting to DB!&quot;)
     new DBConnection
 })(release = _ =&gt; IO(println(&quot;Disconnecting DB&quot;)))
-// dbResource: Resource[IO, DBConnection] = Allocate(cats.effect.kernel.Resource$$$Lambda/0x00007fff688d2a18@53f4c64f)
+// dbResource: Resource[IO, DBConnection] = Allocate(cats.effect.kernel.Resource$$$Lambda/0x00007fff7c8c7ad8@6f9ddd7a)
 
 val mqResource = Resource.make(
   acquire = IO {
    println(&quot;Connecting to Message Queue!&quot;)
    new MessageQueueConnection
 })(release = _ =&gt; IO(println(&quot;Disconnecting Message Queue&quot;)))
-// mqResource: Resource[IO, MessageQueueConnection] = Allocate(cats.effect.kernel.Resource$$$Lambda/0x00007fff688d2a18@72661b2b)
+// mqResource: Resource[IO, MessageQueueConnection] = Allocate(cats.effect.kernel.Resource$$$Lambda/0x00007fff7c8c7ad8@58362cb6)
 
 class MyApp(
   db: DBConnection,
@@ -670,7 +793,7 @@ val objectGraphResource = {
   Injector[IO]()
     .produce(module, Roots.target[MyApp])
 }
-// objectGraphResource: izumi.distage.model.definition.package.Lifecycle[IO, izumi.distage.model.Locator] = izumi.functional.lifecycle.LifecycleMethodImpls$$anon$2@33f97d74
+// objectGraphResource: izumi.distage.model.definition.package.Lifecycle[IO, izumi.distage.model.Locator] = izumi.functional.lifecycle.LifecycleMethodImpls$$anon$2@466148ca
 
 objectGraphResource
   .use(_.get[MyApp].run)
@@ -711,7 +834,7 @@ val closedInit = Injector()
       init
 }
 // true
-// closedInit: Init = repl.MdocSession$MdocApp21$Init@258df8a5
+// closedInit: Init = repl.MdocSession$MdocApp21$Init@7c6188d8
 
 println(closedInit.initialized)
 // false
@@ -815,7 +938,7 @@ val catsEffectHello = polymorphicHelloWorld[cats.effect.IO]
 //val monixHello = polymorphicHelloWorld[monix.eval.Task]
 
 val zioHello = polymorphicHelloWorld[zio.IO[Throwable, _]]
-// zioHello: zio.ZIO[Any, Throwable, Unit] = DynamicNoBox(izumi.functional.quasi.QuasiPrimitivesFromBIO.bracket(QuasiIO.scala:384),1,zio.ZIO$Release$$Lambda/0x00007fff67880de8@57edd480)
+// zioHello: zio.ZIO[Any, Throwable, Unit] = DynamicNoBox(izumi.functional.quasi.QuasiPrimitivesFromBIO.bracket(QuasiIO.scala:384),1,zio.ZIO$Release$$Lambda/0x00007fff7b843508@55d7703a)
 
 //val monixBioHello = polymorphicHelloWorld[monix.bio.IO[Throwable, _]]
 </code></pre>
@@ -891,7 +1014,7 @@ object AppModule extends ModuleDef {
 // wire the graph and get the app
 
 val app = Injector().produceGet[App](AppModule).unsafeGet()
-// app: App = repl.MdocSession$MdocApp26$App$Impl@4662067b
+// app: App = repl.MdocSession$MdocApp26$App$Impl@1fa720a1
 
 // check how it works
 
@@ -1041,12 +1164,12 @@ val io = Injector[Task]()
         res2 &lt;- kv.get(&quot;apple&quot;)
       } yield res1 + res2
   }
-// io: Task[String] = DynamicNoBox(izumi.functional.quasi.QuasiPrimitivesFromBIO.bracket(QuasiIO.scala:384),1,zio.ZIO$Release$$Lambda/0x00007fff67880de8@3621f5f5)
+// io: Task[String] = DynamicNoBox(izumi.functional.quasi.QuasiPrimitivesFromBIO.bracket(QuasiIO.scala:384),1,zio.ZIO$Release$$Lambda/0x00007fff7b843508@1f46bf45)
 
 import izumi.functional.bio.UnsafeRun2
 
 val runtime = UnsafeRun2.createZIO()
-// runtime: UnsafeRun2.ZIORunner[Any] = izumi.functional.bio.UnsafeRun2$ZIORunner@35e97693
+// runtime: UnsafeRun2.ZIORunner[Any] = izumi.functional.bio.UnsafeRun2$ZIORunner@155acdb5
 
 runtime.unsafeRun(io)
 // res38: String = pieipad
@@ -1115,10 +1238,10 @@ trait World {
 // using service functions from everywhere
 
 val hello: URIO[Hello, String] = ZIO.serviceWithZIO(_.hello)
-// hello: URIO[Hello, String] = Stateful(repl.MdocSession.MdocApp39.hello(basics.md:921),zio.FiberRef$unsafe$PatchFiber$$Lambda/0x00007fff67820000@7d408e4e)
+// hello: URIO[Hello, String] = Stateful(repl.MdocSession.MdocApp39.hello(basics.md:921),zio.FiberRef$unsafe$PatchFiber$$Lambda/0x00007fff7b824be0@2a101870)
 
 val world: URIO[World, String] = ZIO.serviceWithZIO(_.world)
-// world: URIO[World, String] = Stateful(repl.MdocSession.MdocApp39.world(basics.md:924),zio.FiberRef$unsafe$PatchFiber$$Lambda/0x00007fff67820000@1a7c4f09)
+// world: URIO[World, String] = Stateful(repl.MdocSession.MdocApp39.world(basics.md:924),zio.FiberRef$unsafe$PatchFiber$$Lambda/0x00007fff7b824be0@4add0935)
 
 // service implementations
 
@@ -1131,7 +1254,7 @@ val makeHello = {
     val hello = ZIO.succeed(&quot;Hello&quot;)
   }
 }
-// makeHello: ZIO[Any with Any with zio.Scope, java.io.IOException, AnyRef with Hello{val hello: zio.ZIO[Any,Nothing,String]}] = FlatMap(repl.MdocSession.MdocApp39.makeHello(basics.md:929),DynamicNoBox(repl.MdocSession.MdocApp39.makeHello(basics.md:931),1,zio.ZIO$$Lambda/0x00007fff68936300@51439ca5),zio.ZIO$$Lambda/0x00007fff678cb198@3bc9698d)
+// makeHello: ZIO[Any with Any with zio.Scope, java.io.IOException, AnyRef with Hello{val hello: zio.ZIO[Any,Nothing,String]}] = FlatMap(repl.MdocSession.MdocApp39.makeHello(basics.md:929),DynamicNoBox(repl.MdocSession.MdocApp39.makeHello(basics.md:931),1,zio.ZIO$$Lambda/0x00007fff7c92b238@500f6f6f),zio.ZIO$$Lambda/0x00007fff7b580000@1d7c9075)
 
 val makeWorld = {
   for {
@@ -1140,7 +1263,7 @@ val makeWorld = {
     val world = counter.get.map(c =&gt; if (c &lt; 1) &quot;World&quot; else &quot;THE World&quot;)
   }
 }
-// makeWorld: ZIO[Any, Nothing, AnyRef with World{val world: zio.ZIO[Any,Nothing,String]}] = FlatMap(repl.MdocSession.MdocApp39.makeWorld(basics.md:940),Sync(repl.MdocSession.MdocApp39.makeWorld(basics.md:940),zio.Ref$$$Lambda/0x00007fff6892e8f8@76551cce),zio.ZIO$$Lambda/0x00007fff678cb198@6209688)
+// makeWorld: ZIO[Any, Nothing, AnyRef with World{val world: zio.ZIO[Any,Nothing,String]}] = FlatMap(repl.MdocSession.MdocApp39.makeWorld(basics.md:940),Sync(repl.MdocSession.MdocApp39.makeWorld(basics.md:940),zio.Ref$$$Lambda/0x00007fff7c9238e0@556ced0e),zio.ZIO$$Lambda/0x00007fff7b580000@2c6a30ee)
 
 // the main function
 
@@ -1151,7 +1274,7 @@ val turboFunctionalHelloWorld: RIO[Hello with World, Unit] = {
     _     &lt;- Console.print(s&quot;$hello $world&quot;)
   } yield ()
 }
-// turboFunctionalHelloWorld: RIO[Hello with World, Unit] = FlatMap(repl.MdocSession.MdocApp39.turboFunctionalHelloWorld(basics.md:949),Stateful(repl.MdocSession.MdocApp39.hello(basics.md:921),zio.FiberRef$unsafe$PatchFiber$$Lambda/0x00007fff67820000@7d408e4e),&lt;function1&gt;)
+// turboFunctionalHelloWorld: RIO[Hello with World, Unit] = FlatMap(repl.MdocSession.MdocApp39.turboFunctionalHelloWorld(basics.md:949),Stateful(repl.MdocSession.MdocApp39.hello(basics.md:921),zio.FiberRef$unsafe$PatchFiber$$Lambda/0x00007fff7b824be0@2a101870),&lt;function1&gt;)
 
 def module = new ModuleDef {
   make[Hello].fromZIOEnv(makeHello)
@@ -1161,12 +1284,12 @@ def module = new ModuleDef {
 
 val main = Injector[Task]()
   .produceRun[Unit](module)((_: Unit) =&gt; ZIO.unit)
-// main: Task[Unit] = DynamicNoBox(izumi.functional.quasi.QuasiPrimitivesFromBIO.bracket(QuasiIO.scala:384),1,zio.ZIO$Release$$Lambda/0x00007fff67880de8@752e82c7)
+// main: Task[Unit] = DynamicNoBox(izumi.functional.quasi.QuasiPrimitivesFromBIO.bracket(QuasiIO.scala:384),1,zio.ZIO$Release$$Lambda/0x00007fff7b843508@45c8cd37)
 
 import izumi.functional.bio.UnsafeRun2
 
 val runtime = UnsafeRun2.createZIO()
-// runtime: UnsafeRun2.ZIORunner[Any] = izumi.functional.bio.UnsafeRun2$ZIORunner@1586a50e
+// runtime: UnsafeRun2.ZIORunner[Any] = izumi.functional.bio.UnsafeRun2$ZIORunner@5b5a8b5b
 
 runtime.unsafeRun(main)
 // Creating Enterprise Hellower...
@@ -1585,7 +1708,7 @@ def module[F[+_, +_]: TagKK] = new ModuleDef {
 import izumi.functional.bio.UnsafeRun2
 
 val runner = UnsafeRun2.createZIO()
-// runner: UnsafeRun2.ZIORunner[Any] = izumi.functional.bio.UnsafeRun2$ZIORunner@28cd459d
+// runner: UnsafeRun2.ZIORunner[Any] = izumi.functional.bio.UnsafeRun2$ZIORunner@2fe6526e
 
 val result = runner.unsafeRun {
   Injector[zio.Task]()
@@ -1594,14 +1717,14 @@ val result = runner.unsafeRun {
         petStoreAPI.buyPetAPI(Pets.arnoldId, 100)
     }
 }
-// I 2026-04-15T00:35:48.975 (basics.md:1433)  ….PetStoreRepository.findPet [735:Thread-225] requestId=RequestId(6f754659-0717-4202-abaf-7a88edee6910) 
-//     Looking up pet_id=PetId(acd59a09-4512-4667-a1a6-436a074c4bef)
-// I 2026-04-15T00:35:48.990 (basics.md:1435)  …P.I.1.1.P.findPet.1433.1434 [735:Thread-225] requestId=RequestId(6f754659-0717-4202-abaf-7a88edee6910) 
+// I 2026-05-18T20:08:27.191 (basics.md:1433)  ….PetStoreRepository.findPet [735:Thread-224] requestId=RequestId(ae9c9973-19d3-4e59-9ede-b619d0c027cb) 
+//     Looking up pet_id=PetId(421d254c-1f75-4e6c-88e3-19c7c518e91c)
+// I 2026-05-18T20:08:27.204 (basics.md:1435)  …P.I.1.1.P.findPet.1433.1434 [735:Thread-224] requestId=RequestId(ae9c9973-19d3-4e59-9ede-b619d0c027cb) 
 //     Got maybe_pet=Some(Pet(Arnold,Dog,99))
-// I 2026-04-15T00:35:48.999 (basics.md:1442)  …reRepository.removePet.1441 [735:Thread-225] requestId=RequestId(6f754659-0717-4202-abaf-7a88edee6910) 
-//     Tried to remove pet_id=PetId(acd59a09-4512-4667-a1a6-436a074c4bef), success=true
-// I 2026-04-15T00:35:49.006 (basics.md:1408)  r.M.M.P.b.1400.1406.1407 [735:Thread-225] requestId=RequestId(6f754659-0717-4202-abaf-7a88edee6910) 
-//     Successfully bought pet=Pet(Arnold,Dog,99) with pet_id=PetId(acd59a09-4512-4667-a1a6-436a074c4bef) for payment=100! overpaid=1
+// I 2026-05-18T20:08:27.212 (basics.md:1442)  …reRepository.removePet.1441 [735:Thread-224] requestId=RequestId(ae9c9973-19d3-4e59-9ede-b619d0c027cb) 
+//     Tried to remove pet_id=PetId(421d254c-1f75-4e6c-88e3-19c7c518e91c), success=true
+// I 2026-05-18T20:08:27.219 (basics.md:1408)  r.M.M.P.b.1400.1406.1407 [735:Thread-224] requestId=RequestId(ae9c9973-19d3-4e59-9ede-b619d0c027cb) 
+//     Successfully bought pet=Pet(Arnold,Dog,99) with pet_id=PetId(421d254c-1f75-4e6c-88e3-19c7c518e91c) for payment=100! overpaid=1
 // result: Either[TransactionFailure, Pet] = Right(
 //   value = Pet(name = &quot;Arnold&quot;, species = &quot;Dog&quot;, price = 99)
 // )
@@ -1687,7 +1810,7 @@ def SyncProgram[F[_]: TagK]: Module = ProgramModule[F] ++ SyncInterpreters[F]
 val objectsLifecycle: Lifecycle[IO, Locator] = {
   Injector[IO]().produce(SyncProgram[IO], Roots.target[TaglessProgram[IO]])
 }
-// objectsLifecycle: Lifecycle[IO, Locator] = izumi.functional.lifecycle.LifecycleMethodImpls$$anon$2@f99ad3
+// objectsLifecycle: Lifecycle[IO, Locator] = izumi.functional.lifecycle.LifecycleMethodImpls$$anon$2@999578b
 
 // run
 
@@ -1735,10 +1858,10 @@ def chooseInterpreters(isDummy: Boolean): Lifecycle[Task, TaglessProgram[Task]] 
 import izumi.functional.bio.UnsafeRun2
 
 val runner: UnsafeRun2[zio.IO] = UnsafeRun2.createZIO()
-// runner: UnsafeRun2[zio.package.IO] = izumi.functional.bio.UnsafeRun2$ZIORunner@1c6eb445
+// runner: UnsafeRun2[zio.package.IO] = izumi.functional.bio.UnsafeRun2$ZIORunner@6bb6a199
 
 val zioEffect: Task[Unit] = chooseInterpreters(isDummy = true).use(_.run)
-// zioEffect: Task[Unit] = DynamicNoBox(izumi.functional.quasi.QuasiPrimitivesFromBIO.bracket(QuasiIO.scala:384),1,zio.ZIO$Release$$Lambda/0x00007fff67880de8@57ae9fee)
+// zioEffect: Task[Unit] = DynamicNoBox(izumi.functional.quasi.QuasiPrimitivesFromBIO.bracket(QuasiIO.scala:384),1,zio.ZIO$Release$$Lambda/0x00007fff7b843508@5e32e435)
 
 runner.unsafeRun(zioEffect)
 // awesomesauce!
@@ -1759,13 +1882,13 @@ class BifunctorIOModule[F[_, _]: TagKK] extends ModuleDef
 <p>All relevant typeclass instances for chosen effect type, such as <code>ConcurrentEffect[F]</code>, are <a href="basics.html#out-of-the-box-typeclass-instances">included by default</a> (overridable by user bindings)</p>
 </div>
 <div>
-<a href="https://github.com/7mind/izumi/tree/v1.3.0-M1/doc/microsite/target/mdoc/distage/basics.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/7mind/izumi/tree/v1.3.0-M2/doc/microsite/target/mdoc/distage/basics.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>
 <div class="print-only">
 <span class="md-source-file md-version">
-1.3.0-M1
+1.3.0-M2
 </span>
 </div>
 </article>
@@ -1830,5 +1953,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 window.prettyPrint && prettyPrint();
 });
 </script>
+<script src="../assets/javascripts/scheme-switch.js"></script>
 </body>
 </html>

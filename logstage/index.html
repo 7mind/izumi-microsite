@@ -33,6 +33,123 @@ code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}
 <link rel="stylesheet" href="../assets/fonts/font-awesome.css">
 <link rel="stylesheet" href="../assets/fonts/material-icons.css">
 <link rel="stylesheet" href="../assets/stylesheets/paradox-material-theme.css">
+<link rel="stylesheet"
+id="darkreader-css"
+href="../assets/stylesheets/darkreader.css"
+media="not (prefers-color-scheme: light)">
+<script>
+/* Synchronous: runs after the <link> is parsed but before the browser
+* applies its rules to the painted DOM, so adjusting media here
+* eliminates any flash-of-wrong-theme on repeat visits. */
+(function () {
+var link = document.getElementById("darkreader-css");
+if (!link) return;
+var stored = null;
+try { stored = localStorage.getItem("izumi-color-scheme"); } catch (e) {}
+/* "light" => disable (force original white theme).
+* Anything else (including null) => force dark, overriding the OS
+* preference. This makes dark the JS-on default for everyone. */
+link.media = (stored === "light") ? "not all" : "all";
+})();
+</script>
+<style>
+/* Theme-toggle layout (see partials/header.st).
+*
+* .md-flex is `display: table` upstream — its children are table-cells
+* whose heights contribute to the row's height. The title cell on
+* sub-pages uses absolute-positioned .md-header-nav__topic spans (each
+* line-height: 4.8rem), which need the row to be at least 4.8rem tall
+* to render fully. So at wide widths we KEEP the table layout intact:
+* the toggle goes in its own .md-flex__cell sibling, no flex on cells.
+*
+* Wide (>=60em): source-cell sits to the right of search (DOM order),
+* with the toggle-cell after it. The default Material rule gives
+* .md-header-nav__source `width: 23rem` and the github link doesn't
+* fill that — the toggle's own cell appears just after, in line.
+*
+* Narrow (<60em): we switch the row to flex (with overrides for the
+* cell display modes) so we can use `order: 1` on the search cell to
+* push it past source-cell + toggle-cell. The source segment, which
+* is normally display:none here, is reshown as icon-only by hiding
+* .md-source__repository.
+*/
+.md-scheme-switch {
+/* The button reuses .md-header-nav__button for padding/cursor.
+* Override font-family — without this, .md-icon (which our button
+* also has) forces "Material Icons" font, which has no ☀ glyph at
+* U+2600 and renders an empty/tofu placeholder. */
+background: transparent;
+border: 0;
+font-family: inherit;
+/* Smaller than the 2.4rem pictographic Material Icons baseline because
+* Roboto's ☀ glyph fills its em-box more densely than icon fonts;
+* 1.8rem visually matches the search/github icons next to it. */
+font-size: 1.8rem;
+line-height: 1;
+color: inherit;
+}
+@media only screen and (max-width: 59.9375em) {
+/* Switch the row to flex so we can reorder via `order`. Force the
+* row's height to match .md-header (4.8rem upstream) so the title
+* cell — whose .md-header-nav__topic children are position:absolute
+* with line-height 4.8rem — has room. Without min-height the row
+* collapses to the icon buttons' ~4rem and topics overflow downward
+* on sub-pages. */
+.md-flex {
+display: flex;
+align-items: stretch;
+min-height: 4.8rem;
+}
+.md-flex__cell {
+display: flex;
+align-items: center;
+width: auto;
+/* Belt-and-suspenders: also pin min-height on each cell so they
+* are guaranteed to provide the 4.8rem the absolute-positioned
+* .md-header-nav__topic spans need on sub-pages, regardless of
+* how align-items: stretch propagates from the container. */
+min-height: 4.8rem;
+}
+.md-flex__cell--stretch {
+flex: 1 1 0;
+min-width: 0;
+}
+.md-flex__ellipsis {
+display: block;
+flex: 1 1 0;
+min-width: 0;
+overflow: hidden;
+text-overflow: ellipsis;
+white-space: nowrap;
+/* The title element has no in-flow content (topics are absolute),
+* so it would collapse to height 0 without an explicit size. The
+* absolute topics position relative to the cell, but giving the
+* title 100% of cell height keeps any cascade/inheritance that
+* depends on title's own box happy. */
+height: 4.8rem;
+}
+.md-header-nav__search-cell {
+order: 1;
+}
+/* Show github source as icon-only. */
+.md-header-nav__source-cell .md-header-nav__source {
+display: flex;
+width: auto;
+max-width: none;
+margin: 0;
+padding: 0;
+}
+.md-header-nav__source-cell .md-source {
+padding: 0;
+height: auto;
+line-height: 1;
+}
+.md-header-nav__source-cell .md-source__repository,
+.md-header-nav__source-cell .md-source__facts {
+display: none;
+}
+}
+</style>
 </head>
 <body
 >
@@ -60,7 +177,7 @@ LogStage
 </span>
 </div>
 </div>
-<div class="md-flex__cell md-flex__cell--shrink">
+<div class="md-flex__cell md-flex__cell--shrink md-header-nav__search-cell">
 <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
 <div class="md-search" data-md-component="search" role="dialog">
 <label class="md-search__overlay" for="__search"></label>
@@ -84,7 +201,7 @@ Type to start searching
 </div>
 
 </div>
-<div class="md-flex__cell md-flex__cell--shrink">
+<div class="md-flex__cell md-flex__cell--shrink md-header-nav__source-cell">
 <div class="md-header-nav__source">
 <a href="https://github.com/7mind/izumi"
 title="Go to repository"
@@ -99,6 +216,12 @@ data-md-source="github">
 </a>
 
 </div>
+</div>
+<div class="md-flex__cell md-flex__cell--shrink md-header-nav__toggle-cell">
+<button id="scheme-switch"
+class="md-icon md-header-nav__button md-scheme-switch"
+type="button"
+aria-label="Toggle color scheme">☀</button>
 </div>
 </div>
 </nav>
@@ -169,7 +292,7 @@ data-md-source="github">
     <li><a href="../logstage/index.html#overview" class="header">Overview</a></li>
     <li><a href="../logstage/index.html#syntax-reference" class="header">Syntax Reference</a></li>
     <li><a href="../logstage/index.html#basic-setup" class="header">Basic setup</a></li>
-    <li><a href="../logstage/index.html#log-algebras" class="header">Log algebras</a></li>
+    <li><a href="../logstage/index.html#logio" class="header">LogIO</a></li>
     <li><a href="../logstage/index.html#zio-environment-support" class="header">ZIO environment support</a></li>
     <li><a href="../logstage/index.html#custom-json-rendering-with-logstagecodec" class="header">Custom JSON rendering with LogstageCodec</a></li>
     <li><a href="../logstage/index.html#slf4j-router" class="header">SLF4J Router</a></li>
@@ -184,7 +307,7 @@ data-md-source="github">
 <ul style="display: none">
 <li class="md-nav__item md-version" id="project.version">
 <label class="md-nav__link" for="__version">
-<i class="md-icon" title="Version">label_outline</i> 1.3.0-M1
+<i class="md-icon" title="Version">label_outline</i> 1.3.0-M2
 </label>
 </li>
 </ul>
@@ -203,7 +326,7 @@ data-md-source="github">
     <li><a href="../logstage/index.html#overview" class="header">Overview</a></li>
     <li><a href="../logstage/index.html#syntax-reference" class="header">Syntax Reference</a></li>
     <li><a href="../logstage/index.html#basic-setup" class="header">Basic setup</a></li>
-    <li><a href="../logstage/index.html#log-algebras" class="header">Log algebras</a></li>
+    <li><a href="../logstage/index.html#logio" class="header">LogIO</a></li>
     <li><a href="../logstage/index.html#zio-environment-support" class="header">ZIO environment support</a></li>
     <li><a href="../logstage/index.html#custom-json-rendering-with-logstagecodec" class="header">Custom JSON rendering with LogstageCodec</a></li>
     <li><a href="../logstage/index.html#slf4j-router" class="header">SLF4J Router</a></li>
@@ -236,15 +359,15 @@ data-md-source="github">
 <h2><a href="#dependencies" name="dependencies" class="anchor"><span class="anchor-link"></span></a>Dependencies</h2>
 <pre class="prettyprint"><code class="language-scala">libraryDependencies ++= Seq(
   // LogStage core library
-  &quot;io.7mind.izumi&quot; %% &quot;logstage-core&quot; % &quot;1.3.0-M1&quot;,
+  &quot;io.7mind.izumi&quot; %% &quot;logstage-core&quot; % &quot;1.3.0-M2&quot;,
   // Json output
-  &quot;io.7mind.izumi&quot; %% &quot;logstage-rendering-circe&quot; % &quot;1.3.0-M1&quot;,
+  &quot;io.7mind.izumi&quot; %% &quot;logstage-rendering-circe&quot; % &quot;1.3.0-M2&quot;,
   // Router from Slf4j to LogStage
-  &quot;io.7mind.izumi&quot; %% &quot;logstage-adapter-slf4j&quot; % &quot;1.3.0-M1&quot;,
+  &quot;io.7mind.izumi&quot; %% &quot;logstage-adapter-slf4j&quot; % &quot;1.3.0-M2&quot;,
   // LogStage integration with DIStage
-  &quot;io.7mind.izumi&quot; %% &quot;distage-extension-logstage&quot; % &quot;1.3.0-M1&quot;,
+  &quot;io.7mind.izumi&quot; %% &quot;distage-extension-logstage&quot; % &quot;1.3.0-M2&quot;,
   // Router from LogStage to Slf4J
-  &quot;io.7mind.izumi&quot; %% &quot;logstage-sink-slf4j &quot; % &quot;1.3.0-M1&quot;,
+  &quot;io.7mind.izumi&quot; %% &quot;logstage-sink-slf4j &quot; % &quot;1.3.0-M2&quot;,
 )
 </code></pre>
 <h2><a href="#overview" name="overview" class="anchor"><span class="anchor-link"></span></a>Overview</h2>
@@ -253,7 +376,7 @@ data-md-source="github">
 import scala.util.Random
 
 val logger = IzLogger()
-// logger: IzLogger = izumi.logstage.api.IzLogger@33889073
+// logger: IzLogger = izumi.logstage.api.IzLogger@42bb30dc
 
 val justAnArg = &quot;example&quot;
 // justAnArg: String = example
@@ -273,9 +396,9 @@ logger.warn(s&quot;Invisible argument: ${Random.nextInt() -&gt; &quot;random num
 // add following fields to all messages printed by a new logger value
 
 val ctxLogger = logger(&quot;userId&quot; -&gt; &quot;user@google.com&quot;, &quot;company&quot; -&gt; &quot;acme&quot;)
-// ctxLogger: IzLogger = izumi.logstage.api.IzLogger@768a0866
+// ctxLogger: IzLogger = izumi.logstage.api.IzLogger@7b9b6ef
 val delta = Random.nextInt(1000)
-// delta: Int = 810
+// delta: Int = 589
 
 ctxLogger.info(s&quot;Processing time: $delta&quot;)
 </code></pre>
@@ -332,32 +455,32 @@ ctxLogger.info(s&quot;Processing time: $delta&quot;)
 import logstage.circe.LogstageCirceRenderingPolicy
 
 val textSink = ConsoleSink.text(colored = true)
-// textSink: ConsoleSink = izumi.logstage.sink.ConsoleSink$ColoredConsoleSink$@47361bf3
+// textSink: ConsoleSink = izumi.logstage.sink.ConsoleSink$ColoredConsoleSink$@36f477f9
 val jsonSink = ConsoleSink(LogstageCirceRenderingPolicy(prettyPrint = true))
-// jsonSink: ConsoleSink = izumi.logstage.sink.ConsoleSink@25db05de
+// jsonSink: ConsoleSink = izumi.logstage.sink.ConsoleSink@7e516b69
 
 val sinks = List(jsonSink, textSink)
-// sinks: List[ConsoleSink] = List(izumi.logstage.sink.ConsoleSink@25db05de, izumi.logstage.sink.ConsoleSink$ColoredConsoleSink$@47361bf3)
+// sinks: List[ConsoleSink] = List(izumi.logstage.sink.ConsoleSink@7e516b69, izumi.logstage.sink.ConsoleSink$ColoredConsoleSink$@36f477f9)
 
 val logger: IzLogger = IzLogger(Trace, sinks)
-// logger: IzLogger = izumi.logstage.api.IzLogger@11fb3fe1
+// logger: IzLogger = izumi.logstage.api.IzLogger@4073530e
 val contextLogger: IzLogger = logger(&quot;key&quot; -&gt; &quot;value&quot;)
-// contextLogger: IzLogger = izumi.logstage.api.IzLogger@5e83af5b
+// contextLogger: IzLogger = izumi.logstage.api.IzLogger@4a427aeb
 
 logger.info(&quot;Hey&quot;)
 
 contextLogger.info(&quot;Hey&quot;)
 </code></pre>
-<h2><a href="#log-algebras" name="log-algebras" class="anchor"><span class="anchor-link"></span></a>Log algebras</h2>
-<p><code>LogIO</code>, <code>LogIO2</code> &amp; <code>LogIO3</code> algebras provide a purely-functional API for one-, two-, and three-parameter effect types respectively:</p>
+<h2><a href="#logio" name="logio" class="anchor"><span class="anchor-link"></span></a>LogIO</h2>
+<p><code>LogIO</code>, <code>LogIO2</code> and <code>LogIO3</code> provide a purely-functional API for one-, two-, and three-parameter effect types respectively:</p>
 <pre class="prettyprint"><code class="language-scala">import logstage.{IzLogger, LogIO}
 import cats.effect.IO
 
 val logger = IzLogger()
-// logger: IzLogger = izumi.logstage.api.IzLogger@535662a5
+// logger: IzLogger = izumi.logstage.api.IzLogger@3ab214b3
 
 val log = LogIO.fromLogger[IO](logger)
-// log: LogIO[IO] = logstage.LogIO$$anon$1@67062b79
+// log: LogIO[IO] = logstage.LogIO$$anon$1@20f58fa6
 
 log.info(s&quot;Hey! I&#39;m logging with ${log}stage!&quot;).unsafeRunSync()(cats.effect.unsafe.IORuntime.global)
 </code></pre>
@@ -372,7 +495,7 @@ def logfun[F[_]: LogIO]: F[Unit] = {
 }
 </code></pre>
 <h3><a href="#adding-custom-context-to-loggers" name="adding-custom-context-to-loggers" class="anchor"><span class="anchor-link"></span></a>Adding Custom Context to Loggers</h3>
-<p><code>LogIO*</code> algebras can be extended with custom context using their <code>.withCustomContext</code> method, same as <code>IzLogger</code>:</p>
+<p><code>LogIO*</code> values can be extended with custom context using their <code>.withCustomContext</code> method, same as <code>IzLogger</code>:</p>
 <pre class="prettyprint"><code class="language-scala">import cats.effect.IO
 import cats.syntax.all._
 import logstage.LogIO
@@ -404,15 +527,15 @@ import zio.{URIO, ZEnvironment}
 val fn: URIO[LogZIO, Unit] = {
   log.info(s&quot;I&#39;m logging with ${log}stage!&quot;)
 }
-// fn: URIO[LogZIO, Unit] = Stateful(logstage.LogZIO.LogZIOImpl.log(LogZIO.scala:34),zio.FiberRef$unsafe$PatchFiber$$Lambda/0x00007fff67820000@6bf8649e)
+// fn: URIO[LogZIO, Unit] = Stateful(logstage.LogZIO.LogZIOImpl.log(LogZIO.scala:34),zio.FiberRef$unsafe$PatchFiber$$Lambda/0x00007fff7b824be0@30b0d000)
 
 val logger: LogZIO = LogIO3.fromLogger(IzLogger())
-// logger: LogZIO = logstage.LogIO$$anon$1@4da1cbd4
+// logger: LogZIO = logstage.LogIO$$anon$1@655728de
 
 import izumi.functional.bio.UnsafeRun2
 
 val runtime = UnsafeRun2.createZIO()
-// runtime: UnsafeRun2.ZIORunner[Any] = izumi.functional.bio.UnsafeRun2$ZIORunner@4cb17502
+// runtime: UnsafeRun2.ZIORunner[Any] = izumi.functional.bio.UnsafeRun2$ZIORunner@5f464204
 
 runtime.unsafeRun {
   fn.provideEnvironment(ZEnvironment(logger))
@@ -421,7 +544,7 @@ runtime.unsafeRun {
 <h3><a href="#adding-fiberid-to-log-messages" name="adding-fiberid-to-log-messages" class="anchor"><span class="anchor-link"></span></a>Adding FiberId to log messages</h3>
 <p><code>LogZIO.withFiberId</code> provides a <code>LogIO</code> instance that logs the current ZIO <code>FiberId</code> in addition to the JVM thread id:</p>
 <pre class="prettyprint"><code class="language-scala">val logger: LogZIO = LogZIO.withFiberId(IzLogger())
-// logger: LogZIO = logstage.LogZIO$$anon$1@26501a5f
+// logger: LogZIO = logstage.LogZIO$$anon$1@3b1bb6cd
 
 runtime.unsafeRun {
   fn.provideEnvironment(ZEnvironment(logger))
@@ -500,7 +623,7 @@ import logstage.ConsoleSink
 import logstage.circe.LogstageCirceRenderingPolicy
 
 val logger = IzStrictLogger(sink = ConsoleSink(LogstageCirceRenderingPolicy()))
-// logger: IzStrictLogger = izumi.logstage.api.strict.IzStrictLogger@b60777a
+// logger: IzStrictLogger = izumi.logstage.api.strict.IzStrictLogger@55f8a783
 
 logger.info(s&quot;Got ${KV(&quot;key&quot;, 7) -&gt; &quot;KeyValue&quot;}&quot;)
 </code></pre>
@@ -511,7 +634,7 @@ logger.info(s&quot;Got ${KV(&quot;key&quot;, 7) -&gt; &quot;KeyValue&quot;}&quot
 import izumi.logstage.api.routing.StaticLogRouter
 
 val myLogger = IzLogger()
-// myLogger: IzLogger = izumi.logstage.api.IzLogger@2230f79f
+// myLogger: IzLogger = izumi.logstage.api.IzLogger@2688b02
 
 // configure SLF4j to use the same router that `myLogger` uses
 StaticLogRouter.instance.setup(myLogger.router)
@@ -565,13 +688,13 @@ logger.info(&quot;This is &lt;b&gt; bold &lt;/b&gt; and &lt;i&gt; italic &lt;/i&
 <img alt="logstage-sample-output-rich-format" src="media/00-logstage-sample-output-rich-format.png" height="128"/>
 </div>
 <div>
-<a href="https://github.com/7mind/izumi/tree/v1.3.0-M1/doc/microsite/target/mdoc/logstage/00_logstage.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/7mind/izumi/tree/v1.3.0-M2/doc/microsite/target/mdoc/logstage/00_logstage.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>
 <div class="print-only">
 <span class="md-source-file md-version">
-1.3.0-M1
+1.3.0-M2
 </span>
 </div>
 </article>
@@ -636,5 +759,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
 window.prettyPrint && prettyPrint();
 });
 </script>
+<script src="../assets/javascripts/scheme-switch.js"></script>
 </body>
 </html>
