@@ -357,20 +357,18 @@ Injector[cats.effect.IO]().assert(badModule, Roots.target[A])
 // izumi.distage.model.exceptions.PlanVerificationException: Plan verification failed, issues were:
 // 
 // 
-//  - IncompatibleEffectType({type.repl.MdocSession.MdocApp0.B},{type.repl.MdocSession.MdocApp0.B} BindingOrigin((debugging.md:22)) := effect[λ %0 → zio.ZIO[-scala.Any,+java.lang.Throwable,+0]]{effect.{type.repl.MdocSession.MdocApp0.B}/zio.ZIO[-scala.Any,+java.lang.Throwable,+scala.Nothing]},λ %0 → cats.effect.IO[+0],λ %0 → zio.ZIO[-scala.Any,+java.lang.Throwable,+0])
+//  - IncompatibleEffectType({type.repl.MdocSession.MdocApp0.B},{type.repl.MdocSession.MdocApp0.B} BindingOrigin((debugging.md:23)) := effect[λ %0 → zio.ZIO[-scala.Any,+java.lang.Throwable,+0]]{effect.{type.repl.MdocSession.MdocApp0.B}/zio.ZIO[-scala.Any,+java.lang.Throwable,+repl.MdocSession::MdocApp0::B]},λ %0 → cats.effect.IO[+0],λ %0 → zio.ZIO[-scala.Any,+java.lang.Throwable,+0])
 // 
 // Visited keys:
 // 
 // 
 //  - {type.repl.MdocSession.MdocApp0.A}
 // 
-// 	at izumi.distage.planning.solver.PlanVerifier$PlanVerifierResult.throwOnError(PlanVerifier.scala:308)
-// 	at izumi.distage.model.Injector.assert(Injector.scala:275)
-// 	at izumi.distage.model.Injector.assert$(Injector.scala:269)
+// 	at izumi.distage.planning.solver.PlanVerifier$PlanVerifierResult.throwOnError(PlanVerifier.scala:305)
+// 	at izumi.distage.model.Injector.assert(Injector.scala:280)
+// 	at izumi.distage.model.Injector.assert$(Injector.scala:27)
 // 	at izumi.distage.InjectorDefaultImpl.assert(InjectorDefaultImpl.scala:23)
-// 	at repl.MdocSession$MdocApp0$$anonfun$3.apply$mcV$sp(debugging.md:30)
-// 	at repl.MdocSession$MdocApp0$$anonfun$3.apply(debugging.md:30)
-// 	at repl.MdocSession$MdocApp0$$anonfun$3.apply(debugging.md:30)
+// 	at repl.MdocSession$MdocApp0.$init$$$anonfun$1(debugging.md:30)
 </code></pre>
 <pre class="prettyprint"><code class="language-scala">def goodModule = new ModuleDef {
   make[A]
@@ -384,17 +382,17 @@ Injector[cats.effect.IO]().assert(goodModule, Roots.target[A])
 <h3><a href="#pretty-printing-plans" name="pretty-printing-plans" class="anchor"><span class="anchor-link"></span></a>Pretty-printing plans</h3>
 <p>You can print the output of <code>plan.render()</code> to get detailed info on what will happen during instantiation. The printout includes source and line numbers so your IDE can show you where the binding was defined!</p>
 <pre class="prettyprint"><code class="language-scala">val plan = Injector().plan(goodModule, Roots.target[A]).getOrThrow()
-// plan: izumi.distage.model.plan.Plan = 1: {effect.{type.MdocSession::MdocApp0::B}} BindingOrigin((debugging.md:41)) := value cats.effect.IO$Delay#-1989464131
-// 2: {type.MdocSession::MdocApp0::B} BindingOrigin((debugging.md:41)) := effect[λ %0 → cats.effect.IO[+0]]{effect.{type.MdocSession::MdocApp0::B}}
-// 3: {type.MdocSession::MdocApp0::A} BindingOrigin((debugging.md:40)) :=
+// plan: Plan = 1: {effect.{type.MdocSession::MdocApp0::B}} BindingOrigin((debugging.md:40)) := value cats.effect.IO$Delay#-1487931808
+// 2: {type.MdocSession::MdocApp0::B} BindingOrigin((debugging.md:40)) := effect[λ %0 → cats.effect.IO[+0]]{effect.{type.MdocSession::MdocApp0::B}}
+// 3: {type.MdocSession::MdocApp0::A} BindingOrigin((debugging.md:39)) :=
 // 4:     call(π:Constructor(MdocSession::MdocApp0::B): MdocSession::MdocApp0::A[32m) {
 // 5:       arg b: MdocSession::MdocApp0::B &lt;- {type.MdocSession::MdocApp0::B}
 // 6:     }
 
 println(plan.render())
-// 1: {effect.{type.MdocSession::MdocApp0::B}} BindingOrigin((debugging.md:41)) := value cats.effect.IO$Delay#-1989464131
-// 2: {type.MdocSession::MdocApp0::B} BindingOrigin((debugging.md:41)) := effect[λ %0 → cats.effect.IO[+0]]{effect.{type.MdocSession::MdocApp0::B}}
-// 3: {type.MdocSession::MdocApp0::A} BindingOrigin((debugging.md:40)) :=
+// 1: {effect.{type.MdocSession::MdocApp0::B}} BindingOrigin((debugging.md:40)) := value cats.effect.IO$Delay#-1487931808
+// 2: {type.MdocSession::MdocApp0::B} BindingOrigin((debugging.md:40)) := effect[λ %0 → cats.effect.IO[+0]]{effect.{type.MdocSession::MdocApp0::B}}
+// 3: {type.MdocSession::MdocApp0::A} BindingOrigin((debugging.md:39)) :=
 // 4:     call(π:Constructor(MdocSession::MdocApp0::B): MdocSession::MdocApp0::A[32m) {
 // 5:       arg b: MdocSession::MdocApp0::B &lt;- {type.MdocSession::MdocApp0::B}
 // 6:     }
@@ -403,15 +401,15 @@ println(plan.render())
 <p>You can also query a plan to see the dependencies and reverse dependencies of a specific class and their order of instantiation:</p>
 <pre class="prettyprint"><code class="language-scala">// Print dependencies
 println(plan.renderDeps(DIKey[A]))
-// ➤ {type.MdocSession::MdocApp0::A} BindingOrigin((debugging.md:40))
-//   ⮑ 1: {type.MdocSession::MdocApp0::B} BindingOrigin((debugging.md:41))
-//     ⮑ 2: {effect.{type.MdocSession::MdocApp0::B}} BindingOrigin((debugging.md:41))
+// ➤ {type.MdocSession::MdocApp0::A} BindingOrigin((debugging.md:39))
+//   ⮑ 1: {type.MdocSession::MdocApp0::B} BindingOrigin((debugging.md:40))
+//     ⮑ 2: {effect.{type.MdocSession::MdocApp0::B}} BindingOrigin((debugging.md:40))
 // 
 
 // Print reverse dependencies
 println(plan.renderDependees(DIKey[B]))
-// ➤ {type.MdocSession::MdocApp0::B} BindingOrigin((debugging.md:41))
-//   ↖ 1: {type.MdocSession::MdocApp0::A} BindingOrigin((debugging.md:40))
+// ➤ {type.MdocSession::MdocApp0::B} BindingOrigin((debugging.md:40))
+//   ↖ 1: {type.MdocSession::MdocApp0::A} BindingOrigin((debugging.md:39))
 //
 </code></pre>
 <p>The printer highlights circular dependencies:</p>
@@ -431,7 +429,7 @@ println(plan.renderDependees(DIKey[B]))
 <pre class="prettyprint"><code class="language-scala">import distage.{GraphDumpBootstrapModule, Injector}
 
 Injector(bootstrapOverrides = Seq(GraphDumpBootstrapModule))
-// res6: Injector[[A]izumi.fundamentals.platform.functional.package.Identity[A]] = izumi.distage.InjectorDefaultImpl@1e90e629
+// res6: Injector[[A &gt;: Nothing &lt;: Any] =&gt;&gt; A] = izumi.distage.InjectorDefaultImpl@524ae6db
 </code></pre>
 <p>You&rsquo;ll need a <code>GraphViz</code> installation to render these files into a viewable PNG images:</p>
 <pre class="prettyprint"><code class="language-bash">dot -Tpng target/plan-last-nogc.gv -o out.png
@@ -468,7 +466,7 @@ abstract class MyRoleLauncher extends RoleAppMain.LauncherBIO[IO] {
 </code></pre>
 </div>
 <div>
-<a href="https://github.com/7mind/izumi/tree/master/doc/microsite/target/mdoc/distage/debugging.md" title="Edit this page" class="md-source-file md-edit">
+<a href="https://github.com/7mind/izumi/tree/master/target/out/jvm/scala-3.9.0/microsite/mdoc/distage/debugging.md" title="Edit this page" class="md-source-file md-edit">
 Edit this page
 </a>
 </div>
