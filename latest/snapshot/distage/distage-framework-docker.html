@@ -478,7 +478,7 @@ object DistageFrameworkModules extends ModuleDef {
 }
 
 minimalExample.unsafeRunSync()(cats.effect.unsafe.IORuntime.global)
-// postgres is available on port AvailablePort(10.1.1.148,38405)
+// postgres is available on port AvailablePort(172.17.0.2,5432)
 </code></pre>
 <p>If the <code>DockerSupportModule</code> is not included in an application then a get of a Docker container dependent resource will fail with a <code>izumi.distage.model.exceptions.runtime.ProvisioningException</code>.</p>
 <h3><a href="#config-api" name="config-api" class="anchor"><span class="anchor-link"></span></a>Config API</h3>
@@ -671,6 +671,7 @@ postgresDockerIntegrationExample.unsafeRunSync()(cats.effect.unsafe.IORuntime.gl
 <ul>
   <li><code>DISTAGE_PORT_&lt;protocol&gt;_&lt;originalPort&gt;</code> are the host ports allocated for the container</li>
 </ul>
+<p>If another process takes an allocated host port before the container starts, distage removes the container and creates it again with newly allocated host ports, up to 10 attempts in total.</p>
 <h3><a href="#docker-metadata" name="docker-metadata" class="anchor"><span class="anchor-link"></span></a>Docker Metadata</h3>
 <p>The host ports allocated for the container are also added to the container metadata as labels. These labels follow the pattern <code>distage.port.&lt;protocol&gt;.&lt;originalPort&gt;</code>. The value is the integer port number.</p>
 <h3><a href="#docker-container-networks" name="docker-container-networks" class="anchor"><span class="anchor-link"></span></a>Docker Container Networks</h3>
